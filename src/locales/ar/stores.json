@@ -1,0 +1,14 @@
+{
+    "title": "التجار النشطون",
+    "searchPlaceholder": "البحث عن متجر...",
+    "merchantEntity": "كيان التاجر",
+    "legalOwner": "المالك القانوني",
+    "deployment": "النشر",
+    "operationalStatus": "الحالة التشغيلية",
+    "commercialStats": "الإحصائيات التجارية",
+    "orders": "الطلبات",
+    "revenue": "الإيرادات",
+    "notSet": "غير محدد",
+    "noStoresFound": "لا توجد سجلات متاجر في النظام",
+    "syncing": "جاري مزامنة سجلات المتاجر..."
+}

@@ -1,0 +1,15 @@
+{
+    "title": "System Users",
+    "searchPlaceholder": "Filter directory...",
+    "roleFilter": "Filter by role",
+    "allRoles": "All Security Roles",
+    "admin": "Admin",
+    "employee": "Staff Admin",
+    "storeOwner": "Merchant/Owner",
+    "customer": "Client Access",
+    "userProfile": "User Profile",
+    "permissions": "Permissions",
+    "communication": "Communication",
+    "registration": "Registration",
+    "noUsersFound": "No user records found using these filters"
+}

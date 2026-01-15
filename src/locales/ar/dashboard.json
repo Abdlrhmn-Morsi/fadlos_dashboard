@@ -1,0 +1,22 @@
+{
+    "title": "نظرة عامة على لوحة التحكم",
+    "totalRevenue": "إجمالي الإيرادات",
+    "totalOrders": "إجمالي الطلبات",
+    "totalUsers": "إجمالي المستخدمين",
+    "totalStores": "إجمالي المتاجر",
+    "totalProducts": "إجمالي المنتجات",
+    "platformUsers": "مستخدمو المنصة",
+    "avgOrderValue": "متوسط قيمة الطلب",
+    "vsLastPeriod": "مقارنة بالفترة السابقة",
+    "revenuePerformance": "أداء الإيرادات",
+    "recentActivity": "النشاط الأخير",
+    "topStores": "المتاجر الأفضل أداءً",
+    "failedToLoad": "فشل تحميل بيانات لوحة التحكم.",
+    "loading": "جاري تحميل الرؤى المميزة...",
+    "last30Days": "آخر 30 يومًا",
+    "last90Days": "آخر 90 يومًا",
+    "statsSynchronized": "تم مزامنة إحصائيات المنصة",
+    "justNow": "الآن",
+    "viewAllActivity": "عرض كل النشاط",
+    "week": "الأسبوع {{number}}"
+}

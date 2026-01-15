@@ -1,0 +1,14 @@
+{
+    "title": "Active Merchants",
+    "searchPlaceholder": "Store lookup...",
+    "merchantEntity": "Merchant Entity",
+    "legalOwner": "Legal Owner",
+    "deployment": "Deployment",
+    "operationalStatus": "Operational Status",
+    "commercialStats": "Commercial Stats",
+    "orders": "Orders",
+    "revenue": "REV",
+    "notSet": "Not Set",
+    "noStoresFound": "No store records found in system",
+    "syncing": "Syncing store records..."
+}

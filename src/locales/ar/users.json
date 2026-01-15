@@ -1,0 +1,15 @@
+{
+    "title": "مستخدمي النظام",
+    "searchPlaceholder": "تصفية الدليل...",
+    "roleFilter": "تصفية حسب الدور",
+    "allRoles": "جميع الأدوار الأمنية",
+    "admin": "مسؤول",
+    "employee": "مشرف طاقم",
+    "storeOwner": "تاجر/مالك",
+    "customer": "وصول العميل",
+    "userProfile": "ملف المستخدم",
+    "permissions": "الصلاحيات",
+    "communication": "التواصل",
+    "registration": "التسجيل",
+    "noUsersFound": "لا توجد سجلات مستخدمين باستخدام هذه المرشحات"
+}
