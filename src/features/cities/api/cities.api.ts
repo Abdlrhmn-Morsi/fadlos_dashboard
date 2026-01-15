@@ -2,7 +2,8 @@ import apiService from '../../../services/api.service';
 
 export const getCities = async (params: any = {}) => {
     try {
-        const responseBody = await apiService.get('/towns', { params });
+        const url = params.includeAll ? '/towns/admin' : '/towns';
+        const responseBody = await apiService.get(url, { params });
         const data = responseBody.data || responseBody;
         return Array.isArray(data) ? data : (data.data || []);
     } catch (error) {

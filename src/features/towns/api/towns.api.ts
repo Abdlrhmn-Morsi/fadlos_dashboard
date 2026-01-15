@@ -1,8 +1,10 @@
 import apiService from '../../../services/api.service';
 
-export const getTowns = async () => {
+export const getTowns = async (params: any = {}) => {
     try {
-        const responseBody = await apiService.get('/places');
+        // Use admin endpoint if asking for all records (which implies admin access)
+        const url = params.includeAll ? '/places/admin' : '/places';
+        const responseBody = await apiService.get(url, { params });
         const data = responseBody.data || responseBody;
         return Array.isArray(data) ? data : (data.data || []);
     } catch (error) {
@@ -10,7 +12,7 @@ export const getTowns = async () => {
     }
 };
 
-export const createTown = async (townData) => {
+export const createTown = async (townData: any) => {
     try {
         return await apiService.post('/places', townData);
     } catch (error) {
@@ -18,7 +20,7 @@ export const createTown = async (townData) => {
     }
 };
 
-export const updateTown = async (id, townData) => {
+export const updateTown = async (id: string, townData: any) => {
     try {
         return await apiService.patch(`/places/${id}`, townData);
     } catch (error) {
@@ -26,7 +28,7 @@ export const updateTown = async (id, townData) => {
     }
 };
 
-export const deleteTown = async (id) => {
+export const deleteTown = async (id: string) => {
     try {
         return await apiService.delete(`/places/${id}`);
     } catch (error) {
@@ -34,7 +36,7 @@ export const deleteTown = async (id) => {
     }
 };
 
-export const toggleTownStatus = async (id, isActive) => {
+export const toggleTownStatus = async (id: string, isActive: boolean) => {
     try {
         const action = isActive ? 'deactivate' : 'activate';
         return await apiService.patch(`/places/${id}/${action}`);

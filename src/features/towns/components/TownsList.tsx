@@ -53,8 +53,8 @@ const TownsList = () => {
         setLoading(true);
         try {
             const [townsData, citiesData] = await Promise.all([
-                getTowns(),
-                getCities()
+                getTowns({ includeAll: true }),
+                getCities({ includeAll: true })
             ]);
             setTowns(townsData);
             setCities(citiesData);
