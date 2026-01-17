@@ -9,7 +9,7 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store } from 'lucide-react';
+import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import {
     dashboardStatsState,
@@ -64,7 +64,7 @@ const Dashboard: React.FC = () => {
                 const userStr = localStorage.getItem('user');
                 const user = userStr ? JSON.parse(userStr) : {};
 
-                const dashboardData = await fetchDashboardStats(user.role);
+                const dashboardData = await fetchDashboardStats(user);
                 setStats(dashboardData);
 
                 // Update chart data
@@ -109,6 +109,7 @@ const Dashboard: React.FC = () => {
     return (
         <div className="p-6 space-y-8 animate-in animate-fade">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Revenue - Common for all */}
                 <StatCard
                     title={t('totalRevenue')}
                     value={`$${(stats.totalRevenue || 0).toLocaleString()}`}
@@ -117,6 +118,8 @@ const Dashboard: React.FC = () => {
                     color="emerald"
                     comparisonText={t('vsLastPeriod')}
                 />
+
+                {/* Orders - Common for all */}
                 <StatCard
                     title={t('totalOrders')}
                     value={stats.totalOrders || 0}
@@ -125,30 +128,65 @@ const Dashboard: React.FC = () => {
                     color="orange"
                     comparisonText={t('vsLastPeriod')}
                 />
-                <StatCard
-                    title={t('totalStores')}
-                    value={stats.totalStores || 0}
-                    change="+2.4%"
-                    icon={Store}
-                    color="blue"
-                    comparisonText={t('vsLastPeriod')}
-                />
-                <StatCard
-                    title={t('totalProducts')}
-                    value={stats.totalProducts || 0}
-                    change="+8.1%"
-                    icon={ShoppingBag}
-                    color="indigo"
-                    comparisonText={t('vsLastPeriod')}
-                />
-                <StatCard
-                    title={t('platformUsers')}
-                    value={stats.totalUsers || 0}
-                    change="+3.7%"
-                    icon={Users}
-                    color="violet"
-                    comparisonText={t('vsLastPeriod')}
-                />
+
+                {/* Conditional Cards */}
+                {JSON.parse(localStorage.getItem('user') || '{}').role === 'SUPER_ADMIN' ? (
+                    <>
+                        <StatCard
+                            title={t('totalStores')}
+                            value={stats.totalStores || 0}
+                            change="+2.4%"
+                            icon={Store}
+                            color="blue"
+                            comparisonText={t('vsLastPeriod')}
+                        />
+                        <StatCard
+                            title={t('platformUsers')}
+                            value={stats.totalUsers || 0}
+                            change="+3.7%"
+                            icon={Users}
+                            color="violet"
+                            comparisonText={t('vsLastPeriod')}
+                        />
+                    </>
+                ) : (
+                    <>
+                        <StatCard
+                            title="Clients"
+                            value={stats.totalClients || 0}
+                            change="+4.1%"
+                            icon={Users}
+                            color="blue"
+                            comparisonText="new this month"
+                        />
+                        <StatCard
+                            title="Followers"
+                            value={stats.totalFollowers || 0}
+                            change="+8.5%"
+                            icon={Heart}
+                            color="rose"
+                            comparisonText="new followers"
+                        />
+                        <StatCard
+                            title="Reviews"
+                            value={stats.totalReviews || 0}
+                            change="+2.0%"
+                            icon={Star}
+                            color="yellow"
+                            comparisonText="avg 4.8 stars"
+                        />
+                        <StatCard
+                            title="Products"
+                            value={stats.totalProducts || 0}
+                            change="+1"
+                            icon={Layers}
+                            color="indigo"
+                            comparisonText="active items"
+                        />
+                    </>
+                )}
+
+                {/* Avg Order Value - Common */}
                 <StatCard
                     title={t('avgOrderValue')}
                     value={`$${(stats.avgOrderValue || 0).toFixed(2)}`}

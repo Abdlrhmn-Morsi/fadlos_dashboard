@@ -9,7 +9,11 @@ export const dashboardStatsState = atom<DashboardStats>({
         totalUsers: 0,
         totalStores: 0,
         totalProducts: 0,
-        avgOrderValue: 0
+        avgOrderValue: 0,
+        totalClients: 0,
+        totalFollowers: 0,
+        totalReviews: 0,
+        totalCategories: 0
     }
 });
 
