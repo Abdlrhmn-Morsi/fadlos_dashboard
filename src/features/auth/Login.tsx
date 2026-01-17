@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Coffee, ArrowRight, AlertCircle } from 'lucide-react';
-import apiService from '../../services/api.service';
+import authApi from './api/auth.api';
 
 import InteractiveBackground from './InteractiveBackground';
 import appLogo from '../../assets/app_logo_primary.png';
@@ -21,7 +21,7 @@ const Login = () => {
         setError(null);
 
         try {
-            const responseData: any = await apiService.post('/auth/login', formData);
+            const responseData: any = await authApi.login(formData);
             const { token, user } = responseData;
 
             if (token) {
@@ -74,7 +74,7 @@ const Login = () => {
                             type="text"
                             id="identifier"
                             placeholder="Enter your identifier"
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-900 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             value={formData.identifier}
                             onChange={(e) => setFormData({ ...formData, identifier: e.target.value })}
                             required
@@ -87,7 +87,7 @@ const Login = () => {
                             type="password"
                             id="password"
                             placeholder="••••••••"
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-900 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500"
                             value={formData.password}
                             onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                             required
@@ -118,7 +118,7 @@ const Login = () => {
                 </form>
 
                 <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-                    <p>Don't have an account? <span className="font-bold text-slate-700 dark:text-slate-300 cursor-pointer hover:text-primary transition-colors">Contact support</span></p>
+                    <p>Want to become a seller? <Link to="/register" className="font-bold text-slate-700 dark:text-slate-300 cursor-pointer hover:text-primary transition-colors">Create Store Account</Link></p>
                 </div>
             </div>
         </div>

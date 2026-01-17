@@ -12,6 +12,7 @@ import {
   Map,
   MapPin,
   Briefcase,
+  LayoutGrid,
   LucideIcon
 } from 'lucide-react';
 import clsx from 'clsx';
@@ -19,6 +20,7 @@ import appLogo from '../assets/app_logo_primary.png';
 import StatusModal from '../components/common/StatusModal';
 import LanguageSwitcher from '../components/common/LanguageSwitcher';
 import ThemeToggle from '../components/common/ThemeToggle';
+import { UserRole } from '../types/user-role';
 
 interface SidebarItemProps {
   to: string;
@@ -57,6 +59,7 @@ const DashboardLayout: React.FC = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
   const { t } = useTranslation('common');
+  const user = JSON.parse(localStorage.getItem('user') || '{}');
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -106,19 +109,44 @@ const DashboardLayout: React.FC = () => {
 
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} />
-          <SidebarItem to="/users" icon={Users} label={t('users')} collapsed={collapsed} />
-          <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />
 
-          {!collapsed && (
-            <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-              {t('geoAndOrg')}
-            </div>
+          {/* Admin Links */}
+          {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
+            <>
+              <SidebarItem to="/users" icon={Users} label={t('users')} collapsed={collapsed} />
+              <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />
+
+              {!collapsed && (
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  {t('geoAndOrg')}
+                </div>
+              )}
+              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+
+              <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />
+              <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />
+              <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />
+            </>
           )}
-          {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-          <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />
-          <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />
-          <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />
+          {/* Store Owner Links */}
+          {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+            <>
+              {!collapsed && (
+                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                  Management
+                </div>
+              )}
+              <SidebarItem to="/products" icon={Briefcase} label="Products" collapsed={collapsed} />
+              <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
+              <SidebarItem to="/orders" icon={Briefcase} label="Orders" collapsed={collapsed} />
+              <SidebarItem to="/reviews" icon={Briefcase} label="Reviews" collapsed={collapsed} />
+              <SidebarItem to="/promocodes" icon={Briefcase} label="Promo Codes" collapsed={collapsed} />
+              <SidebarItem to="/clients" icon={Users} label="Clients" collapsed={collapsed} />
+              <SidebarItem to="/followers" icon={Users} label="Followers" collapsed={collapsed} />
+            </>
+          )}
+
           <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
         </nav>
 
@@ -150,12 +178,14 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex flex-col items-end mr-2 hidden xs:flex">
-              <span className="text-sm font-bold text-slate-900 dark:text-slate-100">{t('administrator')}</span>
-              <span className="text-[10px] font-medium text-slate-400 dark:text-slate-500 uppercase tracking-wider">{t('superControl')}</span>
+            <div className="flex flex-col items-end mr-2 hidden xs:flex text-right">
+              <span className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tighter">
+                {user?.role === UserRole.SUPER_ADMIN ? t('administrator') : user?.role === UserRole.STORE_OWNER ? 'Store Owner' : user?.role}
+              </span>
+              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{user?.role === UserRole.SUPER_ADMIN ? t('superControl') : 'Dashboard'}</span>
             </div>
-            <div className="w-10 h-10 rounded-none-none bg-primary-light text-primary flex items-center justify-center font-black border-2 border-white shadow-sm">
-              AD
+            <div className="w-10 h-10 rounded-none bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20">
+              {user?.username?.substring(0, 2).toUpperCase() || 'AD'}
             </div>
           </div>
         </header>

@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getUsers } from '../api/users.api';
+import { UserRole } from '../../../types/user-role';
 import {
     usersState,
     usersLoadingState,
@@ -66,11 +67,11 @@ const UsersList: React.FC = () => {
     const getRoleBadge = (role: string) => {
         const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none-none text-xs font-semibold";
         switch (role) {
-            case 'store_owner':
+            case UserRole.STORE_OWNER:
                 return <span className={`${baseClass} bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300`}><Store size={12} /> {t('storeOwner')}</span>;
-            case 'employee':
+            case UserRole.EMPLOYEE:
                 return <span className={`${baseClass} bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300`}><Shield size={12} /> {t('employee', { defaultValue: 'Employee' })}</span>;
-            case 'customer':
+            case UserRole.CUSTOMER:
                 return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><ShoppingBag size={12} /> {t('customer')}</span>;
             default:
                 return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><UserIcon size={12} /> {role}</span>;
@@ -110,9 +111,9 @@ const UsersList: React.FC = () => {
                             }}
                         >
                             <option value="">{t('allRoles')}</option>
-                            <option value="customer">{t('customer')}</option>
-                            <option value="store_owner">{t('storeOwner')}</option>
-                            <option value="employee">{t('employee', { defaultValue: 'Employee' })}</option>
+                            <option value={UserRole.CUSTOMER}>{t('customer')}</option>
+                            <option value={UserRole.STORE_OWNER}>{t('storeOwner')}</option>
+                            <option value={UserRole.EMPLOYEE}>{t('employee', { defaultValue: 'Employee' })}</option>
                         </select>
                     </div>
                 </div>

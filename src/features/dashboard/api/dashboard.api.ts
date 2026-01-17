@@ -1,4 +1,6 @@
 import apiService from '../../../services/api.service';
+import { UserRole } from '../../../types/user-role';
+import { OrderStatus } from '../../../types/order-status';
 
 export const fetchDashboardStats = async (userRole: string) => {
     try {
@@ -9,7 +11,7 @@ export const fetchDashboardStats = async (userRole: string) => {
         let productsCount = 0;
         let avgValue = 0;
 
-        if (userRole === 'super_admin') {
+        if (userRole === UserRole.SUPER_ADMIN) {
             const [usersRes, storesRes, ordersRes, productsRes] = await Promise.all([
                 apiService.get('/users').catch(() => ({ data: [], meta: { total: 0 } })),
                 apiService.get('/stores').catch(() => ({ data: [], meta: { total: 0 } })),
@@ -24,7 +26,7 @@ export const fetchDashboardStats = async (userRole: string) => {
             const orders = ordersRes.orders || [];
             ordersCount = orders.length;
             revenue = orders
-                .filter((o: any) => o.status === 'DELIVERED')
+                .filter((o: any) => o.status === OrderStatus.DELIVERED)
                 .reduce((sum: number, o: any) => sum + Number(o.total), 0);
 
             avgValue = ordersCount > 0 ? revenue / ordersCount : 0;

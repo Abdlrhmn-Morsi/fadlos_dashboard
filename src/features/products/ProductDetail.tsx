@@ -1,0 +1,183 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { ArrowLeft, Edit, Tag, DollarSign, Package, CheckCircle, XCircle } from 'lucide-react';
+import productsApi from './api/products.api';
+
+const ProductDetail = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [product, setProduct] = useState<any>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetchProduct();
+    }, [id]);
+
+    const fetchProduct = async () => {
+        try {
+            setLoading(true);
+            const data: any = await productsApi.getProduct(id!);
+            setProduct(data);
+        } catch (error) {
+            console.error('Failed to fetch product', error);
+            alert('Failed to load product');
+            navigate('/products');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="p-6">
+                <div className="text-center py-12 text-slate-500">Loading product...</div>
+            </div>
+        );
+    }
+
+    if (!product) {
+        return (
+            <div className="p-6">
+                <div className="text-center py-12 text-slate-500">Product not found</div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="p-6 max-w-5xl mx-auto">
+            <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-4">
+                    <button
+                        onClick={() => navigate('/products')}
+                        className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
+                    >
+                        <ArrowLeft size={24} className="text-slate-600 dark:text-slate-400" />
+                    </button>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">Product Details</h1>
+                </div>
+                <button
+                    onClick={() => navigate(`/products/edit/${product.id}`)}
+                    className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition-colors"
+                >
+                    <Edit size={18} />
+                    <span>Edit Product</span>
+                </button>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                    {/* Product Image */}
+                    <div className="space-y-4">
+                        {product.coverImage ? (
+                            <img
+                                src={product.coverImage}
+                                alt={product.name}
+                                className="w-full h-80 object-cover rounded-lg"
+                            />
+                        ) : (
+                            <div className="w-full h-80 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                <Tag size={64} className="text-slate-400" />
+                            </div>
+                        )}
+
+                        {/* Additional Images */}
+                        {product.images && product.images.length > 0 && (
+                            <div className="grid grid-cols-4 gap-2">
+                                {product.images.map((img: string, idx: number) => (
+                                    <img
+                                        key={idx}
+                                        src={img}
+                                        alt={`${product.name} ${idx + 1}`}
+                                        className="w-full h-20 object-cover rounded"
+                                    />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Product Info */}
+                    <div className="space-y-6">
+                        <div>
+                            <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
+                                {product.name}
+                            </h2>
+                            {product.nameAr && (
+                                <h3 className="text-xl text-slate-600 dark:text-slate-400 mb-4">
+                                    {product.nameAr}
+                                </h3>
+                            )}
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 text-3xl font-bold text-primary">
+                                <DollarSign size={28} />
+                                <span>{Number(product.price).toFixed(2)}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {product.isAvailable ? (
+                                    <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-sm font-semibold">
+                                        <CheckCircle size={16} />
+                                        Available
+                                    </span>
+                                ) : (
+                                    <span className="flex items-center gap-1 px-3 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-full text-sm font-semibold">
+                                        <XCircle size={16} />
+                                        Unavailable
+                                    </span>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="space-y-2">
+                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                <Package size={20} />
+                                <span className="font-semibold">Category:</span>
+                                <span>{product.category?.name || 'Uncategorized'}</span>
+                            </div>
+                        </div>
+
+                        <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                            <h4 className="font-bold text-slate-800 dark:text-white mb-2">Description</h4>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
+                                {product.description || 'No description available'}
+                            </p>
+                            {product.descriptionAr && (
+                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mt-3 text-right" dir="rtl">
+                                    {product.descriptionAr}
+                                </p>
+                            )}
+                        </div>
+
+                        {/* Product Variants */}
+                        {product.variants && product.variants.length > 0 && (
+                            <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
+                                <h4 className="font-bold text-slate-800 dark:text-white mb-3">Variants</h4>
+                                <div className="space-y-3">
+                                    {product.variants.map((variant: any) => (
+                                        <div key={variant.id} className="bg-slate-50 dark:bg-slate-800 p-3 rounded">
+                                            <div className="font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                                                {variant.name}
+                                            </div>
+                                            <div className="flex flex-wrap gap-2">
+                                                {variant.values?.map((value: any) => (
+                                                    <span
+                                                        key={value.id}
+                                                        className="px-3 py-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded text-sm"
+                                                    >
+                                                        {value.value}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default ProductDetail;

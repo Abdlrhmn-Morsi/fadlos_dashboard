@@ -2,12 +2,24 @@ import React from 'react';
 import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './features/auth/Login';
+import Register from './features/auth/Register';
 import Dashboard from './features/dashboard/Dashboard';
 import Users from './features/users/Users';
 import Stores from './features/stores/Stores';
 import Cities from './features/cities/Cities';
 import Towns from './features/towns/Towns';
 import BusinessTypes from './features/business-types/BusinessTypes';
+import ProductList from './features/products/ProductList';
+import ProductForm from './features/products/ProductForm';
+import ProductDetail from './features/products/ProductDetail';
+import OrderList from './features/orders/OrderList';
+import OrderDetail from './features/orders/OrderDetail';
+import PromoCodeList from './features/promocodes/PromoCodeList';
+import PromoCodeForm from './features/promocodes/PromoCodeForm';
+import ReviewList from './features/reviews/ReviewList';
+import ClientList from './features/clients/ClientList';
+import FollowerList from './features/followers/FollowerList';
+import CategoryList from './features/categories/CategoryList';
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token');
@@ -18,6 +30,7 @@ const ProtectedRoute = () => {
 };
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { Toaster } from './utils/toast';
 
 const AppContent = () => {
   const { isDark } = useTheme();
@@ -26,10 +39,30 @@ const AppContent = () => {
     <div className={isDark ? 'dark' : ''}>
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
+
+            {/* Store Owner Routes */}
+            <Route path="products" element={<ProductList />} />
+            <Route path="products/new" element={<ProductForm />} />
+            <Route path="products/edit/:id" element={<ProductForm />} />
+
+            <Route path="categories" element={<CategoryList />} />
+
+            <Route path="orders" element={<OrderList />} />
+            <Route path="orders/:id" element={<OrderDetail />} />
+
+            <Route path="promocodes" element={<PromoCodeList />} />
+            <Route path="promocodes/new" element={<PromoCodeForm />} />
+            <Route path="promocodes/edit/:id" element={<PromoCodeForm />} />
+
+            <Route path="reviews" element={<ReviewList />} />
+
+            <Route path="clients" element={<ClientList />} />
+            <Route path="followers" element={<FollowerList />} />
 
             {/* Placeholder Routes for planned features */}
             <Route path="users" element={<Users />} />
@@ -51,6 +84,7 @@ const AppContent = () => {
 function App() {
   return (
     <ThemeProvider>
+      <Toaster position="top-right" />
       <AppContent />
     </ThemeProvider>
   );
