@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import DashboardLayout from './layouts/DashboardLayout';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
+import VerifyEmail from './features/auth/VerifyEmail';
 import Dashboard from './features/dashboard/Dashboard';
 import Users from './features/users/Users';
 import Stores from './features/stores/Stores';
@@ -20,6 +21,9 @@ import ReviewList from './features/reviews/ReviewList';
 import ClientList from './features/clients/ClientList';
 import FollowerList from './features/followers/FollowerList';
 import CategoryList from './features/categories/CategoryList';
+import Settings from './features/settings/Settings';
+import StoreSettings from './features/settings/StoreSettings';
+import ProfileSettings from './features/settings/ProfileSettings';
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token');
@@ -40,6 +44,7 @@ const AppContent = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardLayout />}>
@@ -64,13 +69,16 @@ const AppContent = () => {
             <Route path="clients" element={<ClientList />} />
             <Route path="followers" element={<FollowerList />} />
 
-            {/* Placeholder Routes for planned features */}
+            {/* Admin Routes */}
             <Route path="users" element={<Users />} />
             <Route path="stores" element={<Stores />} />
             <Route path="cities" element={<Cities />} />
             <Route path="towns" element={<Towns />} />
             <Route path="business-types" element={<BusinessTypes />} />
-            <Route path="settings" element={<div className="p-4"><h2>Settings (Coming Soon)</h2></div>} />
+
+            <Route path="store-settings" element={<StoreSettings />} />
+            <Route path="profile-settings" element={<ProfileSettings />} />
+            <Route path="settings" element={<Settings />} />
 
             {/* Redirect unknown to dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />

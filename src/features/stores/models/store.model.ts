@@ -21,6 +21,7 @@ export interface Store {
 
 export interface StoresFilters {
     search: string;
+    status: string;
 }
 
 export interface StoresPagination {
@@ -28,4 +29,11 @@ export interface StoresPagination {
     limit: number;
     total: number;
     totalPages: number;
+}
+
+export interface GetStoresParams {
+    page?: number;
+    limit?: number;
+    search?: string;
+    status?: string;
 }

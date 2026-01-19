@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import StoreStatusModal from './StoreStatusModal';
 import {
     Store,
     Search,
@@ -7,10 +8,11 @@ import {
     MoreVertical,
     CheckCircle,
     XCircle,
-    Clock
+    Clock,
+    ShieldAlert
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getStores } from '../api/stores.api';
+import { getStores, getStoreStatsSummary } from '../api/stores.api';
 import {
     storesState,
     storesLoadingState,
@@ -24,6 +26,18 @@ const StoresList = () => {
     const [loading, setLoading] = useRecoilState(storesLoadingState);
     const [filters, setFilters] = useRecoilState(storesFiltersState);
     const [pagination, setPagination] = useRecoilState(storesPaginationState);
+    const [selectedStore, setSelectedStore] = useState<any>(null);
+    const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+    const [statsSummary, setStatsSummary] = useState<any>(null);
+
+    const fetchStatsSummary = async () => {
+        try {
+            const stats = await getStoreStatsSummary();
+            setStatsSummary(stats);
+        } catch (error) {
+            console.error('Failed to fetch store stats summary:', error);
+        }
+    };
 
     const fetchStores = async () => {
         setLoading(true);
@@ -31,7 +45,8 @@ const StoresList = () => {
             const params = {
                 page: pagination.page,
                 limit: pagination.limit,
-                search: filters.search
+                search: filters.search,
+                status: filters.status
             };
 
             const { stores, meta } = await getStores(params);
@@ -50,7 +65,11 @@ const StoresList = () => {
 
     useEffect(() => {
         fetchStores();
-    }, [pagination.page]);
+    }, [pagination.page, filters.status]);
+
+    useEffect(() => {
+        fetchStatsSummary();
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -59,17 +78,25 @@ const StoresList = () => {
     };
 
     const getStatusBadge = (status: string) => {
-        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none-none text-xs font-semibold";
-        switch (status) {
+        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-xs font-semibold";
+        const s = status?.toUpperCase();
+        switch (s) {
             case 'ACTIVE':
                 return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('common:active')}</span>;
             case 'INACTIVE':
                 return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><XCircle size={12} /> {t('common:inactive')}</span>;
             case 'PENDING':
                 return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('common:pending')}</span>;
+            case 'SUSPENDED':
+                return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><ShieldAlert size={12} /> {t('common:suspended')}</span>;
             default:
                 return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}>{status}</span>;
         }
+    };
+
+    const handleOpenStatusModal = (store: any) => {
+        setSelectedStore(store);
+        setIsStatusModalOpen(true);
     };
 
     return (
@@ -82,7 +109,22 @@ const StoresList = () => {
                     <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex flex-wrap gap-3">
+                    <select
+                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
+                        value={filters.status}
+                        onChange={(e) => {
+                            setFilters(prev => ({ ...prev, status: e.target.value }));
+                            setPagination(prev => ({ ...prev, page: 1 }));
+                        }}
+                    >
+                        <option value="">{t('common:allStatuses', { defaultValue: 'All Statuses' })}</option>
+                        <option value="active">{t('common:active')}</option>
+                        <option value="pending">{t('common:pending')}</option>
+                        <option value="suspended">{t('common:suspended')}</option>
+                        <option value="inactive">{t('common:inactive')}</option>
+                    </select>
+
                     <form onSubmit={handleSubmit} className="relative group">
                         <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" />
                         <input
@@ -93,6 +135,57 @@ const StoresList = () => {
                             onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
                         />
                     </form>
+                </div>
+            </div>
+
+            {/* Stats Summary Section */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-none">
+                            <CheckCircle size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('activeMerchants', { defaultValue: 'Active Merchants' })}</p>
+                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.active || 0}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-none">
+                            <Clock size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:pending')}</p>
+                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.pending || 0}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-none">
+                            <ShieldAlert size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:suspended')}</p>
+                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.suspended || 0}</h4>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                    <div className="flex items-center gap-4">
+                        <div className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-none">
+                            <XCircle size={20} />
+                        </div>
+                        <div>
+                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:inactive')}</p>
+                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.inactive || 0}</h4>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -151,7 +244,10 @@ const StoresList = () => {
                                                 <div className="text-[11px] font-bold text-slate-400 mt-0.5">${(store.totalRevenue || 0).toLocaleString()} {t('revenue')}</div>
                                             </td>
                                             <td className="table-cell text-right">
-                                                <button className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none-none transition-all active:scale-90">
+                                                <button
+                                                    onClick={() => handleOpenStatusModal(store)}
+                                                    className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none transition-all active:scale-90"
+                                                >
                                                     <MoreVertical size={20} />
                                                 </button>
                                             </td>
@@ -198,6 +294,13 @@ const StoresList = () => {
                     </button>
                 </div>
             )}
+
+            <StoreStatusModal
+                isOpen={isStatusModalOpen}
+                store={selectedStore}
+                onClose={() => setIsStatusModalOpen(false)}
+                onSuccess={fetchStores}
+            />
         </div>
 
     );

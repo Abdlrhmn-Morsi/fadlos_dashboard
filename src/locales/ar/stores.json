@@ -10,5 +10,13 @@
     "revenue": "الإيرادات",
     "notSet": "غير محدد",
     "noStoresFound": "لا توجد سجلات متاجر في النظام",
-    "syncing": "جاري مزامنة سجلات المتاجر..."
+    "syncing": "جاري مزامنة سجلات المتجر...",
+    "updateStoreSettings": "إدارة التفاصيل التشغيلية لمتجرك",
+    "visualIdentity": "الهوية البصرية",
+    "banner": "شعار المتجر (Banner)",
+    "primaryInformation": "المعلومات الأساسية",
+    "storeName": "اسم المتجر",
+    "contactSupport": "الاتصال والدعم",
+    "serviceCoverage": "نطاق الخدمة",
+    "selectCitiesFirst": "اختر المدن أولاً لرؤية المناطق المتاحة"
 }

@@ -137,9 +137,13 @@ const Register = () => {
         setError(null);
 
         try {
-            await authApi.registerStoreOwner(formData);
-            // On success, redirect to login
-            navigate('/login');
+            const responseData: any = await authApi.registerStoreOwner(formData);
+            if (responseData.requiresVerification) {
+                navigate('/verify-email', { state: { token: responseData.verificationToken } });
+            } else {
+                // On success, redirect to login
+                navigate('/login');
+            }
         } catch (err: any) {
             console.error('Registration error:', err);
             const msg = err.response?.data?.message || 'Failed to register.';

@@ -134,16 +134,16 @@ const DashboardLayout: React.FC = () => {
             <>
               {!collapsed && (
                 <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
-                  Management
+                  {t('management')}
                 </div>
               )}
-              <SidebarItem to="/products" icon={Briefcase} label="Products" collapsed={collapsed} />
+              <SidebarItem to="/products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
               <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
-              <SidebarItem to="/orders" icon={Briefcase} label="Orders" collapsed={collapsed} />
-              <SidebarItem to="/reviews" icon={Briefcase} label="Reviews" collapsed={collapsed} />
-              <SidebarItem to="/promocodes" icon={Briefcase} label="Promo Codes" collapsed={collapsed} />
-              <SidebarItem to="/clients" icon={Users} label="Clients" collapsed={collapsed} />
-              <SidebarItem to="/followers" icon={Users} label="Followers" collapsed={collapsed} />
+              <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
+              <SidebarItem to="/reviews" icon={Briefcase} label={t('reviews')} collapsed={collapsed} />
+              <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
+              <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
+              <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
             </>
           )}
 
@@ -178,14 +178,26 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="flex flex-col items-end mr-2 hidden xs:flex text-right">
-              <span className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tighter">
-                {user?.role === UserRole.SUPER_ADMIN ? t('administrator') : user?.role === UserRole.STORE_OWNER ? 'Store Owner' : user?.role}
-              </span>
-              <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{user?.role === UserRole.SUPER_ADMIN ? t('superControl') : 'Dashboard'}</span>
-            </div>
-            <div className="w-10 h-10 rounded-none bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20">
-              {user?.username?.substring(0, 2).toUpperCase() || 'AD'}
+            <div
+              className={clsx(
+                "flex items-center gap-3 transition-all duration-200",
+                (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && "cursor-pointer hover:opacity-80 active:scale-95"
+              )}
+              onClick={() => {
+                if (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) {
+                  navigate('/profile-settings');
+                }
+              }}
+            >
+              <div className="flex flex-col items-end mr-2 hidden xs:flex text-right">
+                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tighter">
+                  {user?.role === UserRole.SUPER_ADMIN ? t('administrator') : user?.role === UserRole.STORE_OWNER ? t('storeOwner') : user?.role}
+                </span>
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{user?.role === UserRole.SUPER_ADMIN ? t('superControl') : t('dashboard')}</span>
+              </div>
+              <div className="w-10 h-10 rounded-none bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20">
+                {user?.username?.substring(0, 2).toUpperCase() || 'AD'}
+              </div>
             </div>
           </div>
         </header>

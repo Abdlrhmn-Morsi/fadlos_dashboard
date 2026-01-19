@@ -18,5 +18,12 @@
     "statsSynchronized": "تم مزامنة إحصائيات المنصة",
     "justNow": "الآن",
     "viewAllActivity": "عرض كل النشاط",
-    "week": "الأسبوع {{number}}"
+    "week": "الأسبوع {{number}}",
+    "totalClients": "إجمالي العملاء",
+    "totalFollowers": "إجمالي المتابعين",
+    "totalReviews": "إجمالي التقييمات",
+    "activeItems": "عناصر نشطة",
+    "newThisMonth": "جديد هذا الشهر",
+    "newFollowers": "متابعون جدد",
+    "avgStars": "متوسط {{stars}} نجوم"
 }

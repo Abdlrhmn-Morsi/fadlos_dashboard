@@ -1,6 +1,6 @@
 import apiService from '../../../services/api.service';
 
-export const getUsers = async (params) => {
+export const getUsers = async (params: any) => {
     try {
         const responseBody = await apiService.get('/users', { params });
 
@@ -21,6 +21,22 @@ export const getUsers = async (params) => {
         }
 
         return { users, meta };
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateProfile = async (data: any) => {
+    try {
+        return await apiService.patch('/users/profile', data);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updatePassword = async (data: any) => {
+    try {
+        return await apiService.patch('/users/password', data);
     } catch (error) {
         throw error;
     }

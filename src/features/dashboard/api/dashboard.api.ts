@@ -19,24 +19,15 @@ export const fetchDashboardStats = async (user: any) => {
         let categoriesCount = 0;
 
         if (userRole === UserRole.SUPER_ADMIN) {
-            const [usersRes, storesRes, ordersRes, productsRes] = await Promise.all([
-                apiService.get('/users').catch(() => ({ data: [], meta: { total: 0 } })),
-                apiService.get('/stores').catch(() => ({ data: [], meta: { total: 0 } })),
-                apiService.get('/orders').catch(() => ({ orders: [] })),
-                apiService.get('/products').catch(() => ({ data: [], meta: { total: 0 } }))
-            ]);
+            const adminStats = await apiService.get('/stats/admin-summary');
+            const data = adminStats.data || adminStats;
 
-            usersCount = usersRes.meta?.total || 0;
-            storesCount = storesRes.meta?.total || 0;
-            productsCount = productsRes.meta?.total || 0;
-
-            const orders = ordersRes.orders || [];
-            ordersCount = orders.length;
-            revenue = orders
-                .filter((o: any) => o.status === OrderStatus.DELIVERED)
-                .reduce((sum: number, o: any) => sum + Number(o.total), 0);
-
-            avgValue = ordersCount > 0 ? revenue / ordersCount : 0;
+            usersCount = data.totalUsers || 0;
+            storesCount = data.totalStores || 0;
+            productsCount = data.totalProducts || 0;
+            ordersCount = data.totalOrders || 0;
+            revenue = data.totalRevenue || 0;
+            avgValue = data.avgOrderValue || 0;
         } else {
             // Store Owner / Employee
             const storeId = user.store?.id || user.storeId;

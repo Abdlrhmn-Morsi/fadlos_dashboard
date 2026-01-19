@@ -37,6 +37,24 @@ export const authApi = {
      */
     getPlacesByTown: async (townId: string) => {
         return apiService.get(`/places/by-town/${townId}`);
+    },
+
+    /**
+     * Verify email with 6-digit code
+     */
+    verifyEmail: async (token: string, code: string) => {
+        return apiService.post('/auth/verify-email', { code }, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
+    },
+
+    /**
+     * Resend verification code
+     */
+    resendVerificationCode: async (token: string) => {
+        return apiService.post('/auth/resend-verification', {}, {
+            headers: { Authorization: `Bearer ${token}` }
+        });
     }
 };
 

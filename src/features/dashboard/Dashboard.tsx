@@ -1,5 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRecoilState } from 'recoil';
+import { useNavigate } from 'react-router-dom';
 import {
     BarChart,
     Bar,
@@ -9,8 +10,10 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers } from 'lucide-react';
+import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
+import { getMyStore } from '../stores/api/stores.api';
+import { UserRole } from '../../types/user-role';
 import {
     dashboardStatsState,
     dashboardLoadingState,
@@ -52,17 +55,21 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, c
 const Dashboard: React.FC = () => {
     const { t } = useTranslation(['dashboard', 'common']);
     const { isDark } = useTheme();
+    const navigate = useNavigate();
     const [stats, setStats] = useRecoilState(dashboardStatsState);
     const [loading, setLoading] = useRecoilState(dashboardLoadingState);
     const [error, setError] = useRecoilState(dashboardErrorState);
     const [chartData, setChartData] = useRecoilState(dashboardChartDataState);
+    const [storeDetails, setStoreDetails] = useState<any>(null);
+
+    const userStr = localStorage.getItem('user');
+    const user = userStr ? JSON.parse(userStr) : {};
+    const isAdmin = user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN;
 
     useEffect(() => {
         const loadDashboardData = async () => {
             setLoading(true);
             try {
-                const userStr = localStorage.getItem('user');
-                const user = userStr ? JSON.parse(userStr) : {};
 
                 const dashboardData = await fetchDashboardStats(user);
                 setStats(dashboardData);
@@ -74,6 +81,12 @@ const Dashboard: React.FC = () => {
                     { name: t('week', { number: 3 }), revenue: (dashboardData.totalRevenue || 0) * 0.3 },
                     { name: t('week', { number: 4 }), revenue: (dashboardData.totalRevenue || 0) * 0.4 },
                 ]);
+
+                // Fetch store details for sellers
+                if (user.role !== UserRole.SUPER_ADMIN && user.role !== UserRole.ADMIN) {
+                    const storeData = await getMyStore();
+                    setStoreDetails(storeData);
+                }
 
                 setError(null);
             } catch (err: any) {
@@ -106,8 +119,59 @@ const Dashboard: React.FC = () => {
         </div>
     );
 
+    const renderStatusBanner = () => {
+        if (!storeDetails || storeDetails.status?.toUpperCase() === 'ACTIVE') return null;
+
+        const status = storeDetails.status?.toUpperCase();
+        const reason = storeDetails.statusReason;
+
+        let bgColor = "bg-amber-50 dark:bg-amber-900/20";
+        let borderColor = "border-amber-200 dark:border-amber-800";
+        let textColor = "text-amber-800 dark:text-amber-300";
+        let iconColor = "text-amber-500";
+        let label = t('common:underReview');
+        let Icon = Clock;
+
+        if (status === 'SUSPENDED') {
+            bgColor = "bg-rose-50 dark:bg-rose-900/20";
+            borderColor = "border-rose-200 dark:border-rose-800";
+            textColor = "text-rose-800 dark:text-rose-300";
+            iconColor = "text-rose-500";
+            label = t('common:accountSuspended');
+            Icon = ShieldAlert;
+        } else if (status === 'INACTIVE') {
+            bgColor = "bg-slate-50 dark:bg-slate-800";
+            borderColor = "border-slate-200 dark:border-slate-700";
+            textColor = "text-slate-800 dark:text-slate-300";
+            iconColor = "text-slate-500";
+            label = t('common:accountInactive');
+            Icon = AlertTriangle;
+        }
+
+        return (
+            <div className={`${bgColor} ${borderColor} border rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500`}>
+                <div className={`p-3 rounded-none bg-white/50 dark:bg-black/20 ${iconColor} h-fit`}>
+                    <Icon size={24} />
+                </div>
+                <div className="space-y-1">
+                    <h4 className={`text-lg font-black uppercase tracking-tight ${textColor}`}>{label}</h4>
+                    <p className={`text-sm font-medium opacity-90 ${textColor}`}>
+                        {reason || t('common:statusReasonPlaceholder')}
+                    </p>
+                    {status === 'SUSPENDED' && (
+                        <div className="pt-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">
+                            <Info size={12} />
+                            {t('common:contactSupportMistake')}
+                        </div>
+                    )}
+                </div>
+            </div>
+        );
+    };
+
     return (
         <div className="p-6 space-y-8 animate-in animate-fade">
+            {renderStatusBanner()}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {/* Revenue - Common for all */}
                 <StatCard
@@ -130,7 +194,7 @@ const Dashboard: React.FC = () => {
                 />
 
                 {/* Conditional Cards */}
-                {JSON.parse(localStorage.getItem('user') || '{}').role === 'SUPER_ADMIN' ? (
+                {(user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN) ? (
                     <>
                         <StatCard
                             title={t('totalStores')}
@@ -148,40 +212,48 @@ const Dashboard: React.FC = () => {
                             color="violet"
                             comparisonText={t('vsLastPeriod')}
                         />
+                        <StatCard
+                            title={t('totalProducts')}
+                            value={stats.totalProducts || 0}
+                            change="+1.8%"
+                            icon={Layers}
+                            color="indigo"
+                            comparisonText={t('vsLastPeriod')}
+                        />
                     </>
                 ) : (
                     <>
                         <StatCard
-                            title="Clients"
+                            title={t('totalClients')}
                             value={stats.totalClients || 0}
                             change="+4.1%"
                             icon={Users}
                             color="blue"
-                            comparisonText="new this month"
+                            comparisonText={t('newThisMonth')}
                         />
                         <StatCard
-                            title="Followers"
+                            title={t('totalFollowers')}
                             value={stats.totalFollowers || 0}
                             change="+8.5%"
                             icon={Heart}
                             color="rose"
-                            comparisonText="new followers"
+                            comparisonText={t('newFollowers')}
                         />
                         <StatCard
-                            title="Reviews"
+                            title={t('totalReviews')}
                             value={stats.totalReviews || 0}
                             change="+2.0%"
                             icon={Star}
                             color="yellow"
-                            comparisonText="avg 4.8 stars"
+                            comparisonText={t('avgStars', { stars: 4.8 })}
                         />
                         <StatCard
-                            title="Products"
+                            title={t('totalProducts')}
                             value={stats.totalProducts || 0}
                             change="+1"
                             icon={Layers}
                             color="indigo"
-                            comparisonText="active items"
+                            comparisonText={t('activeItems')}
                         />
                     </>
                 )}
@@ -196,6 +268,28 @@ const Dashboard: React.FC = () => {
                     comparisonText={t('vsLastPeriod')}
                 />
             </div>
+
+            {/* Quick Actions for Sellers */}
+            {(user.role === UserRole.STORE_OWNER || user.role === UserRole.EMPLOYEE) && (
+                <div className="bg-gradient-to-r from-primary to-primary-dark p-8 rounded-none border border-primary/20 shadow-xl shadow-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                    <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-none rotate-12 transition-transform group-hover:scale-110" />
+                    <div className="relative z-10 flex items-center gap-6">
+                        <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-none flex items-center justify-center text-white shadow-inner">
+                            <Store size={40} />
+                        </div>
+                        <div>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">{t('common:manageYourStore', { defaultValue: 'Manage Your Store' })}</h3>
+                            <p className="text-white/80 font-medium">{t('common:updateStoreDirectly', { defaultValue: 'Update your images, contact info, and operational details instantly.' })}</p>
+                        </div>
+                    </div>
+                    <button
+                        onClick={() => navigate('/store-settings')}
+                        className="relative z-10 px-8 py-4 bg-white text-primary font-black uppercase tracking-widest text-sm rounded-none hover:-translate-y-1 transition-all shadow-lg active:scale-95 whitespace-nowrap"
+                    >
+                        {t('common:settings', { defaultValue: 'Store Settings' })}
+                    </button>
+                </div>
+            )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">

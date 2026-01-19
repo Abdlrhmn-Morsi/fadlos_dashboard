@@ -10,5 +10,13 @@
     "revenue": "REV",
     "notSet": "Not Set",
     "noStoresFound": "No store records found in system",
-    "syncing": "Syncing store records..."
+    "syncing": "Syncing store records...",
+    "updateStoreSettings": "Manage your store operational details",
+    "visualIdentity": "Visual Identity",
+    "banner": "Store Banner",
+    "primaryInformation": "Primary Information",
+    "storeName": "Store Name",
+    "contactSupport": "Contact & Support",
+    "serviceCoverage": "Service Coverage",
+    "selectCitiesFirst": "Select cities first to see available towns"
 }

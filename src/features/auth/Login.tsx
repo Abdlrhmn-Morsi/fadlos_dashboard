@@ -30,6 +30,8 @@ const Login = () => {
                     localStorage.setItem('user', JSON.stringify(user));
                 }
                 navigate('/');
+            } else if (responseData.requiresVerification) {
+                navigate('/verify-email', { state: { token: responseData.verificationToken } });
             } else {
                 if (responseData.accessToken) {
                     localStorage.setItem('token', responseData.accessToken);

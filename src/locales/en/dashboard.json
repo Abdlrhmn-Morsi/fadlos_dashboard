@@ -18,5 +18,12 @@
     "statsSynchronized": "Platform stats synchronized",
     "justNow": "Just now",
     "viewAllActivity": "View All Activity",
-    "week": "Week {{number}}"
+    "week": "Week {{number}}",
+    "totalClients": "Total Clients",
+    "totalFollowers": "Total Followers",
+    "totalReviews": "Total Reviews",
+    "activeItems": "active items",
+    "newThisMonth": "new this month",
+    "newFollowers": "new followers",
+    "avgStars": "avg {{stars}} stars"
 }
