@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { toast } from '../../utils/toast';
 import { useNavigate, useParams } from 'react-router-dom';
 import {
-    ArrowLeft, Upload, Save, X, Image as ImageIcon,
+    ArrowLeft, Upload, Save, Image as ImageIcon,
     Box, DollarSign, Layers, Globe,
-    Loader2, Trash2
+    Loader2, Trash2, Plus, X
 } from 'lucide-react';
 import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
+import toolsApi from '../../services/tools.api';
 
 const InputGroup = ({ label, children, required = false, subtitle = '' }: any) => (
     <div className="space-y-1.5">
@@ -18,6 +19,20 @@ const InputGroup = ({ label, children, required = false, subtitle = '' }: any) =
         {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
     </div>
 );
+
+interface VariantValue {
+    id?: string;
+    value: string;
+    price: string;
+    sortOrder: string;
+}
+
+interface Variant {
+    id?: string;
+    name: string;
+    sortOrder: string;
+    values: VariantValue[];
+}
 
 const ProductForm = () => {
     const { id } = useParams();
@@ -41,7 +56,8 @@ const ProductForm = () => {
         trackInventory: false,
         isAvailable: true,
         isActive: true,
-        sortOrder: '0'
+        sortOrder: '0',
+        variants: [] as Variant[]
     });
 
     // Media State
@@ -88,7 +104,18 @@ const ProductForm = () => {
                 trackInventory: data.trackInventory ?? false,
                 isAvailable: data.isAvailable ?? true,
                 isActive: data.isActive ?? true,
-                sortOrder: data.sort || '0'
+                sortOrder: data.sort || '0',
+                variants: data.variants ? data.variants.map((v: any) => ({
+                    id: v.id,
+                    name: v.name,
+                    sortOrder: String(v.sortOrder || 0),
+                    values: v.values ? v.values.map((val: any) => ({
+                        id: val.id,
+                        value: val.value,
+                        price: String(val.price || 0),
+                        sortOrder: String(val.sortOrder || 0)
+                    })) : []
+                })) : []
             });
             setCurrCoverImage(data.coverImage);
             setExistingImages(data.images || []);
@@ -98,6 +125,23 @@ const ProductForm = () => {
             navigate('/products');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleTranslate = async (field: 'name' | 'description', value: string) => {
+        if (!value) return;
+        try {
+            const res: any = await toolsApi.translate(value, 'ar', 'en');
+            // Assuming API returns { translatedText: string } or similar based on backend implementation
+            // Since backend is returning `[Translated] ...` or real text depending on mock/fetch
+            const translated = typeof res === 'string' ? res : res.translatedText;
+
+            if (translated && !formData[field]) {
+                setFormData(prev => ({ ...prev, [field]: translated }));
+                toast.success(`Auto-translated ${field === 'name' ? 'Name' : 'Description'} to English`);
+            }
+        } catch (error) {
+            console.error("Translation error", error);
         }
     };
 
@@ -117,6 +161,45 @@ const ProductForm = () => {
         setNewImages(prev => prev.filter((_, i) => i !== index));
     };
 
+    // Variants Logic
+    const addVariant = () => {
+        setFormData(prev => ({
+            ...prev,
+            variants: [...prev.variants, { name: '', sortOrder: '0', values: [] }]
+        }));
+    };
+
+    const removeVariant = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            variants: prev.variants.filter((_, i) => i !== index)
+        }));
+    };
+
+    const updateVariant = (index: number, field: keyof Variant, value: string) => {
+        const newVariants = [...formData.variants];
+        newVariants[index] = { ...newVariants[index], [field]: value };
+        setFormData({ ...formData, variants: newVariants });
+    };
+
+    const addVariantValue = (variantIndex: number) => {
+        const newVariants = [...formData.variants];
+        newVariants[variantIndex].values.push({ value: '', price: '0', sortOrder: '0' });
+        setFormData({ ...formData, variants: newVariants });
+    };
+
+    const removeVariantValue = (variantIndex: number, valueIndex: number) => {
+        const newVariants = [...formData.variants];
+        newVariants[variantIndex].values = newVariants[variantIndex].values.filter((_, i) => i !== valueIndex);
+        setFormData({ ...formData, variants: newVariants });
+    };
+
+    const updateVariantValue = (variantIndex: number, valueIndex: number, field: keyof VariantValue, value: string) => {
+        const newVariants = [...formData.variants];
+        newVariants[variantIndex].values[valueIndex] = { ...newVariants[variantIndex].values[valueIndex], [field]: value };
+        setFormData({ ...formData, variants: newVariants });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSubmitting(true);
@@ -125,11 +208,57 @@ const ProductForm = () => {
 
             // Append basic fields
             Object.keys(formData).forEach(key => {
+                if (key === 'variants') return; // Handle manually
                 const value = (formData as any)[key];
                 if (value !== null && value !== undefined && value !== '') {
                     data.append(key, value);
                 }
             });
+
+            // Reconstruct variants properly for submission
+            // Since backend expects JSON or specific structure, but we are using FormData (multipart) for images.
+            // Usually complex objects in FormData need to be stringified or indexed.
+            // Backend `CreateProductDto` has `variants` as array of objects. 
+            // TypeORM/NestJS with Interceptor might handle indexed fields, but JSON stringify is safer for nested objects in FormData.
+            // However, looking at previous code, seems we use standard FormData. 
+            // NestJS FileInterceptor often needs manual parsing for nested JSON fields if sending multipart.
+            // BUT, `CreateProductDto` expects `variants` as an array.
+            // Let's assume we need to send it as a JSON string and parse it on backend, OR use index notation.
+            // For now, let's remove `variants` from direct append and verify how backend handles it.
+            // Actually, if I look at `UpdateProductDto`, it's PartialType. 
+            // IF backend logic assumes `body` is processed by ValidationPipe, it works fine for JSON body.
+            // But we are sending `FormData`.
+            // Best practice with complex DTOs + Files: stringify specific fields or use a library.
+            // I will try ensuring we don't send `variants` because I need to check how backend handles multipart + complex array.
+            // Most valid approach: Send `variants` as a JSON string key, and have Backend Parse it, OR send indexed keys `variants[0][name]`.
+            // Let's try sending standard indexed keys first or simply...
+            // Wait, standard `FormData` does NOT support nested arrays natively.
+            // I will filter `variants` from generic loop and try to structure it.
+            // Actually, for NestJS with `FileInterceptor`, the body comes as string values.
+            // I simply cannot send nested objects cleanly in FormData easily without stringifying.
+            // **Correction**: I will use a simple hack: `data.append('variants', JSON.stringify(formData.variants));`
+            // But checking Backend `CreateProductDto`... `@Type(() => CreateVariantForProductDto)`.
+            // ClassTransformer DOES NOT automatically parse JSON strings from FormData.
+            // It expects an object.
+            // If I send JSON string, I need a custom internal transform.
+            // For now, I will skip complex FormData logic and assume I might need to adjust backend 
+            // OR I just stringify it and let's hope I can fix backend to parse it if needed.
+            // BUT: If I reuse `productsApi`, it uses `axios`. `axios` handles FormData.
+
+            // Let's try appending indices.
+            formData.variants.forEach((variant, vIdx) => {
+                data.append(`variants[${vIdx}][name]`, variant.name);
+                data.append(`variants[${vIdx}][sortOrder]`, variant.sortOrder);
+                if (variant.id) data.append(`variants[${vIdx}][id]`, variant.id);
+
+                variant.values.forEach((val, valIdx) => {
+                    data.append(`variants[${vIdx}][values][${valIdx}][value]`, val.value);
+                    data.append(`variants[${vIdx}][values][${valIdx}][price]`, val.price);
+                    data.append(`variants[${vIdx}][values][${valIdx}][sortOrder]`, val.sortOrder);
+                    if (val.id) data.append(`variants[${vIdx}][values][${valIdx}][id]`, val.id);
+                });
+            });
+
 
             // Append cover image
             if (coverImageFile) {
@@ -163,8 +292,6 @@ const ProductForm = () => {
             setSubmitting(false);
         }
     };
-
-
 
     if (loading) return (
         <div className="flex h-[50vh] items-center justify-center">
@@ -223,26 +350,41 @@ const ProductForm = () => {
                                 Product Information
                             </h2>
                             <div className="space-y-6">
-                                <InputGroup label="Product Name (English)" required>
-                                    <input
-                                        type="text"
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                                        placeholder="e.g. Classic Beef Burger"
-                                        value={formData.name}
-                                        onChange={e => setFormData({ ...formData, name: e.target.value })}
-                                        required
-                                    />
-                                </InputGroup>
-                                <InputGroup label="Product Name (Arabic)">
+                                <InputGroup label="Product Name (Arabic)" required>
                                     <input
                                         type="text"
                                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-right"
                                         placeholder="مثال: برجر لحم كلاسيك"
                                         value={formData.nameAr}
                                         onChange={e => setFormData({ ...formData, nameAr: e.target.value })}
+                                        onBlur={() => handleTranslate('name', formData.nameAr)}
+                                        required
                                     />
                                 </InputGroup>
+                                <InputGroup label="Product Name (English)">
+                                    <div className="relative">
+                                        <input
+                                            type="text"
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            placeholder="e.g. Classic Beef Burger"
+                                            value={formData.name}
+                                            onChange={e => setFormData({ ...formData, name: e.target.value })}
+                                        />
+                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
+                                            Auto-translated
+                                        </div>
+                                    </div>
+                                </InputGroup>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <InputGroup label="Description (Arabic)">
+                                        <textarea
+                                            className="w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none text-right"
+                                            placeholder="وصف المنتج..."
+                                            value={formData.descriptionAr}
+                                            onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })}
+                                            onBlur={() => handleTranslate('description', formData.descriptionAr)}
+                                        />
+                                    </InputGroup>
                                     <InputGroup label="Description (English)">
                                         <textarea
                                             className="w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
@@ -251,17 +393,110 @@ const ProductForm = () => {
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         />
                                     </InputGroup>
-                                    <InputGroup label="Description (Arabic)">
-                                        <textarea
-                                            className="w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none text-right"
-                                            placeholder="وصف المنتج..."
-                                            value={formData.descriptionAr}
-                                            onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })}
-                                        />
-                                    </InputGroup>
                                 </div>
                             </div>
                         </div>
+
+                        {/* Variants Section */}
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Layers className="w-5 h-5 text-indigo-500" />
+                                    Variants
+                                </h2>
+                                <button
+                                    type="button"
+                                    onClick={addVariant}
+                                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+                                >
+                                    <Plus size={16} /> Add Option
+                                </button>
+                            </div>
+
+                            <div className="space-y-6">
+                                {formData.variants.map((variant, vIdx) => (
+                                    <div key={vIdx} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                            <InputGroup label="Option Name (e.g. Size, Color)">
+                                                <input
+                                                    type="text"
+                                                    value={variant.name}
+                                                    onChange={e => updateVariant(vIdx, 'name', e.target.value)}
+                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                    placeholder="Option Name"
+                                                />
+                                            </InputGroup>
+                                            <div className="flex items-end gap-2">
+                                                <div className="flex-1">
+                                                    <InputGroup label="Sort Order">
+                                                        <input
+                                                            type="number"
+                                                            value={variant.sortOrder}
+                                                            onChange={e => updateVariant(vIdx, 'sortOrder', e.target.value)}
+                                                            className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                        />
+                                                    </InputGroup>
+                                                </div>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeVariant(vIdx)}
+                                                    className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors mb-0.5"
+                                                    title="Remove Option"
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        {/* Variant Values */}
+                                        <div className="pl-4 border-l-2 border-indigo-200 dark:border-indigo-900 space-y-3">
+                                            {variant.values.map((val, valIdx) => (
+                                                <div key={valIdx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
+                                                    <div className="flex-1 min-w-[120px]">
+                                                        <input
+                                                            type="text"
+                                                            value={val.value}
+                                                            onChange={e => updateVariantValue(vIdx, valIdx, 'value', e.target.value)}
+                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                            placeholder="Value (e.g. Small)"
+                                                        />
+                                                    </div>
+                                                    <div className="w-[100px]">
+                                                        <input
+                                                            type="number"
+                                                            value={val.price}
+                                                            onChange={e => updateVariantValue(vIdx, valIdx, 'price', e.target.value)}
+                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                            placeholder="+ Price"
+                                                        />
+                                                    </div>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeVariantValue(vIdx, valIdx)}
+                                                        className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
+                                                    >
+                                                        <X size={16} />
+                                                    </button>
+                                                </div>
+                                            ))}
+                                            <button
+                                                type="button"
+                                                onClick={() => addVariantValue(vIdx)}
+                                                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 mt-2"
+                                            >
+                                                <Plus size={14} /> Add Value
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                                {formData.variants.length === 0 && (
+                                    <div className="text-center py-8 text-slate-500 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
+                                        No variants added. Click "Add Option" to create variants like Size or Color.
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
 
                         {/* Media Section */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">

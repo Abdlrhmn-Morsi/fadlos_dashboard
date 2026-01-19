@@ -25,6 +25,8 @@ const OrderList = () => {
             // Handle paginated response { data: [...], meta: {...} } or plain array
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
                 setOrders(response.data);
+            } else if (response && typeof response === 'object' && 'orders' in response && Array.isArray(response.orders)) {
+                setOrders(response.orders);
             } else if (Array.isArray(response)) {
                 setOrders(response);
             } else {
@@ -101,13 +103,13 @@ const OrderList = () => {
                                             #{order.id.slice(0, 8)}
                                         </td>
                                         <td className="px-6 py-4 font-medium text-slate-800 dark:text-white">
-                                            {order.customer?.firstName} {order.customer?.lastName}
+                                            {order.client?.name || `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim() || 'Guest'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                                             {new Date(order.createdAt).toLocaleDateString()}
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-800 dark:text-white">
-                                            ${Number(order.totalAmount).toFixed(2)}
+                                            ${Number(order.total || 0).toFixed(2)}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>
