@@ -33,7 +33,7 @@ const Settings = () => {
             title: t('personalInformation', { defaultValue: 'Account Info' }),
             description: t('manageAccountDetails', { defaultValue: 'Update your personal profile information and email' }),
             icon: User,
-            path: '/profile-settings',
+            path: '/profile-settings?tab=profile',
             color: 'text-blue-500',
             bgColor: 'bg-blue-50',
             visible: true
@@ -43,7 +43,7 @@ const Settings = () => {
             title: t('changePassword', { defaultValue: 'Security & Password' }),
             description: t('managePasswordDesc', { defaultValue: 'Keep your account secure by updating your password' }),
             icon: ShieldCheck,
-            path: '/profile-settings', // Points to profile but scroll to password is handled by component logic usually, or just general page
+            path: '/profile-settings?tab=security',
             color: 'text-rose-500',
             bgColor: 'bg-rose-50',
             visible: true

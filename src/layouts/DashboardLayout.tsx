@@ -174,7 +174,9 @@ const DashboardLayout: React.FC = () => {
             >
               <Menu size={24} />
             </button>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 hidden sm:block">{t('adminConsole')}</h1>
+            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 hidden sm:block">
+              {user?.role === UserRole.SUPER_ADMIN ? t('adminConsole') : (user?.store?.name || t('adminConsole'))}
+            </h1>
           </div>
 
           <div className="flex items-center gap-3">

@@ -73,12 +73,16 @@ const ReviewList = () => {
                         <div key={review.id} className="bg-white dark:bg-slate-900 p-6 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800">
                             <div className="flex justify-between items-start mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500">
-                                        <User size={20} />
+                                    <div className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 overflow-hidden">
+                                        {review.customer?.profileImage ? (
+                                            <img src={review.customer.profileImage} alt={review.customer.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <User size={20} />
+                                        )}
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-slate-800 dark:text-white">
-                                            {review.customer?.firstName} {review.customer?.lastName}
+                                            {review.customer?.name || 'Anonymous'}
                                         </h3>
                                         <p className="text-xs text-slate-500">
                                             {new Date(review.createdAt).toLocaleDateString()}
