@@ -5,6 +5,7 @@ import {
     Printer, Mail, AlertCircle, FileText, CheckCircle, Package
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
+import { OrderStatus } from '../../types/order-status';
 
 const OrderDetail = () => {
     const { id } = useParams();
@@ -32,19 +33,21 @@ const OrderDetail = () => {
         }
     };
 
-    const handleStatusUpdate = async () => {
-        if (!newStatus || newStatus === order.status) return;
+    const handleStatusUpdate = async (status: string) => {
+        if (!status || status === order.status) return;
 
         try {
             setUpdating(true);
-            await ordersApi.updateOrderStatus(id!, newStatus);
-            setOrder({ ...order, status: newStatus });
+            setNewStatus(status);
+            await ordersApi.updateOrderStatus(id!, status);
+            setOrder({ ...order, status: status });
             // Ideally show toast
         } catch (error) {
             console.error('Failed to update status', error);
-            alert('Failed to update order status');
+            // Removed alert as per request
         } finally {
             setUpdating(false);
+            setNewStatus('');
         }
     };
 
@@ -57,18 +60,34 @@ const OrderDetail = () => {
     if (!order) return <div className="p-6">Order not found</div>;
 
     const statuses = [
-        'PENDING', 'PREPARING', 'READY_FOR_PICKUP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'
+        OrderStatus.PENDING,
+        OrderStatus.CONFIRMED,
+        OrderStatus.PREPARING,
+        OrderStatus.READY,
+        OrderStatus.DELIVERED
     ];
 
     const getStatusColor = (status: string) => {
         switch (status) {
-            case 'PENDING': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
-            case 'PREPARING': return 'text-blue-600 bg-blue-50 border-blue-200';
-            case 'READY_FOR_PICKUP': return 'text-indigo-600 bg-indigo-50 border-indigo-200';
-            case 'OUT_FOR_DELIVERY': return 'text-purple-600 bg-purple-50 border-purple-200';
-            case 'DELIVERED': return 'text-green-600 bg-green-50 border-green-200';
-            case 'CANCELLED': return 'text-rose-600 bg-rose-50 border-rose-200';
+            case OrderStatus.PENDING: return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+            case OrderStatus.CONFIRMED: return 'text-blue-600 bg-blue-50 border-blue-200';
+            case OrderStatus.PREPARING: return 'text-indigo-600 bg-indigo-50 border-indigo-200';
+            case OrderStatus.READY: return 'text-purple-600 bg-purple-50 border-purple-200';
+            case OrderStatus.DELIVERED: return 'text-green-600 bg-green-50 border-green-200';
+            case OrderStatus.CANCELLED: return 'text-rose-600 bg-rose-50 border-rose-200';
             default: return 'text-slate-600 bg-slate-50 border-slate-200';
+        }
+    };
+
+    const getStatusLabel = (status: string) => {
+        switch (status) {
+            case OrderStatus.PENDING: return 'Pending';
+            case OrderStatus.CONFIRMED: return 'Confirmed';
+            case OrderStatus.PREPARING: return 'Preparing';
+            case OrderStatus.READY: return 'Ready';
+            case OrderStatus.DELIVERED: return 'Delivered';
+            case OrderStatus.CANCELLED: return 'Cancelled';
+            default: return status;
         }
     };
 
@@ -103,7 +122,7 @@ const OrderDetail = () => {
                                     Order #{order.orderNumber || order.id.substring(0, 8)}
                                 </h1>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}>
-                                    {order.status.replace(/_/g, ' ')}
+                                    {getStatusLabel(order.status)}
                                 </span>
                             </div>
                             <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
@@ -213,42 +232,59 @@ const OrderDetail = () => {
 
                     {/* Sidebar */}
                     <div className="space-y-6">
-                        {/* Status Update */}
-                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-4">Update Status</h3>
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <select
-                                        className="w-full appearance-none pl-4 pr-10 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 font-medium text-slate-700 dark:text-slate-200"
-                                        value={newStatus}
-                                        onChange={(e) => setNewStatus(e.target.value)}
-                                    >
-                                        {statuses.map(status => (
-                                            <option key={status} value={status}>
-                                                {status.replace(/_/g, ' ')}
-                                            </option>
-                                        ))}
-                                    </select>
-                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                                        <CheckCircle size={16} />
-                                    </div>
+                        {/* Status Stepper */}
+                        {order.status !== OrderStatus.CANCELLED && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-4">Order Progress</h3>
+                                <div className="relative flex flex-col gap-0">
+                                    {statuses.map((status, index) => {
+                                        const isCompleted = statuses.indexOf(order.status) >= index;
+                                        const isCurrent = order.status === status;
+                                        const isFuture = statuses.indexOf(order.status) < index;
+                                        const isClickable = statuses.indexOf(order.status) === index - 1; // Can only click direct next step
+
+                                        return (
+                                            <div key={status} className="flex gap-4 relative pb-8 last:pb-0">
+                                                {index !== statuses.length - 1 && (
+                                                    <div className={`absolute left-[15px] top-8 bottom-0 w-0.5 ${isCompleted && !isCurrent ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                                                )}
+
+                                                <button
+                                                    onClick={() => isClickable ? handleStatusUpdate(status) : null}
+                                                    disabled={updating || !isClickable}
+                                                    className={`
+                                                        relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 transition-all
+                                                        ${isCompleted
+                                                            ? 'bg-indigo-600 border-indigo-600 text-white'
+                                                            : isClickable
+                                                                ? 'bg-white dark:bg-slate-800 border-indigo-600 text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30'
+                                                                : 'bg-white dark:bg-slate-800 border-slate-300 dark:border-slate-600 text-slate-300 dark:text-slate-600'}
+                                                    `}
+                                                >
+                                                    {updating && isClickable && newStatus === status ? (
+                                                        <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-indigo-600"></div>
+                                                    ) : isCompleted ? (
+                                                        <CheckCircle size={14} />
+                                                    ) : (
+                                                        <span className="text-xs font-bold">{index + 1}</span>
+                                                    )}
+                                                </button>
+
+                                                <div className={`mt-1 flex-1 ${isClickable ? 'cursor-pointer' : ''}`} onClick={() => isClickable ? handleStatusUpdate(status) : null}>
+                                                    <h4 className={`font-bold text-sm ${isCompleted || isCurrent ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600'}`}>
+                                                        {getStatusLabel(status)}
+                                                    </h4>
+                                                    <p className="text-xs text-slate-500">
+                                                        {isCurrent ? 'Current Status' : isCompleted ? 'Completed' : 'Pending'}
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                                <button
-                                    onClick={handleStatusUpdate}
-                                    disabled={updating || newStatus === order.status}
-                                    className="w-full py-3 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-indigo-200 dark:shadow-none"
-                                >
-                                    {updating ? (
-                                        <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
-                                    ) : (
-                                        <>
-                                            <Save size={18} />
-                                            Update Status
-                                        </>
-                                    )}
-                                </button>
                             </div>
-                        </div>
+                        )}
+
 
                         {/* Customer Details */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">

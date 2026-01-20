@@ -44,9 +44,9 @@ const OrderList = () => {
     const getStatusColor = (status: string) => {
         switch (status) {
             case OrderStatus.PENDING: return 'text-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 dark:text-yellow-400';
-            case OrderStatus.PREPARING: return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400';
-            case OrderStatus.READY_FOR_PICKUP: return 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400';
-            case OrderStatus.OUT_FOR_DELIVERY: return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400';
+            case OrderStatus.CONFIRMED: return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400';
+            case OrderStatus.PREPARING: return 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400';
+            case OrderStatus.READY: return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400';
             case OrderStatus.DELIVERED: return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
             case OrderStatus.CANCELLED: return 'text-rose-600 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400';
             default: return 'text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400';
@@ -65,9 +65,9 @@ const OrderList = () => {
                     >
                         <option value="">All Statuses</option>
                         <option value={OrderStatus.PENDING}>Pending</option>
+                        <option value={OrderStatus.CONFIRMED}>Confirmed</option>
                         <option value={OrderStatus.PREPARING}>Preparing</option>
-                        <option value={OrderStatus.READY_FOR_PICKUP}>Ready for Pickup</option>
-                        <option value={OrderStatus.OUT_FOR_DELIVERY}>Out for Delivery</option>
+                        <option value={OrderStatus.READY}>Ready</option>
                         <option value={OrderStatus.DELIVERED}>Delivered</option>
                         <option value={OrderStatus.CANCELLED}>Cancelled</option>
                     </select>
