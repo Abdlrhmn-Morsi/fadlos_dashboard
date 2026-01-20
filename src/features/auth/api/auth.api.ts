@@ -55,6 +55,31 @@ export const authApi = {
         return apiService.post('/auth/resend-verification', {}, {
             headers: { Authorization: `Bearer ${token}` }
         });
+    },
+
+    /**
+     * Request a password reset code
+     */
+    forgotPassword: async (email: string) => {
+        return apiService.post('/auth/forgot-password', { email });
+    },
+
+    /**
+     * Verify the password reset code
+     */
+    verifyResetCode: async (code: string, sessionToken: string) => {
+        return apiService.post('/auth/verify-reset-code', { code }, {
+            headers: { Authorization: `Bearer ${sessionToken}` }
+        });
+    },
+
+    /**
+     * Reset password using the reset token
+     */
+    resetPassword: async (newPassword: string, authorizedToken: string) => {
+        return apiService.post('/auth/reset-password', { newPassword }, {
+            headers: { Authorization: `Bearer ${authorizedToken}` }
+        });
     }
 };
 

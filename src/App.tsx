@@ -4,6 +4,7 @@ import DashboardLayout from './layouts/DashboardLayout';
 import Login from './features/auth/Login';
 import Register from './features/auth/Register';
 import VerifyEmail from './features/auth/VerifyEmail';
+import ForgotPassword from './features/auth/ForgotPassword';
 import Dashboard from './features/dashboard/Dashboard';
 import Users from './features/users/Users';
 import Stores from './features/stores/Stores';
@@ -45,6 +46,7 @@ const AppContent = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
 
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardLayout />}>

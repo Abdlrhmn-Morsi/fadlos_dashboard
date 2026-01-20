@@ -98,10 +98,10 @@ const Login = () => {
 
                     <div className="flex items-center justify-between text-sm">
                         <label className="flex items-center gap-2 text-slate-600 dark:text-slate-400 cursor-pointer group">
-                            <input type="checkbox" className="w-4 h-4 rounded-none border-slate-300 dark:border-slate-600 text-primary focus:ring-primary" />
+                            <input type="checkbox" className="w-4 h-4 rounded-none border-slate-300 dark:border-slate-600 text-primary focus:ring-primary appearance-none checked:bg-primary checked:border-primary checked:after:content-['✓'] checked:after:text-white checked:after:text-[10px] checked:after:flex checked:after:items-center checked:after:justify-center border bg-slate-50 dark:bg-slate-900" />
                             <span className="font-medium group-hover:text-primary transition-colors">Remember me</span>
                         </label>
-                        <a href="#" className="text-primary font-bold hover:underline transition-all">Forgot password?</a>
+                        <Link to="/forgot-password" title="Go to forgot password page" className="text-primary font-bold hover:underline transition-all">Forgot password?</Link>
                     </div>
 
                     <button
