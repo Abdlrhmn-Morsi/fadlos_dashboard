@@ -20,6 +20,9 @@ const apiService = {
     },
 
     post: async <T = any>(url: string, data: any = {}, config: AxiosRequestConfig = {}): Promise<T> => {
+        if (data instanceof FormData) {
+            config.headers = { ...config.headers, 'Content-Type': 'multipart/form-data' };
+        }
         const response = await api.post<any>(url, data, config);
         const body = response.data;
         if (body && body.success !== undefined && body.data !== undefined) {
@@ -32,6 +35,9 @@ const apiService = {
     },
 
     patch: async <T = any>(url: string, data: any = {}, config: AxiosRequestConfig = {}): Promise<T> => {
+        if (data instanceof FormData) {
+            config.headers = { ...config.headers, 'Content-Type': 'multipart/form-data' };
+        }
         const response = await api.patch<any>(url, data, config);
         const body = response.data;
         if (body && body.success !== undefined && body.data !== undefined) {

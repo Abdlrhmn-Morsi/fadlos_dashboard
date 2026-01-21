@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router-dom';
 import {
@@ -9,7 +9,9 @@ import {
     Loader2,
     Eye,
     EyeOff,
-    CheckCircle
+    CheckCircle,
+    Camera,
+    Phone
 } from 'lucide-react';
 import { updateProfile, updatePassword } from '../users/api/users.api';
 import { toast } from '../../utils/toast';
@@ -17,7 +19,7 @@ import { toast } from '../../utils/toast';
 const ProfileSettings = () => {
     const { t } = useTranslation(['dashboard', 'common']);
     const [searchParams] = useSearchParams();
-    const activeTab = searchParams.get('tab') || 'profile'; // default to profile if no tab specified
+    const activeTab = searchParams.get('tab') || 'profile';
 
     const [savingProfile, setSavingProfile] = useState(false);
     const [savingPassword, setSavingPassword] = useState(false);
@@ -27,11 +29,16 @@ const ProfileSettings = () => {
         confirm: false
     });
 
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
+    const [imagePreview, setImagePreview] = useState<string | null>(user.profileImage || null);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const [profileData, setProfileData] = useState({
+        name: user.name || '',
         username: user.username || '',
-        email: user.email || ''
+        phone: user.phone || '',
+        email: user.email || '' // Read only
     });
 
     const [passwordData, setPasswordData] = useState({
@@ -45,6 +52,18 @@ const ProfileSettings = () => {
         setProfileData(prev => ({ ...prev, [name]: value }));
     };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setSelectedFile(file);
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setPasswordData(prev => ({ ...prev, [name]: value }));
@@ -54,14 +73,33 @@ const ProfileSettings = () => {
         e.preventDefault();
         setSavingProfile(true);
         try {
-            const result = await updateProfile(profileData);
+            const formData = new FormData();
+            formData.append('name', profileData.name);
+            formData.append('username', profileData.username);
+            formData.append('phone', profileData.phone);
+
+            if (selectedFile) {
+                formData.append('profileImage', selectedFile);
+            }
+
+            const response = await updateProfile(formData);
+
             // Update local storage with new user data
-            const updatedUser = { ...user, ...profileData };
+            const updatedUser = {
+                ...user,
+                name: profileData.name,
+                username: profileData.username,
+                phone: profileData.phone,
+                profileImage: response.user?.profileImage || user.profileImage
+            };
             localStorage.setItem('user', JSON.stringify(updatedUser));
+            setUser(updatedUser);
+
             toast.success(t('common:success'));
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to update profile:', error);
-            toast.error(t('common:errorUpdatingData'));
+            const message = error.response?.data?.message;
+            toast.error(Array.isArray(message) ? message[0] : message || t('common:errorUpdatingData'));
         } finally {
             setSavingProfile(false);
         }
@@ -85,9 +123,10 @@ const ProfileSettings = () => {
                 newPassword: '',
                 confirmPassword: ''
             });
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to update password:', error);
-            toast.error(t('common:errorUpdatingData'));
+            const message = error.response?.data?.message;
+            toast.error(message || t('common:errorUpdatingData'));
         } finally {
             setSavingPassword(false);
         }
@@ -99,7 +138,6 @@ const ProfileSettings = () => {
 
     return (
         <div className="p-6 max-w-2xl mx-auto space-y-8 animate-in animate-fade">
-            {/* Page Header */}
             <div className="flex items-center gap-4 mb-12">
                 <div className="p-4 bg-primary-light dark:bg-primary/20 rounded-none shadow-inner">
                     <User size={32} className="text-primary" />
@@ -117,7 +155,6 @@ const ProfileSettings = () => {
                 </div>
             </div>
 
-            {/* Profile Section */}
             {activeTab === 'profile' && (
                 <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
@@ -125,33 +162,92 @@ const ProfileSettings = () => {
                         <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('personalInformation', { defaultValue: 'Personal Information' })}</h3>
                     </div>
 
-                    <form onSubmit={handleProfileSubmit} className="p-8 space-y-6">
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <User size={14} /> {t('username', { defaultValue: 'Full Name' })}
-                            </label>
-                            <input
-                                type="text"
-                                name="username"
-                                value={profileData.username}
-                                onChange={handleProfileChange}
-                                required
-                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
-                            />
+                    <form onSubmit={handleProfileSubmit} className="p-8 space-y-8">
+                        {/* Profile Image Upload */}
+                        <div className="flex flex-col items-center gap-4 mb-8">
+                            <div className="relative group">
+                                <div className="w-32 h-32 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 border-4 border-white dark:border-slate-900 shadow-xl relative">
+                                    {imagePreview ? (
+                                        <img src={imagePreview} alt="Profile" className="w-full h-full object-cover" />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                            <User size={64} />
+                                        </div>
+                                    )}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="absolute bottom-0 right-0 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all transform hover:scale-110 active:scale-95 z-10"
+                                >
+                                    <Camera size={20} />
+                                </button>
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleImageChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
+                            </div>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                                {t('changeProfilePicture', { defaultValue: 'Change Profile Picture' })}
+                            </p>
                         </div>
 
-                        <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <Mail size={14} /> {t('common:email', { defaultValue: 'Email Address' })}
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={profileData.email}
-                                onChange={handleProfileChange}
-                                required
-                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
-                            />
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <User size={14} /> {t('fullName', { defaultValue: 'Full Name' })}
+                                </label>
+                                <input
+                                    type="text"
+                                    name="name"
+                                    value={profileData.name}
+                                    onChange={handleProfileChange}
+                                    required
+                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <User size={14} /> {t('username', { defaultValue: 'Username' })}
+                                </label>
+                                <input
+                                    type="text"
+                                    name="username"
+                                    value={profileData.username}
+                                    onChange={handleProfileChange}
+                                    required
+                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <Mail size={14} /> {t('common:email', { defaultValue: 'Email Address' })}
+                                </label>
+                                <input
+                                    type="email"
+                                    value={profileData.email}
+                                    readOnly
+                                    className="w-full px-5 py-4 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none text-slate-500 cursor-not-allowed font-bold"
+                                />
+                            </div>
+
+                            <div className="space-y-2">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <Phone size={14} /> {t('common:phone', { defaultValue: 'Phone Number' })}
+                                </label>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={profileData.phone}
+                                    onChange={handleProfileChange}
+                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex justify-end pt-4">
@@ -168,7 +264,6 @@ const ProfileSettings = () => {
                 </section>
             )}
 
-            {/* Password Section */}
             {activeTab === 'security' && (
                 <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
@@ -187,8 +282,7 @@ const ProfileSettings = () => {
                                     name="currentPassword"
                                     value={passwordData.currentPassword}
                                     onChange={handlePasswordChange}
-                                    required
-                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
+                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
                                 />
                                 <button
                                     type="button"
@@ -212,7 +306,7 @@ const ProfileSettings = () => {
                                         value={passwordData.newPassword}
                                         onChange={handlePasswordChange}
                                         required
-                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
+                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
                                     />
                                     <button
                                         type="button"
@@ -235,7 +329,7 @@ const ProfileSettings = () => {
                                         value={passwordData.confirmPassword}
                                         onChange={handlePasswordChange}
                                         required
-                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
+                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
                                     />
                                     <button
                                         type="button"
