@@ -25,6 +25,7 @@ import CategoryList from './features/categories/CategoryList';
 import Settings from './features/settings/Settings';
 import StoreSettings from './features/settings/StoreSettings';
 import ProfileSettings from './features/settings/ProfileSettings';
+import DeliveryAreasPage from './features/stores/DeliveryAreasPage';
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token');
@@ -70,6 +71,7 @@ const AppContent = () => {
 
             <Route path="clients" element={<ClientList />} />
             <Route path="followers" element={<FollowerList />} />
+            <Route path="delivery-areas" element={<DeliveryAreasPage />} />
 
             {/* Admin Routes */}
             <Route path="users" element={<Users />} />

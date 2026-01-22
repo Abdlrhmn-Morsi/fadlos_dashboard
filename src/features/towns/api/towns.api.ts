@@ -44,3 +44,45 @@ export const toggleTownStatus = async (id: string, isActive: boolean) => {
         throw error;
     }
 };
+
+// Delivery Area Management
+export const assignTownToStore = async (dto: { townId: string; defaultPrice: number; storeId?: string }) => {
+    try {
+        return await apiService.post('/towns/delivery-areas/bulk', dto);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getMyStoreDeliveryAreas = async () => {
+    try {
+        const responseBody = await apiService.get('/towns/delivery-areas/my-store');
+        return responseBody.data || responseBody;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateDeliveryArea = async (id: string, dto: { price?: number; isActive?: boolean }) => {
+    try {
+        return await apiService.patch(`/towns/delivery-areas/${id}`, dto);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const removeDeliveryArea = async (id: string) => {
+    try {
+        return await apiService.delete(`/towns/delivery-areas/${id}`);
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const resetMyStoreDeliveryAreas = async () => {
+    try {
+        return await apiService.delete('/towns/delivery-areas/reset/all');
+    } catch (error) {
+        throw error;
+    }
+};

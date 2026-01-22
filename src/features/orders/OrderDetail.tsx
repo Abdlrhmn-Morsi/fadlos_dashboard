@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Clock, MapPin, User, Phone, Save,
-    Printer, Mail, AlertCircle, FileText, CheckCircle, Package
+    Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
 import { OrderStatus } from '../../types/order-status';
@@ -295,11 +295,11 @@ const OrderDetail = () => {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
                                     <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
-                                        {order.client?.name?.[0] || order.client?.firstName?.[0] || 'G'}
+                                        {order.client?.name?.[0] || order.clientInfo?.name?.[0] || 'G'}
                                     </div>
                                     <div>
                                         <p className="font-bold text-slate-900 dark:text-white">
-                                            {order.client?.name || `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim() || 'Guest'}
+                                            {order.client?.name || order.clientInfo?.name || 'Guest'}
                                         </p>
                                         <p className="text-xs text-slate-500">Customer</p>
                                     </div>
@@ -308,21 +308,79 @@ const OrderDetail = () => {
                                 <div className="space-y-3 text-sm">
                                     <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors">
                                         <Mail size={16} className="text-slate-400" />
-                                        <span>{order.client?.email || 'No email provided'}</span>
+                                        <span>{order.client?.email || order.clientInfo?.email || 'No email provided'}</span>
                                     </div>
                                     <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors">
                                         <Phone size={16} className="text-slate-400" />
-                                        <span>{order.client?.phone || 'No phone provided'}</span>
-                                    </div>
-                                    <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
-                                        <MapPin size={16} className="text-slate-400 mt-0.5" />
-                                        <span>
-                                            {order.deliveryAddress ?
-                                                `${order.deliveryAddress.street || ''}, ${order.deliveryAddress.city || ''}`
-                                                : 'Pickup Order'}
-                                        </span>
+                                        <span>{order.client?.phone || order.clientInfo?.phone || 'No phone provided'}</span>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        {/* Delivery Details */}
+                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                            <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                <MapPin className="text-indigo-500" size={20} />
+                                Delivery Details
+                            </h3>
+                            <div className="space-y-4">
+                                {order.deliveryAddress ? (
+                                    <>
+                                        <div className="space-y-3 text-sm">
+                                            <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                                <Globe size={16} className="text-slate-400 mt-0.5" />
+                                                <div>
+                                                    <p className="font-medium text-slate-900 dark:text-white">
+                                                        {order.deliveryAddress.townEnName} ({order.deliveryAddress.townArName})
+                                                    </p>
+                                                    <p>{order.deliveryAddress.placeEnName} ({order.deliveryAddress.placeArName})</p>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                                <MapPin size={16} className="text-slate-400 mt-0.5" />
+                                                <span>{order.deliveryAddress.addressDetails}</span>
+                                            </div>
+                                            {(order.deliveryAddress.phone || order.deliveryAddress.email) && (
+                                                <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                                                    <p className="text-xs font-semibold text-slate-400 uppercase">Contact for Delivery</p>
+                                                    {order.deliveryAddress.phone && (
+                                                        <div className="flex items-center gap-3">
+                                                            <Phone size={14} className="text-slate-400" />
+                                                            <span>{order.deliveryAddress.phone}</span>
+                                                        </div>
+                                                    )}
+                                                    {order.deliveryAddress.email && (
+                                                        <div className="flex items-center gap-3">
+                                                            <Mail size={14} className="text-slate-400" />
+                                                            <span>{order.deliveryAddress.email}</span>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Map */}
+                                        {order.deliveryAddress.latitude && order.deliveryAddress.longitude && (
+                                            <div className="mt-4 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 h-48">
+                                                <iframe
+                                                    width="100%"
+                                                    height="100%"
+                                                    frameBorder="0"
+                                                    scrolling="no"
+                                                    marginHeight={0}
+                                                    marginWidth={0}
+                                                    src={`https://maps.google.com/maps?q=${order.deliveryAddress.latitude},${order.deliveryAddress.longitude}&z=15&output=embed`}
+                                                ></iframe>
+                                            </div>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 italic">
+                                        <AlertCircle size={16} className="text-amber-500" />
+                                        <span>No delivery information provided</span>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

@@ -11,7 +11,8 @@ import {
     Loader2,
     CheckCircle,
     XCircle,
-    Camera
+    Camera,
+    Truck
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getMyStore, updateStore } from '../stores/api/stores.api';
@@ -19,6 +20,7 @@ import { getBusinessTypes } from '../business-types/api/business-types.api';
 import { getCities } from '../cities/api/cities.api';
 import { getTowns } from '../towns/api/towns.api';
 import { toast } from '../../utils/toast';
+
 
 const StoreSettings = () => {
     const { t } = useTranslation(['stores', 'common']);

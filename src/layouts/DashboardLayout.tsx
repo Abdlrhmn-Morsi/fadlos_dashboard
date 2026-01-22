@@ -13,6 +13,7 @@ import {
   MapPin,
   Briefcase,
   LayoutGrid,
+  Truck,
   LucideIcon
 } from 'lucide-react';
 import clsx from 'clsx';
@@ -144,6 +145,7 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
               <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
               <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
+              <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas', { defaultValue: 'Delivery Areas' })} collapsed={collapsed} />
             </>
           )}
 
