@@ -6,6 +6,8 @@ import {
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
 import { OrderStatus } from '../../types/order-status';
+import ConfirmationModal from '../../components/ui/ConfirmationModal';
+import InputModal from '../../components/ui/InputModal';
 
 const OrderDetail = () => {
     const { id } = useParams();
@@ -13,7 +15,12 @@ const OrderDetail = () => {
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+
     const [newStatus, setNewStatus] = useState('');
+
+    // Modal States
+    const [statusModal, setStatusModal] = useState<{ isOpen: boolean; status: string }>({ isOpen: false, status: '' });
+    const [cancelModal, setCancelModal] = useState(false);
 
     useEffect(() => {
         fetchOrder();
@@ -33,21 +40,40 @@ const OrderDetail = () => {
         }
     };
 
-    const handleStatusUpdate = async (status: string) => {
+    const handleStatusClick = (status: string) => {
         if (!status || status === order.status) return;
+        setStatusModal({ isOpen: true, status });
+    };
+
+    const confirmStatusUpdate = async () => {
+        const status = statusModal.status;
+        if (!status) return;
 
         try {
             setUpdating(true);
             setNewStatus(status);
             await ordersApi.updateOrderStatus(id!, status);
             setOrder({ ...order, status: status });
-            // Ideally show toast
+            setStatusModal({ isOpen: false, status: '' });
         } catch (error) {
             console.error('Failed to update status', error);
-            // Removed alert as per request
         } finally {
             setUpdating(false);
             setNewStatus('');
+        }
+    };
+
+    const handleCancelOrder = async (reason: string) => {
+        try {
+            setUpdating(true);
+            await ordersApi.cancelOrder(id!, reason);
+            setCancelModal(false);
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to cancel order', error);
+            // Ideally toast error
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -250,7 +276,7 @@ const OrderDetail = () => {
                                                 )}
 
                                                 <button
-                                                    onClick={() => isClickable ? handleStatusUpdate(status) : null}
+                                                    onClick={() => isClickable ? handleStatusClick(status) : null}
                                                     disabled={updating || !isClickable}
                                                     className={`
                                                         relative z-10 w-8 h-8 rounded-full flex items-center justify-center shrink-0 border-2 transition-all
@@ -270,7 +296,7 @@ const OrderDetail = () => {
                                                     )}
                                                 </button>
 
-                                                <div className={`mt-1 flex-1 ${isClickable ? 'cursor-pointer' : ''}`} onClick={() => isClickable ? handleStatusUpdate(status) : null}>
+                                                <div className={`mt-1 flex-1 ${isClickable ? 'cursor-pointer' : ''}`} onClick={() => isClickable ? handleStatusClick(status) : null}>
                                                     <h4 className={`font-bold text-sm ${isCompleted || isCurrent ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600'}`}>
                                                         {getStatusLabel(status)}
                                                     </h4>
@@ -385,8 +411,50 @@ const OrderDetail = () => {
                         </div>
 
                     </div>
+
+                    {/* Cancel Order Section */}
+                    {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
+                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                            <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                <AlertCircle className="text-rose-500" size={20} />
+                                Cancel Order
+                            </h3>
+                            <p className="text-sm text-slate-500 mb-4">
+                                If you need to cancel this order, please provide a reason. This action cannot be undone.
+                            </p>
+                            <button
+                                onClick={() => setCancelModal(true)}
+                                className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
+                            >
+                                Cancel Order
+                            </button>
+                        </div>
+                    )}
+
                 </div>
             </div>
+
+            {/* Modals */}
+            <ConfirmationModal
+                isOpen={statusModal.isOpen}
+                title="Update Order Status"
+                message={`Are you sure you want to change the status to "${getStatusLabel(statusModal.status)}"? The customer will be notified.`}
+                onConfirm={confirmStatusUpdate}
+                confirmLabel="Update Status"
+                onCancel={() => setStatusModal({ isOpen: false, status: '' })}
+                isLoading={updating}
+            />
+
+            <InputModal
+                isOpen={cancelModal}
+                title="Cancel Order"
+                message="Please provide a reason for cancelling this order. This action cannot be undone."
+                placeholder="Reason for cancellation..."
+                submitLabel="Cancel Order"
+                onSubmit={handleCancelOrder}
+                onCancel={() => setCancelModal(false)}
+                isLoading={updating}
+            />
         </div>
     );
 };

@@ -23,6 +23,13 @@ export const ordersApi = {
      */
     updateOrderStatus: async (id: string, status: string) => {
         return apiService.patch(`/orders/${id}/status`, { status });
+    },
+
+    /**
+     * Cancel an order
+     */
+    cancelOrder: async (id: string, reason: string) => {
+        return apiService.delete(`/orders/${id}`, { data: { reason } });
     }
 };
 
