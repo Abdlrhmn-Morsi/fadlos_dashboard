@@ -26,6 +26,8 @@ import Settings from './features/settings/Settings';
 import StoreSettings from './features/settings/StoreSettings';
 import ProfileSettings from './features/settings/ProfileSettings';
 import DeliveryAreasPage from './features/stores/DeliveryAreasPage';
+import AppUpdateSettings from './features/settings/AppUpdateSettings';
+import AppVersionHistory from './features/settings/AppVersionHistory';
 
 const ProtectedRoute = () => {
   const token = localStorage.getItem('token');
@@ -83,6 +85,8 @@ const AppContent = () => {
             <Route path="store-settings" element={<StoreSettings />} />
             <Route path="profile-settings" element={<ProfileSettings />} />
             <Route path="settings" element={<Settings />} />
+            <Route path="app-updates" element={<AppUpdateSettings />} />
+            <Route path="app-version-history" element={<AppVersionHistory />} />
 
             {/* Redirect unknown to dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />

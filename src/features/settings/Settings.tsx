@@ -6,7 +6,8 @@ import {
     User,
     ChevronRight,
     ShieldCheck,
-    Briefcase
+    Briefcase,
+    Smartphone
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user-role';
@@ -47,7 +48,18 @@ const Settings = () => {
             color: 'text-rose-500',
             bgColor: 'bg-rose-50',
             visible: true
-        }
+        },
+        {
+            id: 'app-updates',
+            title: t('appUpdates', { defaultValue: 'App Updates' }),
+            description: t('manageAppUpdatesDesc', { defaultValue: 'Manage minimum versions, blocked updates, and maintenance mode' }),
+            icon: Smartphone,
+            path: '/app-updates',
+            color: 'text-purple-500',
+            bgColor: 'bg-purple-50',
+            visible: !isSeller // Only visible to Admins/Super Admins
+        },
+
     ];
 
     return (
