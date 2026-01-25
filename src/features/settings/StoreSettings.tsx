@@ -12,7 +12,15 @@ import {
     CheckCircle,
     XCircle,
     Camera,
-    Truck
+    Truck,
+    Plus,
+    Trash2,
+    Globe,
+    Facebook,
+    Instagram,
+    Twitter,
+    Linkedin,
+    Youtube
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getMyStore, updateStore } from '../stores/api/stores.api';
@@ -21,6 +29,17 @@ import { getCities } from '../cities/api/cities.api';
 import { getTowns } from '../towns/api/towns.api';
 import { toast } from '../../utils/toast';
 
+
+const SOCIAL_PLATFORMS = [
+    { name: 'Facebook', icon: <Facebook size={16} className="text-blue-600" /> },
+    { name: 'Instagram', icon: <Instagram size={16} className="text-pink-600" /> },
+    { name: 'Twitter', icon: <Twitter size={16} className="text-sky-500" /> },
+    { name: 'LinkedIn', icon: <Linkedin size={16} className="text-blue-700" /> },
+    { name: 'YouTube', icon: <Youtube size={16} className="text-red-600" /> },
+    { name: 'TikTok', icon: <Globe size={16} className="text-black" /> },
+    { name: 'Snapchat', icon: <Globe size={16} className="text-yellow-400" /> },
+    { name: 'Website', icon: <Globe size={16} className="text-slate-500" /> }
+];
 
 const StoreSettings = () => {
     const { t } = useTranslation(['stores', 'common']);
@@ -39,7 +58,9 @@ const StoreSettings = () => {
         email: '',
         businessTypeId: '',
         townIds: [] as string[],
-        placeIds: [] as string[]
+        placeIds: [] as string[],
+        whatsapp: '',
+        socialMedia: [] as { platform: string; url: string }[]
     });
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -69,7 +90,13 @@ const StoreSettings = () => {
                 email: store.email || '',
                 businessTypeId: store.businessType?.id || '',
                 townIds: store.towns?.map((t: any) => t.id) || [],
-                placeIds: store.places?.map((p: any) => p.id) || []
+                placeIds: store.places?.map((p: any) => p.id) || [],
+                whatsapp: store.whatsapp || '',
+                socialMedia: Array.isArray(store.socialMedia)
+                    ? store.socialMedia
+                    : (store.socialMedia && typeof store.socialMedia === 'string')
+                        ? JSON.parse(store.socialMedia)
+                        : []
             });
 
             setLogoPreview(store.logo);
@@ -116,6 +143,26 @@ const StoreSettings = () => {
         }
     };
 
+    const addSocialMedia = (platform: string) => {
+        setFormData(prev => ({
+            ...prev,
+            socialMedia: [...prev.socialMedia, { platform, url: '' }]
+        }));
+    };
+
+    const removeSocialMedia = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            socialMedia: prev.socialMedia.filter((_, i) => i !== index)
+        }));
+    };
+
+    const updateSocialMedia = (index: number, field: 'platform' | 'url', value: string) => {
+        const newSocialMedia = [...formData.socialMedia];
+        newSocialMedia[index] = { ...newSocialMedia[index], [field]: value };
+        setFormData({ ...formData, socialMedia: newSocialMedia });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
@@ -137,6 +184,13 @@ const StoreSettings = () => {
                 formData.placeIds.forEach(id => data.append('placeIds', id));
             } else {
                 data.append('placeIds', '[]');
+            }
+
+            if (formData.whatsapp) data.append('whatsapp', formData.whatsapp);
+            if (formData.socialMedia.length > 0) {
+                data.append('socialMedia', JSON.stringify(formData.socialMedia));
+            } else {
+                data.append('socialMedia', '[]');
             }
 
             if (logoInputRef.current?.files?.[0]) {
@@ -330,6 +384,91 @@ const StoreSettings = () => {
                                 onChange={handleChange}
                                 className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
                             />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Phone size={14} /> WhatsApp
+                            </label>
+                            <input
+                                type="tel"
+                                name="whatsapp"
+                                value={formData.whatsapp}
+                                onChange={handleChange}
+                                placeholder="+1234567890"
+                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                            />
+                        </div>
+                    </div>
+                </section>
+
+                {/* Social Media Links */}
+                <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm">
+                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                        <Globe size={20} className="text-primary" />
+                        <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">Social Media</h3>
+                    </div>
+
+                    <div className="p-8">
+                        <div className="flex items-center justify-between mb-6">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Globe size={14} /> Platforms
+                            </label>
+
+                            <div className="relative group">
+                                <select
+                                    className="appearance-none bg-primary/5 text-primary text-xs font-bold px-4 py-2 pr-8 rounded-none cursor-pointer focus:outline-none hover:bg-primary/10 transition-colors"
+                                    onChange={(e) => {
+                                        if (e.target.value) {
+                                            addSocialMedia(e.target.value);
+                                            e.target.value = ''; // Reset
+                                        }
+                                    }}
+                                >
+                                    <option value="">+ Add Platform</option>
+                                    {SOCIAL_PLATFORMS.map(p => (
+                                        <option key={p.name} value={p.name}>{p.name}</option>
+                                    ))}
+                                </select>
+                                <Plus size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-primary pointer-events-none" />
+                            </div>
+                        </div>
+
+                        <div className="space-y-4">
+                            {formData.socialMedia.map((item, index) => {
+                                const platformInfo = SOCIAL_PLATFORMS.find(p => p.name === item.platform) || { icon: <Globe size={16} /> };
+                                return (
+                                    <div key={index} className="flex gap-4 items-center animate-fadeIn">
+                                        <div className="w-32 flex items-center gap-2 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 font-bold text-sm text-slate-700 dark:text-slate-300">
+                                            {platformInfo.icon}
+                                            <span className="truncate">{item.platform}</span>
+                                        </div>
+                                        <div className="flex-1">
+                                            <input
+                                                type="url"
+                                                value={item.url}
+                                                onChange={(e) => updateSocialMedia(index, 'url', e.target.value)}
+                                                placeholder={`https://${item.platform.toLowerCase()}.com/...`}
+                                                className="w-full px-5 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                            />
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => removeSocialMedia(index)}
+                                            className="p-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-none transition-colors"
+                                            title="Remove"
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
+                                    </div>
+                                );
+                            })}
+
+                            {formData.socialMedia.length === 0 && (
+                                <div className="text-center py-8 text-slate-400 text-sm italic bg-slate-50 dark:bg-slate-800/30 rounded-none border border-dashed border-slate-200 dark:border-slate-800">
+                                    No social media links added. Select a platform to add one.
+                                </div>
+                            )}
                         </div>
                     </div>
                 </section>
