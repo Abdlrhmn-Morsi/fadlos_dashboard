@@ -111,7 +111,7 @@ const ProductForm = () => {
                 categoryId: data.categoryId || '',
                 sku: data.sku || '',
                 inventory: data.inventory ? String(data.inventory) : '0',
-                trackInventory: data.trackInventory ?? false,
+                trackInventory: String(data.trackInventory) === 'true',
                 isAvailable: data.isAvailable ?? true,
                 isActive: data.isActive ?? true,
                 sortOrder: data.sort || '0',
@@ -228,6 +228,11 @@ const ProductForm = () => {
                 if (key === 'variants') return; // Handle manually
                 const value = (formData as any)[key];
                 if (value !== null && value !== undefined && value !== '') {
+                    // Start Debug
+                    if (['trackInventory', 'isActive', 'isAvailable'].includes(key)) {
+                        console.log(`Appending ${key}:`, value, typeof value);
+                    }
+                    // End Debug
                     data.append(key, value);
                 }
             });
@@ -767,6 +772,11 @@ const ProductForm = () => {
                                             onChange={e => setFormData({ ...formData, inventory: e.target.value })}
                                         />
                                     </InputGroup>
+                                )}
+                                {!formData.trackInventory && (
+                                    <div className="mt-2 text-sm text-yellow-600 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800/30">
+                                        The customer can order this product even if the quantity is 0.
+                                    </div>
                                 )}
                             </div>
                         </div>
