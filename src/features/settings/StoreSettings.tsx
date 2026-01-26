@@ -20,7 +20,10 @@ import {
     Instagram,
     Twitter,
     Linkedin,
-    Youtube
+    Youtube,
+    Clock,
+    Calendar,
+    AlertTriangle
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getMyStore, updateStore } from '../stores/api/stores.api';
@@ -60,7 +63,14 @@ const StoreSettings = () => {
         townIds: [] as string[],
         placeIds: [] as string[],
         whatsapp: '',
-        socialMedia: [] as { platform: string; url: string }[]
+        socialMedia: [] as { platform: string; url: string }[],
+        openingTime: '',
+        closingTime: '',
+        is24Hours: false,
+        workingDays: [] as number[],
+        acceptOrdersIfOffDay: false,
+        acceptOrdersInClosedHours: false,
+        isAcceptingOrders: true
     });
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -96,7 +106,14 @@ const StoreSettings = () => {
                     ? store.socialMedia
                     : (store.socialMedia && typeof store.socialMedia === 'string')
                         ? JSON.parse(store.socialMedia)
-                        : []
+                        : [],
+                openingTime: store.openingTime || '',
+                closingTime: store.closingTime || '',
+                is24Hours: store.is24Hours || false,
+                workingDays: store.workingDays || [],
+                acceptOrdersIfOffDay: store.acceptOrdersIfOffDay || false,
+                acceptOrdersInClosedHours: store.acceptOrdersInClosedHours || false,
+                isAcceptingOrders: store.isAcceptingOrders !== undefined ? store.isAcceptingOrders : true
             });
 
             setLogoPreview(store.logo);
@@ -114,8 +131,13 @@ const StoreSettings = () => {
     }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-        const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const { name, value, type } = e.target;
+        const checked = (e.target as HTMLInputElement).checked;
+
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === 'checkbox' ? checked : value
+        }));
     };
 
     const handleLocationChange = (type: 'townIds' | 'placeIds', id: string) => {
@@ -163,6 +185,19 @@ const StoreSettings = () => {
         setFormData({ ...formData, socialMedia: newSocialMedia });
     };
 
+    const toggleWorkingDay = (dayIndex: number) => {
+        setFormData(prev => {
+            const currentDays = [...prev.workingDays];
+            const index = currentDays.indexOf(dayIndex);
+            if (index > -1) {
+                currentDays.splice(index, 1);
+            } else {
+                currentDays.push(dayIndex);
+            }
+            return { ...prev, workingDays: currentDays };
+        });
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
@@ -191,6 +226,21 @@ const StoreSettings = () => {
                 data.append('socialMedia', JSON.stringify(formData.socialMedia));
             } else {
                 data.append('socialMedia', '[]');
+            }
+
+
+            // Operating Hours & Settings
+            if (formData.openingTime) data.append('openingTime', formData.openingTime);
+            if (formData.closingTime) data.append('closingTime', formData.closingTime);
+            data.append('is24Hours', String(formData.is24Hours));
+            data.append('acceptOrdersIfOffDay', String(formData.acceptOrdersIfOffDay));
+            data.append('acceptOrdersInClosedHours', String(formData.acceptOrdersInClosedHours));
+            data.append('isAcceptingOrders', String(formData.isAcceptingOrders));
+
+            if (formData.workingDays.length > 0) {
+                data.append('workingDays', JSON.stringify(formData.workingDays));
+            } else {
+                data.append('workingDays', '[]');
             }
 
             if (logoInputRef.current?.files?.[0]) {
@@ -532,6 +582,155 @@ const StoreSettings = () => {
                     </div>
                 </section>
 
+                {/* Operating Hours & Settings */}
+                <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm">
+                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                        <Clock size={20} className="text-primary" />
+                        <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">Operating Hours & Settings</h3>
+                    </div>
+
+                    <div className="p-8 space-y-8">
+                        {/* 24 Hours Toggle */}
+                        <div className="flex items-center gap-3">
+                            <input
+                                type="checkbox"
+                                id="is24Hours"
+                                name="is24Hours"
+                                checked={formData.is24Hours}
+                                onChange={handleChange}
+                                className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                            />
+                            <label htmlFor="is24Hours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                Open 24 Hours
+                            </label>
+                        </div>
+
+                        {/* Opening/Closing Time */}
+                        {!formData.is24Hours && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <Clock size={14} /> Opening Time
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="openingTime"
+                                        value={formData.openingTime}
+                                        onChange={handleChange}
+                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    />
+                                </div>
+                                <div className="space-y-2">
+                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                        <Clock size={14} /> Closing Time
+                                    </label>
+                                    <input
+                                        type="time"
+                                        name="closingTime"
+                                        value={formData.closingTime}
+                                        onChange={handleChange}
+                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    />
+                                </div>
+                            </div>
+                        )}
+
+                        <hr className="border-slate-100 dark:border-slate-800" />
+
+                        {/* Working Days */}
+                        <div className="space-y-4">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Calendar size={14} /> Working Days
+                            </label>
+                            <div className="flex flex-wrap gap-3">
+                                {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, index) => (
+                                    <button
+                                        key={day}
+                                        type="button"
+                                        onClick={() => toggleWorkingDay(index)}
+                                        className={clsx(
+                                            "w-12 h-12 rounded-full font-bold text-sm transition-all flex items-center justify-center border",
+                                            formData.workingDays.includes(index)
+                                                ? "bg-primary text-white border-primary shadow-lg shadow-primary/30"
+                                                : "bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-primary/50"
+                                        )}
+                                    >
+                                        {day}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <hr className="border-slate-100 dark:border-slate-800" />
+
+                        {/* Order Acceptance Rules */}
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between">
+                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-2">
+                                    Order Acceptance Rules
+                                </label>
+                                <div className="flex items-center gap-3 bg-primary/5 px-4 py-2 rounded-full">
+                                    <label htmlFor="isAcceptingOrders" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                        Accepting Orders
+                                    </label>
+                                    <div className="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
+                                        <input
+                                            type="checkbox"
+                                            name="isAcceptingOrders"
+                                            id="isAcceptingOrders"
+                                            checked={formData.isAcceptingOrders}
+                                            onChange={handleChange}
+                                            className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer translate-x-1 top-1 checked:translate-x-5 checked:border-primary transition-transform duration-200"
+                                        />
+                                        <label htmlFor="isAcceptingOrders" className={clsx("toggle-label block overflow-hidden h-6 rounded-full cursor-pointer border-2", formData.isAcceptingOrders ? "bg-primary border-primary" : "bg-slate-300 border-slate-300")}></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="space-y-3 opacity-90">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="acceptOrdersIfOffDay"
+                                        name="acceptOrdersIfOffDay"
+                                        checked={formData.acceptOrdersIfOffDay}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                    />
+                                    <label htmlFor="acceptOrdersIfOffDay" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                        Accept orders even on off days
+                                    </label>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="acceptOrdersInClosedHours"
+                                        name="acceptOrdersInClosedHours"
+                                        checked={formData.acceptOrdersInClosedHours}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                    />
+                                    <label htmlFor="acceptOrdersInClosedHours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                        Accept orders even during closed hours
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {!formData.isAcceptingOrders && (
+                        <div className="mx-8 mb-8 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900 rounded-none flex items-start gap-3">
+                            <AlertTriangle className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" size={20} />
+                            <div>
+                                <h4 className="font-bold text-rose-700 dark:text-rose-300 text-sm">Not Accepting Orders</h4>
+                                <p className="text-rose-600 dark:text-rose-400 text-sm mt-1">
+                                    Your store is currently set to not accept any orders. Customers will successfully browse your menu but cannot add items to cart or place orders.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+                </section>
+
                 {/* Submit Action */}
                 <div className="flex justify-end pt-8">
                     <button
@@ -547,5 +746,6 @@ const StoreSettings = () => {
         </div>
     );
 };
+
 
 export default StoreSettings;

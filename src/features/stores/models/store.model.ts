@@ -17,7 +17,15 @@ export interface Store {
         id: string;
         enName: string;
     }>;
+    openingTime?: string;
+    closingTime?: string;
+    is24Hours?: boolean;
+    workingDays?: number[];
+    acceptOrdersIfOffDay?: boolean;
+    acceptOrdersInClosedHours?: boolean;
+    isAcceptingOrders?: boolean;
 }
+
 
 export interface StoresFilters {
     search: string;
