@@ -23,7 +23,8 @@ import {
     Youtube,
     Clock,
     Calendar,
-    AlertTriangle
+    AlertTriangle,
+    Languages
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getMyStore, updateStore } from '../stores/api/stores.api';
@@ -31,6 +32,7 @@ import { getBusinessTypes } from '../business-types/api/business-types.api';
 import { getCities } from '../cities/api/cities.api';
 import { getTowns } from '../towns/api/towns.api';
 import { toast } from '../../utils/toast';
+import toolsApi from '../../services/tools.api';
 
 
 const SOCIAL_PLATFORMS = [
@@ -55,7 +57,9 @@ const StoreSettings = () => {
 
     // Form states
     const [formData, setFormData] = useState({
+        nameAr: '',
         name: '',
+        descriptionAr: '',
         description: '',
         phone: '',
         email: '',
@@ -94,7 +98,9 @@ const StoreSettings = () => {
             setTowns(allTowns);
 
             setFormData({
+                nameAr: store.nameAr || '',
                 name: store.name || '',
+                descriptionAr: store.descriptionAr || '',
                 description: store.description || '',
                 phone: store.phone || '',
                 email: store.email || '',
@@ -198,12 +204,36 @@ const StoreSettings = () => {
         });
     };
 
+    const handleTranslate = async (value: string, field: 'name' | 'description') => {
+        const targetField = field === 'name' ? 'name' : 'description';
+        if (!value || formData[targetField]) return;
+        try {
+            let translated = '';
+            if (field === 'name') {
+                const res: any = await toolsApi.transliterate(value, 'ar');
+                translated = typeof res === 'string' ? res : res.translatedText;
+            } else {
+                const res: any = await toolsApi.translate(value, 'ar', 'en');
+                translated = typeof res === 'string' ? res : res.translatedText;
+            }
+
+            if (translated) {
+                setFormData(prev => ({ ...prev, [targetField]: translated }));
+                toast.success(`${field.charAt(0).toUpperCase() + field.slice(1)} ${field === 'name' ? 'Romanized' : 'translated to English'}`);
+            }
+        } catch (error) {
+            console.error("Translation error", error);
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
         try {
             const data = new FormData();
+            data.append('nameAr', formData.nameAr);
             data.append('name', formData.name);
+            data.append('descriptionAr', formData.descriptionAr);
             data.append('description', formData.description);
             data.append('phone', formData.phone);
             data.append('email', formData.email);
@@ -356,7 +386,22 @@ const StoreSettings = () => {
                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                         <div className="space-y-2">
                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                <Store size={14} /> {t('storeName', { defaultValue: 'Store Name' })}
+                                <Store size={14} /> {t('storeName', { defaultValue: 'Store Name (Arabic)' })}
+                            </label>
+                            <input
+                                type="text"
+                                name="nameAr"
+                                value={formData.nameAr}
+                                onChange={handleChange}
+                                onBlur={(e) => handleTranslate(e.target.value, 'name')}
+                                required
+                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 text-right"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <Store size={14} /> {t('storeNameEn', { defaultValue: 'Store Name (English)' })}
                             </label>
                             <input
                                 type="text"
@@ -364,7 +409,7 @@ const StoreSettings = () => {
                                 value={formData.name}
                                 onChange={handleChange}
                                 required
-                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
                             />
                         </div>
 
@@ -376,7 +421,7 @@ const StoreSettings = () => {
                                 name="businessTypeId"
                                 value={formData.businessTypeId}
                                 onChange={handleChange}
-                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 appearance-none"
+                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 appearance-none"
                             >
                                 <option value="">Select Type</option>
                                 {businessTypes.map(type => (
@@ -387,16 +432,34 @@ const StoreSettings = () => {
                             </select>
                         </div>
 
+                        <div className="space-y-2">
+                            {/* Empty space to align if needed, or we can put phone here */}
+                        </div>
+
                         <div className="md:col-span-2 space-y-2">
                             <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                                {t('common:description', { defaultValue: 'Description' })}
+                                {t('descriptionAr', { defaultValue: 'Description (Arabic)' })}
+                            </label>
+                            <textarea
+                                name="descriptionAr"
+                                value={formData.descriptionAr}
+                                onChange={handleChange}
+                                onBlur={(e) => handleTranslate(e.target.value, 'description')}
+                                rows={3}
+                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 text-right resize-none"
+                            />
+                        </div>
+
+                        <div className="md:col-span-2 space-y-2">
+                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                {t('descriptionEn', { defaultValue: 'Description (English)' })}
                             </label>
                             <textarea
                                 name="description"
                                 value={formData.description}
                                 onChange={handleChange}
-                                rows={4}
-                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 resize-none"
+                                rows={3}
+                                className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 resize-none"
                             />
                         </div>
                     </div>

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { X, Save, Loader2, LayoutGrid, Info } from 'lucide-react';
 import categoriesApi from '../api/categories.api';
 import { toast } from '../../../utils/toast';
+import toolsApi from '../../../services/tools.api';
 
 interface CategoryFormModalProps {
     category?: any;
@@ -12,6 +13,7 @@ interface CategoryFormModalProps {
 const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose, onSuccess }) => {
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
+        nameAr: '',
         name: '',
         sort: 0,
         isActive: true
@@ -20,12 +22,27 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
     useEffect(() => {
         if (category) {
             setFormData({
+                nameAr: category.nameAr || '',
                 name: category.name || '',
                 sort: category.sort || 0,
                 isActive: category.isActive ?? true
             });
         }
     }, [category]);
+
+    const handleTranslate = async (arabicName: string) => {
+        if (!arabicName || formData.name) return;
+        try {
+            const res: any = await toolsApi.translate(arabicName, 'ar', 'en');
+            const translated = typeof res === 'string' ? res : res.translatedText;
+            if (translated) {
+                setFormData(prev => ({ ...prev, name: translated }));
+                toast.success('Category name translated to English');
+            }
+        } catch (error) {
+            console.error("Translation error", error);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -71,7 +88,22 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                Category Name <span className="text-rose-500">*</span>
+                                Category Name (Arabic) <span className="text-rose-500">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                required
+                                className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                                placeholder="مثلاً: مشروبات، أطباق رئيسية"
+                                value={formData.nameAr}
+                                onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
+                                onBlur={(e) => handleTranslate(e.target.value)}
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                Category Name (English) <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="text"
@@ -148,8 +180,8 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                         </button>
                     </div>
                 </form>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

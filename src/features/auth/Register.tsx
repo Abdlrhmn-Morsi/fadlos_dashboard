@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, AlertCircle, Store as StoreIcon, MapPin, Briefcase } from 'lucide-react';
+import { ArrowRight, AlertCircle, Store as StoreIcon, MapPin, Briefcase, Languages, Type } from 'lucide-react';
 import authApi from './api/auth.api';
 import InteractiveBackground from './InteractiveBackground';
 import appLogo from '../../assets/app_logo_primary.png';
+import toolsApi from '../../services/tools.api';
+import { toast } from '../../utils/toast';
 
 const CustomSelect = ({ label, icon: Icon, options, value, onChange, placeholder, disabled = false }: any) => {
     const [isOpen, setIsOpen] = useState(false);
@@ -86,7 +88,10 @@ const Register = () => {
         email: '',
         password: '',
         phone: '',
+        storeNameAr: '',
         storeName: '',
+        storeDescriptionAr: '',
+        storeDescription: '',
         businessTypeId: '',
         townIds: [] as string[],
         placeIds: [] as string[]
@@ -130,6 +135,28 @@ const Register = () => {
             console.error(err);
         }
     }
+
+    const handleTranslate = async (value: string, field: 'name' | 'description') => {
+        const targetField = field === 'name' ? 'storeName' : 'storeDescription';
+        if (!value || formData[targetField as keyof typeof formData]) return;
+        try {
+            let translated = '';
+            if (field === 'name') {
+                const res: any = await toolsApi.transliterate(value, 'ar');
+                translated = typeof res === 'string' ? res : res.translatedText;
+            } else {
+                const res: any = await toolsApi.translate(value, 'ar', 'en');
+                translated = typeof res === 'string' ? res : res.translatedText;
+            }
+
+            if (translated) {
+                setFormData(prev => ({ ...prev, [targetField]: translated }));
+                toast.success(`Store ${field} ${field === 'name' ? 'Romanized' : 'translated to English'}`);
+            }
+        } catch (error) {
+            console.error("Translation error", error);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -274,18 +301,63 @@ const Register = () => {
                             </div>
                         ) : (
                             <div className="space-y-4 animate-in slide-in-from-right-4 duration-300">
-                                <div className="space-y-1.5">
-                                    <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider ml-1">Store Name</label>
-                                    <div className="relative">
-                                        <StoreIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
-                                        <input
-                                            type="text"
-                                            placeholder="My Awesome Store"
-                                            className={`${inputClasses} pl-11`}
-                                            value={formData.storeName}
-                                            onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
-                                            required
-                                        />
+                                <div className="space-y-4">
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider ml-1">Store Name (Arabic)</label>
+                                        <div className="relative">
+                                            <StoreIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
+                                            <input
+                                                type="text"
+                                                placeholder="متجري الرائع"
+                                                className={`${inputClasses} pl-11 text-right`}
+                                                value={formData.storeNameAr}
+                                                onChange={(e) => setFormData({ ...formData, storeNameAr: e.target.value })}
+                                                onBlur={(e) => handleTranslate(e.target.value, 'name')}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider ml-1">Store Name (English)</label>
+                                        <div className="relative">
+                                            <StoreIcon className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500" size={18} />
+                                            <input
+                                                type="text"
+                                                placeholder="My Awesome Store"
+                                                className={`${inputClasses} pl-11`}
+                                                value={formData.storeName}
+                                                onChange={(e) => setFormData({ ...formData, storeName: e.target.value })}
+                                                required
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider ml-1">Store Description (Arabic)</label>
+                                        <div className="relative">
+                                            <Type className="absolute left-4 top-4 text-slate-400 dark:text-slate-500" size={18} />
+                                            <textarea
+                                                placeholder="وصف المتجر باللغة العربية"
+                                                className={`${inputClasses} pl-11 text-right min-h-[100px] py-3`}
+                                                value={formData.storeDescriptionAr}
+                                                onChange={(e) => setFormData({ ...formData, storeDescriptionAr: e.target.value })}
+                                                onBlur={(e) => handleTranslate(e.target.value, 'description')}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-1.5">
+                                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider ml-1">Store Description (English)</label>
+                                        <div className="relative">
+                                            <Type className="absolute left-4 top-4 text-slate-400 dark:text-slate-500" size={18} />
+                                            <textarea
+                                                placeholder="Store description in English"
+                                                className={`${inputClasses} pl-11 min-h-[100px] py-3`}
+                                                value={formData.storeDescription}
+                                                onChange={(e) => setFormData({ ...formData, storeDescription: e.target.value })}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 

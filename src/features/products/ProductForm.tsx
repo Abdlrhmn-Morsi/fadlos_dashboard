@@ -9,6 +9,7 @@ import {
 import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
 import toolsApi from '../../services/tools.api';
+import CategoryFormModal from '../categories/components/CategoryFormModal';
 
 const InputGroup = ({ label, children, required = false, subtitle = '' }: any) => (
     <div className="space-y-1.5">
@@ -52,6 +53,7 @@ const ProductForm = () => {
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [categories, setCategories] = useState<any[]>([]);
+    const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -63,7 +65,7 @@ const ProductForm = () => {
         categoryId: '',
         sku: '',
         inventory: '0',
-        trackInventory: false,
+        trackInventory: true,
         isAvailable: true,
         isActive: true,
         sortOrder: '0',
@@ -86,10 +88,15 @@ const ProductForm = () => {
         }
     }, [id]);
 
-    const fetchCategories = async () => {
+    const fetchCategories = async (selectNewId?: string) => {
         try {
             const res: any = await categoriesApi.getSellerCategories();
-            setCategories(res.data || []);
+            const categoryList = res.data || [];
+            setCategories(categoryList);
+
+            if (selectNewId) {
+                setFormData(prev => ({ ...prev, categoryId: selectNewId }));
+            }
         } catch (error) {
             console.error('Error fetching categories', error);
             toast.error('Failed to load categories');
@@ -142,20 +149,17 @@ const ProductForm = () => {
         if (!value) return;
         try {
             const res: any = await toolsApi.translate(value, 'ar', 'en');
-            // Assuming API returns { translatedText: string } or similar based on backend implementation
-            // Since backend is returning `[Translated] ...` or real text depending on mock/fetch
             const translated = typeof res === 'string' ? res : res.translatedText;
 
             if (translated && !formData[field]) {
                 setFormData(prev => {
                     const newData = { ...prev, [field]: translated };
-                    // If it's name and SKU is empty, generate it
                     if (field === 'name' && !prev.sku) {
                         newData.sku = generateSKU(translated);
                     }
                     return newData;
                 });
-                toast.success(`Auto-translated ${field === 'name' ? 'Name' : 'Description'} to English`);
+                toast.success(`Auto-translated to English`);
             }
         } catch (error) {
             console.error("Translation error", error);
@@ -666,18 +670,47 @@ const ProductForm = () => {
                                 Organization
                             </h2>
                             <div className="space-y-4">
-                                <InputGroup label="Category" required>
-                                    <select
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                                        value={formData.categoryId}
-                                        onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
-                                        required
-                                    >
-                                        <option value="">Select Category</option>
-                                        {categories.map((cat: any) => (
-                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                        ))}
-                                    </select>
+                                <InputGroup
+                                    label={
+                                        <div className="flex items-center justify-between w-full">
+                                            <span>Category</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => setIsCategoryModalOpen(true)}
+                                                className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 transition-colors uppercase tracking-wider font-bold"
+                                            >
+                                                + New
+                                            </button>
+                                        </div>
+                                    }
+                                    required
+                                >
+                                    {categories.length === 0 ? (
+                                        <div className="space-y-3">
+                                            <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-center">
+                                                <p className="text-xs text-slate-500 mb-2">No categories found</p>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setIsCategoryModalOpen(true)}
+                                                    className="w-full py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
+                                                >
+                                                    Create First Category
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <select
+                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            value={formData.categoryId}
+                                            onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
+                                            required
+                                        >
+                                            <option value="">Select Category</option>
+                                            {categories.map((cat: any) => (
+                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                            ))}
+                                        </select>
+                                    )}
                                 </InputGroup>
                                 <InputGroup label="Sort Order">
                                     <input
@@ -783,6 +816,17 @@ const ProductForm = () => {
                     </div>
                 </div>
             </form>
+
+            {isCategoryModalOpen && (
+                <CategoryFormModal
+                    onClose={() => setIsCategoryModalOpen(false)}
+                    onSuccess={() => {
+                        setIsCategoryModalOpen(false);
+                        fetchCategories();
+                        toast.success('Category created! You can now select it.');
+                    }}
+                />
+            )}
         </div>
     );
 };

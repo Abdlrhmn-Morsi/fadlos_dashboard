@@ -1,6 +1,9 @@
 export interface Store {
     id: string;
+    nameAr: string;
     name: string;
+    descriptionAr?: string;
+    description?: string;
     logo: string | null;
     status: 'ACTIVE' | 'INACTIVE' | 'PENDING';
     totalOrders: number;
