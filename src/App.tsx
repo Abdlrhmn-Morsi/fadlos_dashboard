@@ -26,6 +26,7 @@ import Settings from './features/settings/Settings';
 import StoreSettings from './features/settings/StoreSettings';
 import ProfileSettings from './features/settings/ProfileSettings';
 import DeliveryAreasPage from './features/stores/DeliveryAreasPage';
+import { BranchesList } from './features/branches/BranchesList';
 import AppUpdateSettings from './features/settings/AppUpdateSettings';
 import AppVersionHistory from './features/settings/AppVersionHistory';
 
@@ -74,6 +75,7 @@ const AppContent = () => {
             <Route path="clients" element={<ClientList />} />
             <Route path="followers" element={<FollowerList />} />
             <Route path="delivery-areas" element={<DeliveryAreasPage />} />
+            <Route path="branches" element={<BranchesList />} />
 
             {/* Admin Routes */}
             <Route path="users" element={<Users />} />

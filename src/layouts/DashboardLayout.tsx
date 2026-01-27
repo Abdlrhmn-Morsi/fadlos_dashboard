@@ -146,6 +146,7 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
               <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
               <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas', { defaultValue: 'Delivery Areas' })} collapsed={collapsed} />
+              <SidebarItem to="/branches" icon={MapPin} label={t('branches', { defaultValue: 'Branches' })} collapsed={collapsed} />
             </>
           )}
 
