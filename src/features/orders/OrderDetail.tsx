@@ -9,9 +9,15 @@ import { OrderStatus } from '../../types/order-status';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import InputModal from '../../components/ui/InputModal';
 
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
+
 const OrderDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { t } = useTranslation(['orders', 'common', 'dashboard']);
+    const { isRTL } = useLanguage();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -83,7 +89,7 @@ const OrderDetail = () => {
         </div>
     );
 
-    if (!order) return <div className="p-6">Order not found</div>;
+    if (!order) return <div className={clsx("p-6", isRTL && "text-right")}>{t('noOrdersFound')}</div>;
 
     const statuses = [
         OrderStatus.PENDING,
@@ -106,15 +112,7 @@ const OrderDetail = () => {
     };
 
     const getStatusLabel = (status: string) => {
-        switch (status) {
-            case OrderStatus.PENDING: return 'Pending';
-            case OrderStatus.CONFIRMED: return 'Confirmed';
-            case OrderStatus.PREPARING: return 'Preparing';
-            case OrderStatus.READY: return 'Ready';
-            case OrderStatus.DELIVERED: return 'Delivered';
-            case OrderStatus.CANCELLED: return 'Cancelled';
-            default: return status;
-        }
+        return t(`dashboard:status.${status.toLowerCase()}`, { defaultValue: status.replace(/_/g, ' ') });
     };
 
     // Helper to resolve variant names
@@ -134,36 +132,36 @@ const OrderDetail = () => {
         <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6">
             <div className="max-w-6xl mx-auto space-y-6">
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
+                <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "md:flex-row-reverse")}>
+                    <div className={clsx("flex items-center gap-4", isRTL && "flex-row-reverse")}>
                         <button
                             onClick={() => navigate('/orders')}
                             className="p-2 hover:bg-white dark:hover:bg-slate-800 rounded-full transition-colors border border-transparent hover:border-slate-200 dark:hover:border-slate-700"
                         >
-                            <ArrowLeft size={20} className="text-slate-500" />
+                            <ArrowLeft size={20} className={clsx("text-slate-500", isRTL && "rotate-180")} />
                         </button>
-                        <div>
-                            <div className="flex items-center gap-3">
+                        <div className={isRTL ? "text-right" : "text-left"}>
+                            <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
                                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                    Order #{order.orderNumber || order.id.substring(0, 8)}
+                                    {t('orderNumber', { number: order.orderNumber || order.id.substring(0, 8) })}
                                 </h1>
                                 <span className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusColor(order.status)}`}>
                                     {getStatusLabel(order.status)}
                                 </span>
                             </div>
-                            <p className="text-sm text-slate-500 mt-1 flex items-center gap-2">
+                            <p className={clsx("text-sm text-slate-500 mt-1 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <Clock size={14} />
-                                Placed on {new Date(order.createdAt).toLocaleString()}
+                                {t('placedOn', { date: new Date(order.createdAt).toLocaleString(isRTL ? 'ar-EG' : 'en-US') })}
                             </p>
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className={clsx("flex gap-2", isRTL && "flex-row-reverse")}>
                         <button
                             onClick={() => window.print()}
-                            className="px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-colors shadow-sm"
+                            className={clsx("px-4 py-2 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium flex items-center gap-2 transition-colors shadow-sm", isRTL && "flex-row-reverse")}
                         >
                             <Printer size={16} />
-                            Print Invoice
+                            {t('printInvoice')}
                         </button>
                     </div>
                 </div>
@@ -173,16 +171,16 @@ const OrderDetail = () => {
                     <div className="lg:col-span-2 space-y-6">
                         {/* Order Items */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
-                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
-                                <h2 className="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                            <div className={clsx("p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center", isRTL && "flex-row-reverse")}>
+                                <h2 className={clsx("font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                     <Package className="text-indigo-500" size={20} />
-                                    Order Items
+                                    {t('orderItems')}
                                 </h2>
-                                <span className="text-sm text-slate-500">{order.items.length} Items</span>
+                                <span className="text-sm text-slate-500">{t('itemsCount', { count: order.items.length })}</span>
                             </div>
                             <div className="divide-y divide-slate-100 dark:divide-slate-800">
                                 {order.items?.map((item: any) => (
-                                    <div key={item.id} className="p-6 flex items-start gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
+                                    <div key={item.id} className={clsx("p-6 flex items-start gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors", isRTL && "flex-row-reverse")}>
                                         <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 font-medium shrink-0 overflow-hidden">
                                             {item.product?.coverImage ? (
                                                 <img src={item.product.coverImage} alt={item.productName} className="w-full h-full object-cover" />
@@ -190,18 +188,18 @@ const OrderDetail = () => {
                                                 <span>x{item.quantity}</span>
                                             )}
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex justify-between items-start mb-1">
-                                                <h3 className="font-bold text-slate-900 dark:text-white text-lg truncate pr-4">
+                                        <div className={clsx("flex-1 min-w-0", isRTL ? "text-right" : "text-left")}>
+                                            <div className={clsx("flex justify-between items-start mb-1", isRTL && "flex-row-reverse")}>
+                                                <h3 className={clsx("font-bold text-slate-900 dark:text-white text-lg truncate", isRTL ? "pl-4" : "pr-4")}>
                                                     {item.productName}
                                                 </h3>
                                                 <p className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
                                                     ${(Number(item.price) * item.quantity).toFixed(2)}
                                                 </p>
                                             </div>
-                                            <div className="flex flex-wrap gap-2 text-sm text-slate-500 mb-1">
+                                            <div className={clsx("flex flex-wrap gap-2 text-sm text-slate-500 mb-1", isRTL && "flex-row-reverse")}>
                                                 <span className="bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded text-slate-600 dark:text-slate-400">
-                                                    ${Number(item.price).toFixed(2)} each
+                                                    ${Number(item.price).toFixed(2)} {t('each')}
                                                 </span>
                                                 <span>x {item.quantity}</span>
                                             </div>
@@ -217,24 +215,24 @@ const OrderDetail = () => {
 
                             {/* Order Summary */}
                             <div className="p-6 bg-slate-50 dark:bg-slate-900/50 space-y-3 border-t border-slate-200 dark:border-slate-800">
-                                <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                                    <span>Subtotal</span>
+                                <div className={clsx("flex justify-between text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse")}>
+                                    <span>{t('subtotal')}</span>
                                     <span>${Number(order.subtotal).toFixed(2)}</span>
                                 </div>
                                 {Number(order.deliveryFee) > 0 && (
-                                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                                        <span>Delivery Fee</span>
+                                    <div className={clsx("flex justify-between text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse")}>
+                                        <span>{t('deliveryFee')}</span>
                                         <span>${Number(order.deliveryFee).toFixed(2)}</span>
                                     </div>
                                 )}
                                 {Number(order.promoDiscount) > 0 && (
-                                    <div className="flex justify-between text-emerald-600 font-medium">
-                                        <span>Discount (Promo)</span>
+                                    <div className={clsx("flex justify-between text-emerald-600 font-medium", isRTL && "flex-row-reverse")}>
+                                        <span>{t('discount')}</span>
                                         <span>-${Number(order.promoDiscount).toFixed(2)}</span>
                                     </div>
                                 )}
-                                <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                                    <span className="font-bold text-slate-900 dark:text-white text-lg">Total</span>
+                                <div className={clsx("pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center", isRTL && "flex-row-reverse")}>
+                                    <span className="font-bold text-slate-900 dark:text-white text-lg">{t('total')}</span>
                                     <span className="font-bold text-indigo-600 dark:text-indigo-400 text-2xl">
                                         ${Number(order.totalAmount || order.total).toFixed(2)}
                                     </span>
@@ -245,11 +243,11 @@ const OrderDetail = () => {
                         {/* Customer Note */}
                         {order.notes && (
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                                <h3 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
+                                <h3 className={clsx("font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                     <FileText className="text-amber-500" size={20} />
-                                    Order Notes
+                                    {t('orderNotes')}
                                 </h3>
-                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 rounded-lg text-sm leading-relaxed border border-amber-100 dark:border-amber-900/30">
+                                <div className={clsx("p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 rounded-lg text-sm leading-relaxed border border-amber-100 dark:border-amber-900/30", isRTL && "text-right")}>
                                     {order.notes}
                                 </div>
                             </div>
@@ -261,7 +259,7 @@ const OrderDetail = () => {
                         {/* Status Stepper */}
                         {order.status !== OrderStatus.CANCELLED && (
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                                <h3 className="font-bold text-slate-900 dark:text-white mb-4">Order Progress</h3>
+                                <h3 className={clsx("font-bold text-slate-900 dark:text-white mb-4", isRTL && "text-right")}>{t('orderProgress')}</h3>
                                 <div className="relative flex flex-col gap-0">
                                     {statuses.map((status, index) => {
                                         const isCompleted = statuses.indexOf(order.status) >= index;
@@ -270,9 +268,9 @@ const OrderDetail = () => {
                                         const isClickable = statuses.indexOf(order.status) === index - 1; // Can only click direct next step
 
                                         return (
-                                            <div key={status} className="flex gap-4 relative pb-8 last:pb-0">
+                                            <div key={status} className={clsx("flex gap-4 relative pb-8 last:pb-0", isRTL && "flex-row-reverse")}>
                                                 {index !== statuses.length - 1 && (
-                                                    <div className={`absolute left-[15px] top-8 bottom-0 w-0.5 ${isCompleted && !isCurrent ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                                                    <div className={clsx(`absolute top-8 bottom-0 w-0.5 ${isCompleted && !isCurrent ? 'bg-indigo-600' : 'bg-slate-200 dark:bg-slate-700'}`, isRTL ? "right-[15px]" : "left-[15px]")} />
                                                 )}
 
                                                 <button
@@ -296,12 +294,12 @@ const OrderDetail = () => {
                                                     )}
                                                 </button>
 
-                                                <div className={`mt-1 flex-1 ${isClickable ? 'cursor-pointer' : ''}`} onClick={() => isClickable ? handleStatusClick(status) : null}>
+                                                <div className={clsx("mt-1 flex-1", isClickable ? "cursor-pointer" : "", isRTL ? "text-right" : "text-left")} onClick={() => isClickable ? handleStatusClick(status) : null}>
                                                     <h4 className={`font-bold text-sm ${isCompleted || isCurrent ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600'}`}>
                                                         {getStatusLabel(status)}
                                                     </h4>
                                                     <p className="text-xs text-slate-500">
-                                                        {isCurrent ? 'Current Status' : isCompleted ? 'Completed' : 'Pending'}
+                                                        {isCurrent ? t('currentStatus') : isCompleted ? t('completed') : t('pending')}
                                                     </p>
                                                 </div>
                                             </div>
@@ -314,31 +312,31 @@ const OrderDetail = () => {
 
                         {/* Customer Details */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                            <h3 className={clsx("font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <User className="text-indigo-500" size={20} />
-                                Customer
+                                {t('customer')}
                             </h3>
                             <div className="space-y-4">
-                                <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                                <div className={clsx("flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800", isRTL && "flex-row-reverse")}>
                                     <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
                                         {order.client?.name?.[0] || order.clientInfo?.name?.[0] || 'G'}
                                     </div>
-                                    <div>
+                                    <div className={isRTL ? "text-right" : "text-left"}>
                                         <p className="font-bold text-slate-900 dark:text-white">
-                                            {order.client?.name || order.clientInfo?.name || 'Guest'}
+                                            {order.client?.name || order.clientInfo?.name || t('guest')}
                                         </p>
-                                        <p className="text-xs text-slate-500">Customer</p>
+                                        <p className="text-xs text-slate-500">{t('customer')}</p>
                                     </div>
                                 </div>
 
                                 <div className="space-y-3 text-sm">
-                                    <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors">
+                                    <div className={clsx("flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors", isRTL && "flex-row-reverse")}>
                                         <Mail size={16} className="text-slate-400" />
-                                        <span>{order.client?.email || order.clientInfo?.email || 'No email provided'}</span>
+                                        <span>{order.client?.email || order.clientInfo?.email || t('noEmail')}</span>
                                     </div>
-                                    <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors">
+                                    <div className={clsx("flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors", isRTL && "flex-row-reverse")}>
                                         <Phone size={16} className="text-slate-400" />
-                                        <span>{order.client?.phone || order.clientInfo?.phone || 'No phone provided'}</span>
+                                        <span>{order.client?.phone || order.clientInfo?.phone || t('noPhone')}</span>
                                     </div>
                                 </div>
                             </div>
@@ -346,40 +344,48 @@ const OrderDetail = () => {
 
                         {/* Delivery Details */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                            <h3 className={clsx("font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <MapPin className="text-indigo-500" size={20} />
-                                Delivery Details
+                                {t('deliveryDetails')}
                             </h3>
                             <div className="space-y-4">
                                 {order.deliveryAddress ? (
                                     <>
                                         <div className="space-y-3 text-sm">
-                                            <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                            <div className={clsx("flex items-start gap-3 text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse")}>
                                                 <Globe size={16} className="text-slate-400 mt-0.5" />
-                                                <div>
+                                                <div className={isRTL ? "text-right" : "text-left"}>
                                                     <p className="font-medium text-slate-900 dark:text-white">
-                                                        {order.deliveryAddress.townEnName} ({order.deliveryAddress.townArName})
+                                                        {isRTL ?
+                                                            `${order.deliveryAddress.townArName} (${order.deliveryAddress.townEnName})` :
+                                                            `${order.deliveryAddress.townEnName} (${order.deliveryAddress.townArName})`
+                                                        }
                                                     </p>
-                                                    <p>{order.deliveryAddress.placeEnName} ({order.deliveryAddress.placeArName})</p>
+                                                    <p>
+                                                        {isRTL ?
+                                                            `${order.deliveryAddress.placeArName} (${order.deliveryAddress.placeEnName})` :
+                                                            `${order.deliveryAddress.placeEnName} (${order.deliveryAddress.placeArName})`
+                                                        }
+                                                    </p>
                                                 </div>
                                             </div>
-                                            <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                            <div className={clsx("flex items-start gap-3 text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse")}>
                                                 <MapPin size={16} className="text-slate-400 mt-0.5" />
-                                                <span>{order.deliveryAddress.addressDetails}</span>
+                                                <span className={isRTL ? "text-right" : "text-left"}>{order.deliveryAddress.addressDetails}</span>
                                             </div>
                                             {(order.deliveryAddress.phone || order.deliveryAddress.email) && (
                                                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                                                    <p className="text-xs font-semibold text-slate-400 uppercase">Contact for Delivery</p>
+                                                    <p className={clsx("text-xs font-semibold text-slate-400 uppercase", isRTL && "text-right")}>{t('contactForDelivery')}</p>
                                                     {order.deliveryAddress.phone && (
-                                                        <div className="flex items-center gap-3">
+                                                        <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
                                                             <Phone size={14} className="text-slate-400" />
-                                                            <span>{order.deliveryAddress.phone}</span>
+                                                            <span className={clsx(isRTL && "text-right")}>{order.deliveryAddress.phone}</span>
                                                         </div>
                                                     )}
                                                     {order.deliveryAddress.email && (
-                                                        <div className="flex items-center gap-3">
+                                                        <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
                                                             <Mail size={14} className="text-slate-400" />
-                                                            <span>{order.deliveryAddress.email}</span>
+                                                            <span className={clsx(isRTL && "text-right")}>{order.deliveryAddress.email}</span>
                                                         </div>
                                                     )}
                                                 </div>
@@ -402,9 +408,9 @@ const OrderDetail = () => {
                                         )}
                                     </>
                                 ) : (
-                                    <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 italic">
+                                    <div className={clsx("flex items-center gap-3 text-slate-600 dark:text-slate-400 italic", isRTL && "flex-row-reverse")}>
                                         <AlertCircle size={16} className="text-amber-500" />
-                                        <span>No delivery information provided</span>
+                                        <span>{t('noDeliveryInfo')}</span>
                                     </div>
                                 )}
                             </div>
@@ -415,18 +421,18 @@ const OrderDetail = () => {
                     {/* Cancel Order Section */}
                     {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                            <h3 className={clsx("font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <AlertCircle className="text-rose-500" size={20} />
-                                Cancel Order
+                                {t('cancelOrder')}
                             </h3>
-                            <p className="text-sm text-slate-500 mb-4">
-                                If you need to cancel this order, please provide a reason. This action cannot be undone.
+                            <p className={clsx("text-sm text-slate-500 mb-4", isRTL && "text-right")}>
+                                {t('cancelOrderWarning')}
                             </p>
                             <button
                                 onClick={() => setCancelModal(true)}
                                 className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
                             >
-                                Cancel Order
+                                {t('cancelOrder')}
                             </button>
                         </div>
                     )}
@@ -437,20 +443,20 @@ const OrderDetail = () => {
             {/* Modals */}
             <ConfirmationModal
                 isOpen={statusModal.isOpen}
-                title="Update Order Status"
-                message={`Are you sure you want to change the status to "${getStatusLabel(statusModal.status)}"? The customer will be notified.`}
+                title={t('updateStatusTitle')}
+                message={t('updateStatusConfirm', { status: getStatusLabel(statusModal.status) })}
                 onConfirm={confirmStatusUpdate}
-                confirmLabel="Update Status"
+                confirmLabel={t('confirmUpdateLabel')}
                 onCancel={() => setStatusModal({ isOpen: false, status: '' })}
                 isLoading={updating}
             />
 
             <InputModal
                 isOpen={cancelModal}
-                title="Cancel Order"
-                message="Please provide a reason for cancelling this order. This action cannot be undone."
-                placeholder="Reason for cancellation..."
-                submitLabel="Cancel Order"
+                title={t('cancelOrder')}
+                message={t('cancelOrderWarning')}
+                placeholder={t('cancelReasonPlaceholder')}
+                submitLabel={t('cancelOrder')}
                 onSubmit={handleCancelOrder}
                 onCancel={() => setCancelModal(false)}
                 isLoading={updating}

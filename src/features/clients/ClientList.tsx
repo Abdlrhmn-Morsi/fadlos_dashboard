@@ -6,6 +6,8 @@ import {
     Loader2, TrendingUp, TrendingDown,
     Clock, Package, ArrowLeft, Mail, Phone, MapPin, Eye
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
 import clientsApi from './api/clients.api';
 import ordersApi from '../orders/api/orders.api';
 import { toast } from '../../utils/toast';
@@ -13,6 +15,8 @@ import { OrderStatus } from '../../types/order-status';
 import clsx from 'clsx';
 
 const ClientList = () => {
+    const { t } = useTranslation(['clients', 'common']);
+    const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const [clients, setClients] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -46,7 +50,7 @@ const ClientList = () => {
             setClients(response.data || response || []);
         } catch (error) {
             console.error('Failed to fetch clients', error);
-            toast.error('Failed to load clients');
+            toast.error(t('common:errorFetchingData'));
         } finally {
             setLoading(false);
         }
@@ -76,7 +80,7 @@ const ClientList = () => {
             setClientOrders(response.data || response.orders || []);
         } catch (error) {
             console.error('Failed to fetch client orders', error);
-            toast.error('Failed to load order history');
+            toast.error(t('common:errorFetchingData'));
         } finally {
             setLoadingOrders(false);
         }
@@ -90,7 +94,7 @@ const ClientList = () => {
             setSelectedOrder(data);
         } catch (error) {
             console.error('Failed to fetch order detail', error);
-            toast.error('Failed to load order details');
+            toast.error(t('common:errorFetchingData'));
             setViewMode('list');
         } finally {
             setLoadingOrderDetail(false);
@@ -110,16 +114,19 @@ const ClientList = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">Store Clients</h1>
-                    <p className="text-sm text-slate-500 font-medium">Analyze and manage your customer relationships</p>
+                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
+                    <p className="text-sm text-slate-500 font-medium">{t('subtitle')}</p>
                 </div>
 
                 <form onSubmit={handleSearch} className="relative w-full md:w-80">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+                    <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={18} />
                     <input
                         type="text"
-                        placeholder="Search clients..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm"
+                        placeholder={t('searchPlaceholder')}
+                        className={clsx(
+                            "w-full pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-sm",
+                            isRTL ? "pr-10" : "pl-10"
+                        )}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -131,7 +138,8 @@ const ClientList = () => {
                 <button
                     onClick={() => { setSortBy('totalSpent'); setOrder('DESC'); }}
                     className={clsx(
-                        "p-4 rounded-xl border transition-all text-left group",
+                        "p-4 rounded-xl border transition-all group",
+                        isRTL ? "text-right" : "text-left",
                         sortBy === 'totalSpent' ? "bg-primary border-primary text-white shadow-lg shadow-primary/20" : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-primary/50"
                     )}
                 >
@@ -139,14 +147,15 @@ const ClientList = () => {
                         <DollarSign size={20} className={sortBy === 'totalSpent' ? "text-white/80" : "text-primary"} />
                         {sortBy === 'totalSpent' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
-                    <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalSpent' ? "text-white/70" : "text-slate-400")}>Highest Spenders</p>
-                    <p className="text-sm font-black">Sort by Total Spent</p>
+                    <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalSpent' ? "text-white/70" : "text-slate-400")}>{t('highestSpenders')}</p>
+                    <p className="text-sm font-black">{t('sortByTotalSpent')}</p>
                 </button>
 
                 <button
                     onClick={() => { setSortBy('totalOrders'); setOrder('DESC'); }}
                     className={clsx(
-                        "p-4 rounded-xl border transition-all text-left group",
+                        "p-4 rounded-xl border transition-all group",
+                        isRTL ? "text-right" : "text-left",
                         sortBy === 'totalOrders' ? "bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-200" : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-indigo-400"
                     )}
                 >
@@ -154,8 +163,8 @@ const ClientList = () => {
                         <ShoppingBag size={20} className={sortBy === 'totalOrders' ? "text-white/80" : "text-indigo-500"} />
                         {sortBy === 'totalOrders' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
-                    <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalOrders' ? "text-white/70" : "text-slate-400")}>Most Active</p>
-                    <p className="text-sm font-black">Sort by Total Orders</p>
+                    <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalOrders' ? "text-white/70" : "text-slate-400")}>{t('mostActive')}</p>
+                    <p className="text-sm font-black">{t('sortByTotalOrders')}</p>
                 </button>
             </div>
 
@@ -167,20 +176,20 @@ const ClientList = () => {
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-4">
                                     <button onClick={() => toggleSort('firstName')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
-                                        Client Information
+                                        {t('clientInformation')}
                                         <ArrowUpDown size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </button>
                                 </th>
-                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">Client Since</th>
+                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('clientSince')}</th>
                                 <th className="px-6 py-4">
                                     <button onClick={() => toggleSort('totalOrders')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
-                                        Total Orders
+                                        {t('totalOrders')}
                                         <ArrowUpDown size={14} className={clsx("transition-opacity", sortBy === 'totalOrders' ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100")} />
                                     </button>
                                 </th>
                                 <th className="px-6 py-4">
                                     <button onClick={() => toggleSort('totalSpent')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
-                                        Total Spent
+                                        {t('totalSpent')}
                                         <ArrowUpDown size={14} className={clsx("transition-opacity", sortBy === 'totalSpent' ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100")} />
                                     </button>
                                 </th>
@@ -193,13 +202,13 @@ const ClientList = () => {
                                     <td colSpan={5} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center gap-2">
                                             <Loader2 size={32} className="text-primary animate-spin" />
-                                            <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">Syncing Clients...</span>
+                                            <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">{t('syncingClients')}</span>
                                         </div>
                                     </td>
                                 </tr>
                             ) : clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-tighter">No clients match your criteria.</td>
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-tighter">{t('noClientsMatch')}</td>
                                 </tr>
                             ) : (
                                 clients.map((item) => {
@@ -222,7 +231,7 @@ const ClientList = () => {
                                                     </div>
                                                     <div>
                                                         <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                                                            {client?.name || 'Anonymous User'}
+                                                            {client?.name || t('anonymousUser')}
                                                         </h3>
                                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{client?.email}</p>
                                                     </div>
@@ -243,13 +252,13 @@ const ClientList = () => {
                                             <td className="px-6 py-5">
                                                 <div className="flex flex-col">
                                                     <span className="text-primary font-black text-lg tracking-tight">
-                                                        ${Number(stats?.totalSpent || 0).toFixed(2)}
+                                                        {Number(stats?.totalSpent || 0).toFixed(2)}$
                                                     </span>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">Avg. ${Number(stats?.averageOrderValue || 0).toFixed(2)}</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">{t('avg')} {Number(stats?.averageOrderValue || 0).toFixed(2)}$</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 text-right">
-                                                <ChevronRight size={20} className="text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all inline-block" />
+                                            <td className="px-6 py-5 text-right rtl:text-left">
+                                                <ChevronRight size={20} className={clsx("text-slate-300 transition-all inline-block", isRTL ? "group-hover:text-primary group-hover:-translate-x-1 rotate-180" : "group-hover:text-primary group-hover:translate-x-1")} />
                                             </td>
                                         </tr>
                                     );
@@ -271,8 +280,9 @@ const ClientList = () => {
                 )} onClick={() => setSelectedClient(null)} />
 
                 <div className={clsx(
-                    "absolute top-0 right-0 h-full w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl transition-transform duration-500 pointer-events-auto border-l border-slate-200 dark:border-slate-800",
-                    selectedClient ? "translate-x-0" : "translate-x-full"
+                    "absolute top-0 h-full w-full max-w-xl bg-white dark:bg-slate-900 shadow-2xl transition-transform duration-500 pointer-events-auto",
+                    isRTL ? "left-0 border-r border-slate-200 dark:border-slate-800" : "right-0 border-l border-slate-200 dark:border-slate-800",
+                    selectedClient ? "translate-x-0" : (isRTL ? "-translate-x-full" : "translate-x-full")
                 )}>
                     <div className="flex flex-col h-full">
                         {/* Panel Header */}
@@ -283,12 +293,12 @@ const ClientList = () => {
                                         onClick={() => setViewMode('list')}
                                         className="p-2 hover:bg-white dark:hover:bg-slate-700 rounded-xl transition-all text-slate-400 hover:text-primary"
                                     >
-                                        <ArrowLeft size={20} />
+                                        <ArrowLeft size={20} className={isRTL ? "rotate-180" : ""} />
                                     </button>
                                 )}
                                 <div>
                                     <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
-                                        {viewMode === 'list' ? 'Order History' : `Order Details`}
+                                        {viewMode === 'list' ? t('orderHistory') : t('orderDetails')}
                                     </h2>
                                     <p className="text-xs font-bold text-primary uppercase tracking-widest">{selectedClient?.client?.name}</p>
                                 </div>
@@ -308,12 +318,12 @@ const ClientList = () => {
                                 loadingOrders ? (
                                     <div className="flex flex-col items-center justify-center h-full gap-3">
                                         <Loader2 size={32} className="text-primary animate-spin" />
-                                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Retrieving Purchases...</p>
+                                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('retrievingPurchases')}</p>
                                     </div>
                                 ) : clientOrders.length === 0 ? (
                                     <div className="text-center py-20">
                                         <ShoppingBag size={48} className="mx-auto text-slate-100 mb-4" />
-                                        <p className="font-bold text-slate-400 font-mono text-sm">No recent orders found.</p>
+                                        <p className="font-bold text-slate-400 font-mono text-sm">{t('noRecentOrders')}</p>
                                     </div>
                                 ) : (
                                     clientOrders.map((order) => (
@@ -340,9 +350,9 @@ const ClientList = () => {
                                                         <span>{new Date(order.createdAt).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
-                                                <div className="text-right">
-                                                    <p className="text-lg font-black text-slate-900 dark:text-white leading-tight">${Number(order.total).toFixed(2)}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{order.items?.length || 0} ITEMS</p>
+                                                <div className={clsx(isRTL ? "text-left" : "text-right")}>
+                                                    <p className="text-lg font-black text-slate-900 dark:text-white leading-tight">{Number(order.total).toFixed(2)}$</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{order.items?.length || 0} {t('common:items')}</p>
                                                 </div>
                                             </div>
 
@@ -365,8 +375,8 @@ const ClientList = () => {
                                                 </div>
                                                 <span className="flex-1" />
                                                 <button className="flex items-center gap-1 text-[10px] font-black text-primary uppercase tracking-widest group-hover:gap-2 transition-all">
-                                                    Details
-                                                    <ChevronRight size={14} />
+                                                    {t('common:details')}
+                                                    <ChevronRight size={14} className={isRTL ? "rotate-180" : ""} />
                                                 </button>
                                             </div>
                                         </div>
@@ -377,14 +387,14 @@ const ClientList = () => {
                                 loadingOrderDetail ? (
                                     <div className="flex flex-col items-center justify-center h-full gap-3">
                                         <Loader2 size={32} className="text-primary animate-spin" />
-                                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Loading Details...</p>
+                                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('common:loading')}</p>
                                     </div>
                                 ) : selectedOrder && (
                                     <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
                                         {/* Simplified Detail UI */}
                                         <div className="bg-slate-50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex justify-between items-center">
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Order Status</p>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('orderStatus')}</p>
                                                 <span className={clsx(
                                                     "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border",
                                                     getStatusColor(selectedOrder.status)
@@ -392,8 +402,8 @@ const ClientList = () => {
                                                     {selectedOrder.status}
                                                 </span>
                                             </div>
-                                            <div className="text-right">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Placed On</p>
+                                            <div className={clsx(isRTL ? "text-left" : "text-right")}>
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('placedOn')}</p>
                                                 <p className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tighter">
                                                     {new Date(selectedOrder.createdAt).toLocaleString()}
                                                 </p>
@@ -401,7 +411,7 @@ const ClientList = () => {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Purchased Items</h3>
+                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('purchasedItems')}</h3>
                                             <div className="space-y-2">
                                                 {selectedOrder.items?.map((item: any) => (
                                                     <div key={item.id} className="flex gap-4 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800">
@@ -415,9 +425,9 @@ const ClientList = () => {
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex justify-between items-start">
                                                                 <p className="font-bold text-slate-900 dark:text-white text-sm truncate uppercase tracking-tighter">{item.productName}</p>
-                                                                <p className="font-black text-slate-900 dark:text-white text-sm tracking-tighter">${(item.price * item.quantity).toFixed(2)}</p>
+                                                                <p className="font-black text-slate-900 dark:text-white text-sm tracking-tighter">{Number(item.price * item.quantity).toFixed(2)}$</p>
                                                             </div>
-                                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">Qty: {item.quantity} × ${Number(item.price).toFixed(2)}</p>
+                                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">{t('qty')}: {item.quantity} × {Number(item.price).toFixed(2)}$</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -427,38 +437,38 @@ const ClientList = () => {
                                         {/* Financial Summary */}
                                         <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
                                             <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tighter">
-                                                <span>Subtotal</span>
-                                                <span className="text-slate-900 dark:text-white">${Number(selectedOrder.subtotal).toFixed(2)}</span>
+                                                <span>{t('subtotal')}</span>
+                                                <span className="text-slate-900 dark:text-white">{Number(selectedOrder.subtotal).toFixed(2)}$</span>
                                             </div>
                                             {Number(selectedOrder.promoDiscount) > 0 && (
                                                 <div className="flex justify-between text-xs font-bold text-emerald-500 uppercase tracking-tighter">
-                                                    <span>Discount</span>
-                                                    <span>-${Number(selectedOrder.promoDiscount).toFixed(2)}</span>
+                                                    <span>{t('discount')}</span>
+                                                    <span>-{Number(selectedOrder.promoDiscount).toFixed(2)}$</span>
                                                 </div>
                                             )}
                                             {Number(selectedOrder.deliveryFee) > 0 && (
                                                 <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tighter">
-                                                    <span>Delivery</span>
-                                                    <span className="text-slate-900 dark:text-white">+${Number(selectedOrder.deliveryFee).toFixed(2)}</span>
+                                                    <span>{t('delivery')}</span>
+                                                    <span className="text-slate-900 dark:text-white">+{Number(selectedOrder.deliveryFee).toFixed(2)}$</span>
                                                 </div>
                                             )}
                                             <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                                                <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.1em]">Total Paid</span>
-                                                <span className="text-2xl font-black text-primary tracking-tighter">${Number(selectedOrder.total).toFixed(2)}</span>
+                                                <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.1em]">{t('totalPaid')}</span>
+                                                <span className="text-2xl font-black text-primary tracking-tighter">{Number(selectedOrder.total).toFixed(2)}$</span>
                                             </div>
                                         </div>
 
                                         {/* Delivery Info */}
                                         <div className="space-y-4">
-                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">Logistics</h3>
+                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('logistics')}</h3>
                                             <div className="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
                                                 <div className="flex items-center gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
                                                     <MapPin size={16} className="text-primary" />
-                                                    <span className="uppercase tracking-tighter">{selectedOrder.deliveryAddress ? `${selectedOrder.deliveryAddress.street}, ${selectedOrder.deliveryAddress.city}` : 'Pickup'}</span>
+                                                    <span className="uppercase tracking-tighter">{selectedOrder.deliveryAddress ? `${selectedOrder.deliveryAddress.street}, ${selectedOrder.deliveryAddress.city}` : t('pickup')}</span>
                                                 </div>
                                                 <div className="flex items-center gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
                                                     <Phone size={16} className="text-primary" />
-                                                    <span className="tracking-tighter">{selectedOrder.client?.phone || 'No Phone provided'}</span>
+                                                    <span className="tracking-tighter">{selectedOrder.client?.phone || t('noPhone')}</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -472,11 +482,11 @@ const ClientList = () => {
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Lifetime Value</p>
-                                        <p className="text-xl font-black text-primary">${Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)}</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('lifetimeValue')}</p>
+                                        <p className="text-xl font-black text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)}$</p>
                                     </div>
                                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Total Purchases</p>
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('totalPurchases')}</p>
                                         <p className="text-xl font-black text-slate-900 dark:text-white uppercase">{selectedClient?.stats?.totalOrders || 0}</p>
                                     </div>
                                 </div>
@@ -489,7 +499,7 @@ const ClientList = () => {
                                     className="w-full py-3 bg-slate-900 dark:bg-primary text-white font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Eye size={16} />
-                                    Go to Order Fulfillment
+                                    {t('goToOrderFulfillment')}
                                 </button>
                             </div>
                         )}

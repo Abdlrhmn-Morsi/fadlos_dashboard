@@ -2,8 +2,11 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { CreateBranchDto, Branch } from '../../../types/branch';
 import { MapPin, Phone, Home, Globe, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import toolsApi from '../../../services/tools.api';
 import { toast } from '../../../utils/toast';
+import clsx from 'clsx';
 
 interface BranchFormProps {
     initialData?: Branch;
@@ -12,6 +15,8 @@ interface BranchFormProps {
 }
 
 export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, isLoading }) => {
+    const { t } = useTranslation(['branches', 'common']);
+    const { isRTL } = useLanguage();
     const [isTranslating, setIsTranslating] = React.useState(false);
 
     const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm<CreateBranchDto>({
@@ -35,7 +40,7 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
             const translated = typeof res === 'string' ? res : res.translatedText;
             if (translated) {
                 setValue('addressEn', translated);
-                toast.success('Address auto-translated to English');
+                toast.success(t('autoTranslated'));
             }
         } catch (error) {
             console.error("Translation error", error);
@@ -48,36 +53,44 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address (Arabic)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('addressAr')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "right-0 pr-3" : "left-0 pl-3")}>
                             <Home className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
                         <input
                             type="text"
-                            {...register('addressAr', { required: 'Arabic address is required' })}
+                            {...register('addressAr', { required: t('addressArRequired') })}
                             onBlur={(e) => handleTranslate(e.target.value)}
-                            className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5 text-right"
-                            placeholder="العنوان بالعربي"
+                            className={clsx(
+                                "focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5",
+                                isRTL ? "pr-10 text-right" : "pl-10",
+                                errors.addressAr ? "border-red-300" : ""
+                            )}
+                            placeholder={t('addressAr')}
                         />
                     </div>
                     {errors.addressAr && <p className="mt-1 text-sm text-red-600">{errors.addressAr.message}</p>}
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Address (English)</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('addressEn')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "right-0 pr-3" : "left-0 pl-3")}>
                             <Home className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
                         <input
                             type="text"
-                            {...register('addressEn', { required: 'English address is required' })}
-                            className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5"
-                            placeholder="Address in English"
+                            {...register('addressEn', { required: t('addressEnRequired') })}
+                            className={clsx(
+                                "focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5",
+                                isRTL ? "pr-10" : "pl-10",
+                                errors.addressEn ? "border-red-300" : ""
+                            )}
+                            placeholder={t('addressEn')}
                         />
                         {isTranslating && (
-                            <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "left-0 pl-3" : "right-0 pr-3")}>
                                 <Loader2 className="h-4 w-4 text-indigo-500 animate-spin" />
                             </div>
                         )}
@@ -87,15 +100,19 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
             </div>
 
             <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('phone')}</label>
                 <div className="mt-1 relative rounded-md shadow-sm">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "right-0 pr-3" : "left-0 pl-3")}>
                         <Phone className="h-5 w-5 text-gray-400" aria-hidden="true" />
                     </div>
                     <input
                         type="text"
-                        {...register('phone', { required: 'Phone is required' })}
-                        className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5"
+                        {...register('phone', { required: t('phoneRequired') })}
+                        className={clsx(
+                            "focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5",
+                            isRTL ? "pr-10" : "pl-10",
+                            errors.phone ? "border-red-300" : ""
+                        )}
                         placeholder="+1 234 567 890"
                     />
                 </div>
@@ -104,42 +121,50 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
 
             <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Latitude</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('latitude')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "right-0 pr-3" : "left-0 pl-3")}>
                             <Globe className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
                         <input
                             type="number"
                             step="any"
                             {...register('latitude', {
-                                required: 'Latitude is required',
+                                required: t('latRequired'),
                                 valueAsNumber: true,
-                                min: { value: -90, message: 'Latitude must be between -90 and 90' },
-                                max: { value: 90, message: 'Latitude must be between -90 and 90' }
+                                min: { value: -90, message: t('latRange') },
+                                max: { value: 90, message: t('latRange') }
                             })}
-                            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5 ${errors.latitude ? 'border-red-300' : ''}`}
+                            className={clsx(
+                                "focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5",
+                                isRTL ? "pr-10" : "pl-10",
+                                errors.latitude ? "border-red-300" : ""
+                            )}
                             placeholder="30.0444"
                         />
                     </div>
                     {errors.latitude && <p className="mt-1 text-sm text-red-600">{errors.latitude.message}</p>}
                 </div>
                 <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Longitude</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('longitude')}</label>
                     <div className="mt-1 relative rounded-md shadow-sm">
-                        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "right-0 pr-3" : "left-0 pl-3")}>
                             <Globe className="h-5 w-5 text-gray-400" aria-hidden="true" />
                         </div>
                         <input
                             type="number"
                             step="any"
                             {...register('longitude', {
-                                required: 'Longitude is required',
+                                required: t('lngRequired'),
                                 valueAsNumber: true,
-                                min: { value: -180, message: 'Longitude must be between -180 and 180' },
-                                max: { value: 180, message: 'Longitude must be between -180 and 180' }
+                                min: { value: -180, message: t('lngRange') },
+                                max: { value: 180, message: t('lngRange') }
                             })}
-                            className={`focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-10 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5 ${errors.longitude ? 'border-red-300' : ''}`}
+                            className={clsx(
+                                "focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 py-2.5",
+                                isRTL ? "pr-10" : "pl-10",
+                                errors.longitude ? "border-red-300" : ""
+                            )}
                             placeholder="31.2357"
                         />
                     </div>
@@ -156,9 +181,9 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500"
                     />
                 </div>
-                <div className="ml-3 text-sm">
-                    <label htmlFor="isActive" className="font-medium text-gray-700 dark:text-gray-300">Active Status</label>
-                    <p className="text-gray-500 dark:text-gray-400">Enable or disable this branch for customers.</p>
+                <div className={clsx("text-sm", isRTL ? "mr-3 text-right" : "ml-3")}>
+                    <label htmlFor="isActive" className="font-medium text-gray-700 dark:text-gray-300">{t('activeStatus')}</label>
+                    <p className="text-gray-500 dark:text-gray-400">{t('activeStatusDesc')}</p>
                 </div>
             </div>
 
@@ -168,7 +193,7 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                     disabled={isLoading}
                     className="inline-flex justify-center py-2.5 px-6 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 transition-colors duration-200"
                 >
-                    {isLoading ? 'Saving...' : 'Save Branch'}
+                    {isLoading ? t('saving') : t('saveBranch')}
                 </button>
             </div>
         </form>

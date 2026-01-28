@@ -16,5 +16,14 @@
     "inactive": "Inactive",
     "loadFailed": "Failed to load categories",
     "saveSuccess": "Category saved successfully",
-    "deleteSuccess": "Category deleted successfully"
+    "deleteSuccess": "Category deleted successfully",
+    "categoryNameAr": "Category Name (Arabic)",
+    "categoryNameEn": "Category Name (English)",
+    "sortOrder": "Sort Order",
+    "sortOrderInfo": "Lower numbers appear first in the list.",
+    "placeholderNameAr": "مثلاً: مشروبات، أطباق رئيسية",
+    "placeholderNameEn": "e.g. Beverages, Main Courses",
+    "categoryTranslated": "Category name translated to English",
+    "createNewCategory": "Create New Category",
+    "saveChanges": "Save Changes"
 }

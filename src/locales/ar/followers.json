@@ -1,9 +1,14 @@
 {
-    "title": "المتابعون",
+    "title": "متابعي المتجر",
     "subtitle": "تفاعل مع المستخدمين الذين يتابعون متجرك",
-    "searchPlaceholder": "البحث في المتابعين...",
-    "name": "الاسم",
-    "followDate": "تاريخ المتابعة",
-    "actions": "الإجراءات",
-    "noFollowersFound": "لم يتم العثور على متابعين"
+    "activeConnection": "اتصال نشط",
+    "activeConnections": "اتصالات نشطة",
+    "communityReach": "الوصول للمجتمع",
+    "loadingNetwork": "جاري تحميل الشبكة...",
+    "evolveTitle": "متجرك في تطور مستمر",
+    "evolveSubtitle": "النمو يبدأ باتصال واحد",
+    "noFollowersFound": "لا يوجد متابعين",
+    "valuedFollower": "متابع مقدر",
+    "verifiedReader": "قارئ معتمد",
+    "searchPlaceholder": "البحث في المتابعين..."
 }

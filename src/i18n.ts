@@ -32,6 +32,9 @@ import clientsEN from './locales/en/clients.json';
 import clientsAR from './locales/ar/clients.json';
 import followersEN from './locales/en/followers.json';
 import followersAR from './locales/ar/followers.json';
+import branchesEN from './locales/en/branches.json';
+import branchesAR from './locales/ar/branches.json';
+
 
 const resources = {
     en: {
@@ -50,6 +53,7 @@ const resources = {
         reviews: reviewsEN,
         clients: clientsEN,
         followers: followersEN,
+        branches: branchesEN,
     },
     ar: {
         common: commonAR,
@@ -67,6 +71,7 @@ const resources = {
         reviews: reviewsAR,
         clients: clientsAR,
         followers: followersAR,
+        branches: branchesAR,
     },
 };
 

@@ -1,25 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import {
-    ArrowLeft, Save, Tag, Calendar,
-    Hash, DollarSign, Percent, Info,
-    CheckCircle2, AlertCircle, Loader2
-} from 'lucide-react';
+import { ArrowLeft, Save, Tag, Calendar, Hash, DollarSign, Percent, Info, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
 import promoCodesApi from './api/promocodes.api';
 import { toast } from '../../utils/toast';
+import clsx from 'clsx';
 
-const InputGroup = ({ label, children, icon: Icon, required = false, subtitle = '' }: any) => (
-    <div className="space-y-1.5">
-        <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
-            {Icon && <Icon size={16} className="text-slate-400" />}
-            {label} {required && <span className="text-rose-500">*</span>}
-        </label>
-        {children}
-        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
-    </div>
-);
+const InputGroup = ({ label, children, icon: Icon, required = false, subtitle = '' }: any) => {
+    const { isRTL } = useLanguage();
+    return (
+        <div className="space-y-1.5">
+            <label className={clsx("flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "flex-row-reverse")}>
+                {Icon && <Icon size={16} className="text-slate-400" />}
+                <span className={isRTL ? "text-right" : "text-left"}>
+                    {label} {required && <span className="text-rose-500 ms-1">*</span>}
+                </span>
+            </label>
+            {children}
+            {subtitle && <p className={clsx("text-xs text-slate-400", isRTL && "text-right")}>{subtitle}</p>}
+        </div>
+    );
+};
 
 const PromoCodeForm = () => {
+    const { t } = useTranslation(['promocodes', 'common']);
+    const { isRTL } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
@@ -63,7 +69,7 @@ const PromoCodeForm = () => {
             });
         } catch (error) {
             console.error('Failed to fetch promo code', error);
-            toast.error('Failed to load promo code data');
+            toast.error(t('common:errorFetchingData'));
             navigate('/promocodes');
         } finally {
             setLoading(false);
@@ -74,7 +80,7 @@ const PromoCodeForm = () => {
         e.preventDefault();
 
         if (!formData.expiresAt) {
-            toast.error('Expiry date is required');
+            toast.error(t('expiryRequired'));
             return;
         }
 
@@ -95,15 +101,15 @@ const PromoCodeForm = () => {
 
             if (isEditMode) {
                 await promoCodesApi.updatePromoCode(id!, payload);
-                toast.success('Promo code updated successfully');
+                toast.success(t('common:success'));
             } else {
                 await promoCodesApi.createPromoCode(payload);
-                toast.success('Promo code created successfully');
+                toast.success(t('common:success'));
             }
             navigate('/promocodes');
         } catch (error: any) {
             console.error('Failed to save promo code', error);
-            const message = error.response?.data?.message || 'Failed to save promo code';
+            const message = error.response?.data?.message || t('common:errorUpdatingData');
             toast.error(Array.isArray(message) ? message[0] : message);
         } finally {
             setSubmitting(false);
@@ -127,14 +133,14 @@ const PromoCodeForm = () => {
                             onClick={() => navigate('/promocodes')}
                             className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                         >
-                            <ArrowLeft className="w-6 h-6 text-slate-500" />
+                            <ArrowLeft className={clsx("w-6 h-6 text-slate-500", isRTL && "rotate-180")} />
                         </button>
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {isEditMode ? 'Edit Promo Code' : 'Create Promo Code'}
+                                {isEditMode ? t('editTitle') : t('createTitle')}
                             </h1>
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                                {isEditMode ? 'Update your discount campaign' : 'Launch a new discount campaign for your customers'}
+                                {isEditMode ? t('editSubtitle') : t('createSubtitle')}
                             </p>
                         </div>
                     </div>
@@ -144,7 +150,7 @@ const PromoCodeForm = () => {
                             onClick={() => navigate('/promocodes')}
                             className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         >
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button
                             type="submit"
@@ -152,7 +158,7 @@ const PromoCodeForm = () => {
                             className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-sm shadow-indigo-200 dark:shadow-none"
                         >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            <span>{isEditMode ? 'Save Changes' : 'Publish Promo Code'}</span>
+                            <span>{isEditMode ? t('saveChanges') : t('publishPromoCode')}</span>
                         </button>
                     </div>
                 </div>
@@ -164,13 +170,16 @@ const PromoCodeForm = () => {
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                                 <Tag className="w-5 h-5 text-indigo-500" />
-                                General Information
+                                {t('generalInformation')}
                             </h2>
                             <div className="space-y-6">
-                                <InputGroup label="Promo Code" icon={Tag} required subtitle="Customers will enter this code at checkout.">
+                                <InputGroup label={t('promoCode')} icon={Tag} required subtitle={t('promoCodeSubtitle')}>
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all uppercase font-mono font-bold tracking-wider"
+                                        className={clsx(
+                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all uppercase font-mono font-bold tracking-wider",
+                                            isRTL && "text-right"
+                                        )}
                                         placeholder="e.g. SUMMER2024"
                                         value={formData.code}
                                         onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
@@ -178,9 +187,12 @@ const PromoCodeForm = () => {
                                     />
                                 </InputGroup>
 
-                                <InputGroup label="Description" icon={Info} subtitle="Internal note about this promo code.">
+                                <InputGroup label={t('description')} icon={Info} subtitle={t('descriptionSubtitle')}>
                                     <textarea
-                                        className="w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
+                                        className={clsx(
+                                            "w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none",
+                                            isRTL && "text-right"
+                                        )}
                                         placeholder="e.g. 20% off for first 100 orders"
                                         value={formData.description}
                                         onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -193,61 +205,82 @@ const PromoCodeForm = () => {
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                                 <DollarSign className="w-5 h-5 text-emerald-500" />
-                                Discount Configuration
+                                {t('discountConfiguration')}
                             </h2>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <InputGroup label="Discount Type" icon={formData.type === 'percentage' ? Percent : DollarSign}>
+                                <InputGroup label={t('discountType')} icon={formData.type === 'percentage' ? Percent : DollarSign}>
                                     <select
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        className={clsx(
+                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                            isRTL && "text-right"
+                                        )}
                                         value={formData.type}
                                         onChange={e => setFormData({ ...formData, type: e.target.value })}
                                     >
-                                        <option value="percentage">Percentage (%)</option>
-                                        <option value="fixed_amount">Fixed Amount ($)</option>
+                                        <option value="percentage">{t('percentage')}</option>
+                                        <option value="fixed_amount">{t('fixedAmount')}</option>
                                     </select>
                                 </InputGroup>
 
-                                <InputGroup label="Discount Value" required icon={formData.type === 'percentage' ? Percent : DollarSign}>
+                                <InputGroup label={t('discountValue')} required icon={formData.type === 'percentage' ? Percent : DollarSign}>
                                     <div className="relative">
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className={clsx(
+                                                "w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL ? "pr-4 pl-12 text-right" : "pl-4 pr-12"
+                                            )}
                                             placeholder={formData.type === 'percentage' ? 'e.g. 20' : 'e.g. 50'}
                                             value={formData.value}
                                             onChange={e => setFormData({ ...formData, value: e.target.value })}
                                             required
                                         />
-                                        <span className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold">
+                                        <span className={clsx(
+                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+                                            isRTL ? "left-4" : "right-4"
+                                        )}>
                                             {formData.type === 'percentage' ? '%' : '$'}
                                         </span>
                                     </div>
                                 </InputGroup>
 
-                                <InputGroup label="Minimum Order Amount" icon={CheckCircle2} subtitle="Only applies if order total is above this.">
+                                <InputGroup label={t('minOrderAmount')} icon={CheckCircle2} subtitle={t('minOrderAmountSubtitle')}>
                                     <div className="relative">
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className={clsx(
+                                                "w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL ? "pr-8 pl-4" : "pl-8 pr-4"
+                                            )}
                                             value={formData.minOrderAmount}
                                             onChange={e => setFormData({ ...formData, minOrderAmount: e.target.value })}
                                         />
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                                        <span className={clsx(
+                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+                                            isRTL ? "right-3" : "left-3"
+                                        )}>$</span>
                                     </div>
                                 </InputGroup>
 
-                                <InputGroup label="Max Discount Amount" icon={AlertCircle} subtitle="Cap the discount amount (Percentage only).">
+                                <InputGroup label={t('maxDiscountAmount')} icon={AlertCircle} subtitle={t('maxDiscountAmountSubtitle')}>
                                     <div className="relative">
                                         <input
                                             type="number"
                                             step="0.01"
                                             disabled={formData.type !== 'percentage'}
-                                            className="w-full pl-8 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all disabled:opacity-50"
+                                            className={clsx(
+                                                "w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all disabled:opacity-50",
+                                                isRTL ? "pl-8 pr-4 text-right" : "pl-8 pr-4"
+                                            )}
                                             value={formData.maxDiscountAmount}
                                             onChange={e => setFormData({ ...formData, maxDiscountAmount: e.target.value })}
                                         />
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">$</span>
+                                        <span className={clsx(
+                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold",
+                                            isRTL ? "right-3" : "left-3"
+                                        )}>$</span>
                                     </div>
                                 </InputGroup>
                             </div>
@@ -258,9 +291,9 @@ const PromoCodeForm = () => {
                     <div className="space-y-6">
                         {/* Status Card */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Availability</h2>
+                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('availability')}</h2>
                             <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Active Status</label>
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('activeStatus')}</label>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -268,7 +301,12 @@ const PromoCodeForm = () => {
                                         checked={formData.isActive}
                                         onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
                                     />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    <div className={clsx(
+                                        "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500",
+                                        isRTL
+                                            ? "after:right-[2px] peer-checked:after:-translate-x-full"
+                                            : "after:left-[2px] peer-checked:after:translate-x-full"
+                                    )}></div>
                                 </label>
                             </div>
                         </div>
@@ -277,12 +315,15 @@ const PromoCodeForm = () => {
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                                 <Hash className="w-5 h-5 text-amber-500" />
-                                Usage Limits
+                                {t('usageLimits')}
                             </h2>
-                            <InputGroup label="Maximum Total Uses" subtitle="How many times the code can be used in total.">
+                            <InputGroup label={t('maxTotalUses')} subtitle={t('maxTotalUsesSubtitle')}>
                                 <input
                                     type="number"
-                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                    className={clsx(
+                                        "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                        isRTL && "text-right"
+                                    )}
                                     placeholder="e.g. 100"
                                     value={formData.maxUses}
                                     onChange={e => setFormData({ ...formData, maxUses: e.target.value })}
@@ -294,22 +335,28 @@ const PromoCodeForm = () => {
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
                                 <Calendar className="w-5 h-5 text-blue-500" />
-                                Validity Period
+                                {t('validityPeriod')}
                             </h2>
                             <div className="space-y-4">
-                                <InputGroup label="Starts On" icon={Calendar}>
+                                <InputGroup label={t('startsOn')} icon={Calendar}>
                                     <input
                                         type="date"
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        className={clsx(
+                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                            isRTL && "text-right"
+                                        )}
                                         value={formData.startsAt}
                                         onChange={e => setFormData({ ...formData, startsAt: e.target.value })}
                                     />
                                 </InputGroup>
 
-                                <InputGroup label="Expires On" icon={Calendar} required>
+                                <InputGroup label={t('expiresOn')} icon={Calendar} required>
                                     <input
                                         type="date"
-                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        className={clsx(
+                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                            isRTL && "text-right"
+                                        )}
                                         value={formData.expiresAt}
                                         onChange={e => setFormData({ ...formData, expiresAt: e.target.value })}
                                         required

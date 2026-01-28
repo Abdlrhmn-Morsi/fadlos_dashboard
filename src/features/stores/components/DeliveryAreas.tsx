@@ -15,6 +15,7 @@ import {
     RotateCcw
 } from 'lucide-react';
 import clsx from 'clsx';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { getCities } from '../../cities/api/cities.api';
 import {
     assignTownToStore,
@@ -27,7 +28,8 @@ import { toast } from '../../../utils/toast';
 import StatusModal from '../../../components/common/StatusModal';
 
 const DeliveryAreas = () => {
-    const { t } = useTranslation(['stores', 'common']);
+    const { t, i18n } = useTranslation(['stores', 'common']);
+    const { isRTL } = useLanguage();
     const [loading, setLoading] = useState(true);
     const [cities, setCities] = useState<any[]>([]);
     const [deliveryAreas, setDeliveryAreas] = useState<any[]>([]);
@@ -128,7 +130,7 @@ const DeliveryAreas = () => {
         );
     }
 
-    const currentLng = localStorage.getItem('i18nextLng') || 'en';
+    const currentLng = i18n.language;
 
     // Get unique towns for filtering
     const uniqueTowns = Array.from(new Set(deliveryAreas.map(area => area.place?.town?.id)))
@@ -149,38 +151,44 @@ const DeliveryAreas = () => {
     return (
         <div className="space-y-8">
             {/* Add New Delivery Area Section */}
-            <div className="bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none">
+            <div className={clsx("bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col", isRTL && "items-end")}>
                 <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
                     <Plus size={14} className="text-primary" />
-                    {t('addDeliveryCity', { defaultValue: 'Add Delivery City' })}
+                    {t('addDeliveryCity')}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('common:city')}</label>
+                        <label className={clsx("text-[10px] font-black text-slate-400 uppercase tracking-widest block", isRTL && "text-right")}>{t('common:city')}</label>
                         <select
                             value={selectedCityId}
                             onChange={(e) => setSelectedCityId(e.target.value)}
-                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors"
+                            className={clsx(
+                                "w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors",
+                                isRTL && "text-right"
+                            )}
                         >
-                            <option value="">{t('selectCity', { defaultValue: 'Select City' })}</option>
+                            <option value="">{t('selectCity')}</option>
                             {cities.map(city => (
                                 <option key={city.id} value={city.id}>
-                                    {currentLng === 'ar' ? city.arName : city.enName}
+                                    {currentLng.startsWith('ar') ? city.arName : city.enName}
                                 </option>
                             ))}
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('defaultPrice', { defaultValue: 'Default Price' })}</label>
+                        <label className={clsx("text-[10px] font-black text-slate-400 uppercase tracking-widest block", isRTL && "text-right")}>{t('defaultPrice')}</label>
                         <div className="relative">
                             <input
                                 type="number"
                                 value={defaultPrice}
                                 onChange={(e) => setDefaultPrice(Number(e.target.value))}
-                                className="w-full pl-8 pr-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors"
+                                className={clsx(
+                                    "w-full py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors",
+                                    isRTL ? "pr-8 pl-4" : "pl-8 pr-4"
+                                )}
                                 min="0"
                             />
-                            <DollarSign size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <DollarSign size={14} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold", isRTL ? "right-3" : "left-3")} />
                         </div>
                     </div>
                     <div className="flex items-end">
@@ -191,41 +199,46 @@ const DeliveryAreas = () => {
                             className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
                         >
                             {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                            {t('addArea', { defaultValue: 'Add Area' })}
+                            {t('addArea')}
                         </button>
                     </div>
                 </div>
-                <p className="mt-4 text-[10px] text-slate-500 font-medium">
-                    {t('addAreaNote', { defaultValue: '* Adding a city will automatically select all its towns with the default price. You can customize them below.' })}
+                <p className={clsx("mt-4 text-[10px] text-slate-500 font-medium", isRTL && "text-right")}>
+                    {t('addAreaNote')}
                 </p>
             </div>
 
             {/* List of Delivery Areas */}
             <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "items-end")}>
                     <div className="flex items-center gap-4">
-                        <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs flex items-center gap-2">
-                            <Truck size={14} className="text-primary" />
-                            {t('activeDeliveryAreas', { defaultValue: 'Active Delivery Areas' })}
-                        </h4>
-                        <div className="text-[10px] font-black px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-none">
-                            {filteredAreas.length}
+                        <div className="flex items-center gap-4">
+                            <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs flex items-center gap-2">
+                                <Truck size={14} className="text-primary" />
+                                {t('activeDeliveryAreas')}
+                            </h4>
+                            <div className="text-[10px] font-black px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-none">
+                                {filteredAreas.length}
+                            </div>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className={clsx("flex items-center gap-3 flex-wrap", isRTL ? "justify-start" : "justify-end")}>
                         {/* Town Filter */}
                         <div className="relative">
-                            <Filter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                            <Filter size={14} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
                             <select
                                 value={filterTownId}
                                 onChange={(e) => setFilterTownId(e.target.value)}
-                                className="pl-9 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors"
+                                className={clsx(
+                                    "py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors",
+                                    isRTL ? "pr-9 pl-4 text-right" : "pl-9 pr-4"
+                                )}
                             >
-                                <option value="all">{t('allTowns', { defaultValue: 'All Towns' })}</option>
+                                <option value="all">{t('allTowns')}</option>
                                 {uniqueTowns.map(town => (
                                     <option key={town.id} value={town.id}>
-                                        {currentLng === 'ar' ? town.arName : town.enName}
+                                        {currentLng.startsWith('ar') ? town.arName : town.enName}
                                     </option>
                                 ))}
                             </select>
@@ -239,7 +252,7 @@ const DeliveryAreas = () => {
                             className="flex items-center gap-2 px-4 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-bold text-[10px] uppercase tracking-widest disabled:opacity-30"
                         >
                             <RotateCcw size={14} />
-                            {t('resetAll', { defaultValue: 'Reset All' })}
+                            {t('resetAll')}
                         </button>
 
                         <button
@@ -255,12 +268,12 @@ const DeliveryAreas = () => {
                 {deliveryAreas.length === 0 ? (
                     <div className="py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
                         <Truck size={32} strokeWidth={1} />
-                        <p className="font-bold text-sm uppercase tracking-widest">{t('noDeliveryAreas', { defaultValue: 'No Delivery Areas Configured' })}</p>
+                        <p className="font-bold text-sm uppercase tracking-widest">{t('noDeliveryAreas')}</p>
                     </div>
                 ) : filteredAreas.length === 0 ? (
                     <div className="py-12 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
                         <Filter size={24} strokeWidth={1} />
-                        <p className="font-bold text-xs uppercase tracking-widest">{t('noAreasFoundForTown', { defaultValue: 'No areas found for this town' })}</p>
+                        <p className={clsx("font-bold text-xs uppercase tracking-widest", isRTL && "text-right")}>{t('noAreasFoundForTown')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -269,15 +282,15 @@ const DeliveryAreas = () => {
                                 key={area.id}
                                 className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between hover:border-primary/50 transition-all shadow-sm"
                             >
-                                <div className="space-y-1">
+                                <div className={clsx("space-y-1", isRTL && "text-right")}>
                                     <div className="flex items-center gap-2">
                                         <MapPin size={14} className="text-primary" />
                                         <span className="font-black text-slate-900 dark:text-slate-100 text-sm italic">
-                                            {currentLng === 'ar' ? area.place?.arName : area.place?.enName}
+                                            {currentLng.startsWith('ar') ? area.place?.arName : area.place?.enName}
                                         </span>
                                     </div>
                                     <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">
-                                        {currentLng === 'ar' ? area.place?.town?.arName : area.place?.town?.enName}
+                                        {currentLng.startsWith('ar') ? area.place?.town?.arName : area.place?.town?.enName}
                                     </div>
                                 </div>
 
@@ -292,9 +305,12 @@ const DeliveryAreas = () => {
                                                     handleUpdatePrice(area.id, newPrice);
                                                 }
                                             }}
-                                            className="w-full pl-6 pr-2 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors"
+                                            className={clsx(
+                                                "w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors",
+                                                isRTL ? "pr-6 pl-2" : "pl-6 pr-2"
+                                            )}
                                         />
-                                        <DollarSign size={10} className="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400" />
+                                        <DollarSign size={10} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-2" : "left-2")} />
                                     </div>
                                     <button
                                         type="button"
@@ -316,8 +332,8 @@ const DeliveryAreas = () => {
                 isOpen={showResetConfirm}
                 onClose={() => setShowResetConfirm(false)}
                 type="confirm"
-                title={t('resetDeliveryAreas', { defaultValue: 'Reset Delivery Areas' })}
-                message={t('resetDeliveryAreasMessage', { defaultValue: 'Are you sure you want to clear all configured delivery areas? This action cannot be undone.' })}
+                title={t('resetDeliveryAreas')}
+                message={t('resetDeliveryAreasMessage')}
                 onConfirm={handleResetAll}
                 confirmText={resetting ? t('common:loading') : t('common:confirm')}
             />

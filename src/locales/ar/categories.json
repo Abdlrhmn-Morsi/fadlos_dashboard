@@ -16,5 +16,14 @@
     "inactive": "غير نشط",
     "loadFailed": "فشل تحميل التصنيفات",
     "saveSuccess": "تم حفظ التصنيف بنجاح",
-    "deleteSuccess": "تم حذف التصنيف بنجاح"
+    "deleteSuccess": "تم حذف التصنيف بنجاح",
+    "categoryNameAr": "اسم التصنيف (بالعربية)",
+    "categoryNameEn": "اسم التصنيف (بالإنجليزية)",
+    "sortOrder": "ترتيب العرض",
+    "sortOrderInfo": "الأرقام الأقل تظهر أولاً في القائمة.",
+    "placeholderNameAr": "مثلاً: مشروبات، أطباق رئيسية",
+    "placeholderNameEn": "مثلاً: Beverages, Main Courses",
+    "categoryTranslated": "تمت ترجمة اسم التصنيف إلى الإنجليزية",
+    "createNewCategory": "إنشاء تصنيف جديد",
+    "saveChanges": "حفظ التغييرات"
 }

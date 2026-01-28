@@ -121,7 +121,7 @@ const CategoryList = () => {
                                     {t('name')}
                                 </th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    {t('common:sortOrder', { defaultValue: 'Sort Order' })}
+                                    {t('common:sortOrder')}
                                 </th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                     {t('status')}
@@ -147,7 +147,7 @@ const CategoryList = () => {
                                         <div className="flex flex-col items-center justify-center text-slate-400">
                                             <LayoutGrid size={48} strokeWidth={1} />
                                             <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">{t('noCategoriesFound')}</p>
-                                            <p className="text-sm">{t('common:adjustSearch', { defaultValue: 'Try adjusting your search or add a new one.' })}</p>
+                                            <p className="text-sm">{t('common:adjustSearch')}</p>
                                         </div>
                                     </td>
                                 </tr>

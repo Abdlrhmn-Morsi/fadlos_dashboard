@@ -40,13 +40,15 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
         'flex items-center gap-3 px-4 py-3 rounded-none-none transition-all duration-200 group relative',
         isActive
           ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
-          : 'text-slate-500 hover:bg-primary-light hover:text-primary',
-        isRTL && 'flex-row-reverse'
+          : 'text-slate-500 hover:bg-primary-light hover:text-primary'
       )}
     >
       <Icon size={20} className={clsx('shrink-0', collapsed ? 'mx-auto' : '')} />
       {!collapsed && (
-        <span className="font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300">
+        <span className={clsx(
+          "font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300 flex-1",
+          isRTL ? "text-right" : "text-left"
+        )}>
           {label}
         </span>
       )}
@@ -130,7 +132,10 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />
 
               {!collapsed && (
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                <div className={clsx(
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]",
+                  isRTL ? "text-right" : "text-left"
+                )}>
                   {t('geoAndOrg')}
                 </div>
               )}
@@ -146,14 +151,17 @@ const DashboardLayout: React.FC = () => {
           {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
             <>
               {!collapsed && (
-                <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                <div className={clsx(
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]",
+                  isRTL ? "text-right" : "text-left"
+                )}>
                   {t('management')}
                 </div>
               )}
               <SidebarItem to="/products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
               <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
               <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
-              <SidebarItem to="/reviews" icon={Briefcase} label={t('reviews')} collapsed={collapsed} />
+              <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
               <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
               <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
               <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
@@ -169,29 +177,42 @@ const DashboardLayout: React.FC = () => {
           <button
             className={clsx(
               'flex items-center gap-3 w-full px-4 py-3 rounded-none-none transition-all duration-200 group text-rose-500 hover:bg-rose-50',
-              collapsed && 'justify-center',
-              isRTL && 'flex-row-reverse'
+              collapsed && 'justify-center'
             )}
             onClick={handleLogout}
           >
             <LogOut size={20} className={isRTL ? 'rotate-180' : ''} />
-            {!collapsed && <span className="font-bold text-sm">{t('logout')}</span>}
+            {!collapsed && (
+              <span className={clsx(
+                "font-bold text-sm flex-1",
+                isRTL ? "text-right" : "text-left"
+              )}>
+                {t('logout')}
+              </span>
+            )}
           </button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+      <div className={clsx(
+        "flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300",
+        isRTL
+          ? (collapsed ? 'lg:mr-20' : 'lg:mr-64')
+          : (collapsed ? 'lg:ml-20' : 'lg:ml-64')
+      )}>
         <header className="h-[70px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0 relative z-30 transition-colors">
           <div className="flex items-center gap-4">
             <button
               className="lg:hidden p-2 -mx-2 text-slate-500 hover:text-primary transition-colors"
               onClick={() => setMobileOpen(true)}
             >
-              <Menu size={24} />
+              <Menu size={24} className={isRTL ? "rotate-180" : ""} />
             </button>
             <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 hidden sm:block">
-              {user?.role === UserRole.SUPER_ADMIN ? t('adminConsole') : (user?.store?.name || t('adminConsole'))}
+              {user?.role === UserRole.SUPER_ADMIN
+                ? t('adminConsole')
+                : (isRTL ? (user?.store?.nameAr || user?.store?.name) : user?.store?.name) || t('adminConsole')}
             </h1>
           </div>
 
@@ -199,8 +220,7 @@ const DashboardLayout: React.FC = () => {
             <div
               className={clsx(
                 "flex items-center gap-3 transition-all duration-200",
-                (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && "cursor-pointer hover:opacity-80 active:scale-95",
-                isRTL && "flex-row-reverse"
+                (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && "cursor-pointer hover:opacity-80 active:scale-95"
               )}
               onClick={() => {
                 if (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) {

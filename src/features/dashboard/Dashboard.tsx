@@ -38,7 +38,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, c
     const { isRTL } = useLanguage();
     return (
         <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
-            <div className={clsx("flex justify-between items-start mb-4", isRTL && "flex-row-reverse")}>
+            <div className="flex justify-between items-start mb-4">
                 <div className={isRTL ? "text-right" : "text-left"}>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</h3>
@@ -47,7 +47,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, c
                     <Icon size={24} />
                 </div>
             </div>
-            <div className={clsx("flex items-center gap-2 text-sm", isRTL && "flex-row-reverse")}>
+            <div className="flex items-center gap-2 text-sm">
                 <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
                     <TrendingUp size={14} className={isRTL ? "rotate-180" : ""} /> {change}
                 </span>
@@ -307,7 +307,7 @@ const Dashboard: React.FC = () => {
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
-                    <div className={clsx("flex items-center justify-between mb-8", isRTL && "flex-row-reverse")}>
+                    <div className="flex items-center justify-between mb-8">
                         <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
                         <select className={clsx(
                             "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-none px-3 py-1.5 focus:ring-primary focus:border-primary outline-none",
@@ -360,11 +360,11 @@ const Dashboard: React.FC = () => {
                     <div className="space-y-6 flex-grow">
                         {[1, 2, 3].map((_, i) => (
                             <div key={i} className={clsx("flex gap-4 group cursor-pointer", isRTL && "flex-row-reverse text-right")}>
-                                <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform shrink-0" />
-                                <div>
+                                <div className="flex-1">
                                     <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{t('statsSynchronized')}</p>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('justNow')}</p>
                                 </div>
+                                <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform shrink-0" />
                             </div>
                         ))}
                     </div>

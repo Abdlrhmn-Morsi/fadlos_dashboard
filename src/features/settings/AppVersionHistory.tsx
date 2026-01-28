@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { ArrowLeft, History } from 'lucide-react';
+import { ArrowLeft, History, ChevronRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
 
@@ -21,6 +23,7 @@ interface AppVersionHistoryItem {
 
 const AppVersionHistory: React.FC = () => {
     const { t } = useTranslation('dashboard');
+    const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const [history, setHistory] = useState<AppVersionHistoryItem[]>([]);
     const [loading, setLoading] = useState(true);
@@ -45,27 +48,27 @@ const AppVersionHistory: React.FC = () => {
 
     return (
         <div className="p-6">
-            <div className="flex items-center gap-4 mb-8">
+            <div className={clsx("flex items-center gap-4 mb-8", isRTL && "flex-row-reverse")}>
                 <button
                     onClick={() => navigate('/settings')}
                     className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                 >
-                    <ArrowLeft className="w-6 h-6 text-slate-600 dark:text-slate-400" />
+                    {isRTL ? <ChevronRight className="w-6 h-6 text-slate-600 dark:text-slate-400" /> : <ArrowLeft className="w-6 h-6 text-slate-600 dark:text-slate-400" />}
                 </button>
-                <div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <div className={isRTL ? "text-right" : "text-left"}>
+                    <h1 className={clsx("text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                         <History className="w-6 h-6" />
-                        App Version History
+                        {t('appVersionHistory', { defaultValue: 'App Version History' })}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
-                        View log of all app configuration changes
+                        {t('appVersionHistoryDesc', { defaultValue: 'View log of all app configuration changes' })}
                     </p>
                 </div>
             </div>
 
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                                 <th className="p-4 font-semibold text-sm text-slate-600 dark:text-slate-300">Date</th>

@@ -1,6 +1,12 @@
 {
-    "title": "Reviews",
-    "subtitle": "Manage customer feedback and ratings",
+    "title": "Customer Feedback",
+    "subtitle": "Review the latest sentiments from your community",
+    "storeOverall": "Store Overall",
+    "specificProducts": "Specific Products",
+    "loadingImpressions": "Reading Impressions...",
+    "noFeedbackYet": "No feedback received yet",
+    "anonymousUser": "Authorized Member",
+    "noComment": "Sellers have not yet provided a written testimonial for this experience.",
     "searchPlaceholder": "Search reviews...",
     "customer": "Customer",
     "rating": "Rating",
@@ -9,6 +15,5 @@
     "status": "Status",
     "actions": "Actions",
     "approved": "Approved",
-    "pending": "Pending",
-    "noReviewsFound": "No reviews found"
+    "pending": "Pending"
 }

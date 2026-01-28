@@ -3,6 +3,9 @@ import { X, Save, Loader2, LayoutGrid, Info } from 'lucide-react';
 import categoriesApi from '../api/categories.api';
 import { toast } from '../../../utils/toast';
 import toolsApi from '../../../services/tools.api';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import clsx from 'clsx';
 
 interface CategoryFormModalProps {
     category?: any;
@@ -11,6 +14,8 @@ interface CategoryFormModalProps {
 }
 
 const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose, onSuccess }) => {
+    const { t } = useTranslation(['categories', 'common']);
+    const { isRTL } = useLanguage();
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         nameAr: '',
@@ -37,7 +42,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
             const translated = typeof res === 'string' ? res : res.translatedText;
             if (translated) {
                 setFormData(prev => ({ ...prev, name: translated }));
-                toast.success('Category name translated to English');
+                toast.success(t('categoryTranslated'));
             }
         } catch (error) {
             console.error("Translation error", error);
@@ -67,13 +72,13 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
             <div className="bg-white dark:bg-slate-900 w-full max-w-lg rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-200">
                 {/* Modal Header */}
-                <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                    <div className="flex items-center gap-3">
+                <div className={clsx("flex items-center justify-between px-6 py-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50", isRTL && "flex-row-reverse")}>
+                    <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
                         <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                             <LayoutGrid className="text-indigo-600 dark:text-indigo-400" size={20} />
                         </div>
                         <h2 className="text-lg font-bold text-slate-900 dark:text-white">
-                            {category ? 'Edit Category' : 'Create New Category'}
+                            {category ? t('editCategory') : t('createNewCategory')}
                         </h2>
                     </div>
                     <button
@@ -87,14 +92,17 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                Category Name (Arabic) <span className="text-rose-500">*</span>
+                            <label className={clsx("block text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "text-right")}>
+                                {t('categoryNameAr')} <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 required
-                                className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
-                                placeholder="مثلاً: مشروبات، أطباق رئيسية"
+                                className={clsx(
+                                    "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400",
+                                    isRTL && "text-right"
+                                )}
+                                placeholder={t('placeholderNameAr')}
                                 value={formData.nameAr}
                                 onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
                                 onBlur={(e) => handleTranslate(e.target.value)}
@@ -102,44 +110,50 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                Category Name (English) <span className="text-rose-500">*</span>
+                            <label className={clsx("block text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "text-right")}>
+                                {t('categoryNameEn')} <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 required
-                                className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
-                                placeholder="e.g. Beverages, Main Courses"
+                                className={clsx(
+                                    "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400",
+                                    isRTL && "text-right"
+                                )}
+                                placeholder={t('placeholderNameEn')}
                                 value={formData.name}
                                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                             />
                         </div>
 
                         {/* Sort Order & Active Status Row */}
-                        <div className="flex items-start gap-6">
+                        <div className={clsx("flex items-start gap-6", isRTL && "flex-row-reverse")}>
                             <div className="flex-1 space-y-2">
-                                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                    Sort Order
+                                <label className={clsx("flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "flex-row-reverse text-right")}>
+                                    {t('sortOrder')}
                                     <div className="group relative">
                                         <Info size={14} className="text-slate-400 cursor-help" />
                                         <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-48 p-2 bg-slate-800 text-white text-xs rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
-                                            Lower numbers appear first in the list.
+                                            {t('sortOrderInfo')}
                                         </div>
                                     </div>
                                 </label>
                                 <input
                                     type="number"
-                                    className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                    className={clsx(
+                                        "w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                        isRTL && "text-right"
+                                    )}
                                     value={formData.sort}
                                     onChange={(e) => setFormData({ ...formData, sort: parseInt(e.target.value) || 0 })}
                                 />
                             </div>
 
                             <div className="flex-1 space-y-2">
-                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                    Status
+                                <label className={clsx("block text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "text-right")}>
+                                    {t('status')}
                                 </label>
-                                <label className="relative flex items-start p-3 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                <label className={clsx("relative flex items-start p-3 border border-slate-200 dark:border-slate-700 rounded-lg cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors", isRTL && "flex-row-reverse")}>
                                     <div className="flex items-center h-5">
                                         <input
                                             type="checkbox"
@@ -148,9 +162,9 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                                             onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                                         />
                                     </div>
-                                    <div className="ml-3 text-sm">
+                                    <div className={clsx("text-sm", isRTL ? "mr-3 text-right" : "ml-3")}>
                                         <span className={`font-medium ${formData.isActive ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-500'}`}>
-                                            {formData.isActive ? 'Active' : 'Inactive'}
+                                            {formData.isActive ? t('active') : t('inactive')}
                                         </span>
                                     </div>
                                 </label>
@@ -164,7 +178,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                             onClick={onClose}
                             className="flex-1 px-4 py-2.5 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
                         >
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button
                             type="submit"
@@ -176,7 +190,7 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                             ) : (
                                 <Save size={18} />
                             )}
-                            <span>{category ? 'Save Changes' : 'Create Category'}</span>
+                            <span>{category ? t('saveChanges') : t('createNewCategory')}</span>
                         </button>
                     </div>
                 </form>

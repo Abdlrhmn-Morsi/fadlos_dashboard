@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Star, MessageSquare, User, Package, Calendar, Loader2, Quote } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
 import reviewsApi from './api/reviews.api';
 import clsx from 'clsx';
 
 const ReviewList = () => {
+    const { t } = useTranslation(['reviews', 'common']);
+    const { isRTL } = useLanguage();
     const [reviews, setReviews] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('STORE'); // STORE or PRODUCT
@@ -47,8 +51,8 @@ const ReviewList = () => {
             {/* Header section with high-contrast tab switcher */}
             <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">Customer Feedback</h1>
-                    <p className="text-slate-500 font-medium text-sm mt-1">Review the latest sentiments from your community</p>
+                    <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
+                    <p className="text-slate-500 font-medium text-sm mt-1">{t('subtitle')}</p>
                 </div>
 
                 <div className="inline-flex bg-slate-100 dark:bg-slate-900 p-1.5 rounded-2xl border border-slate-200/50 dark:border-slate-800">
@@ -61,7 +65,7 @@ const ReviewList = () => {
                                 : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                         )}
                     >
-                        Store Overall
+                        {t('storeOverall')}
                     </button>
                     <button
                         onClick={() => setType('PRODUCT')}
@@ -72,7 +76,7 @@ const ReviewList = () => {
                                 : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                         )}
                     >
-                        Specific Products
+                        {t('specificProducts')}
                     </button>
                 </div>
             </div>
@@ -81,19 +85,22 @@ const ReviewList = () => {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-20 gap-4">
                         <Loader2 size={40} className="text-primary animate-spin" />
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">Reading Impressions...</span>
+                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">{t('loadingImpressions')}</span>
                     </div>
                 ) : reviews.length === 0 ? (
                     <div className="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                         <MessageSquare size={48} className="mx-auto text-slate-200 mb-4" />
-                        <p className="font-bold text-slate-400 uppercase tracking-widest text-sm">No feedback received yet</p>
+                        <p className="font-bold text-slate-400 uppercase tracking-widest text-sm">{t('noFeedbackYet')}</p>
                     </div>
                 ) : (
                     reviews.map((review) => (
                         <div key={review.id} className="group bg-white dark:bg-slate-900 p-1 rounded-3xl border border-slate-100 dark:border-slate-800 hover:border-primary/30 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden relative">
                             {/* Accent line for top reviews */}
                             {review.rating >= 4 && (
-                                <div className="absolute top-0 right-10 w-20 h-1 bg-gradient-to-r from-amber-400 to-amber-600 rounded-b-full shadow-lg shadow-amber-400/20" />
+                                <div className={clsx(
+                                    "absolute top-0 w-20 h-1 bg-gradient-to-r from-amber-400 to-amber-600 rounded-b-full shadow-lg shadow-amber-400/20",
+                                    isRTL ? "left-10" : "right-10"
+                                )} />
                             )}
 
                             <div className="p-8">
@@ -108,7 +115,7 @@ const ReviewList = () => {
                                         </div>
                                         <div>
                                             <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1">
-                                                {review.customer?.name || 'Authorized Member'}
+                                                {review.customer?.name || t('anonymousUser')}
                                             </h3>
                                             <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
                                                 <Calendar size={12} className="text-slate-300" />
@@ -130,11 +137,14 @@ const ReviewList = () => {
                                     </div>
                                 )}
 
-                                <div className="relative pl-6">
-                                    <Quote className="absolute left-0 top-0 text-slate-100 dark:text-slate-800 w-10 h-10 -z-0" />
+                                <div className="relative ps-6">
+                                    <Quote className={clsx(
+                                        "absolute top-0 text-slate-100 dark:text-slate-800 w-10 h-10 -z-0",
+                                        isRTL ? "right-0 scale-x-[-1]" : "left-0"
+                                    )} />
                                     <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium text-base relative z-10 italic">
                                         {review.comment || (
-                                            <span className="text-slate-400 font-normal">Sellers have not yet provided a written testimonial for this experience.</span>
+                                            <span className="text-slate-400 font-normal">{t('noComment')}</span>
                                         )}
                                     </p>
                                 </div>

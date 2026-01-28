@@ -15,9 +15,12 @@ import {
 } from 'lucide-react';
 import { updateProfile, updatePassword } from '../users/api/users.api';
 import { toast } from '../../utils/toast';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
 
 const ProfileSettings = () => {
     const { t } = useTranslation(['dashboard', 'common']);
+    const { isRTL } = useLanguage();
     const [searchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') || 'profile';
 
@@ -138,12 +141,12 @@ const ProfileSettings = () => {
 
     return (
         <div className="p-6 max-w-2xl mx-auto space-y-8 animate-in animate-fade">
-            <div className="flex items-center gap-4 mb-12">
+            <div className={clsx("flex items-center gap-4 mb-12", isRTL && "flex-row-reverse")}>
                 <div className="p-4 bg-primary-light dark:bg-primary/20 rounded-none shadow-inner">
                     <User size={32} className="text-primary" />
                 </div>
-                <div>
-                    <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                <div className={isRTL ? "text-right" : "text-left"}>
+                    <h2 className={clsx("text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
                         {activeTab === 'profile' ? t('personalInformation', { defaultValue: 'Account Settings' }) : t('updatePassword', { defaultValue: 'Update Password' })}
                     </h2>
                     <p className="text-slate-500 font-medium">
@@ -157,9 +160,9 @@ const ProfileSettings = () => {
 
             {activeTab === 'profile' && (
                 <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                    <div className={clsx("p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3", isRTL && "flex-row-reverse")}>
                         <User size={20} className="text-primary" />
-                        <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('personalInformation', { defaultValue: 'Personal Information' })}</h3>
+                        <h3 className={clsx("font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm", isRTL && "text-right")}>{t('personalInformation', { defaultValue: 'Personal Information' })}</h3>
                     </div>
 
                     <form onSubmit={handleProfileSubmit} className="p-8 space-y-8">
@@ -178,7 +181,10 @@ const ProfileSettings = () => {
                                 <button
                                     type="button"
                                     onClick={() => fileInputRef.current?.click()}
-                                    className="absolute bottom-0 right-0 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all transform hover:scale-110 active:scale-95 z-10"
+                                    className={clsx(
+                                        "absolute bottom-0 p-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-dark transition-all transform hover:scale-110 active:scale-95 z-10",
+                                        isRTL ? "left-0" : "right-0"
+                                    )}
                                 >
                                     <Camera size={20} />
                                 </button>
@@ -197,7 +203,7 @@ const ProfileSettings = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                     <User size={14} /> {t('fullName', { defaultValue: 'Full Name' })}
                                 </label>
                                 <input
@@ -211,7 +217,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                     <User size={14} /> {t('username', { defaultValue: 'Username' })}
                                 </label>
                                 <input
@@ -225,7 +231,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                     <Mail size={14} /> {t('common:email', { defaultValue: 'Email Address' })}
                                 </label>
                                 <input
@@ -237,7 +243,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                     <Phone size={14} /> {t('common:phone', { defaultValue: 'Phone Number' })}
                                 </label>
                                 <input
@@ -245,7 +251,10 @@ const ProfileSettings = () => {
                                     name="phone"
                                     value={profileData.phone}
                                     onChange={handleProfileChange}
-                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    className={clsx(
+                                        "w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100",
+                                        isRTL ? "text-right" : "text-left"
+                                    )}
                                 />
                             </div>
                         </div>
@@ -254,7 +263,10 @@ const ProfileSettings = () => {
                             <button
                                 type="submit"
                                 disabled={savingProfile}
-                                className="flex items-center gap-3 px-8 py-4 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all disabled:opacity-50"
+                                className={clsx(
+                                    "flex items-center gap-3 px-8 py-4 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all disabled:opacity-50",
+                                    isRTL && "flex-row-reverse"
+                                )}
                             >
                                 {savingProfile ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                 {t('common:save')}
@@ -266,14 +278,14 @@ const ProfileSettings = () => {
 
             {activeTab === 'security' && (
                 <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-                    <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
+                    <div className={clsx("p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3", isRTL && "flex-row-reverse")}>
                         <Lock size={20} className="text-primary" />
-                        <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('updatePassword', { defaultValue: 'Update Password' })}</h3>
+                        <h3 className={clsx("font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm", isRTL && "text-right")}>{t('updatePassword', { defaultValue: 'Update Password' })}</h3>
                     </div>
 
                     <form onSubmit={handlePasswordSubmit} className="p-8 space-y-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                 <Lock size={14} /> {t('oldPassword', { defaultValue: 'Current Password' })}
                             </label>
                             <div className="relative">
@@ -282,12 +294,18 @@ const ProfileSettings = () => {
                                     name="currentPassword"
                                     value={passwordData.currentPassword}
                                     onChange={handlePasswordChange}
-                                    className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
+                                    className={clsx(
+                                        "w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100",
+                                        isRTL ? "pl-12 text-right" : "pr-12 text-left"
+                                    )}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => togglePasswordVisibility('old')}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                                    className={clsx(
+                                        "absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors",
+                                        isRTL ? "left-4" : "right-4"
+                                    )}
                                 >
                                     {showPasswords.old ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
@@ -296,7 +314,7 @@ const ProfileSettings = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                     <Lock size={14} /> {t('newPassword', { defaultValue: 'New Password' })}
                                 </label>
                                 <div className="relative">
@@ -306,12 +324,18 @@ const ProfileSettings = () => {
                                         value={passwordData.newPassword}
                                         onChange={handlePasswordChange}
                                         required
-                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
+                                        className={clsx(
+                                            "w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100",
+                                            isRTL ? "pl-12 text-right" : "pr-12 text-left"
+                                        )}
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility('new')}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                                        className={clsx(
+                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors",
+                                            isRTL ? "left-4" : "right-4"
+                                        )}
                                     >
                                         {showPasswords.new ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>
@@ -319,7 +343,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className={clsx("text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2", isRTL && "flex-row-reverse text-right")}>
                                     <Lock size={14} /> {t('confirmPassword', { defaultValue: 'Confirm New' })}
                                 </label>
                                 <div className="relative">
@@ -329,12 +353,18 @@ const ProfileSettings = () => {
                                         value={passwordData.confirmPassword}
                                         onChange={handlePasswordChange}
                                         required
-                                        className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 pr-12"
+                                        className={clsx(
+                                            "w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100",
+                                            isRTL ? "pl-12 text-right" : "pr-12 text-left"
+                                        )}
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility('confirm')}
-                                        className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors"
+                                        className={clsx(
+                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors",
+                                            isRTL ? "left-4" : "right-4"
+                                        )}
                                     >
                                         {showPasswords.confirm ? <EyeOff size={18} /> : <Eye size={18} />}
                                     </button>

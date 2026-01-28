@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Save, AlertTriangle, History as HistoryIcon } from 'lucide-react';
+import { Save, AlertTriangle, History as HistoryIcon, ChevronRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
 
@@ -28,6 +30,7 @@ interface AppVersionResponse {
 
 const AppUpdateSettings: React.FC = () => {
     const { t } = useTranslation('dashboard');
+    const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<PlatformType>(PlatformType.ANDROID);
     const [loading, setLoading] = useState(false);
@@ -123,27 +126,27 @@ const AppUpdateSettings: React.FC = () => {
 
     return (
         <div className="p-6">
-            <div className="mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                <div>
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-                        App Update Controls
+            <div className={clsx("mb-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4", isRTL && "md:flex-row-reverse")}>
+                <div className={isRTL ? "text-right" : "text-left"}>
+                    <h1 className={clsx("text-2xl font-bold text-gray-900 dark:text-white", isRTL && "text-right")}>
+                        {t('appUpdates', { defaultValue: 'App Update Controls' })}
                     </h1>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        Unsaved changes are specific to the active tab.
+                        {t('unsavedChangesSpecific', { defaultValue: 'Unsaved changes are specific to the active tab.' })}
                     </p>
                 </div>
                 <button
                     onClick={() => navigate('/app-version-history')}
-                    className="flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+                    className={clsx("flex items-center px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm", isRTL && "flex-row-reverse")}
                 >
-                    <HistoryIcon className="w-4 h-4 mr-2" />
-                    View Version History
+                    <HistoryIcon className={clsx("w-4 h-4", isRTL ? "ml-2" : "mr-2")} />
+                    {t('viewVersionHistory', { defaultValue: 'View Version History' })}
                 </button>
             </div>
 
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
                 <div className="border-b border-gray-200 dark:border-gray-700">
-                    <nav className="flex space-x-8 px-6" aria-label="Tabs">
+                    <nav className={clsx("flex px-6", isRTL ? "space-x-reverse space-x-8" : "space-x-8")} aria-label="Tabs">
                         <button
                             onClick={() => setActiveTab(PlatformType.ANDROID)}
                             className={`${activeTab === PlatformType.ANDROID
@@ -170,8 +173,8 @@ const AppUpdateSettings: React.FC = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="md:col-span-2">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Store URL
+                            <label className={clsx("block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", isRTL && "text-right")}>
+                                {t('storeUrl', { defaultValue: 'Store URL' })}
                             </label>
                             <input
                                 type="text"
@@ -181,14 +184,14 @@ const AppUpdateSettings: React.FC = () => {
                                 className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
                                 placeholder={activeTab === PlatformType.ANDROID ? "https://play.google.com/..." : "https://apps.apple.com/..."}
                             />
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Link to the app updates.
+                            <p className={clsx("mt-1 text-sm text-gray-500 dark:text-gray-400", isRTL && "text-right")}>
+                                {t('storeUrlDesc', { defaultValue: 'Link to the app updates.' })}
                             </p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Latest Version
+                            <label className={clsx("block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", isRTL && "text-right")}>
+                                {t('latestVersion', { defaultValue: 'Latest Version' })}
                             </label>
                             <input
                                 type="text"
@@ -198,14 +201,14 @@ const AppUpdateSettings: React.FC = () => {
                                 className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="e.g. 1.5.0"
                             />
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Current semantic version.
+                            <p className={clsx("mt-1 text-sm text-gray-500 dark:text-gray-400", isRTL && "text-right")}>
+                                {t('latestVersionDesc', { defaultValue: 'Current semantic version.' })}
                             </p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Minimum Supported Version
+                            <label className={clsx("block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", isRTL && "text-right")}>
+                                {t('minSupportedVersion', { defaultValue: 'Minimum Supported Version' })}
                             </label>
                             <input
                                 type="text"
@@ -215,14 +218,14 @@ const AppUpdateSettings: React.FC = () => {
                                 className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="e.g. 5.3.0"
                             />
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Verions lower than this will be forced to update.
+                            <p className={clsx("mt-1 text-sm text-gray-500 dark:text-gray-400", isRTL && "text-right")}>
+                                {t('minSupportedVersionDesc', { defaultValue: 'Versions lower than this will be forced to update.' })}
                             </p>
                         </div>
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                Exact Blocked Version
+                            <label className={clsx("block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", isRTL && "text-right")}>
+                                {t('exactBlockedVersion', { defaultValue: 'Exact Blocked Version' })}
                             </label>
                             <input
                                 type="text"
@@ -232,13 +235,13 @@ const AppUpdateSettings: React.FC = () => {
                                 className="w-full rounded-lg border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="e.g. 5.2.7"
                             />
-                            <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                                Block a specific buggy version from accessing the API.
+                            <p className={clsx("mt-1 text-sm text-gray-500 dark:text-gray-400", isRTL && "text-right")}>
+                                {t('exactBlockedVersionDesc', { defaultValue: 'Block a specific buggy version from accessing the API.' })}
                             </p>
                         </div>
                     </div>
 
-                    <div className="flex items-center space-x-4 p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg">
+                    <div className={clsx("flex items-center p-4 bg-gray-50 dark:bg-gray-700/50 rounded-lg", isRTL ? "space-x-reverse space-x-4" : "space-x-4")}>
                         <div className="flex items-center">
                             <input
                                 type="checkbox"
@@ -248,17 +251,17 @@ const AppUpdateSettings: React.FC = () => {
                                 onChange={handleInputChange}
                                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
                             />
-                            <label htmlFor="is_force_update" className="ml-2 block text-sm text-gray-900 dark:text-white">
-                                Force Update (Recommended for critical updates)
+                            <label htmlFor="is_force_update" className={clsx("block text-sm text-gray-900 dark:text-white", isRTL ? "mr-2" : "ml-2")}>
+                                {t('forceUpdate', { defaultValue: 'Force Update (Recommended for critical updates)' })}
                             </label>
                         </div>
                     </div>
 
                     <div className="border-t border-gray-200 dark:border-gray-700 pt-6">
-                        <div className="flex items-center justify-between mb-4">
-                            <h3 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
-                                <AlertTriangle className="mr-2 h-5 w-5 text-yellow-500" />
-                                Maintenance Mode
+                        <div className={clsx("flex items-center justify-between mb-4", isRTL && "flex-row-reverse")}>
+                            <h3 className={clsx("text-lg font-medium text-gray-900 dark:text-white flex items-center", isRTL && "flex-row-reverse")}>
+                                <AlertTriangle className={clsx("h-5 w-5 text-yellow-500", isRTL ? "ml-2" : "mr-2")} />
+                                {t('maintenanceMode', { defaultValue: 'Maintenance Mode' })}
                             </h3>
                             <div className="relative inline-block w-12 mr-2 align-middle select-none transition duration-200 ease-in">
                                 <input
@@ -275,8 +278,8 @@ const AppUpdateSettings: React.FC = () => {
 
                         {formData.maintenance_mode && (
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                                    Maintenance Message
+                                <label className={clsx("block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1", isRTL && "text-right")}>
+                                    {t('maintenanceMessage', { defaultValue: 'Maintenance Message' })}
                                 </label>
                                 <textarea
                                     name="maintenance_message"
@@ -290,14 +293,14 @@ const AppUpdateSettings: React.FC = () => {
                         )}
                     </div>
 
-                    <div className="flex justify-end pt-4">
+                    <div className={clsx("flex pt-4", isRTL ? "justify-start" : "justify-end")}>
                         <button
                             onClick={handleSave}
                             disabled={loading}
-                            className="flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                            className={clsx("flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50", isRTL && "flex-row-reverse")}
                         >
-                            <Save className="h-4 w-4 mr-2" />
-                            {loading ? 'Saving...' : `Save ${activeTab === PlatformType.ANDROID ? 'Android' : 'iOS'} Settings`}
+                            <Save className={clsx("h-4 w-4", isRTL ? "ml-2" : "mr-2")} />
+                            {loading ? t('common:saving') : t('savePlatformSettings', { defaultValue: `Save ${activeTab === PlatformType.ANDROID ? 'Android' : 'iOS'} Settings` })}
                         </button>
                     </div>
                 </div>

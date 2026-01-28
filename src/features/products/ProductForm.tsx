@@ -10,14 +10,19 @@ import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
 import toolsApi from '../../services/tools.api';
 import CategoryFormModal from '../categories/components/CategoryFormModal';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
 
-const InputGroup = ({ label, children, required = false, subtitle = '' }: any) => (
+const InputGroup = ({ label, children, required = false, subtitle = '', isRTL = false }: any) => (
     <div className="space-y-1.5">
-        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-            {label} {required && <span className="text-rose-500">*</span>}
+        <label className={clsx("block text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "text-right")}>
+            {isRTL && required && <span className="text-rose-500 me-1">*</span>}
+            {label}
+            {!isRTL && required && <span className="text-rose-500 ms-1">*</span>}
         </label>
         {children}
-        {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
+        {subtitle && <p className={clsx("text-xs text-slate-400", isRTL && "text-right")}>{subtitle}</p>}
     </div>
 );
 
@@ -46,6 +51,8 @@ const generateSKU = (name: string) => {
 };
 
 const ProductForm = () => {
+    const { t } = useTranslation(['products', 'common']);
+    const { isRTL } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
@@ -99,7 +106,7 @@ const ProductForm = () => {
             }
         } catch (error) {
             console.error('Error fetching categories', error);
-            toast.error('Failed to load categories');
+            toast.error(t('loadFailed'));
         }
     };
 
@@ -138,7 +145,7 @@ const ProductForm = () => {
             setExistingImages(data.images || []);
         } catch (error) {
             console.error('Error fetching product', error);
-            toast.error('Failed to load product data');
+            toast.error(t('loadFailed'));
             navigate('/products');
         } finally {
             setLoading(false);
@@ -159,7 +166,7 @@ const ProductForm = () => {
                     }
                     return newData;
                 });
-                toast.success(`Auto-translated to English`);
+                toast.success(t('autoTranslated'));
             }
         } catch (error) {
             console.error("Translation error", error);
@@ -305,15 +312,15 @@ const ProductForm = () => {
 
             if (isEditMode) {
                 await productsApi.updateProduct(id, data);
-                toast.success('Product updated successfully');
+                toast.success(t('updateSuccess'));
             } else {
                 await productsApi.createProduct(data);
-                toast.success('Product created successfully');
+                toast.success(t('saveSuccess'));
             }
             navigate('/products');
         } catch (error) {
             console.error('Error saving product', error);
-            toast.error('Failed to save product');
+            toast.error(t('common:error', { defaultValue: 'Failed to save product' }));
         } finally {
             setSubmitting(false);
         }
@@ -329,31 +336,31 @@ const ProductForm = () => {
         <div className="max-w-[1600px] mx-auto p-6">
             <form onSubmit={handleSubmit}>
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-                    <div className="flex items-center gap-4">
+                <div className={clsx("flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8", isRTL && "sm:flex-row-reverse")}>
+                    <div className={clsx("flex items-center gap-4", isRTL && "flex-row-reverse")}>
                         <button
                             type="button"
                             onClick={() => navigate('/products')}
                             className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                         >
-                            <ArrowLeft className="w-6 h-6 text-slate-500" />
+                            <ArrowLeft className={clsx("w-6 h-6 text-slate-500", isRTL && "rotate-180")} />
                         </button>
-                        <div>
+                        <div className={isRTL ? "text-right" : "text-left"}>
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {isEditMode ? 'Edit Product' : 'Add Product'}
+                                {isEditMode ? t('editProduct') : t('addProduct')}
                             </h1>
                             <p className="text-sm text-slate-500 dark:text-slate-400">
-                                {isEditMode ? 'Manage your existing product' : 'Create a new product for your store'}
+                                {isEditMode ? t('manageExisting') : t('createNewProduct')}
                             </p>
                         </div>
                     </div>
-                    <div className="flex gap-3">
+                    <div className={clsx("flex gap-3", isRTL && "flex-row-reverse")}>
                         <button
                             type="button"
                             onClick={() => navigate('/products')}
                             className="px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                         >
-                            Cancel
+                            {t('common:cancel')}
                         </button>
                         <button
                             type="submit"
@@ -361,7 +368,7 @@ const ProductForm = () => {
                             className="flex items-center gap-2 px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors disabled:opacity-50 shadow-sm shadow-indigo-200 dark:shadow-none"
                         >
                             {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-                            <span>{isEditMode ? 'Save Changes' : 'Publish Product'}</span>
+                            <span>{isEditMode ? t('saveChanges') : t('publishProduct')}</span>
                         </button>
                     </div>
                 </div>
@@ -371,28 +378,34 @@ const ProductForm = () => {
                     <div className="lg:col-span-2 space-y-8">
                         {/* Basic Info Section */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                            <h2 className={clsx("text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <Globe className="w-5 h-5 text-indigo-500" />
-                                Product Information
+                                {t('productInformation')}
                             </h2>
                             <div className="space-y-6">
-                                <InputGroup label="Product Name (Arabic)" required>
+                                <InputGroup label={t('productNameAr')} required isRTL={isRTL}>
                                     <input
                                         type="text"
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all text-right"
-                                        placeholder="مثال: برجر لحم كلاسيك"
+                                        className={clsx(
+                                            "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                            isRTL ? "text-right" : ""
+                                        )}
+                                        placeholder={t('placeholderNameAr')}
                                         value={formData.nameAr}
                                         onChange={e => setFormData({ ...formData, nameAr: e.target.value })}
                                         onBlur={() => handleTranslate('name', formData.nameAr)}
                                         required
                                     />
                                 </InputGroup>
-                                <InputGroup label="Product Name (English)">
+                                <InputGroup label={t('productNameEn')} isRTL={isRTL}>
                                     <div className="relative">
                                         <input
                                             type="text"
-                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                                            placeholder="e.g. Classic Beef Burger"
+                                            className={clsx(
+                                                "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL ? "text-right pr-4 pl-24" : "pr-24"
+                                            )}
+                                            placeholder={t('placeholderNameEn')}
                                             value={formData.name}
                                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                                             onBlur={() => {
@@ -401,25 +414,31 @@ const ProductForm = () => {
                                                 }
                                             }}
                                         />
-                                        <div className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none">
-                                            Auto-translated
+                                        <div className={clsx("absolute top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none", isRTL ? "left-3" : "right-3")}>
+                                            {t('autoTranslated')}
                                         </div>
                                     </div>
                                 </InputGroup>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <InputGroup label="Description (Arabic)">
+                                    <InputGroup label={t('descriptionAr')} isRTL={isRTL}>
                                         <textarea
-                                            className="w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none text-right"
-                                            placeholder="وصف المنتج..."
+                                            className={clsx(
+                                                "w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none",
+                                                isRTL ? "text-right" : ""
+                                            )}
+                                            placeholder={t('placeholderDescAr')}
                                             value={formData.descriptionAr}
                                             onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })}
                                             onBlur={() => handleTranslate('description', formData.descriptionAr)}
                                         />
                                     </InputGroup>
-                                    <InputGroup label="Description (English)">
+                                    <InputGroup label={t('descriptionEn')} isRTL={isRTL}>
                                         <textarea
-                                            className="w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
-                                            placeholder="Describe your product..."
+                                            className={clsx(
+                                                "w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none",
+                                                isRTL ? "text-right" : ""
+                                            )}
+                                            placeholder={t('placeholderDescEn')}
                                             value={formData.description}
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                         />
@@ -430,17 +449,17 @@ const ProductForm = () => {
 
                         {/* Variants Section */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                            <div className={clsx("flex items-center justify-between mb-6", isRTL && "flex-row-reverse")}>
+                                <h2 className={clsx("text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                     <Layers className="w-5 h-5 text-indigo-500" />
-                                    Variants
+                                    {t('variants')}
                                 </h2>
                                 <button
                                     type="button"
                                     onClick={addVariant}
-                                    className="text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1"
+                                    className={clsx("text-sm text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1", isRTL && "flex-row-reverse")}
                                 >
-                                    <Plus size={16} /> Add Option
+                                    <Plus size={16} /> {t('addOption')}
                                 </button>
                             </div>
 
@@ -448,23 +467,29 @@ const ProductForm = () => {
                                 {formData.variants.map((variant, vIdx) => (
                                     <div key={vIdx} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                            <InputGroup label="Option Name (e.g. Size, Color)">
+                                            <InputGroup label={t('optionNameLabel')} isRTL={isRTL}>
                                                 <input
                                                     type="text"
                                                     value={variant.name}
                                                     onChange={e => updateVariant(vIdx, 'name', e.target.value)}
-                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                    placeholder="Option Name"
+                                                    className={clsx(
+                                                        "w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg",
+                                                        isRTL ? "text-right" : ""
+                                                    )}
+                                                    placeholder={t('optionNameLabel')}
                                                 />
                                             </InputGroup>
-                                            <div className="flex items-end gap-2">
+                                            <div className={clsx("flex items-end gap-2", isRTL && "flex-row-reverse")}>
                                                 <div className="flex-1">
-                                                    <InputGroup label="Sort Order">
+                                                    <InputGroup label={t('sortOrder')} isRTL={isRTL}>
                                                         <input
                                                             type="number"
                                                             value={variant.sortOrder}
                                                             onChange={e => updateVariant(vIdx, 'sortOrder', e.target.value)}
-                                                            className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                            className={clsx(
+                                                                "w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg",
+                                                                isRTL ? "text-right" : ""
+                                                            )}
                                                         />
                                                     </InputGroup>
                                                 </div>
@@ -472,7 +497,7 @@ const ProductForm = () => {
                                                     type="button"
                                                     onClick={() => removeVariant(vIdx)}
                                                     className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors mb-0.5"
-                                                    title="Remove Option"
+                                                    title={t('removeOption')}
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
@@ -480,16 +505,19 @@ const ProductForm = () => {
                                         </div>
 
                                         {/* Variant Values */}
-                                        <div className="pl-4 border-l-2 border-indigo-200 dark:border-indigo-900 space-y-3">
+                                        <div className={clsx("border-indigo-200 dark:border-indigo-900 space-y-3", isRTL ? "pr-4 border-r-2" : "pl-4 border-l-2")}>
                                             {variant.values.map((val, valIdx) => (
-                                                <div key={valIdx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
+                                                <div key={valIdx} className={clsx("flex flex-wrap md:flex-nowrap items-center gap-3", isRTL && "flex-row-reverse")}>
                                                     <div className="flex-1 min-w-[120px]">
                                                         <input
                                                             type="text"
                                                             value={val.value}
                                                             onChange={e => updateVariantValue(vIdx, valIdx, 'value', e.target.value)}
-                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                            placeholder="Value (e.g. Small)"
+                                                            className={clsx(
+                                                                "w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg",
+                                                                isRTL ? "text-right" : ""
+                                                            )}
+                                                            placeholder={t('valueLabel')}
                                                         />
                                                     </div>
                                                     <div className="w-[100px]">
@@ -497,7 +525,10 @@ const ProductForm = () => {
                                                             type="number"
                                                             value={val.price}
                                                             onChange={e => updateVariantValue(vIdx, valIdx, 'price', e.target.value)}
-                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                            className={clsx(
+                                                                "w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg",
+                                                                isRTL ? "text-right" : ""
+                                                            )}
                                                             placeholder="+ Price"
                                                         />
                                                     </div>
@@ -513,16 +544,16 @@ const ProductForm = () => {
                                             <button
                                                 type="button"
                                                 onClick={() => addVariantValue(vIdx)}
-                                                className="text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 mt-2"
+                                                className={clsx("text-xs text-indigo-600 hover:text-indigo-700 font-medium flex items-center gap-1 mt-2", isRTL && "flex-row-reverse")}
                                             >
-                                                <Plus size={14} /> Add Value
+                                                <Plus size={14} /> {t('addValue')}
                                             </button>
                                         </div>
                                     </div>
                                 ))}
                                 {formData.variants.length === 0 && (
                                     <div className="text-center py-8 text-slate-500 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg border border-dashed border-slate-300 dark:border-slate-700">
-                                        No variants added. Click "Add Option" to create variants like Size or Color.
+                                        {t('noVariants')}
                                     </div>
                                 )}
                             </div>
@@ -531,15 +562,15 @@ const ProductForm = () => {
 
                         {/* Media Section */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                            <h2 className={clsx("text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <ImageIcon className="w-5 h-5 text-indigo-500" />
-                                Media
+                                {t('media')}
                             </h2>
 
                             {/* Cover Image */}
                             <div className="mb-8">
-                                <InputGroup label="Cover Image" subtitle="Main image displayed on product cards." required>
-                                    <div className="flex items-start gap-4">
+                                <InputGroup label={t('coverImage')} subtitle={t('coverImageSubtitle')} required isRTL={isRTL}>
+                                    <div className={clsx("flex items-start gap-4", isRTL && "flex-row-reverse")}>
                                         {(currCoverImage || coverImageFile) ? (
                                             <div className="relative group w-40 h-40 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700">
                                                 <img
@@ -562,7 +593,7 @@ const ProductForm = () => {
                                                 <div className="p-2 bg-indigo-50 dark:bg-indigo-900/30 rounded-full text-indigo-600 dark:text-indigo-400 mb-2 group-hover:scale-110 transition-transform">
                                                     <Upload size={20} />
                                                 </div>
-                                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">Upload Cover</span>
+                                                <span className="text-xs font-semibold text-slate-600 dark:text-slate-400">{t('uploadCover')}</span>
                                                 <input
                                                     type="file"
                                                     accept="image/*"
@@ -617,7 +648,7 @@ const ProductForm = () => {
                                     {(existingImages.length + newImages.length < 8) && (
                                         <label className="aspect-square flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-lg cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/10 transition-all">
                                             <Upload className="w-6 h-6 text-slate-400 mb-2" />
-                                            <span className="text-xs text-slate-500">Add Image</span>
+                                            <span className="text-xs text-slate-500">{t('addImage')}</span>
                                             <input
                                                 type="file"
                                                 accept="image/*"
@@ -636,9 +667,9 @@ const ProductForm = () => {
                     <div className="space-y-8">
                         {/* Status */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Status</h2>
-                            <div className="flex items-center justify-between mb-4">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Active</label>
+                            <h2 className={clsx("text-sm font-bold text-slate-400 uppercase tracking-wider mb-4", isRTL && "text-right")}>{t('status')}</h2>
+                            <div className={clsx("flex items-center justify-between mb-4", isRTL && "flex-row-reverse")}>
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('active')}</label>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -649,8 +680,8 @@ const ProductForm = () => {
                                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                                 </label>
                             </div>
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Available</label>
+                            <div className={clsx("flex items-center justify-between", isRTL && "flex-row-reverse")}>
+                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('available')}</label>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -665,57 +696,64 @@ const ProductForm = () => {
 
                         {/* Organization */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                            <h2 className={clsx("text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <Layers className="w-5 h-5 text-indigo-500" />
-                                Organization
+                                {t('organization')}
                             </h2>
                             <div className="space-y-4">
                                 <InputGroup
                                     label={
-                                        <div className="flex items-center justify-between w-full">
-                                            <span>Category</span>
+                                        <div className={clsx("flex items-center justify-between w-full", isRTL && "flex-row-reverse")}>
+                                            <span>{t('category')}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => setIsCategoryModalOpen(true)}
                                                 className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 transition-colors uppercase tracking-wider font-bold"
                                             >
-                                                + New
+                                                {t('newCategory')}
                                             </button>
                                         </div>
                                     }
                                     required
+                                    isRTL={isRTL}
                                 >
                                     {categories.length === 0 ? (
                                         <div className="space-y-3">
                                             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-center">
-                                                <p className="text-xs text-slate-500 mb-2">No categories found</p>
+                                                <p className="text-xs text-slate-500 mb-2">{t('common:noResults', { defaultValue: 'No categories found' })}</p>
                                                 <button
                                                     type="button"
                                                     onClick={() => setIsCategoryModalOpen(true)}
                                                     className="w-full py-2 bg-indigo-600 text-white text-sm font-semibold rounded-lg hover:bg-indigo-700 transition-colors shadow-sm"
                                                 >
-                                                    Create First Category
+                                                    {t('createFirstCategory')}
                                                 </button>
                                             </div>
                                         </div>
                                     ) : (
                                         <select
-                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className={clsx(
+                                                "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL && "text-right"
+                                            )}
                                             value={formData.categoryId}
                                             onChange={e => setFormData({ ...formData, categoryId: e.target.value })}
                                             required
                                         >
-                                            <option value="">Select Category</option>
+                                            <option value="">{t('selectCategory')}</option>
                                             {categories.map((cat: any) => (
                                                 <option key={cat.id} value={cat.id}>{cat.name}</option>
                                             ))}
                                         </select>
                                     )}
                                 </InputGroup>
-                                <InputGroup label="Sort Order">
+                                <InputGroup label={t('sortOrder')} isRTL={isRTL}>
                                     <input
                                         type="number"
-                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        className={clsx(
+                                            "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                            isRTL && "text-right"
+                                        )}
                                         value={formData.sortOrder}
                                         onChange={e => setFormData({ ...formData, sortOrder: e.target.value })}
                                     />
@@ -725,31 +763,37 @@ const ProductForm = () => {
 
                         {/* Pricing */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                            <h2 className={clsx("text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <DollarSign className="w-5 h-5 text-indigo-500" />
-                                Pricing
+                                {t('pricing')}
                             </h2>
                             <div className="space-y-4">
-                                <InputGroup label="Price" required>
+                                <InputGroup label={t('price')} required isRTL={isRTL}>
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500">$</span>
+                                        <span className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500", isRTL ? "right-3" : "left-3")}>$</span>
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className={clsx(
+                                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL ? "pr-8 pl-4 text-right" : "pl-8 pr-4"
+                                            )}
                                             value={formData.price}
                                             onChange={e => setFormData({ ...formData, price: e.target.value })}
                                             required
                                         />
                                     </div>
                                 </InputGroup>
-                                <InputGroup label="Compare at Price" subtitle="Original price before discount">
+                                <InputGroup label={t('comparePrice')} subtitle={t('comparePriceSubtitle')} isRTL={isRTL}>
                                     <div className="relative">
-                                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">$</span>
+                                        <span className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-500", isRTL ? "right-3" : "left-3")}>$</span>
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className="w-full pl-8 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className={clsx(
+                                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL ? "pr-8 pl-4 text-right" : "pl-8 pr-4"
+                                            )}
                                             value={formData.comparePrice}
                                             onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
                                         />
@@ -760,16 +804,19 @@ const ProductForm = () => {
 
                         {/* Inventory */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                            <h2 className={clsx("text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2", isRTL && "flex-row-reverse")}>
                                 <Box className="w-5 h-5 text-indigo-500" />
-                                Inventory
+                                {t('inventory')}
                             </h2>
                             <div className="space-y-4">
-                                <InputGroup label="SKU (Stock Keeping Unit)">
+                                <InputGroup label={t('sku')} isRTL={isRTL}>
                                     <div className="relative group/sku">
                                         <input
                                             type="text"
-                                            className="w-full pl-4 pr-10 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all uppercase"
+                                            className={clsx(
+                                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all uppercase",
+                                                isRTL ? "pr-4 pl-10 text-right" : "pl-4 pr-10"
+                                            )}
                                             value={formData.sku}
                                             onChange={e => setFormData({ ...formData, sku: e.target.value.toUpperCase() })}
                                             placeholder="e.g. PIZ-123456"
@@ -777,15 +824,15 @@ const ProductForm = () => {
                                         <button
                                             type="button"
                                             onClick={() => setFormData({ ...formData, sku: generateSKU(formData.name || formData.nameAr) })}
-                                            className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-all opacity-0 group-hover/sku:opacity-100 focus:opacity-100"
-                                            title="Regenerate SKU"
+                                            className={clsx("absolute top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-md transition-all opacity-0 group-hover/sku:opacity-100 focus:opacity-100", isRTL ? "left-2" : "right-2")}
+                                            title={t('regenerateSKU')}
                                         >
                                             <RefreshCcw size={16} />
                                         </button>
                                     </div>
                                 </InputGroup>
-                                <div className="flex items-center justify-between py-2">
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Track Quantity</label>
+                                <div className={clsx("flex items-center justify-between py-2", isRTL && "flex-row-reverse")}>
+                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('trackQuantity')}</label>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
                                             type="checkbox"
@@ -797,18 +844,21 @@ const ProductForm = () => {
                                     </label>
                                 </div>
                                 {formData.trackInventory && (
-                                    <InputGroup label="Quantity">
+                                    <InputGroup label={t('quantity')} isRTL={isRTL}>
                                         <input
                                             type="number"
-                                            className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            className={clsx(
+                                                "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                                isRTL && "text-right"
+                                            )}
                                             value={formData.inventory}
                                             onChange={e => setFormData({ ...formData, inventory: e.target.value })}
                                         />
                                     </InputGroup>
                                 )}
                                 {!formData.trackInventory && (
-                                    <div className="mt-2 text-sm text-yellow-600 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800/30">
-                                        The customer can order this product even if the quantity is 0.
+                                    <div className={clsx("mt-2 text-sm text-yellow-600 bg-yellow-50 dark:bg-yellow-900/10 p-3 rounded-lg border border-yellow-200 dark:border-yellow-800/30", isRTL && "text-right")}>
+                                        {t('unlimitedStockWarning')}
                                     </div>
                                 )}
                             </div>
@@ -823,7 +873,7 @@ const ProductForm = () => {
                     onSuccess={() => {
                         setIsCategoryModalOpen(false);
                         fetchCategories();
-                        toast.success('Category created! You can now select it.');
+                        toast.success(t('categoryCreated'));
                     }}
                 />
             )}

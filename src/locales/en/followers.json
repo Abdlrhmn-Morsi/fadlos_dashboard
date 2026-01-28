@@ -1,9 +1,14 @@
 {
-    "title": "Followers",
+    "title": "Store Followers",
     "subtitle": "Engage with users following your store",
-    "searchPlaceholder": "Search followers...",
-    "name": "Name",
-    "followDate": "Follow Date",
-    "actions": "Actions",
-    "noFollowersFound": "No followers found"
+    "activeConnection": "Active Connection",
+    "activeConnections": "Active Connections",
+    "communityReach": "Community Reach",
+    "loadingNetwork": "Loading Network...",
+    "evolveTitle": "Your store is evolving",
+    "evolveSubtitle": "Growth begins with a single connection",
+    "noFollowersFound": "No followers found",
+    "valuedFollower": "Valued Follower",
+    "verifiedReader": "Verified Reader",
+    "searchPlaceholder": "Search followers..."
 }
