@@ -8,17 +8,16 @@ import { toast } from '../../utils/toast';
 import clsx from 'clsx';
 
 const InputGroup = ({ label, children, icon: Icon, required = false, subtitle = '' }: any) => {
-    const { isRTL } = useLanguage();
     return (
         <div className="space-y-1.5">
-            <label className={clsx("flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300", isRTL && "flex-row-reverse")}>
+            <label className="flex items-center gap-2 text-sm font-semibold text-slate-700 dark:text-slate-300">
                 {Icon && <Icon size={16} className="text-slate-400" />}
-                <span className={isRTL ? "text-right" : "text-left"}>
+                <span>
                     {label} {required && <span className="text-rose-500 ms-1">*</span>}
                 </span>
             </label>
             {children}
-            {subtitle && <p className={clsx("text-xs text-slate-400", isRTL && "text-right")}>{subtitle}</p>}
+            {subtitle && <p className="text-xs text-slate-400">{subtitle}</p>}
         </div>
     );
 };
@@ -123,7 +122,7 @@ const PromoCodeForm = () => {
     );
 
     return (
-        <div className="max-w-5xl mx-auto p-6">
+        <div className="max-w-5xl mx-auto p-6" dir={isRTL ? 'rtl' : 'ltr'}>
             <form onSubmit={handleSubmit}>
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
@@ -176,10 +175,7 @@ const PromoCodeForm = () => {
                                 <InputGroup label={t('promoCode')} icon={Tag} required subtitle={t('promoCodeSubtitle')}>
                                     <input
                                         type="text"
-                                        className={clsx(
-                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all uppercase font-mono font-bold tracking-wider",
-                                            isRTL && "text-right"
-                                        )}
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all uppercase font-mono font-bold tracking-wider"
                                         placeholder="e.g. SUMMER2024"
                                         value={formData.code}
                                         onChange={e => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
@@ -189,10 +185,7 @@ const PromoCodeForm = () => {
 
                                 <InputGroup label={t('description')} icon={Info} subtitle={t('descriptionSubtitle')}>
                                     <textarea
-                                        className={clsx(
-                                            "w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none",
-                                            isRTL && "text-right"
-                                        )}
+                                        className="w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
                                         placeholder="e.g. 20% off for first 100 orders"
                                         value={formData.description}
                                         onChange={e => setFormData({ ...formData, description: e.target.value })}
@@ -210,10 +203,7 @@ const PromoCodeForm = () => {
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <InputGroup label={t('discountType')} icon={formData.type === 'percentage' ? Percent : DollarSign}>
                                     <select
-                                        className={clsx(
-                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                            isRTL && "text-right"
-                                        )}
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                         value={formData.type}
                                         onChange={e => setFormData({ ...formData, type: e.target.value })}
                                     >
@@ -227,20 +217,14 @@ const PromoCodeForm = () => {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className={clsx(
-                                                "w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                                isRTL ? "pr-4 pl-12 text-right" : "pl-4 pr-12"
-                                            )}
+                                            className="w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all ps-4 pe-12"
                                             placeholder={formData.type === 'percentage' ? 'e.g. 20' : 'e.g. 50'}
                                             value={formData.value}
                                             onChange={e => setFormData({ ...formData, value: e.target.value })}
                                             required
                                         />
-                                        <span className={clsx(
-                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold",
-                                            isRTL ? "left-4" : "right-4"
-                                        )}>
-                                            {formData.type === 'percentage' ? '%' : '$'}
+                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold end-4">
+                                            {formData.type === 'percentage' ? '%' : t('common:currencySymbol')}
                                         </span>
                                     </div>
                                 </InputGroup>
@@ -250,17 +234,11 @@ const PromoCodeForm = () => {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className={clsx(
-                                                "w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                                isRTL ? "pr-8 pl-4" : "pl-8 pr-4"
-                                            )}
+                                            className="w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all ps-8 pe-4"
                                             value={formData.minOrderAmount}
                                             onChange={e => setFormData({ ...formData, minOrderAmount: e.target.value })}
                                         />
-                                        <span className={clsx(
-                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold",
-                                            isRTL ? "right-3" : "left-3"
-                                        )}>$</span>
+                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold start-3">{t('common:currencySymbol')}</span>
                                     </div>
                                 </InputGroup>
 
@@ -270,17 +248,11 @@ const PromoCodeForm = () => {
                                             type="number"
                                             step="0.01"
                                             disabled={formData.type !== 'percentage'}
-                                            className={clsx(
-                                                "w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all disabled:opacity-50",
-                                                isRTL ? "pl-8 pr-4 text-right" : "pl-8 pr-4"
-                                            )}
+                                            className="w-full py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all disabled:opacity-50 ps-8 pe-4"
                                             value={formData.maxDiscountAmount}
                                             onChange={e => setFormData({ ...formData, maxDiscountAmount: e.target.value })}
                                         />
-                                        <span className={clsx(
-                                            "absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold",
-                                            isRTL ? "right-3" : "left-3"
-                                        )}>$</span>
+                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold start-3">{t('common:currencySymbol')}</span>
                                     </div>
                                 </InputGroup>
                             </div>
@@ -303,9 +275,8 @@ const PromoCodeForm = () => {
                                     />
                                     <div className={clsx(
                                         "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500",
-                                        isRTL
-                                            ? "after:right-[2px] peer-checked:after:-translate-x-full"
-                                            : "after:left-[2px] peer-checked:after:translate-x-full"
+                                        "after:start-[2px]",
+                                        isRTL ? "peer-checked:after:-translate-x-full" : "peer-checked:after:translate-x-full"
                                     )}></div>
                                 </label>
                             </div>
@@ -320,10 +291,7 @@ const PromoCodeForm = () => {
                             <InputGroup label={t('maxTotalUses')} subtitle={t('maxTotalUsesSubtitle')}>
                                 <input
                                     type="number"
-                                    className={clsx(
-                                        "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                        isRTL && "text-right"
-                                    )}
+                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                     placeholder="e.g. 100"
                                     value={formData.maxUses}
                                     onChange={e => setFormData({ ...formData, maxUses: e.target.value })}
@@ -341,10 +309,7 @@ const PromoCodeForm = () => {
                                 <InputGroup label={t('startsOn')} icon={Calendar}>
                                     <input
                                         type="date"
-                                        className={clsx(
-                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                            isRTL && "text-right"
-                                        )}
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                         value={formData.startsAt}
                                         onChange={e => setFormData({ ...formData, startsAt: e.target.value })}
                                     />
@@ -353,10 +318,7 @@ const PromoCodeForm = () => {
                                 <InputGroup label={t('expiresOn')} icon={Calendar} required>
                                     <input
                                         type="date"
-                                        className={clsx(
-                                            "w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                            isRTL && "text-right"
-                                        )}
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                         value={formData.expiresAt}
                                         onChange={e => setFormData({ ...formData, expiresAt: e.target.value })}
                                         required

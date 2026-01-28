@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface InputModalProps {
     isOpen: boolean;
@@ -22,6 +23,7 @@ const InputModal: React.FC<InputModalProps> = ({
     isLoading = false,
     submitLabel = 'Submit'
 }) => {
+    const { isRTL } = useLanguage();
     const [value, setValue] = useState('');
 
     useEffect(() => {
@@ -38,7 +40,7 @@ const InputModal: React.FC<InputModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
             <div
                 className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm animate-in animate-fade duration-300"
                 onClick={isLoading ? undefined : onCancel}

@@ -19,7 +19,11 @@
     "no": "No",
     "loading": "Loading",
     "error": "Error",
+    "errorUpdatingData": "Error updating data",
+    "errorFetchingData": "Error fetching data",
     "success": "Success",
+    "email": "Email Address",
+    "phone": "Phone Number",
     "actions": "Actions",
     "status": "Status",
     "active": "Active",
@@ -73,7 +77,9 @@
     "manageProfileDesc": "Update your personal profile information",
     "accountSettings": "Account Settings",
     "personalInformation": "Personal Information",
-    "username": "Full Name",
+    "changeProfilePicture": "Change Profile Picture",
+    "fullName": "Full Name",
+    "username": "Username",
     "changePassword": "Security & Password",
     "updatePassword": "Update Password",
     "oldPassword": "Current Password",
@@ -88,5 +94,6 @@
     "needHelpTitle": "System Configuration",
     "needHelpDesc": "Manage your entire presence from one place. Ensure your store data is accurate to improve customer trust and visibility.",
     "businessReady": "Business Ready",
-    "secureAccount": "Secure Account"
+    "secureAccount": "Secure Account",
+    "currencySymbol": "LE"
 }

@@ -13,6 +13,8 @@ interface ConfirmationModalProps {
     type?: 'danger' | 'warning' | 'info';
 }
 
+import { useLanguage } from '../../contexts/LanguageContext';
+
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     isOpen,
     title,
@@ -24,6 +26,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     isLoading = false,
     type = 'info'
 }) => {
+    const { isRTL } = useLanguage();
     if (!isOpen) return null;
 
     const getIcon = () => {
@@ -35,7 +38,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
             <div
                 className="absolute inset-0 bg-slate-900/40 dark:bg-slate-950/60 backdrop-blur-sm animate-in animate-fade duration-300"
                 onClick={isLoading ? undefined : onCancel}
@@ -62,10 +65,10 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                             onClick={onConfirm}
                             disabled={isLoading}
                             className={`px-5 py-2.5 text-white rounded-lg font-medium transition-all shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 disabled:opacity-50 flex items-center gap-2 ${type === 'danger'
-                                    ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20 hover:shadow-rose-500/30'
-                                    : type === 'warning'
-                                        ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20 hover:shadow-amber-500/30'
-                                        : 'bg-indigo-600 hover:bg-indigo-700'
+                                ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20 hover:shadow-rose-500/30'
+                                : type === 'warning'
+                                    ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20 hover:shadow-amber-500/30'
+                                    : 'bg-indigo-600 hover:bg-indigo-700'
                                 }`}
                         >
                             {isLoading && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>}

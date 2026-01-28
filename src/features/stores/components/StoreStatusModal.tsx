@@ -3,6 +3,7 @@ import { X, AlertCircle, CheckCircle, Clock, XCircle, ShieldAlert } from 'lucide
 import { useTranslation } from 'react-i18next';
 import { updateStoreStatus } from '../api/stores.api';
 import { toast } from '../../../utils/toast';
+import { useLanguage } from '../../../contexts/LanguageContext';
 
 interface StoreStatusModalProps {
     store: any;
@@ -13,6 +14,7 @@ interface StoreStatusModalProps {
 
 const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onClose, onSuccess }) => {
     const { t } = useTranslation(['stores', 'common']);
+    const { isRTL } = useLanguage();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({
         status: store?.status?.toLowerCase() || 'pending',
@@ -46,7 +48,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
     ];
 
     return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-none shadow-2xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-3">
@@ -62,7 +64,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="space-y-3">
-                        <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ml-1">{t('common:operationalState')}</label>
+                        <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ms-1">{t('common:operationalState')}</label>
                         <div className="grid grid-cols-2 gap-3">
                             {statuses.map((s) => (
                                 <button
@@ -84,7 +86,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                     </div>
 
                     <div className="space-y-3">
-                        <div className="flex items-center justify-between ml-1">
+                        <div className="flex items-center justify-between ms-1">
                             <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t('common:reasonNotes')}</label>
                             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{t('common:optional')}</span>
                         </div>

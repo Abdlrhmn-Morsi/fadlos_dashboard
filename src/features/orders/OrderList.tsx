@@ -123,7 +123,7 @@ const OrderList = () => {
                                             {new Date(order.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-800 dark:text-white">
-                                            ${Number(order.total || 0).toFixed(2)}
+                                            {Number(order.total || 0).toFixed(2)} {t('common:currencySymbol')}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`px-3 py-1 rounded-full text-xs font-bold ${getStatusColor(order.status)}`}>

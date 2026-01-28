@@ -1,7 +1,20 @@
 import React from 'react';
 import { CheckCircle, XCircle, AlertTriangle, X } from 'lucide-react';
 
-const StatusModal = ({
+import { useLanguage } from '../../contexts/LanguageContext';
+
+interface StatusModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    type?: 'success' | 'error' | 'confirm';
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+    confirmText?: string;
+    cancelText?: string;
+}
+
+const StatusModal: React.FC<StatusModalProps> = ({
     isOpen,
     onClose,
     type = 'success', // success, error, confirm
@@ -11,6 +24,7 @@ const StatusModal = ({
     confirmText = 'Confirm',
     cancelText = 'Cancel'
 }) => {
+    const { isRTL } = useLanguage();
     if (!isOpen) return null;
 
     const getIcon = () => {
@@ -43,7 +57,7 @@ const StatusModal = ({
     };
 
     return (
-        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4">
+        <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
             <div
                 className="absolute inset-0 bg-slate-900/60 dark:bg-slate-950/80 backdrop-blur-md animate-in animate-fade duration-300"
                 onClick={onClose}

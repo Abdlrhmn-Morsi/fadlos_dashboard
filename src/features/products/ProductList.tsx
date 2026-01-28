@@ -184,7 +184,7 @@ const ProductList = () => {
                                             )}
                                         </td>
                                         <td className="px-6 py-4 font-semibold text-slate-900 dark:text-white">
-                                            ${Number(product.price).toFixed(2)}
+                                            {Number(product.price).toFixed(2)} {t('common:currencySymbol')}
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${product.isActive

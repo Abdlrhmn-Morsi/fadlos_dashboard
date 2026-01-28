@@ -77,7 +77,7 @@ const CategoryList = () => {
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div className={isRTL ? 'text-right' : 'text-left'}>
+                <div>
                     <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                         {t('title')}
                     </h1>
@@ -97,14 +97,11 @@ const CategoryList = () => {
             {/* Search and Filter Bar */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
                 <div className="relative max-w-md">
-                    <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={20} />
+                    <Search className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-3" size={20} />
                     <input
                         type="text"
                         placeholder={t('searchPlaceholder')}
-                        className={clsx(
-                            "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none",
-                            isRTL ? "pr-10 pl-4 text-right" : "pl-10 pr-4"
-                        )}
+                        className="w-full py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none ps-10 pe-4"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -114,7 +111,7 @@ const CategoryList = () => {
             {/* Categories Grid/Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
+                    <table className="w-full border-collapse">
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
@@ -126,7 +123,7 @@ const CategoryList = () => {
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                                     {t('status')}
                                 </th>
-                                <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider text-end">
                                     {t('actions')}
                                 </th>
                             </tr>
@@ -178,12 +175,12 @@ const CategoryList = () => {
                                                 ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
                                                 : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                                                 }`}>
-                                                <span className={clsx("w-1.5 h-1.5 rounded-full", isRTL ? "ml-1.5" : "mr-1.5", category.isActive ? 'bg-emerald-500' : 'bg-slate-400')}></span>
+                                                <span className={clsx("w-1.5 h-1.5 rounded-full me-1.5", category.isActive ? 'bg-emerald-500' : 'bg-slate-400')}></span>
                                                 {category.isActive ? t('active') : t('inactive')}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
-                                            <div className={clsx("flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
+                                        <td className="px-6 py-4 text-end">
+                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 justify-end">
                                                 <button
                                                     onClick={() => handleEdit(category)}
                                                     className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"

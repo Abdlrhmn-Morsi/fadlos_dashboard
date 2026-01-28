@@ -1,6 +1,7 @@
 import React, { Fragment } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 import { X } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 interface ModalProps {
     isOpen: boolean;
@@ -10,9 +11,11 @@ interface ModalProps {
 }
 
 export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }) => {
+    const { isRTL } = useLanguage();
+
     return (
         <Transition.Root show={isOpen} as={Fragment}>
-            <Dialog as="div" className="relative z-50" onClose={onClose}>
+            <Dialog as="div" className="relative z-50" onClose={onClose} dir={isRTL ? 'rtl' : 'ltr'}>
                 <Transition.Child
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -36,8 +39,8 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
                             leaveFrom="opacity-100 translate-y-0 sm:scale-100"
                             leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
                         >
-                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pt-5 pb-4 text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
-                                <div className="absolute top-0 right-0 hidden pt-4 pr-4 sm:block">
+                            <Dialog.Panel className="relative transform overflow-hidden rounded-lg bg-white dark:bg-gray-800 px-4 pt-5 pb-4 text-start shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg sm:p-6">
+                                <div className="absolute top-0 end-0 hidden pt-4 pe-4 sm:block">
                                     <button
                                         type="button"
                                         className="rounded-md bg-white dark:bg-gray-800 text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
@@ -48,7 +51,7 @@ export const Modal: React.FC<ModalProps> = ({ isOpen, onClose, title, children }
                                     </button>
                                 </div>
                                 <div>
-                                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                                    <div className="mt-3 text-center sm:mt-0 sm:ms-4 sm:text-start">
                                         <Dialog.Title as="h3" className="text-lg font-medium leading-6 text-gray-900 dark:text-white">
                                             {title}
                                         </Dialog.Title>

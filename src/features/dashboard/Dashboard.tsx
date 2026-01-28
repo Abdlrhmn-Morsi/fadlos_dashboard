@@ -187,7 +187,7 @@ const Dashboard: React.FC = () => {
                 {/* Revenue - Common for all */}
                 <StatCard
                     title={t('totalRevenue')}
-                    value={`$${(stats.totalRevenue || 0).toLocaleString()}`}
+                    value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
                     change="+12.5%"
                     icon={DollarSign}
                     color="emerald"
@@ -272,7 +272,7 @@ const Dashboard: React.FC = () => {
                 {/* Avg Order Value - Common */}
                 <StatCard
                     title={t('avgOrderValue')}
-                    value={`$${(stats.avgOrderValue || 0).toFixed(2)}`}
+                    value={`${(stats.avgOrderValue || 0).toFixed(2)} ${t('common:currencySymbol')}`}
                     change="+1.2%"
                     icon={TrendingUp}
                     color="amber"
@@ -334,7 +334,7 @@ const Dashboard: React.FC = () => {
                                     tickLine={false}
                                     tick={{ fill: textColor, fontSize: 12 }}
                                     dx={isRTL ? 10 : -10}
-                                    tickFormatter={(val) => `$${val}`}
+                                    tickFormatter={(val) => `${val} ${t('common:currencySymbol')}`}
                                     orientation={isRTL ? "right" : "left"}
                                 />
                                 <Tooltip

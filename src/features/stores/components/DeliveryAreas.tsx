@@ -151,21 +151,19 @@ const DeliveryAreas = () => {
     return (
         <div className="space-y-8">
             {/* Add New Delivery Area Section */}
-            <div className={clsx("bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col", isRTL && "items-end")}>
+            {/* Add New Delivery Area Section */}
+            <div className="bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col">
                 <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
                     <Plus size={14} className="text-primary" />
                     {t('addDeliveryCity')}
                 </h4>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div className="space-y-1">
-                        <label className={clsx("text-[10px] font-black text-slate-400 uppercase tracking-widest block", isRTL && "text-right")}>{t('common:city')}</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('common:city')}</label>
                         <select
                             value={selectedCityId}
                             onChange={(e) => setSelectedCityId(e.target.value)}
-                            className={clsx(
-                                "w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors",
-                                isRTL && "text-right"
-                            )}
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors"
                         >
                             <option value="">{t('selectCity')}</option>
                             {cities.map(city => (
@@ -176,19 +174,18 @@ const DeliveryAreas = () => {
                         </select>
                     </div>
                     <div className="space-y-1">
-                        <label className={clsx("text-[10px] font-black text-slate-400 uppercase tracking-widest block", isRTL && "text-right")}>{t('defaultPrice')}</label>
+                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('defaultPrice')}</label>
                         <div className="relative">
                             <input
                                 type="number"
                                 value={defaultPrice}
                                 onChange={(e) => setDefaultPrice(Number(e.target.value))}
                                 className={clsx(
-                                    "w-full py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors",
-                                    isRTL ? "pr-8 pl-4" : "pl-8 pr-4"
+                                    "w-full py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors ps-8 pe-4"
                                 )}
                                 min="0"
                             />
-                            <DollarSign size={14} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold", isRTL ? "right-3" : "left-3")} />
+                            <DollarSign size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold start-3" />
                         </div>
                     </div>
                     <div className="flex items-end">
@@ -203,14 +200,14 @@ const DeliveryAreas = () => {
                         </button>
                     </div>
                 </div>
-                <p className={clsx("mt-4 text-[10px] text-slate-500 font-medium", isRTL && "text-right")}>
+                <p className="mt-4 text-[10px] text-slate-500 font-medium">
                     {t('addAreaNote')}
                 </p>
             </div>
 
             {/* List of Delivery Areas */}
             <div className="space-y-4">
-                <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "items-end")}>
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-4">
                             <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs flex items-center gap-2">
@@ -223,17 +220,14 @@ const DeliveryAreas = () => {
                         </div>
                     </div>
 
-                    <div className={clsx("flex items-center gap-3 flex-wrap", isRTL ? "justify-start" : "justify-end")}>
+                    <div className="flex items-center gap-3 flex-wrap justify-end">
                         {/* Town Filter */}
                         <div className="relative">
-                            <Filter size={14} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
+                            <Filter size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-3" />
                             <select
                                 value={filterTownId}
                                 onChange={(e) => setFilterTownId(e.target.value)}
-                                className={clsx(
-                                    "py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors",
-                                    isRTL ? "pr-9 pl-4 text-right" : "pl-9 pr-4"
-                                )}
+                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4"
                             >
                                 <option value="all">{t('allTowns')}</option>
                                 {uniqueTowns.map(town => (
@@ -273,7 +267,7 @@ const DeliveryAreas = () => {
                 ) : filteredAreas.length === 0 ? (
                     <div className="py-12 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
                         <Filter size={24} strokeWidth={1} />
-                        <p className={clsx("font-bold text-xs uppercase tracking-widest", isRTL && "text-right")}>{t('noAreasFoundForTown')}</p>
+                        <p className="font-bold text-xs uppercase tracking-widest">{t('noAreasFoundForTown')}</p>
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -282,7 +276,7 @@ const DeliveryAreas = () => {
                                 key={area.id}
                                 className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between hover:border-primary/50 transition-all shadow-sm"
                             >
-                                <div className={clsx("space-y-1", isRTL && "text-right")}>
+                                <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <MapPin size={14} className="text-primary" />
                                         <span className="font-black text-slate-900 dark:text-slate-100 text-sm italic">
@@ -305,12 +299,9 @@ const DeliveryAreas = () => {
                                                     handleUpdatePrice(area.id, newPrice);
                                                 }
                                             }}
-                                            className={clsx(
-                                                "w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors",
-                                                isRTL ? "pr-6 pl-2" : "pl-6 pr-2"
-                                            )}
+                                            className="w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors ps-6 pe-2"
                                         />
-                                        <DollarSign size={10} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-2" : "left-2")} />
+                                        <DollarSign size={10} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-2" />
                                     </div>
                                     <button
                                         type="button"
