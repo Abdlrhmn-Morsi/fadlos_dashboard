@@ -25,5 +25,13 @@
     "activeItems": "عناصر نشطة",
     "newThisMonth": "جديد هذا الشهر",
     "newFollowers": "متابعون جدد",
-    "avgStars": "متوسط {{stars}} نجوم"
+    "avgStars": "متوسط {{stars}} نجوم",
+    "status": {
+        "pending": "قيد الانتظار",
+        "confirmed": "تم التأكيد",
+        "preparing": "جاري التحضير",
+        "ready": "جاهز للاستلام",
+        "delivered": "تم التوصيل",
+        "cancelled": "ملغي"
+    }
 }

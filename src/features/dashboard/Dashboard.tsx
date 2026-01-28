@@ -22,6 +22,8 @@ import {
 } from './store/dashboard.store';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
 
 interface StatCardProps {
     title: string;
@@ -32,29 +34,33 @@ interface StatCardProps {
     comparisonText: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, color, comparisonText }) => (
-    <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
-        <div className="flex justify-between items-start mb-4">
-            <div>
-                <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
-                <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</h3>
+const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, color, comparisonText }) => {
+    const { isRTL } = useLanguage();
+    return (
+        <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
+            <div className={clsx("flex justify-between items-start mb-4", isRTL && "flex-row-reverse")}>
+                <div className={isRTL ? "text-right" : "text-left"}>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</h3>
+                </div>
+                <div className={`w-12 h-12 rounded-none flex items-center justify-center bg-${color}-50 dark:bg-${color}-900/20 text-${color}-600 dark:text-${color}-400`}>
+                    <Icon size={24} />
+                </div>
             </div>
-            <div className={`w-12 h-12 rounded-none flex items-center justify-center bg-${color}-50 dark:bg-${color}-900/20 text-${color}-600 dark:text-${color}-400`}>
-                <Icon size={24} />
+            <div className={clsx("flex items-center gap-2 text-sm", isRTL && "flex-row-reverse")}>
+                <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
+                    <TrendingUp size={14} className={isRTL ? "rotate-180" : ""} /> {change}
+                </span>
+                <span className="text-slate-400 dark:text-slate-500">{comparisonText}</span>
             </div>
         </div>
-        <div className="flex items-center gap-2 text-sm">
-            <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
-                <TrendingUp size={14} /> {change}
-            </span>
-            <span className="text-slate-400 dark:text-slate-500">{comparisonText}</span>
-        </div>
-    </div>
-);
+    );
+};
 
 const Dashboard: React.FC = () => {
     const { t } = useTranslation(['dashboard', 'common']);
     const { isDark } = useTheme();
+    const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const [stats, setStats] = useRecoilState(dashboardStatsState);
     const [loading, setLoading] = useRecoilState(dashboardLoadingState);
@@ -64,7 +70,6 @@ const Dashboard: React.FC = () => {
 
     const userStr = localStorage.getItem('user');
     const user = userStr ? JSON.parse(userStr) : {};
-    const isAdmin = user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN;
 
     useEffect(() => {
         const loadDashboardData = async () => {
@@ -109,12 +114,12 @@ const Dashboard: React.FC = () => {
 
     if (loading) return (
         <div className="flex items-center justify-center min-h-[50vh] p-6 animate-pulse">
-            <div className="text-slate-500 font-medium">{t('loading')}</div>
+            <div className="text-slate-500 font-medium">{t('common:loading')}</div>
         </div>
     );
 
     if (error) return (
-        <div className="p-6 bg-rose-50 border border-rose-200 rounded-none-none text-rose-600 font-medium m-6">
+        <div className="p-6 bg-rose-50 border border-rose-200 rounded-none text-rose-600 font-medium m-6">
             {error}
         </div>
     );
@@ -149,7 +154,10 @@ const Dashboard: React.FC = () => {
         }
 
         return (
-            <div className={`${bgColor} ${borderColor} border rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500`}>
+            <div className={clsx(
+                bgColor, borderColor, "border rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
+                isRTL && "flex-row-reverse text-right"
+            )}>
                 <div className={`p-3 rounded-none bg-white/50 dark:bg-black/20 ${iconColor} h-fit`}>
                     <Icon size={24} />
                 </div>
@@ -159,7 +167,10 @@ const Dashboard: React.FC = () => {
                         {reason || t('common:statusReasonPlaceholder')}
                     </p>
                     {status === 'SUSPENDED' && (
-                        <div className="pt-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400">
+                        <div className={clsx(
+                            "pt-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-widest text-rose-600 dark:text-rose-400",
+                            isRTL && "flex-row-reverse"
+                        )}>
                             <Info size={12} />
                             {t('common:contactSupportMistake')}
                         </div>
@@ -271,31 +282,37 @@ const Dashboard: React.FC = () => {
 
             {/* Quick Actions for Sellers */}
             {(user.role === UserRole.STORE_OWNER || user.role === UserRole.EMPLOYEE) && (
-                <div className="bg-gradient-to-r from-primary to-primary-dark p-8 rounded-none border border-primary/20 shadow-xl shadow-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group">
+                <div className={clsx(
+                    "bg-gradient-to-r from-primary to-primary-dark p-8 rounded-none border border-primary/20 shadow-xl shadow-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group",
+                    isRTL && "md:flex-row-reverse"
+                )}>
                     <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-none rotate-12 transition-transform group-hover:scale-110" />
-                    <div className="relative z-10 flex items-center gap-6">
+                    <div className={clsx("relative z-10 flex items-center gap-6", isRTL && "flex-row-reverse")}>
                         <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-none flex items-center justify-center text-white shadow-inner">
                             <Store size={40} />
                         </div>
-                        <div>
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">{t('common:manageYourStore', { defaultValue: 'Manage Your Store' })}</h3>
-                            <p className="text-white/80 font-medium">{t('common:updateStoreDirectly', { defaultValue: 'Update your images, contact info, and operational details instantly.' })}</p>
+                        <div className={isRTL ? "text-right" : "text-left"}>
+                            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">{t('common:manageYourStore')}</h3>
+                            <p className="text-white/80 font-medium">{t('common:updateStoreDirectly')}</p>
                         </div>
                     </div>
                     <button
                         onClick={() => navigate('/store-settings')}
                         className="relative z-10 px-8 py-4 bg-white text-primary font-black uppercase tracking-widest text-sm rounded-none hover:-translate-y-1 transition-all shadow-lg active:scale-95 whitespace-nowrap"
                     >
-                        {t('common:settings', { defaultValue: 'Store Settings' })}
+                        {t('common:storeSettings')}
                     </button>
                 </div>
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
-                    <div className="flex items-center justify-between mb-8">
+                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
+                    <div className={clsx("flex items-center justify-between mb-8", isRTL && "flex-row-reverse")}>
                         <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
-                        <select className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-none px-3 py-1.5 focus:ring-primary focus:border-primary outline-none">
+                        <select className={clsx(
+                            "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-none px-3 py-1.5 focus:ring-primary focus:border-primary outline-none",
+                            isRTL && "text-right"
+                        )}>
                             <option>{t('last30Days')}</option>
                             <option>{t('last90Days')}</option>
                         </select>
@@ -310,13 +327,15 @@ const Dashboard: React.FC = () => {
                                     tickLine={false}
                                     tick={{ fill: textColor, fontSize: 12 }}
                                     dy={10}
+                                    reversed={isRTL}
                                 />
                                 <YAxis
                                     axisLine={false}
                                     tickLine={false}
                                     tick={{ fill: textColor, fontSize: 12 }}
-                                    dx={-10}
+                                    dx={isRTL ? 10 : -10}
                                     tickFormatter={(val) => `$${val}`}
+                                    orientation={isRTL ? "right" : "left"}
                                 />
                                 <Tooltip
                                     cursor={{ fill: cursorFill }}
@@ -326,7 +345,8 @@ const Dashboard: React.FC = () => {
                                         border: `1px solid ${tooltipBorder}`,
                                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                         fontSize: '14px',
-                                        color: isDark ? '#f1f5f9' : '#0f172a'
+                                        color: isDark ? '#f1f5f9' : '#0f172a',
+                                        textAlign: isRTL ? 'right' : 'left'
                                     }}
                                 />
                                 <Bar dataKey="revenue" fill="var(--primary)" radius={[6, 6, 0, 0]} barSize={32} />
@@ -336,11 +356,11 @@ const Dashboard: React.FC = () => {
                 </div>
 
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col transition-colors">
-                    <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100 mb-6">{t('recentActivity')}</h3>
+                    <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100 mb-6", isRTL && "text-right")}>{t('recentActivity')}</h3>
                     <div className="space-y-6 flex-grow">
                         {[1, 2, 3].map((_, i) => (
-                            <div key={i} className="flex gap-4 group cursor-pointer">
-                                <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform" />
+                            <div key={i} className={clsx("flex gap-4 group cursor-pointer", isRTL && "flex-row-reverse text-right")}>
+                                <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform shrink-0" />
                                 <div>
                                     <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{t('statsSynchronized')}</p>
                                     <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('justNow')}</p>

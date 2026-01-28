@@ -1,0 +1,20 @@
+{
+    "title": "التصنيفات",
+    "subtitle": "نظم منتجاتك في مجموعات منطقية",
+    "addCategory": "إضافة تصنيف",
+    "editCategory": "تعديل التصنيف",
+    "deleteCategory": "حذف التصنيف",
+    "searchPlaceholder": "بحث في التصنيفات...",
+    "deleteConfirmation": "هل أنت متأكد أنك تريد حذف هذا التصنيف؟ لن يؤدي هذا إلى حذف المنتجات الموجودة فيه.",
+    "noCategoriesFound": "لم يتم العثور على تصنيفات",
+    "name": "الاسم",
+    "description": "الوصف",
+    "productsCount": "المنتجات",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "active": "نشط",
+    "inactive": "غير نشط",
+    "loadFailed": "فشل تحميل التصنيفات",
+    "saveSuccess": "تم حفظ التصنيف بنجاح",
+    "deleteSuccess": "تم حذف التصنيف بنجاح"
+}

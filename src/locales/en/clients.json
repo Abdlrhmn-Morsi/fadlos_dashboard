@@ -1,0 +1,12 @@
+{
+    "title": "Clients",
+    "subtitle": "View and manage your customer directory",
+    "searchPlaceholder": "Search clients...",
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "totalOrders": "Total Orders",
+    "lastOrder": "Last Order",
+    "actions": "Actions",
+    "noClientsFound": "No clients found"
+}

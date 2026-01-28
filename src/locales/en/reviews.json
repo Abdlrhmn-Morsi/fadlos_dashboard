@@ -1,0 +1,14 @@
+{
+    "title": "Reviews",
+    "subtitle": "Manage customer feedback and ratings",
+    "searchPlaceholder": "Search reviews...",
+    "customer": "Customer",
+    "rating": "Rating",
+    "comment": "Comment",
+    "date": "Date",
+    "status": "Status",
+    "actions": "Actions",
+    "approved": "Approved",
+    "pending": "Pending",
+    "noReviewsFound": "No reviews found"
+}

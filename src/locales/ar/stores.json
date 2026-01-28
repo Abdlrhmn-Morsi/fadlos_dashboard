@@ -1,5 +1,6 @@
 {
-    "title": "التجار النشطون",
+    "title": "دليل التجار",
+    "activeMerchants": "التجار النشطون",
     "searchPlaceholder": "البحث عن متجر...",
     "merchantEntity": "كيان التاجر",
     "legalOwner": "المالك القانوني",

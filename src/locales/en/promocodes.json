@@ -1,0 +1,16 @@
+{
+    "title": "Promo Codes",
+    "subtitle": "Create and manage discount codes for your customers",
+    "addPromoCode": "Add Promo Code",
+    "searchPlaceholder": "Search promo codes...",
+    "code": "Code",
+    "discount": "Discount",
+    "expiryDate": "Expiry Date",
+    "usageLimit": "Usage Limit",
+    "status": "Status",
+    "actions": "Actions",
+    "active": "Active",
+    "expired": "Expired",
+    "noPromoCodesFound": "No promo codes found",
+    "deleteConfirmation": "Are you sure you want to delete this promo code?"
+}

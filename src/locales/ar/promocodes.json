@@ -1,0 +1,16 @@
+{
+    "title": "أكواد الخصم",
+    "subtitle": "إنشاء وإدارة أكواد الخصم لعملائك",
+    "addPromoCode": "إضافة كود خصم",
+    "searchPlaceholder": "البحث في أكواد الخصم...",
+    "code": "الكود",
+    "discount": "الخصم",
+    "expiryDate": "تاريخ الانتهاء",
+    "usageLimit": "حد الاستخدام",
+    "status": "الحالة",
+    "actions": "الإجراءات",
+    "active": "نشط",
+    "expired": "منتهي الصلاحية",
+    "noPromoCodesFound": "لم يتم العثور على أكواد خصم",
+    "deleteConfirmation": "هل أنت متأكد أنك تريد حذف كود الخصم هذا؟"
+}

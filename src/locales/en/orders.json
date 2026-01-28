@@ -1,0 +1,16 @@
+{
+    "title": "Orders",
+    "subtitle": "Track and manage your customer orders",
+    "searchPlaceholder": "Search orders...",
+    "orderId": "Order ID",
+    "customer": "Customer",
+    "total": "Total",
+    "status": "Status",
+    "date": "Date",
+    "actions": "Actions",
+    "noOrdersFound": "No orders found",
+    "viewDetails": "View Details",
+    "updateStatus": "Update Status",
+    "loadFailed": "Failed to load orders",
+    "updateSuccess": "Order status updated successfully"
+}

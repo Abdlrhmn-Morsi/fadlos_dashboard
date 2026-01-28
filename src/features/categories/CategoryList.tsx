@@ -5,7 +5,13 @@ import CategoryFormModal from './components/CategoryFormModal';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { toast } from '../../utils/toast';
 
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../contexts/LanguageContext';
+import clsx from 'clsx';
+
 const CategoryList = () => {
+    const { t } = useTranslation(['categories', 'common']);
+    const { isRTL } = useLanguage();
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -27,7 +33,7 @@ const CategoryList = () => {
             setCategories(data.data || []);
         } catch (error) {
             console.error('Failed to fetch categories', error);
-            toast.error('Could not load categories');
+            toast.error(t('loadFailed'));
         } finally {
             setLoading(false);
         }
@@ -42,11 +48,11 @@ const CategoryList = () => {
         if (!deleteId) return;
         try {
             await categoriesApi.deleteCategory(deleteId);
-            toast.success('Category deleted successfully');
+            toast.success(t('deleteSuccess'));
             fetchCategories();
         } catch (error) {
             console.error('Failed to delete category', error);
-            toast.error('Failed to delete category');
+            toast.error(t('common:error', { defaultValue: 'Error' }));
         } finally {
             setConfirmOpen(false);
             setDeleteId(null);
@@ -71,12 +77,12 @@ const CategoryList = () => {
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                <div>
+                <div className={isRTL ? 'text-right' : 'text-left'}>
                     <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                        Categories
+                        {t('title')}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
-                        Manage your product categories
+                        {t('subtitle')}
                     </p>
                 </div>
                 <button
@@ -84,18 +90,21 @@ const CategoryList = () => {
                     className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
                 >
                     <Plus size={20} />
-                    <span>Create Category</span>
+                    <span>{t('addCategory')}</span>
                 </button>
             </div>
 
             {/* Search and Filter Bar */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
                 <div className="relative max-w-md">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
+                    <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={20} />
                     <input
                         type="text"
-                        placeholder="Search categories..."
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none"
+                        placeholder={t('searchPlaceholder')}
+                        className={clsx(
+                            "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none",
+                            isRTL ? "pr-10 pl-4 text-right" : "pl-10 pr-4"
+                        )}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -105,20 +114,20 @@ const CategoryList = () => {
             {/* Categories Grid/Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    Name
+                                    {t('name')}
                                 </th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    Sort Order
+                                    {t('common:sortOrder', { defaultValue: 'Sort Order' })}
                                 </th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    Status
+                                    {t('status')}
                                 </th>
-                                <th className="px-6 py-5 text-right text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
-                                    Actions
+                                <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>
+                                    {t('actions')}
                                 </th>
                             </tr>
                         </thead>
@@ -137,8 +146,8 @@ const CategoryList = () => {
                                     <td colSpan={4} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
                                             <LayoutGrid size={48} strokeWidth={1} />
-                                            <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">No categories found</p>
-                                            <p className="text-sm">Try adjusting your search or add a new one.</p>
+                                            <p className="mt-4 text-lg font-medium text-slate-600 dark:text-slate-300">{t('noCategoriesFound')}</p>
+                                            <p className="text-sm">{t('common:adjustSearch', { defaultValue: 'Try adjusting your search or add a new one.' })}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -166,26 +175,26 @@ const CategoryList = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${category.isActive
-                                                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
-                                                    : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
+                                                : 'bg-slate-50 text-slate-600 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700'
                                                 }`}>
-                                                <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${category.isActive ? 'bg-emerald-500' : 'bg-slate-400'}`}></span>
-                                                {category.isActive ? 'Active' : 'Inactive'}
+                                                <span className={clsx("w-1.5 h-1.5 rounded-full", isRTL ? "ml-1.5" : "mr-1.5", category.isActive ? 'bg-emerald-500' : 'bg-slate-400')}></span>
+                                                {category.isActive ? t('active') : t('inactive')}
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                                            <div className={clsx("flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
                                                 <button
                                                     onClick={() => handleEdit(category)}
                                                     className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                    title="Edit"
+                                                    title={t('common:edit')}
                                                 >
                                                     <Edit size={18} />
                                                 </button>
                                                 <button
                                                     onClick={() => handleDeleteClick(category.id)}
                                                     className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
-                                                    title="Delete"
+                                                    title={t('common:delete')}
                                                 >
                                                     <Trash2 size={18} />
                                                 </button>
@@ -207,15 +216,15 @@ const CategoryList = () => {
                     onSuccess={() => {
                         setIsModalOpen(false);
                         fetchCategories();
-                        toast.success(editingCategory ? 'Category updated' : 'Category created');
+                        toast.success(editingCategory ? t('saveSuccess') : t('saveSuccess'));
                     }}
                 />
             )}
 
             <ConfirmModal
                 isOpen={confirmOpen}
-                title="Delete Category"
-                message="Are you sure you want to delete this category? This action cannot be undone."
+                title={t('deleteCategory')}
+                message={t('deleteConfirmation')}
                 onConfirm={confirmDelete}
                 onCancel={() => setConfirmOpen(false)}
             />

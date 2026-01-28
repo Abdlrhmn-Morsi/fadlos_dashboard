@@ -11,7 +11,7 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { i18n } = useTranslation();
-    const [language, setLanguage] = useState(i18n.language || 'en');
+    const [language, setLanguage] = useState(i18n.language || 'ar');
     const isRTL = language === 'ar';
 
     useEffect(() => {

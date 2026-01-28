@@ -1,5 +1,6 @@
 {
-    "title": "Active Merchants",
+    "title": "Merchant Directory",
+    "activeMerchants": "Active Merchants",
     "searchPlaceholder": "Store lookup...",
     "merchantEntity": "Merchant Entity",
     "legalOwner": "Legal Owner",

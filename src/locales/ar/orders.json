@@ -1,0 +1,16 @@
+{
+    "title": "الطلبات",
+    "subtitle": "تتبع وإدارة طلبات عملائك",
+    "searchPlaceholder": "البحث في الطلبات...",
+    "orderId": "رقم الطلب",
+    "customer": "العميل",
+    "total": "الإجمالي",
+    "status": "الحالة",
+    "date": "التاريخ",
+    "actions": "الإجراءات",
+    "noOrdersFound": "لم يتم العثور على طلبات",
+    "viewDetails": "عرض التفاصيل",
+    "updateStatus": "تحديث الحالة",
+    "loadFailed": "فشل تحميل الطلبات",
+    "updateSuccess": "تم تحديث حالة الطلب بنجاح"
+}

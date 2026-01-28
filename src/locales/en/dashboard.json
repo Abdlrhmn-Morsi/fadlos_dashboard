@@ -25,5 +25,13 @@
     "activeItems": "active items",
     "newThisMonth": "new this month",
     "newFollowers": "new followers",
-    "avgStars": "avg {{stars}} stars"
+    "avgStars": "avg {{stars}} stars",
+    "status": {
+        "pending": "Pending",
+        "confirmed": "Confirmed",
+        "preparing": "Preparing",
+        "ready": "Ready",
+        "delivered": "Delivered",
+        "cancelled": "Cancelled"
+    }
 }

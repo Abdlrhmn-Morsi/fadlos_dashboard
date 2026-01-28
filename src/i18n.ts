@@ -18,6 +18,20 @@ import townsEN from './locales/en/towns.json';
 import townsAR from './locales/ar/towns.json';
 import businessTypesEN from './locales/en/businessTypes.json';
 import businessTypesAR from './locales/ar/businessTypes.json';
+import productsEN from './locales/en/products.json';
+import productsAR from './locales/ar/products.json';
+import categoriesEN from './locales/en/categories.json';
+import categoriesAR from './locales/ar/categories.json';
+import ordersEN from './locales/en/orders.json';
+import ordersAR from './locales/ar/orders.json';
+import promocodesEN from './locales/en/promocodes.json';
+import promocodesAR from './locales/ar/promocodes.json';
+import reviewsEN from './locales/en/reviews.json';
+import reviewsAR from './locales/ar/reviews.json';
+import clientsEN from './locales/en/clients.json';
+import clientsAR from './locales/ar/clients.json';
+import followersEN from './locales/en/followers.json';
+import followersAR from './locales/ar/followers.json';
 
 const resources = {
     en: {
@@ -29,6 +43,13 @@ const resources = {
         cities: citiesEN,
         towns: townsEN,
         businessTypes: businessTypesEN,
+        products: productsEN,
+        categories: categoriesEN,
+        orders: ordersEN,
+        promocodes: promocodesEN,
+        reviews: reviewsEN,
+        clients: clientsEN,
+        followers: followersEN,
     },
     ar: {
         common: commonAR,
@@ -39,6 +60,13 @@ const resources = {
         cities: citiesAR,
         towns: townsAR,
         businessTypes: businessTypesAR,
+        products: productsAR,
+        categories: categoriesAR,
+        orders: ordersAR,
+        promocodes: promocodesAR,
+        reviews: reviewsAR,
+        clients: clientsAR,
+        followers: followersAR,
     },
 };
 
@@ -47,7 +75,7 @@ i18n
     .use(initReactI18next)
     .init({
         resources,
-        fallbackLng: 'en',
+        fallbackLng: 'ar',
         defaultNS: 'common',
         interpolation: {
             escapeValue: false,
@@ -55,6 +83,8 @@ i18n
         detection: {
             order: ['localStorage', 'navigator'],
             caches: ['localStorage'],
+            lookupLocalStorage: 'i18nextLng',
+            // If nothing is found, it will fallback to fallbackLng ('ar')
         },
     });
 
