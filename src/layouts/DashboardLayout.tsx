@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -108,9 +108,9 @@ const DashboardLayout: React.FC = () => {
         )}
       >
         <div className="h-[70px] flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
-          <div className={clsx('flex items-center gap-3', collapsed && 'justify-center w-full')}>
+          <Link to="/" className={clsx('flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity', collapsed && 'justify-center w-full')}>
             <img src={appLogo} alt="Logo" className="w-12 h-12 object-contain" />
-          </div>
+          </Link>
           {!collapsed && (
             <div className="flex items-center gap-2">
               <LanguageSwitcher />
