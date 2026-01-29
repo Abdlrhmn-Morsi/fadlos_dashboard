@@ -153,10 +153,24 @@ const PromoCodeList = () => {
                                                     <Tag size={20} />
                                                 </div>
                                                 <div>
-                                                    <span className="block font-black font-mono text-slate-900 dark:text-white tracking-widest">{promo.code}</span>
-                                                    <span className="text-[10px] text-slate-400 block uppercase font-bold truncate max-w-[150px]">
-                                                        {promo.description || t('common:noDescription')}
-                                                    </span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="block font-black font-mono text-slate-900 dark:text-white tracking-widest">{promo.code}</span>
+                                                        {promo.isAutoApply && (
+                                                            <span className="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">
+                                                                {t('autoApply')}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-2 mt-0.5">
+                                                        <span className="text-[10px] text-slate-400 block uppercase font-bold truncate max-w-[150px]">
+                                                            {promo.description || t('common:noDescription')}
+                                                        </span>
+                                                        {promo.ruleType && promo.ruleType !== 'none' && (
+                                                            <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-1 rounded border border-slate-200 dark:border-slate-700">
+                                                                {t(promo.ruleType.replace(/_([a-z])/g, (_: any, c: string) => c.toUpperCase()))}
+                                                            </span>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
                                         </td>

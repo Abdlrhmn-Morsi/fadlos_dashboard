@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, Save, Tag, Calendar, Hash, DollarSign, Percent, Info, CheckCircle2, AlertCircle, Loader2 } from 'lucide-react';
+import { ArrowLeft, Save, Tag, Calendar, Hash, DollarSign, Percent, Info, CheckCircle2, AlertCircle, Loader2, Search, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import promoCodesApi from './api/promocodes.api';
+import productsApi from '../products/api/products.api';
+import clientsApi from '../clients/api/clients.api';
+import categoriesApi from '../categories/api/categories.api';
+import { Modal } from '../../components/ui/Modal';
 import { toast } from '../../utils/toast';
 import clsx from 'clsx';
 
@@ -31,7 +35,7 @@ const PromoCodeForm = () => {
 
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<any>({
         code: '',
         description: '',
         type: 'percentage', // percentage or fixed_amount (lowercase for backend)
@@ -41,7 +45,19 @@ const PromoCodeForm = () => {
         startsAt: new Date().toISOString().split('T')[0],
         expiresAt: '',
         maxUses: '100',
-        isActive: true
+        isActive: true,
+        ruleType: 'none',
+        ruleParams: {},
+        isAutoApply: false
+    });
+
+    const [modalData, setModalData] = useState<any>({
+        isOpen: false,
+        type: '', // products, customers, categories
+        items: [],
+        filteredItems: [],
+        searchQuery: '',
+        loading: false
     });
 
     useEffect(() => {
@@ -64,7 +80,10 @@ const PromoCodeForm = () => {
                 startsAt: data.startsAt ? data.startsAt.split('T')[0] : '',
                 expiresAt: data.expiresAt ? data.expiresAt.split('T')[0] : '',
                 maxUses: String(data.maxUses || ''),
-                isActive: data.isActive
+                isActive: data.isActive,
+                ruleType: data.ruleType || 'none',
+                ruleParams: data.ruleParams || {},
+                isAutoApply: data.isAutoApply || false
             });
         } catch (error) {
             console.error('Failed to fetch promo code', error);
@@ -73,6 +92,74 @@ const PromoCodeForm = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const openSelectionModal = async (type: string) => {
+        setModalData({ ...modalData, isOpen: true, type, loading: true, searchQuery: '', items: [], filteredItems: [] });
+        try {
+            let data: any = [];
+            if (type === 'products') {
+                const response = await productsApi.getSellerProducts();
+                data = response.data || response;
+            } else if (type === 'customers') {
+                const response = await clientsApi.getStoreClients();
+                data = response.data || response;
+            } else if (type === 'categories') {
+                const response = await categoriesApi.getSellerCategories();
+                data = response.data || response;
+            }
+            // Normalize data for display
+            const normalizedItems = data.map((item: any) => {
+                let name = item.name || item.nameEn || item.user?.name || item.email || item.client?.name || 'Untitled';
+                let subtitle = item.sku || item.category?.name || item.user?.phone || item.client?.phone || item.id.substring(0, 8);
+
+                if (type === 'categories') {
+                    name = isRTL && item.nameAr ? item.nameAr : name;
+                    subtitle = ''; // Remove ID for categories
+                } else if (type === 'customers') {
+                    subtitle = ''; // Remove ID for customers
+                } else if (type === 'products' && isRTL && item.nameAr) {
+                    name = item.nameAr;
+                }
+
+                return {
+                    id: item.id,
+                    name,
+                    subtitle,
+                    image: item.coverImage || item.client?.profileImage || null,
+                    stats: item.stats ? {
+                        totalOrders: item.stats.totalOrders,
+                        totalSpent: item.stats.totalSpent,
+                        lastOrderAt: item.stats.lastOrderAt
+                    } : null
+                };
+            });
+            setModalData((prev: any) => ({ ...prev, items: normalizedItems, filteredItems: normalizedItems, loading: false }));
+        } catch (error) {
+            console.error('Failed to fetch items', error);
+            toast.error('Failed to load items');
+            setModalData((prev: any) => ({ ...prev, isOpen: false, loading: false }));
+        }
+    };
+
+    const handleSearch = (query: string) => {
+        const filtered = modalData.items.filter((item: any) =>
+            item.name.toLowerCase().includes(query.toLowerCase()) ||
+            item.subtitle.toLowerCase().includes(query.toLowerCase())
+        );
+        setModalData((prev: any) => ({ ...prev, searchQuery: query, filteredItems: filtered }));
+    };
+
+    const toggleSelection = (id: string, paramKey: string) => {
+        const currentIds = formData.ruleParams[paramKey] || [];
+        const newIds = currentIds.includes(id)
+            ? currentIds.filter((cid: string) => cid !== id)
+            : [...currentIds, id];
+
+        setFormData({
+            ...formData,
+            ruleParams: { ...formData.ruleParams, [paramKey]: newIds }
+        });
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -94,9 +181,6 @@ const PromoCodeForm = () => {
                 startsAt: formData.startsAt ? new Date(formData.startsAt).toISOString() : undefined,
                 expiresAt: formData.expiresAt ? new Date(formData.expiresAt).toISOString() : undefined,
             };
-
-            // Fix for the error: backend wants maxUses, not maxUsage
-            // And type is already lowercase in state
 
             if (isEditMode) {
                 await promoCodesApi.updatePromoCode(id!, payload);
@@ -165,6 +249,122 @@ const PromoCodeForm = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
+                        {/* Promotional Rules - NOW AT THE TOP */}
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 bg-gradient-to-br from-indigo-50/30 to-white dark:from-indigo-900/10 dark:to-slate-900">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <CheckCircle2 className="w-5 h-5 text-indigo-500" />
+                                {t('promotionalRules')}
+                            </h2>
+                            <div className="space-y-6">
+                                <InputGroup label={t('ruleType')} icon={Info}>
+                                    <select
+                                        className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm"
+                                        value={formData.ruleType}
+                                        onChange={e => setFormData({
+                                            ...formData,
+                                            ruleType: e.target.value,
+                                            ruleParams: e.target.value === 'loyalty_reward' ? { minOrders: 5 } :
+                                                e.target.value === 'we_miss_you' ? { inactiveDaysAtLeast: 30 } : {}
+                                        })}
+                                    >
+                                        <option value="none">{t('none')}</option>
+                                        <option value="followers_only">{t('followersOnly')}</option>
+                                        <option value="new_customer">{t('newCustomer')}</option>
+                                        <option value="first_order_reward">{t('firstOrderReward')}</option>
+                                        <option value="loyalty_reward">{t('loyaltyReward')}</option>
+                                        <option value="we_miss_you">{t('weMissYou')}</option>
+                                        <option value="favorite_product">{t('favoriteProduct')}</option>
+                                        <option value="category_based">{t('categoryBased')}</option>
+                                        <option value="store_wide">{t('storeWide')}</option>
+                                        <option value="specific_customers">{t('specificCustomers')}</option>
+                                        <option value="specific_products">{t('specificProducts')}</option>
+                                    </select>
+                                    <p className="mt-2 text-xs text-slate-500">
+                                        {formData.ruleType === 'none' && t('noneSubtitle')}
+                                        {formData.ruleType === 'followers_only' && t('followersOnlySubtitle')}
+                                        {formData.ruleType === 'new_customer' && t('newCustomerSubtitle')}
+                                        {formData.ruleType === 'first_order_reward' && t('firstOrderRewardSubtitle')}
+                                        {formData.ruleType === 'loyalty_reward' && t('loyaltyRewardSubtitle')}
+                                        {formData.ruleType === 'we_miss_you' && t('weMissYouSubtitle')}
+                                        {formData.ruleType === 'favorite_product' && t('favoriteProductSubtitle')}
+                                        {formData.ruleType === 'category_based' && t('categoryBasedSubtitle')}
+                                        {formData.ruleType === 'store_wide' && t('storeWideSubtitle')}
+                                        {formData.ruleType === 'specific_customers' && t('specificCustomersSubtitle')}
+                                        {formData.ruleType === 'specific_products' && t('specificProductsSubtitle')}
+                                    </p>
+                                </InputGroup>
+
+                                {formData.ruleType === 'loyalty_reward' && (
+                                    <InputGroup label={t('minOrders')} icon={Hash}>
+                                        <input
+                                            type="number"
+                                            className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm"
+                                            value={formData.ruleParams?.minOrders || ''}
+                                            onChange={e => setFormData({
+                                                ...formData,
+                                                ruleParams: { ...formData.ruleParams, minOrders: Number(e.target.value) }
+                                            })}
+                                            placeholder="e.g. 5"
+                                        />
+                                    </InputGroup>
+                                )}
+
+                                {formData.ruleType === 'we_miss_you' && (
+                                    <InputGroup label={t('inactiveDays')} icon={Calendar}>
+                                        <input
+                                            type="number"
+                                            className="w-full px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm"
+                                            value={formData.ruleParams?.inactiveDaysAtLeast || ''}
+                                            onChange={e => setFormData({
+                                                ...formData,
+                                                ruleParams: { ...formData.ruleParams, inactiveDaysAtLeast: Number(e.target.value) }
+                                            })}
+                                            placeholder="e.g. 30"
+                                        />
+                                    </InputGroup>
+                                )}
+
+                                {formData.ruleType === 'specific_customers' && (
+                                    <InputGroup label={t('specificCustomers')} icon={Hash} subtitle={`Selected: ${formData.ruleParams?.userIds?.length || 0}`}>
+                                        <button
+                                            type="button"
+                                            onClick={() => openSelectionModal('customers')}
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400"
+                                        >
+                                            <span>{formData.ruleParams?.userIds?.length ? `${formData.ruleParams.userIds.length} Customers Selected` : 'Select Customers...'}</span>
+                                            <Search size={16} />
+                                        </button>
+                                    </InputGroup>
+                                )}
+
+                                {formData.ruleType === 'specific_products' && (
+                                    <InputGroup label={t('specificProducts')} icon={Hash} subtitle={`Selected: ${formData.ruleParams?.productIds?.length || 0}`}>
+                                        <button
+                                            type="button"
+                                            onClick={() => openSelectionModal('products')}
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400"
+                                        >
+                                            <span>{formData.ruleParams?.productIds?.length ? `${formData.ruleParams.productIds.length} Products Selected` : 'Select Products...'}</span>
+                                            <Search size={16} />
+                                        </button>
+                                    </InputGroup>
+                                )}
+
+                                {formData.ruleType === 'category_based' && (
+                                    <InputGroup label={t('categoryBased')} icon={Hash} subtitle={`Selected: ${formData.ruleParams?.categoryIds?.length || 0}`}>
+                                        <button
+                                            type="button"
+                                            onClick={() => openSelectionModal('categories')}
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400"
+                                        >
+                                            <span>{formData.ruleParams?.categoryIds?.length ? `${formData.ruleParams.categoryIds.length} Categories Selected` : 'Select Categories...'}</span>
+                                            <Search size={16} />
+                                        </button>
+                                    </InputGroup>
+                                )}
+                            </div>
+                        </div>
+
                         {/* Basic Info */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
@@ -264,21 +464,43 @@ const PromoCodeForm = () => {
                         {/* Status Card */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">{t('availability')}</h2>
-                            <div className="flex items-center justify-between">
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('activeStatus')}</label>
-                                <label className="relative inline-flex items-center cursor-pointer">
-                                    <input
-                                        type="checkbox"
-                                        className="sr-only peer"
-                                        checked={formData.isActive}
-                                        onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
-                                    />
-                                    <div className={clsx(
-                                        "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500",
-                                        "after:start-[2px]",
-                                        isRTL ? "peer-checked:after:-translate-x-full" : "peer-checked:after:translate-x-full"
-                                    )}></div>
-                                </label>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('activeStatus')}</label>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={formData.isActive}
+                                            onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
+                                        />
+                                        <div className={clsx(
+                                            "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500",
+                                            "after:start-[2px]",
+                                            isRTL ? "peer-checked:after:-translate-x-full" : "peer-checked:after:translate-x-full"
+                                        )}></div>
+                                    </label>
+                                </div>
+
+                                <div className="flex items-center justify-between">
+                                    <div className="flex flex-col">
+                                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('autoApply')}</label>
+                                        <p className="text-[10px] text-slate-400 max-w-[120px]">{t('autoApplySubtitle')}</p>
+                                    </div>
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={formData.isAutoApply}
+                                            onChange={e => setFormData({ ...formData, isAutoApply: e.target.checked })}
+                                        />
+                                        <div className={clsx(
+                                            "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500",
+                                            "after:start-[2px]",
+                                            isRTL ? "peer-checked:after:-translate-x-full" : "peer-checked:after:translate-x-full"
+                                        )}></div>
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -329,6 +551,112 @@ const PromoCodeForm = () => {
                     </div>
                 </div>
             </form>
+
+            {/* Selection Modal */}
+            <Modal
+                isOpen={modalData.isOpen}
+                onClose={() => setModalData({ ...modalData, isOpen: false })}
+                title={t(modalData.type === 'products' ? 'selectProducts' : modalData.type === 'customers' ? 'selectCustomers' : 'selectCategories')}
+            >
+                <div className="space-y-4">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            autoFocus
+                            className="w-full px-4 py-2 ps-10 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none transition-all"
+                            placeholder="Search..."
+                            value={modalData.searchQuery}
+                            onChange={e => handleSearch(e.target.value)}
+                        />
+                        <Search className="absolute top-1/2 -translate-y-1/2 start-3 text-slate-400" size={18} />
+                    </div>
+
+                    <div className="max-h-[60vh] overflow-y-auto space-y-2 pr-1">
+                        {modalData.loading ? (
+                            <div className="flex justify-center py-8">
+                                <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+                            </div>
+                        ) : modalData.filteredItems.length > 0 ? (
+                            modalData.filteredItems.map((item: any) => {
+                                const paramKey = modalData.type === 'products' ? 'productIds' : modalData.type === 'customers' ? 'userIds' : 'categoryIds';
+                                const isSelected = formData.ruleParams[paramKey]?.includes(item.id);
+                                return (
+                                    <button
+                                        key={item.id}
+                                        type="button"
+                                        onClick={() => toggleSelection(item.id, paramKey)}
+                                        className={clsx(
+                                            "w-full flex items-center justify-between p-3 rounded-xl border transition-all text-start",
+                                            isSelected
+                                                ? "bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-800 ring-2 ring-indigo-500/20"
+                                                : "hover:bg-slate-50 dark:hover:bg-slate-800 border-slate-100 dark:border-slate-800"
+                                        )}
+                                    >
+                                        <div className="flex gap-4 items-center flex-1 min-w-0">
+                                            {item.image && (
+                                                <div className="relative flex-shrink-0">
+                                                    <img
+                                                        src={item.image}
+                                                        alt={item.name}
+                                                        className="w-12 h-12 rounded-lg object-cover bg-slate-100 dark:bg-slate-800"
+                                                    />
+                                                    {isSelected && (
+                                                        <div className="absolute -top-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5">
+                                                            <CheckCircle2 size={12} className="text-indigo-600" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2">
+                                                    <p className="font-semibold text-slate-900 dark:text-white text-sm truncate">{item.name}</p>
+                                                    {isSelected && !item.image && <CheckCircle2 size={14} className="text-indigo-600" />}
+                                                </div>
+                                                <p className="text-xs text-slate-500 truncate">{item.subtitle}</p>
+
+                                                {item.stats && (
+                                                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
+                                                        <span className="flex items-center gap-1 text-slate-500">
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">{t('totalOrders')}:</span>
+                                                            {item.stats.totalOrders}
+                                                        </span>
+                                                        <span className="flex items-center gap-1 text-slate-500">
+                                                            <span className="font-medium text-slate-700 dark:text-slate-300">{t('totalSpent')}:</span>
+                                                            {new Intl.NumberFormat(isRTL ? 'ar-EG' : 'en-US', { style: 'currency', currency: 'EGP' }).format(item.stats.totalSpent)}
+                                                        </span>
+                                                        {item.stats.lastOrderAt && (
+                                                            <span className="flex items-center gap-1 text-slate-500">
+                                                                <span className="font-medium text-slate-700 dark:text-slate-300">{t('lastOrder')}:</span>
+                                                                {new Date(item.stats.lastOrderAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                        {isSelected && !item.image && !item.stats && <CheckCircle2 size={18} className="text-indigo-600" />}
+                                    </button>
+                                );
+                            })
+                        ) : (
+                            <div className="text-center py-8 text-slate-400">
+                                <Search size={32} className="mx-auto mb-2 opacity-20" />
+                                <p>{t('noItemsFound')}</p>
+                            </div>
+                        )}
+                    </div>
+
+                    <div className="pt-4 flex justify-end">
+                        <button
+                            type="button"
+                            onClick={() => setModalData({ ...modalData, isOpen: false })}
+                            className="px-6 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition-all font-semibold text-sm shadow-lg shadow-indigo-500/20"
+                        >
+                            {t('done')}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };
