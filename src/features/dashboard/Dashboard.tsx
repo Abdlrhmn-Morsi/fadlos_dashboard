@@ -23,6 +23,7 @@ import {
 import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 
 interface StatCardProps {
@@ -68,11 +69,11 @@ const Dashboard: React.FC = () => {
     const [chartData, setChartData] = useRecoilState(dashboardChartDataState);
     const [storeDetails, setStoreDetails] = useState<any>(null);
 
-    const userStr = localStorage.getItem('user');
-    const user = userStr ? JSON.parse(userStr) : {};
+    const { user } = useAuth();
 
     useEffect(() => {
         const loadDashboardData = async () => {
+            if (!user) return; // Add check
             setLoading(true);
             try {
 
@@ -88,7 +89,7 @@ const Dashboard: React.FC = () => {
                 ]);
 
                 // Fetch store details for sellers
-                if (user.role !== UserRole.SUPER_ADMIN && user.role !== UserRole.ADMIN) {
+                if (user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) {
                     const storeData = await getMyStore();
                     setStoreDetails(storeData);
                 }
@@ -103,7 +104,7 @@ const Dashboard: React.FC = () => {
         };
 
         loadDashboardData();
-    }, [setStats, setLoading, setError, setChartData]);
+    }, [setStats, setLoading, setError, setChartData, user, t]); // Add user and t to deps
 
     // Dynamic Chart Colors
     const gridColor = isDark ? '#334155' : '#f1f5f9'; // slate-700 : slate-100
@@ -112,7 +113,7 @@ const Dashboard: React.FC = () => {
     const textColor = isDark ? '#94a3b8' : '#94a3b8'; // slate-400
     const cursorFill = isDark ? '#334155' : '#f8fafc'; // slate-700 : slate-50
 
-    if (loading) return (
+    if (loading || !user) return (
         <div className="flex items-center justify-center min-h-[50vh] p-6 animate-pulse">
             <div className="text-slate-500 font-medium">{t('common:loading')}</div>
         </div>
@@ -194,7 +195,6 @@ const Dashboard: React.FC = () => {
                     comparisonText={t('vsLastPeriod')}
                 />
 
-                {/* Orders - Common for all */}
                 <StatCard
                     title={t('totalOrders')}
                     value={stats.totalOrders || 0}
@@ -204,8 +204,19 @@ const Dashboard: React.FC = () => {
                     comparisonText={t('vsLastPeriod')}
                 />
 
+                {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                    <StatCard
+                        title={t('pendingOrders')}
+                        value={stats.pendingOrders || 0}
+                        change=""
+                        icon={Clock}
+                        color="amber"
+                        comparisonText={t('needsAction')}
+                    />
+                )}
+
                 {/* Conditional Cards */}
-                {(user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN) ? (
+                {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) ? (
                     <>
                         <StatCard
                             title={t('totalStores')}
@@ -281,7 +292,7 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Quick Actions for Sellers */}
-            {(user.role === UserRole.STORE_OWNER || user.role === UserRole.EMPLOYEE) && (
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                 <div className={clsx(
                     "bg-gradient-to-r from-primary to-primary-dark p-8 rounded-none border border-primary/20 shadow-xl shadow-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group",
                     isRTL && "md:flex-row-reverse"

@@ -29,14 +29,8 @@ export const ThemeProvider: React.FC<{ children: ReactNode }> = ({ children }) =
             console.error('Error reading theme from localStorage:', error);
         }
 
-        // Default to dark mode if no saved theme
-        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
-            // Even if system is light, we default to dark per user request, unless we want to respect system strictly.
-            // Request: "make the darkmode the default" -> Implies override system light mode or just default state.
-            // To be safe and compliant with "default", I will return 'dark' here always if no saved preference.
-            return 'dark';
-        }
-        return 'dark';
+        // Default to light mode if no saved theme
+        return 'light';
     });
 
     const isDark = theme === 'dark';

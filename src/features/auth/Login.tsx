@@ -4,6 +4,8 @@ import { ArrowRight, AlertCircle } from 'lucide-react';
 import authApi from './api/auth.api';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useNotification } from '../notification/context/NotificationContext';
+import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 
 import InteractiveBackground from './InteractiveBackground';
@@ -19,6 +21,8 @@ const Login = () => {
         identifier: '',
         password: ''
     });
+    const { loginOneSignal } = useNotification();
+    const { login } = useAuth(); // Add useAuth
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -27,24 +31,20 @@ const Login = () => {
 
         try {
             const responseData: any = await authApi.login(formData);
-            const { token, user } = responseData;
+            const { user } = responseData; // token no longer needed manually
 
-            if (token) {
-                localStorage.setItem('token', token);
-                if (user) {
-                    localStorage.setItem('user', JSON.stringify(user));
+            if (user) {
+                login(user); // Set global user state
+                // Login Subscription
+                if (user.id) {
+                    await loginOneSignal(user.id);
                 }
                 navigate('/');
             } else if (responseData.requiresVerification) {
                 navigate('/verify-email', { state: { token: responseData.verificationToken } });
             } else {
-                if (responseData.accessToken) {
-                    localStorage.setItem('token', responseData.accessToken);
-                    navigate('/');
-                } else {
-                    console.error("Login response:", responseData);
-                    setError(t('loginFailed'));
-                }
+                console.error("Login response:", responseData);
+                setError(t('loginFailed'));
             }
         } catch (err: any) {
             console.error('Login error:', err);

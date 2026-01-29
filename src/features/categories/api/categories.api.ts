@@ -8,16 +8,8 @@ const categoriesApi = {
      * Fetch categories for a store
      */
     getCategories: async (params: any = {}) => {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const storeId = user.store?.id;
-
-        // Default to current user's store if storeId not provided
-        const queryParams = {
-            storeId,
-            ...params
-        };
-
-        return apiService.get('/categories', { params: queryParams });
+        // storeId should be passed in params from the component using useAuth()
+        return apiService.get('/categories', { params });
     },
 
     /**

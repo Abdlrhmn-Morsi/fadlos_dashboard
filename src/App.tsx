@@ -29,17 +29,27 @@ import DeliveryAreasPage from './features/stores/DeliveryAreasPage';
 import { BranchesList } from './features/branches/BranchesList';
 import AppUpdateSettings from './features/settings/AppUpdateSettings';
 import AppVersionHistory from './features/settings/AppVersionHistory';
+import { NotificationPage } from './features/notification/pages/NotificationPage';
+
+import { ThemeProvider, useTheme } from './contexts/ThemeContext';
+import { Toaster } from './utils/toast';
+import { NotificationProvider } from './features/notification/context/NotificationContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 const ProtectedRoute = () => {
-  const token = localStorage.getItem('token');
-  if (!token) {
+  const { isAuthenticated, isLoading } = useAuth();
+
+  if (isLoading) {
+    return <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950">
+      <div className="w-8 h-8 border-4 border-indigo-600 border-t-transparent rounded-full animate-spin"></div>
+    </div>;
+  }
+
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
   return <Outlet />;
 };
-
-import { ThemeProvider, useTheme } from './contexts/ThemeContext';
-import { Toaster } from './utils/toast';
 
 const AppContent = () => {
   const { isDark } = useTheme();
@@ -89,6 +99,7 @@ const AppContent = () => {
             <Route path="settings" element={<Settings />} />
             <Route path="app-updates" element={<AppUpdateSettings />} />
             <Route path="app-version-history" element={<AppVersionHistory />} />
+            <Route path="notifications" element={<NotificationPage />} />
 
             {/* Redirect unknown to dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />
@@ -102,8 +113,12 @@ const AppContent = () => {
 function App() {
   return (
     <ThemeProvider>
-      <Toaster position="top-right" />
-      <AppContent />
+      <AuthProvider>
+        <NotificationProvider>
+          <Toaster position="top-right" />
+          <AppContent />
+        </NotificationProvider>
+      </AuthProvider>
     </ThemeProvider>
   );
 }

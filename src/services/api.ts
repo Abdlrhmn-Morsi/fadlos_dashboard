@@ -12,10 +12,7 @@ const api = axios.create({
 // Request interceptor for adding the bearer token
 api.interceptors.request.use(
     (config) => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`;
-        }
+        // Token is now handled by HttpOnly cookies automatically by the browser
         return config;
     },
     (error) => {
@@ -31,9 +28,7 @@ api.interceptors.response.use(
     async (error) => {
         // Handle 401 Unauthorized
         if (error.response && error.response.status === 401) {
-            // Clear local storage and redirect to login
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
+            // Redirect to login on unauthorized
             if (window.location.pathname !== '/login') {
                 window.location.href = '/login';
             }

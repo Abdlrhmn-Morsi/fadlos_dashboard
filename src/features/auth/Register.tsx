@@ -8,6 +8,7 @@ import toolsApi from '../../services/tools.api';
 import { toast } from '../../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useNotification } from '../notification/context/NotificationContext';
 import clsx from 'clsx';
 
 const CustomSelect = ({ label, icon: Icon, options, value, onChange, placeholder, disabled = false }: any) => {
@@ -93,6 +94,7 @@ const Register = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [step, setStep] = useState(1);
+    const { loginOneSignal } = useNotification();
 
     // Data lists
     const [businessTypes, setBusinessTypes] = useState<any[]>([]);

@@ -12,14 +12,15 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user-role';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 
 const Settings = () => {
     const { t } = useTranslation(['common', 'stores']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const isSeller = user.role === UserRole.STORE_OWNER || user.role === UserRole.EMPLOYEE;
+    const { user } = useAuth();
+    const isSeller = user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE;
 
     const navItems = [
         {

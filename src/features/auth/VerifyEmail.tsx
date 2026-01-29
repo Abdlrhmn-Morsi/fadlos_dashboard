@@ -4,11 +4,15 @@ import { Mail, ArrowRight, AlertCircle, RefreshCcw } from 'lucide-react';
 import authApi from './api/auth.api';
 import InteractiveBackground from './InteractiveBackground';
 import appLogo from '../../assets/app_logo_primary.png';
+import { useAuth } from '../../contexts/AuthContext';
+import { useNotification } from '../notification/context/NotificationContext';
 
 const VerifyEmail = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { token } = location.state || {}; // Get token from state
+    const { login } = useAuth();
+    const { loginOneSignal } = useNotification();
 
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -70,11 +74,9 @@ const VerifyEmail = () => {
         setError(null);
         try {
             const response: any = await authApi.verifyEmail(token, verificationCode);
-            if (response.token) {
-                localStorage.setItem('token', response.token);
-                if (response.user) {
-                    localStorage.setItem('user', JSON.stringify(response.user));
-                }
+            if (response.user) {
+                login(response.user);
+                await loginOneSignal(response.user.id);
                 setMessage('Email verified successfully!');
                 setTimeout(() => navigate('/'), 1500);
             }

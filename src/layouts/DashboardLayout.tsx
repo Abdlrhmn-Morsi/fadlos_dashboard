@@ -14,7 +14,8 @@ import {
   Briefcase,
   LayoutGrid,
   Truck,
-  LucideIcon
+  LucideIcon,
+  Bell
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -23,6 +24,9 @@ import LanguageSwitcher from '../components/common/LanguageSwitcher';
 import ThemeToggle from '../components/common/ThemeToggle';
 import { UserRole } from '../types/user-role';
 import { useLanguage } from '../contexts/LanguageContext';
+import { NotificationBadge } from '../features/notification/components/NotificationBadge';
+import { NotificationList } from '../features/notification/components/NotificationList';
+import { useAuth } from '../contexts/AuthContext';
 
 interface SidebarItemProps {
   to: string;
@@ -71,15 +75,14 @@ const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const { isRTL } = useLanguage();
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const { user, logout } = useAuth(); // Use AuthContext
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
   };
 
-  const confirmLogout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+  const confirmLogout = async () => {
+    await logout();
     navigate('/login');
   };
 
@@ -170,6 +173,9 @@ const DashboardLayout: React.FC = () => {
             </>
           )}
 
+
+
+          <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
           <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
         </nav>
 
@@ -217,6 +223,10 @@ const DashboardLayout: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="relative">
+              <NotificationBadge />
+              <NotificationList />
+            </div>
             <div
               className={clsx(
                 "flex items-center gap-3 transition-all duration-200",

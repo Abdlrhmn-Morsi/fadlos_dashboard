@@ -17,6 +17,7 @@ export const fetchDashboardStats = async (user: any) => {
         let followersCount = 0;
         let reviewsCount = 0;
         let categoriesCount = 0;
+        let pendingOrders = 0;
 
         if (userRole === UserRole.SUPER_ADMIN) {
             const adminStats = await apiService.get('/stats/admin-summary');
@@ -28,6 +29,7 @@ export const fetchDashboardStats = async (user: any) => {
             ordersCount = data.totalOrders || 0;
             revenue = data.totalRevenue || 0;
             avgValue = data.avgOrderValue || 0;
+            pendingOrders = data.statusCounts?.pending || 0;
         } else {
             // Store Owner / Employee
             const storeId = user.store?.id || user.storeId;
@@ -39,6 +41,7 @@ export const fetchDashboardStats = async (user: any) => {
             revenue = data.totalRevenue || 0;
             ordersCount = data.totalOrders || 0;
             avgValue = data.averageOrderValue || 0;
+            pendingOrders = data.statusCounts?.pending || 0;
 
             // 2. Fetch other stats using parallel requests
             const promises = [
@@ -71,6 +74,7 @@ export const fetchDashboardStats = async (user: any) => {
         return {
             totalRevenue: revenue,
             totalOrders: ordersCount,
+            pendingOrders: pendingOrders,
             totalUsers: usersCount,
             totalStores: storesCount,
             totalProducts: productsCount,

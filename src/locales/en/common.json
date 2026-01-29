@@ -95,5 +95,13 @@
     "needHelpDesc": "Manage your entire presence from one place. Ensure your store data is accurate to improve customer trust and visibility.",
     "businessReady": "Business Ready",
     "secureAccount": "Secure Account",
-    "currencySymbol": "LE"
+    "currencySymbol": "LE",
+    "notifications": "Notifications",
+    "markAllRead": "Mark all as read",
+    "noNotifications": "No notifications",
+    "caughtUp": "You're all caught up!",
+    "loadMore": "Load more",
+    "viewAllNotifications": "View all notifications",
+    "notificationsTitle": "Notifications",
+    "loadEarlierNotifications": "Load earlier notifications"
 }

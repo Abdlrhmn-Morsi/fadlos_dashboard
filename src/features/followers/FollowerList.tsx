@@ -2,28 +2,28 @@ import React, { useState, useEffect } from 'react';
 import { User, Loader2, Users, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import followersApi from './api/followers.api';
 import clsx from 'clsx';
 
 const FollowerList = () => {
     const { t } = useTranslation(['followers', 'common']);
     const { isRTL } = useLanguage();
+    const { user } = useAuth();
     const [followers, setFollowers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchFollowers();
-    }, []);
+        if (user) {
+            fetchFollowers();
+        }
+    }, [user]);
 
     const fetchFollowers = async () => {
         try {
             setLoading(true);
-            const userStr = localStorage.getItem('user');
-            if (!userStr) throw new Error('User not found');
-
-            const user = JSON.parse(userStr);
-            const storeId = user.store?.id;
+            const storeId = user?.store?.id;
 
             if (!storeId) {
                 setError(t('common:errorFetchingData'));

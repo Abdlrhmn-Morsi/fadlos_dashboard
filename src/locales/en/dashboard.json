@@ -1,5 +1,8 @@
 {
     "title": "Dashboard Overview",
+    "pendingOrders": "Pending Orders",
+    "needsAction": "Waiting for action",
+    "newOrderReceived": "🎉 New Order Received!",
     "totalRevenue": "Total Revenue",
     "totalOrders": "Total Orders",
     "totalUsers": "Total Users",

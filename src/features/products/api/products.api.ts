@@ -51,10 +51,9 @@ export const productsApi = {
     /**
      * Fetch store-specific categories
      */
-    getCategories: async () => {
-        const user = JSON.parse(localStorage.getItem('user') || '{}');
-        const storeId = user.store?.id;
-        return apiService.get('/categories', { params: { storeId } });
+    getCategories: async (params: any = {}) => {
+        // storeId should be passed in params from the component using useAuth()
+        return apiService.get('/categories', { params });
     },
 };
 

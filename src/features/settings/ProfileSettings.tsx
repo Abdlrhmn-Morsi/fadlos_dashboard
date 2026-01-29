@@ -16,6 +16,7 @@ import {
 import { updateProfile, updatePassword } from '../users/api/users.api';
 import { toast } from '../../utils/toast';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import clsx from 'clsx';
 
 const ProfileSettings = () => {
@@ -33,16 +34,28 @@ const ProfileSettings = () => {
     });
 
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const [user, setUser] = useState(() => JSON.parse(localStorage.getItem('user') || '{}'));
-    const [imagePreview, setImagePreview] = useState<string | null>(user.profileImage || null);
+    const { user, refreshProfile } = useAuth();
+    const [imagePreview, setImagePreview] = useState<string | null>(user?.profileImage || null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const [profileData, setProfileData] = useState({
-        name: user.name || '',
-        username: user.username || '',
-        phone: user.phone || '',
-        email: user.email || '' // Read only
+        name: user?.name || '',
+        username: user?.username || '',
+        phone: user?.phone || '',
+        email: user?.email || '' // Read only
     });
+
+    useEffect(() => {
+        if (user) {
+            setProfileData({
+                name: user.name || '',
+                username: user.username || '',
+                phone: user.phone || '',
+                email: user.email || ''
+            });
+            setImagePreview(user.profileImage || null);
+        }
+    }, [user]);
 
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
@@ -85,18 +98,8 @@ const ProfileSettings = () => {
                 formData.append('profileImage', selectedFile);
             }
 
-            const response = await updateProfile(formData);
-
-            // Update local storage with new user data
-            const updatedUser = {
-                ...user,
-                name: profileData.name,
-                username: profileData.username,
-                phone: profileData.phone,
-                profileImage: response.user?.profileImage || user.profileImage
-            };
-            localStorage.setItem('user', JSON.stringify(updatedUser));
-            setUser(updatedUser);
+            await updateProfile(formData);
+            await refreshProfile(); // Refresh global auth state
 
             toast.success(t('common:success'));
         } catch (error: any) {

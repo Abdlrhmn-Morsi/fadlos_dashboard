@@ -5,6 +5,7 @@ export interface DashboardStats {
     totalStores: number;
     totalProducts: number;
     avgOrderValue: number;
+    pendingOrders?: number;
     // Seller specific (Optional as they might not be present for Admin)
     totalClients?: number;
     totalFollowers?: number;
