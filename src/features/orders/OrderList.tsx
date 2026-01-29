@@ -7,6 +7,7 @@ import { OrderStatus } from '../../types/order-status';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import clsx from 'clsx';
+import { Pagination } from '../../components/common/Pagination';
 
 const OrderList = () => {
     const navigate = useNavigate();
@@ -16,14 +17,27 @@ const OrderList = () => {
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
 
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
     useEffect(() => {
         fetchOrders();
+    }, [statusFilter, page]);
+
+    // Reset to page 1 when filter changes
+    useEffect(() => {
+        setPage(1);
     }, [statusFilter]);
 
     const fetchOrders = async () => {
         try {
             setLoading(true);
-            const params: any = {};
+            const params: any = {
+                page,
+                limit
+            };
             if (statusFilter) params.status = statusFilter;
 
             const response: any = await ordersApi.getOrders(params);
@@ -31,8 +45,14 @@ const OrderList = () => {
             // Handle paginated response { data: [...], meta: {...} } or plain array
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
                 setOrders(response.data);
+                if (response.meta) {
+                    setTotalPages(response.meta.totalPages || 1);
+                }
             } else if (response && typeof response === 'object' && 'orders' in response && Array.isArray(response.orders)) {
                 setOrders(response.orders);
+                if (response.pagination) {
+                    setTotalPages(response.pagination.totalPages || 1);
+                }
             } else if (Array.isArray(response)) {
                 setOrders(response);
             } else {
@@ -146,6 +166,13 @@ const OrderList = () => {
                     </table>
                 </div>
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
         </div>
     );
 };

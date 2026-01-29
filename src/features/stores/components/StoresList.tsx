@@ -21,6 +21,7 @@ import {
 } from '../store/stores.store';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import clsx from 'clsx';
+import { Pagination } from '../../../components/common/Pagination';
 
 const StoresList = () => {
     const { t } = useTranslation(['stores', 'common']);
@@ -278,31 +279,12 @@ const StoresList = () => {
                 )}
             </div>
 
-            {pagination.totalPages > 1 && (
-                <div className={clsx("flex items-center justify-between py-6", isRTL && "flex-row-reverse")}>
-                    <button
-                        disabled={pagination.page === 1}
-                        onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page - 1 }))}
-                        className="btn btn-secondary border-none shadow-sm h-11"
-                    >
-                        {isRTL ? t('common:next') : t('common:previous')}
-                    </button>
-                    <div className={clsx("flex items-center gap-2", isRTL && "flex-row-reverse")}>
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('common:page')}</span>
-                        <div className="w-10 h-10 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white text-sm font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50">
-                            {pagination.page}
-                        </div>
-                        <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('common:of')} {pagination.totalPages}</span>
-                    </div>
-                    <button
-                        disabled={pagination.page >= pagination.totalPages}
-                        onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page + 1 }))}
-                        className="btn btn-secondary border-none shadow-sm h-11"
-                    >
-                        {isRTL ? t('common:previous') : t('common:next')}
-                    </button>
-                </div>
-            )}
+            <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                onPageChange={(p) => setPagination((prev: any) => ({ ...prev, page: p }))}
+                isLoading={loading}
+            />
 
             <StoreStatusModal
                 isOpen={isStatusModalOpen}

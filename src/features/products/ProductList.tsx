@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, MoreHorizontal, ArrowUpDown } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen } from 'lucide-react';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import productsApi from './api/products.api';
@@ -8,6 +8,7 @@ import { toast } from '../../utils/toast';
 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Pagination } from '../../components/common/Pagination';
 
 const ProductList = () => {
     const navigate = useNavigate();
@@ -17,21 +18,51 @@ const ProductList = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchProducts();
-    }, []);
+        const timer = setTimeout(() => {
+            fetchProducts();
+        }, searchTerm ? 300 : 0); // Debounce search
+        return () => clearTimeout(timer);
+    }, [page, searchTerm]);
+
+    // Reset to page 1 when search changes
+    useEffect(() => {
+        setPage(1);
+    }, [searchTerm]);
 
     const fetchProducts = async () => {
         try {
             setLoading(true);
-            const data: any = await productsApi.getSellerProducts();
-            setProducts(data.data || []);
+            const params: any = {
+                page,
+                limit
+            };
+            if (searchTerm) params.search = searchTerm;
+
+            const data: any = await productsApi.getSellerProducts(params);
+
+            if (data && data.data) {
+                setProducts(data.data);
+                if (data.meta) {
+                    setTotalPages(data.meta.totalPages || 1);
+                }
+            } else {
+                setProducts([]);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error('Failed to fetch products', error);
             toast.error(t('loadFailed'));
+            setProducts([]);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
@@ -56,12 +87,6 @@ const ProductList = () => {
             setDeleteId(null);
         }
     };
-
-    const filteredProducts = products.filter(product =>
-        product.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        product.sku?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -135,7 +160,7 @@ const ProductList = () => {
                                         <td className="px-6 py-4"></td>
                                     </tr>
                                 ))
-                            ) : filteredProducts.length === 0 ? (
+                            ) : products.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
@@ -148,7 +173,7 @@ const ProductList = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredProducts.map((product) => (
+                                products.map((product) => (
                                     <tr key={product.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
@@ -195,7 +220,7 @@ const ProductList = () => {
                                                 {product.isActive ? t('active') : t('draft')}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 text-right">
+                                        <td className="px-6 py-4">
                                             <div className={clsx("flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
                                                 <button
                                                     onClick={() => navigate(`/products/edit/${product.id}`)}
@@ -220,6 +245,13 @@ const ProductList = () => {
                     </table>
                 </div>
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
 
             <ConfirmModal
                 isOpen={confirmOpen}

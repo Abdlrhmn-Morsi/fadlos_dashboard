@@ -4,15 +4,15 @@ import {
     User, ShoppingBag, DollarSign, Calendar,
     Search, ArrowUpDown, ChevronRight, X,
     Loader2, TrendingUp, TrendingDown,
-    Clock, Package, ArrowLeft, Mail, Phone, MapPin, Eye
+    Clock, Package, ArrowLeft, Phone, MapPin, Eye
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import clientsApi from './api/clients.api';
 import ordersApi from '../orders/api/orders.api';
 import { toast } from '../../utils/toast';
-import { OrderStatus } from '../../types/order-status';
 import clsx from 'clsx';
+import { Pagination } from '../../components/common/Pagination';
 
 const ClientList = () => {
     const { t } = useTranslation(['clients', 'common']);
@@ -23,6 +23,11 @@ const ClientList = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('createdAt');
     const [order, setOrder] = useState<'ASC' | 'DESC'>('DESC');
+
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
 
     // Side panel state
     const [selectedClient, setSelectedClient] = useState<any>(null);
@@ -36,21 +41,44 @@ const ClientList = () => {
 
     useEffect(() => {
         fetchClients();
-    }, [sortBy, order]);
+    }, [sortBy, order, page]);
+
+    // Reset to page 1 when search or sort changes
+    useEffect(() => {
+        setPage(1);
+    }, [searchTerm, sortBy, order]);
 
     const fetchClients = async () => {
         try {
             setLoading(true);
-            const params = {
+            const params: any = {
                 sortBy,
                 order,
+                page,
+                limit,
                 search: searchTerm || undefined
             };
             const response: any = await clientsApi.getStoreClients(params);
-            setClients(response.data || response || []);
+
+            if (response && response.data) {
+                setClients(response.data);
+                if (response.pagination) {
+                    setTotalPages(response.pagination.totalPages || 1);
+                } else if (response.meta) {
+                    setTotalPages(response.meta.totalPages || 1);
+                }
+            } else if (Array.isArray(response)) {
+                setClients(response);
+                setTotalPages(1);
+            } else {
+                setClients([]);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error('Failed to fetch clients', error);
             toast.error(t('common:errorFetchingData'));
+            setClients([]);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
@@ -171,7 +199,7 @@ const ClientList = () => {
             {/* Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left">
+                    <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-4">
@@ -268,6 +296,13 @@ const ClientList = () => {
                     </table>
                 </div>
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
 
             {/* Side Panel (Contextual View) */}
             <div className={clsx(

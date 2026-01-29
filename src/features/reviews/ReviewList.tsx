@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Star, MessageSquare, User, Package, Calendar, Loader2, Quote } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import reviewsApi from './api/reviews.api';
+import { Star, Loader2, MessageSquare, User, Calendar, Package, Quote } from 'lucide-react';
 import clsx from 'clsx';
+import { Pagination } from '../../components/common/Pagination';
 
 const ReviewList = () => {
     const { t } = useTranslation(['reviews', 'common']);
@@ -12,18 +13,46 @@ const ReviewList = () => {
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('STORE'); // STORE or PRODUCT
 
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
     useEffect(() => {
         fetchReviews();
+    }, [type, page]);
+
+    // Reset to page 1 when type changes
+    useEffect(() => {
+        setPage(1);
     }, [type]);
 
     const fetchReviews = async () => {
         try {
             setLoading(true);
-            const params: any = { type };
-            const data: any = await reviewsApi.getStoreManagementReviews(params);
-            setReviews(data.data || data || []);
+            const params: any = {
+                type,
+                page,
+                limit
+            };
+            const response: any = await reviewsApi.getStoreManagementReviews(params);
+
+            if (response && response.data) {
+                setReviews(response.data);
+                if (response.meta) {
+                    setTotalPages(response.meta.totalPages || 1);
+                }
+            } else if (Array.isArray(response)) {
+                setReviews(response);
+                setTotalPages(1);
+            } else {
+                setReviews([]);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error('Failed to fetch reviews', error);
+            setReviews([]);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
@@ -153,6 +182,13 @@ const ReviewList = () => {
                     ))
                 )}
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
         </div>
     );
 };

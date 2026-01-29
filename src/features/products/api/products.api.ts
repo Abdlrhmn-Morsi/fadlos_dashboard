@@ -7,14 +7,14 @@ export const productsApi = {
     /**
      * Fetch products for the current store
      */
-    getStoreProducts: async () => {
-        return apiService.get('/products/store-products');
+    getStoreProducts: async (params: any = {}) => {
+        return apiService.get('/products/store-products', { params });
     },
     /**
      * Fetch products for the authenticated seller
      */
-    getSellerProducts: async () => {
-        return apiService.get('/products/seller-products');
+    getSellerProducts: async (params: any = {}) => {
+        return apiService.get('/products/seller-products', { params });
     },
     /**
      * Fetch a single product by ID
