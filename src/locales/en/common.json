@@ -11,6 +11,7 @@
     "filter": "Filter",
     "add": "Add",
     "edit": "Edit",
+    "viewAll": "View All",
     "delete": "Delete",
     "save": "Save",
     "cancel": "Cancel",
@@ -103,5 +104,7 @@
     "loadMore": "Load more",
     "viewAllNotifications": "View all notifications",
     "notificationsTitle": "Notifications",
-    "loadEarlierNotifications": "Load earlier notifications"
+    "loadEarlierNotifications": "Load earlier notifications",
+    "newest": "Newest",
+    "completeStoreInfo": "please complete user store info"
 }

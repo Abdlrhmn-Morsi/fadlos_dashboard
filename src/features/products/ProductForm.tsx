@@ -28,6 +28,8 @@ const InputGroup = ({ label, children, required = false, subtitle = '' }: any) =
 interface VariantValue {
     id?: string;
     value: string;
+    valueAr: string;
+    hex?: string;
     price: string;
     sortOrder: string;
 }
@@ -35,6 +37,8 @@ interface VariantValue {
 interface Variant {
     id?: string;
     name: string;
+    nameAr: string;
+    isColor: boolean;
     sortOrder: string;
     values: VariantValue[];
 }
@@ -74,6 +78,7 @@ const ProductForm = () => {
         trackInventory: true,
         isAvailable: true,
         isActive: true,
+        isOffer: false,
         sortOrder: '0',
         variants: [] as Variant[]
     });
@@ -127,14 +132,19 @@ const ProductForm = () => {
                 trackInventory: String(data.trackInventory) === 'true',
                 isAvailable: data.isAvailable ?? true,
                 isActive: data.isActive ?? true,
+                isOffer: data.isOffer ?? false,
                 sortOrder: data.sort || '0',
                 variants: data.variants ? data.variants.map((v: any) => ({
                     id: v.id,
                     name: v.name,
+                    nameAr: v.nameAr || '',
+                    isColor: !!v.isColor,
                     sortOrder: String(v.sortOrder || 0),
                     values: v.values ? v.values.map((val: any) => ({
                         id: val.id,
                         value: val.value,
+                        valueAr: val.valueAr || '',
+                        hex: val.hex || '',
                         price: String(val.price || 0),
                         sortOrder: String(val.sortOrder || 0)
                     })) : []
@@ -172,6 +182,19 @@ const ProductForm = () => {
         }
     };
 
+    const handleVariantTranslate = async (text: string, callback: (translated: string) => void) => {
+        if (!text) return;
+        try {
+            const res: any = await toolsApi.translate(text, 'ar', 'en');
+            const translated = typeof res === 'string' ? res : res.translatedText;
+            if (translated) {
+                callback(translated);
+            }
+        } catch (error) {
+            console.error("Variant translation error", error);
+        }
+    };
+
     const handleImageDelete = (url: string) => {
         setExistingImages(prev => prev.filter(img => img !== url));
         setImagesToDelete(prev => [...prev, url]);
@@ -192,7 +215,7 @@ const ProductForm = () => {
     const addVariant = () => {
         setFormData(prev => ({
             ...prev,
-            variants: [...prev.variants, { name: '', sortOrder: '0', values: [] }]
+            variants: [...prev.variants, { name: '', nameAr: '', isColor: false, sortOrder: '0', values: [] }]
         }));
     };
 
@@ -203,15 +226,15 @@ const ProductForm = () => {
         }));
     };
 
-    const updateVariant = (index: number, field: keyof Variant, value: string) => {
+    const updateVariant = (index: number, field: keyof Variant, value: any) => {
         const newVariants = [...formData.variants];
-        newVariants[index] = { ...newVariants[index], [field]: value };
+        newVariants[index] = { ...newVariants[index], [field]: value } as Variant;
         setFormData({ ...formData, variants: newVariants });
     };
 
     const addVariantValue = (variantIndex: number) => {
         const newVariants = [...formData.variants];
-        newVariants[variantIndex].values.push({ value: '', price: '0', sortOrder: '0' });
+        newVariants[variantIndex].values.push({ value: '', valueAr: '', hex: '#000000', price: '0', sortOrder: '0' });
         setFormData({ ...formData, variants: newVariants });
     };
 
@@ -221,9 +244,9 @@ const ProductForm = () => {
         setFormData({ ...formData, variants: newVariants });
     };
 
-    const updateVariantValue = (variantIndex: number, valueIndex: number, field: keyof VariantValue, value: string) => {
+    const updateVariantValue = (variantIndex: number, valueIndex: number, field: keyof VariantValue, value: any) => {
         const newVariants = [...formData.variants];
-        newVariants[variantIndex].values[valueIndex] = { ...newVariants[variantIndex].values[valueIndex], [field]: value };
+        newVariants[variantIndex].values[valueIndex] = { ...newVariants[variantIndex].values[valueIndex], [field]: value } as VariantValue;
         setFormData({ ...formData, variants: newVariants });
     };
 
@@ -234,13 +257,14 @@ const ProductForm = () => {
             const data = new FormData();
 
             // Append basic fields
+            console.log('Final FormData state before appending:', formData);
             Object.keys(formData).forEach(key => {
                 if (key === 'variants') return; // Handle manually
                 const value = (formData as any)[key];
                 if (value !== null && value !== undefined && value !== '') {
                     // Start Debug
-                    if (['trackInventory', 'isActive', 'isAvailable'].includes(key)) {
-                        console.log(`Appending ${key}:`, value, typeof value);
+                    if (['trackInventory', 'isActive', 'isAvailable', 'isOffer'].includes(key)) {
+                        console.log(`Appending ${key}:`, value, `(Type: ${typeof value})`);
                     }
                     // End Debug
                     data.append(key, value);
@@ -280,11 +304,15 @@ const ProductForm = () => {
             // Let's try appending indices.
             formData.variants.forEach((variant, vIdx) => {
                 data.append(`variants[${vIdx}][name]`, variant.name);
+                data.append(`variants[${vIdx}][nameAr]`, variant.nameAr);
+                data.append(`variants[${vIdx}][isColor]`, String(variant.isColor));
                 data.append(`variants[${vIdx}][sortOrder]`, variant.sortOrder);
                 if (variant.id) data.append(`variants[${vIdx}][id]`, variant.id);
 
                 variant.values.forEach((val, valIdx) => {
                     data.append(`variants[${vIdx}][values][${valIdx}][value]`, val.value);
+                    data.append(`variants[${vIdx}][values][${valIdx}][valueAr]`, val.valueAr);
+                    if (val.hex) data.append(`variants[${vIdx}][values][${valIdx}][hex]`, val.hex);
                     data.append(`variants[${vIdx}][values][${valIdx}][price]`, val.price);
                     data.append(`variants[${vIdx}][values][${valIdx}][sortOrder]`, val.sortOrder);
                     if (val.id) data.append(`variants[${vIdx}][values][${valIdx}][id]`, val.id);
@@ -317,9 +345,10 @@ const ProductForm = () => {
                 toast.success(t('saveSuccess'));
             }
             navigate('/products');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error saving product', error);
-            toast.error(t('common:error', { defaultValue: 'Failed to save product' }));
+            const errorMessage = error.response?.data?.message || t('common:error', { defaultValue: 'Failed to save product' });
+            toast.error(errorMessage);
         } finally {
             setSubmitting(false);
         }
@@ -408,9 +437,6 @@ const ProductForm = () => {
                                             }}
                                             dir="ltr"
                                         />
-                                        <div className="absolute top-1/2 -translate-y-1/2 text-xs text-slate-400 pointer-events-none end-3">
-                                            {t('autoTranslated')}
-                                        </div>
                                     </div>
                                 </InputGroup>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -455,31 +481,44 @@ const ProductForm = () => {
                             <div className="space-y-6">
                                 {formData.variants.map((variant, vIdx) => (
                                     <div key={vIdx} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                            <InputGroup label={t('optionNameLabel')} isRTL={isRTL}>
+                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                                            <InputGroup label={t('optionNameAr')} isRTL={isRTL}>
+                                                <input
+                                                    type="text"
+                                                    value={variant.nameAr}
+                                                    onChange={e => updateVariant(vIdx, 'nameAr', e.target.value)}
+                                                    onBlur={() => handleVariantTranslate(variant.nameAr, (trans) => updateVariant(vIdx, 'name', trans))}
+                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                    placeholder={t('optionNameArPlaceholder')}
+                                                />
+                                            </InputGroup>
+                                            <InputGroup label={t('optionNameEn')} isRTL={isRTL}>
                                                 <input
                                                     type="text"
                                                     value={variant.name}
                                                     onChange={e => updateVariant(vIdx, 'name', e.target.value)}
-                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                    placeholder={t('optionNameLabel')}
+                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                                                    placeholder={t('optionNameEnPlaceholder')}
+                                                    dir="ltr"
                                                 />
                                             </InputGroup>
                                             <div className="flex items-end gap-2">
-                                                <div className="flex-1">
-                                                    <InputGroup label={t('sortOrder')} isRTL={isRTL}>
+                                                <div className="flex-1 flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
+                                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isColor')}</span>
+                                                    <label className="relative inline-flex items-center cursor-pointer">
                                                         <input
-                                                            type="number"
-                                                            value={variant.sortOrder}
-                                                            onChange={e => updateVariant(vIdx, 'sortOrder', e.target.value)}
-                                                            className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                            type="checkbox"
+                                                            className="sr-only peer"
+                                                            checked={variant.isColor}
+                                                            onChange={e => updateVariant(vIdx, 'isColor', e.target.checked)}
                                                         />
-                                                    </InputGroup>
+                                                        <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                                    </label>
                                                 </div>
                                                 <button
                                                     type="button"
                                                     onClick={() => removeVariant(vIdx)}
-                                                    className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors mb-0.5"
+                                                    className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
                                                     title={t('removeOption')}
                                                 >
                                                     <Trash2 size={18} />
@@ -491,13 +530,39 @@ const ProductForm = () => {
                                         <div className="border-indigo-200 dark:border-indigo-900 space-y-3 ps-4 border-s-2">
                                             {variant.values.map((val, valIdx) => (
                                                 <div key={valIdx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
+                                                    {variant.isColor && (
+                                                        <div className="w-[50px] relative">
+                                                            <div
+                                                                className="w-10 h-10 rounded-lg border border-slate-200 shadow-sm overflow-hidden"
+                                                                style={{ backgroundColor: val.hex || '#000000' }}
+                                                            >
+                                                                <input
+                                                                    type="color"
+                                                                    value={val.hex || '#000000'}
+                                                                    onChange={e => updateVariantValue(vIdx, valIdx, 'hex', e.target.value)}
+                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex-1 min-w-[120px]">
+                                                        <input
+                                                            type="text"
+                                                            value={val.valueAr}
+                                                            onChange={e => updateVariantValue(vIdx, valIdx, 'valueAr', e.target.value)}
+                                                            onBlur={() => handleVariantTranslate(val.valueAr, (trans) => updateVariantValue(vIdx, valIdx, 'value', trans))}
+                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                            placeholder={t('valueArLabel')}
+                                                        />
+                                                    </div>
                                                     <div className="flex-1 min-w-[120px]">
                                                         <input
                                                             type="text"
                                                             value={val.value}
                                                             onChange={e => updateVariantValue(vIdx, valIdx, 'value', e.target.value)}
                                                             className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                            placeholder={t('valueLabel')}
+                                                            placeholder={t('valueEnLabel')}
+                                                            dir="ltr"
                                                         />
                                                     </div>
                                                     <div className="w-[100px]">
@@ -506,7 +571,7 @@ const ProductForm = () => {
                                                             value={val.price}
                                                             onChange={e => updateVariantValue(vIdx, valIdx, 'price', e.target.value)}
                                                             className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                            placeholder="+ Price"
+                                                            placeholder={`+ ${t('price')}`}
                                                         />
                                                     </div>
                                                     <button
@@ -645,8 +710,23 @@ const ProductForm = () => {
                         {/* Status */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className={clsx("text-sm font-bold text-slate-400 uppercase tracking-wider mb-4", isRTL && "text-right")}>{t('status')}</h2>
-                            <div className={clsx("flex items-center justify-between mb-4", isRTL && "flex-row-reverse")}>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('active')}</label>
+                            <div className="flex items-center justify-between mb-4">
+                                <div className={isRTL ? "text-right" : "text-left"}>
+                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isOffer')}</label>
+                                    <p className="text-[10px] text-slate-400">{t('isOfferSubtitle')}</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.isOffer}
+                                        onChange={e => setFormData({ ...formData, isOffer: e.target.checked })}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500"></div>
+                                </label>
+                            </div>
+                            <div className="flex items-center justify-between mb-4">
+                                <label className={clsx("text-sm font-medium text-slate-700 dark:text-slate-300", isRTL && "text-right")}>{t('active')}</label>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -657,8 +737,8 @@ const ProductForm = () => {
                                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
                                 </label>
                             </div>
-                            <div className={clsx("flex items-center justify-between", isRTL && "flex-row-reverse")}>
-                                <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('available')}</label>
+                            <div className="flex items-center justify-between">
+                                <label className={clsx("text-sm font-medium text-slate-700 dark:text-slate-300", isRTL && "text-right")}>{t('available')}</label>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"

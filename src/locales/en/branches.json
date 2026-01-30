@@ -8,9 +8,9 @@
     "branchLocation": "Branch Location",
     "contactDetails": "Contact Details",
     "navigateOnMaps": "Navigate on Maps",
-    "noBranchesFound": "No branches found",
-    "noBranchesSubtitle": "Your store ecosystem is empty. Let's add some branches!",
-    "noMatchesFound": "We couldn't find anything matching",
+    "noBranches": "No branches found",
+    "emptyEcosystem": "Your store ecosystem is empty. Let's add some branches!",
+    "noMatchingBranches": "We couldn't find anything matching \"{{term}}\"",
     "editBranch": "Edit Branch",
     "addBranch": "Add Branch",
     "addressAr": "Address (Arabic)",
@@ -31,5 +31,12 @@
     "lngRequired": "Longitude is required",
     "latRange": "Latitude must be between -90 and 90",
     "lngRange": "Longitude must be between -180 and 180",
-    "autoTranslated": "Address auto-translated to English"
+    "autoTranslated": "Address auto-translated to English",
+    "loadError": "Failed to load branches",
+    "createSuccess": "Branch created successfully",
+    "createError": "Failed to create branch",
+    "updateSuccess": "Branch updated successfully",
+    "updateError": "Failed to update branch",
+    "deleteSuccess": "Branch deleted successfully",
+    "deleteError": "Failed to delete branch"
 }

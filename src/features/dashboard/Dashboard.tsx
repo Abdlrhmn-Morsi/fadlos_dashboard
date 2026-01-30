@@ -10,7 +10,7 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock } from 'lucide-react';
+import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
 import { UserRole } from '../../types/user-role';
@@ -157,15 +157,15 @@ const Dashboard: React.FC = () => {
         return (
             <div className={clsx(
                 bgColor, borderColor, "border rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
-                isRTL && "flex-row-reverse text-right"
+                isRTL && "flex-row-reverse"
             )}>
                 <div className={`p-3 rounded-none bg-white/50 dark:bg-black/20 ${iconColor} h-fit`}>
                     <Icon size={24} />
                 </div>
-                <div className="space-y-1">
+                <div className={clsx("space-y-1 flex-1", isRTL ? "text-right" : "text-left")}>
                     <h4 className={`text-lg font-black uppercase tracking-tight ${textColor}`}>{label}</h4>
                     <p className={`text-sm font-medium opacity-90 ${textColor}`}>
-                        {reason || t('common:statusReasonPlaceholder')}
+                        {reason || (status === 'SUSPENDED' || status === 'INACTIVE' ? t('common:statusReasonPlaceholder') : t('common:completeStoreInfo'))}
                     </p>
                     {status === 'SUSPENDED' && (
                         <div className={clsx(
@@ -267,7 +267,7 @@ const Dashboard: React.FC = () => {
                             change="+2.0%"
                             icon={Star}
                             color="yellow"
-                            comparisonText={t('avgStars', { stars: 4.8 })}
+                            comparisonText={t('avgStars', { stars: Number(stats.averageRating || 0).toFixed(1) })}
                         />
                         <StatCard
                             title={t('totalProducts')}
@@ -313,6 +313,100 @@ const Dashboard: React.FC = () => {
                     >
                         {t('common:storeSettings')}
                     </button>
+                </div>
+            )}
+
+            {/* Top Rated Products Section */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && stats.topRatedProducts && stats.topRatedProducts.length > 0 && (
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
+                            {t('topRatedProducts')}
+                        </h3>
+                        <button
+                            onClick={() => navigate('/products')}
+                            className="text-primary text-sm font-bold hover:underline"
+                        >
+                            {t('common:viewAll')}
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {stats.topRatedProducts.map((product: any) => (
+                            <div
+                                key={product.id}
+                                className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative"
+                                onClick={() => navigate(`/products/edit/${product.id}`)}
+                            >
+                                <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
+                                    <Edit size={14} className="text-primary" />
+                                </div>
+                                <div className="aspect-square w-full mb-3 overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                    {product.coverImage ? (
+                                        <img
+                                            src={product.coverImage}
+                                            alt={product.name}
+                                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                            <ShoppingBag size={32} strokeWidth={1} />
+                                        </div>
+                                    )}
+                                </div>
+                                <h4 className={clsx("font-bold text-sm text-slate-800 dark:text-slate-200 truncate mb-1", isRTL && "text-right")}>
+                                    {isRTL ? product.nameAr || product.name : product.name}
+                                </h4>
+                                <div className={clsx("flex items-center gap-1", isRTL && "flex-row-reverse")}>
+                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                                    <span className="text-xs font-black text-slate-700 dark:text-slate-400">
+                                        {Number(product.averageRating || 0).toFixed(1)}
+                                    </span>
+                                    <span className="text-[10px] text-slate-400 lowercase">
+                                        {t('review_count', { count: product.reviewCount || 0 })}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
+            {/* Top Categories Section */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && stats.topCategories && stats.topCategories.length > 0 && (
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors mt-8">
+                    <div className="flex items-center justify-between mb-6">
+                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
+                            {t('topCategories')}
+                        </h3>
+                        <button
+                            onClick={() => navigate('/categories')}
+                            className="text-primary text-sm font-bold hover:underline"
+                        >
+                            {t('common:viewAll')}
+                        </button>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                        {stats.topCategories.map((category: any) => (
+                            <div
+                                key={category.id}
+                                className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative flex flex-col items-center justify-center text-center"
+                                onClick={() => navigate('/categories')}
+                            >
+                                <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
+                                    <Edit size={14} className="text-primary" />
+                                </div>
+                                <div className="w-16 h-16 mb-3 rounded-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                    <Layers size={32} strokeWidth={1.5} />
+                                </div>
+                                <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate w-full">
+                                    {isRTL ? category.nameAr || category.name : category.name}
+                                </h4>
+                                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider">
+                                    {t('product_count', { count: category.productCount || 0 })}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             )}
 

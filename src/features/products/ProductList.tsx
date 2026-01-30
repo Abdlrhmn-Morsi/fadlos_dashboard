@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, Star } from 'lucide-react';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import productsApi from './api/products.api';
+import categoriesApi from '../categories/api/categories.api';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { toast } from '../../utils/toast';
 
@@ -23,6 +24,14 @@ const ProductList = () => {
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
+    // Filters & Sorting State
+    const [selectedCategory, setSelectedCategory] = useState('');
+    const [isOfferFilter, setIsOfferFilter] = useState<boolean | undefined>(undefined);
+    const [hasDiscountFilter, setHasDiscountFilter] = useState<boolean | undefined>(undefined);
+    const [sortBy, setSortBy] = useState('sortOrder');
+    const [sortOrder, setSortOrder] = useState<'ASC' | 'DESC'>('ASC');
+    const [categories, setCategories] = useState<any[]>([]);
+
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
@@ -31,7 +40,20 @@ const ProductList = () => {
             fetchProducts();
         }, searchTerm ? 300 : 0); // Debounce search
         return () => clearTimeout(timer);
-    }, [page, searchTerm]);
+    }, [page, searchTerm, selectedCategory, isOfferFilter, hasDiscountFilter, sortBy, sortOrder]);
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
+
+    const fetchCategories = async () => {
+        try {
+            const res: any = await categoriesApi.getSellerCategories();
+            setCategories(res.data || []);
+        } catch (error) {
+            console.error('Failed to fetch categories', error);
+        }
+    };
 
     // Reset to page 1 when search changes
     useEffect(() => {
@@ -43,9 +65,14 @@ const ProductList = () => {
             setLoading(true);
             const params: any = {
                 page,
-                limit
+                limit,
+                sortBy,
+                sort: sortOrder
             };
             if (searchTerm) params.search = searchTerm;
+            if (selectedCategory) params.categoryId = selectedCategory;
+            if (isOfferFilter !== undefined) params.isOffer = isOfferFilter;
+            if (hasDiscountFilter !== undefined) params.hasDiscount = hasDiscountFilter;
 
             const data: any = await productsApi.getSellerProducts(params);
 
@@ -109,20 +136,87 @@ const ProductList = () => {
                 </Link>
             </div>
 
-            {/* Search Bar */}
-            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
-                <div className="relative max-w-md">
-                    <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={20} />
-                    <input
-                        type="text"
-                        placeholder={t('searchPlaceholder')}
-                        className={clsx(
-                            "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none",
-                            isRTL ? "pr-10 pl-4 text-right" : "pl-10 pr-4"
-                        )}
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
+            {/* Search and Filters Bar */}
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4 space-y-4">
+                <div className="flex flex-col md:flex-row gap-4">
+                    <div className="relative flex-1">
+                        <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={20} />
+                        <input
+                            type="text"
+                            placeholder={t('searchPlaceholder')}
+                            className={clsx(
+                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none",
+                                isRTL ? "pr-10 pl-4 text-right" : "pl-10 pr-4"
+                            )}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="flex flex-wrap items-center gap-3">
+                        {/* Category Filter */}
+                        <select
+                            value={selectedCategory}
+                            onChange={(e) => setSelectedCategory(e.target.value)}
+                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        >
+                            <option value="">{t('category')}</option>
+                            {categories.map(cat => (
+                                <option key={cat.id} value={cat.id}>
+                                    {isRTL ? (cat.nameAr || cat.name) : cat.name}
+                                </option>
+                            ))}
+                        </select>
+
+                        {/* Offer Filter */}
+                        <button
+                            onClick={() => setIsOfferFilter(isOfferFilter === true ? undefined : true)}
+                            className={clsx(
+                                "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border",
+                                isOfferFilter === true
+                                    ? "bg-amber-50 border-amber-200 text-amber-700 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400"
+                                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700"
+                            )}
+                        >
+                            <Tag size={16} className={isOfferFilter === true ? "fill-amber-500" : ""} />
+                            <span>{t('isOffer')}</span>
+                        </button>
+
+                        {/* Discount Filter */}
+                        <button
+                            onClick={() => setHasDiscountFilter(hasDiscountFilter === true ? undefined : true)}
+                            className={clsx(
+                                "flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 border",
+                                hasDiscountFilter === true
+                                    ? "bg-rose-50 border-rose-200 text-rose-700 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400"
+                                    : "bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-700"
+                            )}
+                        >
+                            <Tag size={16} className={hasDiscountFilter === true ? "fill-rose-500" : ""} />
+                            <span>{t('hasDiscount')}</span>
+                        </button>
+
+                        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700 hidden md:block"></div>
+
+                        {/* Sort By */}
+                        <select
+                            value={`${sortBy}:${sortOrder}`}
+                            onChange={(e) => {
+                                const [field, order] = e.target.value.split(':');
+                                setSortBy(field);
+                                setSortOrder(order as any);
+                            }}
+                            className="bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:ring-2 focus:ring-indigo-500/20"
+                        >
+                            <option value="sortOrder:ASC">{t('sortOrder')}</option>
+                            <option value="price:ASC">{t('lowToHigh')}</option>
+                            <option value="price:DESC">{t('highToLow')}</option>
+                            <option value="orderCount:DESC">{t('topSelling')}</option>
+                            <option value="orderCount:ASC">{t('lowSelling')}</option>
+                            <option value="averageRating:DESC">{t('topRated')}</option>
+                            <option value="createdAt:DESC">{t('common:newest')}</option>
+                        </select>
+                    </div>
                 </div>
             </div>
 
@@ -134,6 +228,7 @@ const ProductList = () => {
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('product')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('sku')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('rating', { defaultValue: 'Rating' })}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('stock')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('price')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
@@ -177,24 +272,49 @@ const ProductList = () => {
                                     <tr key={product.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
-                                                {product.coverImage ? (
-                                                    <img src={product.coverImage} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform duration-200" />
-                                                ) : (
-                                                    <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform duration-200">
-                                                        <Package size={20} strokeWidth={1.5} />
-                                                    </div>
-                                                )}
+                                                <div className="relative">
+                                                    {product.coverImage ? (
+                                                        <img src={product.coverImage} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform duration-200" />
+                                                    ) : (
+                                                        <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform duration-200">
+                                                            <Package size={20} strokeWidth={1.5} />
+                                                        </div>
+                                                    )}
+                                                    {product.isOffer && (
+                                                        <div className={clsx(
+                                                            "absolute -top-1.5 -right-1.5 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm border",
+                                                            "bg-amber-500 text-white border-amber-400 animate-pulse"
+                                                        )}>
+                                                            {t('isOffer')}
+                                                        </div>
+                                                    )}
+                                                </div>
                                                 <div>
-                                                    <h3 className="font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">{product.name}</h3>
+                                                    <div className="flex items-center gap-2">
+                                                        <h3 className="font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                            {isRTL ? product.nameAr || product.name : product.name}
+                                                        </h3>
+                                                    </div>
                                                     <div className="flex items-center text-xs text-slate-500 mt-0.5">
                                                         <Tag size={12} className={isRTL ? "ml-1" : "mr-1"} />
-                                                        {product.category?.name || t('uncategorized')}
+                                                        {(isRTL ? product.category?.nameAr || product.category?.name : product.category?.name) || t('uncategorized')}
                                                     </div>
                                                 </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-mono text-xs">
                                             {product.sku || '—'}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-md w-fit border border-yellow-100 dark:border-yellow-900/40">
+                                                <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                                                <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">
+                                                    {Number(product.averageRating || 0).toFixed(1)}
+                                                </span>
+                                                <span className="text-[10px] text-yellow-600/60 dark:text-yellow-400/50 uppercase font-medium">
+                                                    ({product.totalReviews || 0})
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             {product.trackInventory ? (
@@ -208,8 +328,17 @@ const ProductList = () => {
                                                 <span className="text-slate-400 text-xs italic">{t('unlimited')}</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 font-semibold text-slate-900 dark:text-white">
-                                            {Number(product.price).toFixed(2)} {t('common:currencySymbol')}
+                                        <td className="px-6 py-4">
+                                            <div className="flex flex-col">
+                                                <span className="font-bold text-slate-900 dark:text-white">
+                                                    {Number(product.price).toFixed(2)} {t('common:currencySymbol')}
+                                                </span>
+                                                {product.comparePrice && Number(product.comparePrice) > Number(product.price) && (
+                                                    <span className="text-xs text-slate-400 line-through decoration-rose-400/50">
+                                                        {Number(product.comparePrice).toFixed(2)} {t('common:currencySymbol')}
+                                                    </span>
+                                                )}
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${product.isActive
@@ -221,7 +350,7 @@ const ProductList = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className={clsx("flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
+                                            <div className={clsx("flex items-center gap-2 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
                                                 <button
                                                     onClick={() => navigate(`/products/edit/${product.id}`)}
                                                     className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"

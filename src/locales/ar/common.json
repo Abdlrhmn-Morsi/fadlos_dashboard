@@ -10,6 +10,7 @@
     "filter": "تصفية",
     "add": "إضافة",
     "edit": "تعديل",
+    "viewAll": "عرض الكل",
     "delete": "حذف",
     "save": "حفظ",
     "cancel": "إلغاء",
@@ -103,5 +104,7 @@
     "loadMore": "تحميل المزيد",
     "viewAllNotifications": "عرض كل الإشعارات",
     "notificationsTitle": "الإشعارات",
-    "loadEarlierNotifications": "تحميل الإشعارات السابقة"
+    "loadEarlierNotifications": "تحميل الإشعارات السابقة",
+    "newest": "الأحدث",
+    "completeStoreInfo": "يرجى إكمال معلومات متجرك"
 }

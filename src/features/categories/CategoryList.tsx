@@ -160,7 +160,7 @@ const CategoryList = () => {
                                                     <Tag size={18} />
                                                 </div>
                                                 <span className="font-semibold text-slate-700 dark:text-slate-200">
-                                                    {category.name}
+                                                    {isRTL ? category.nameAr || category.name : category.name}
                                                 </span>
                                             </div>
                                         </td>
@@ -180,7 +180,7 @@ const CategoryList = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 text-end">
-                                            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200 justify-end">
+                                            <div className="flex items-center gap-2 transition-opacity duration-200 justify-end">
                                                 <button
                                                     onClick={() => handleEdit(category)}
                                                     className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"

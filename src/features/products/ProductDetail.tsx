@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import clsx from 'clsx';
 import { ArrowLeft, Edit, Tag, DollarSign, Package, CheckCircle, XCircle } from 'lucide-react';
 import productsApi from './api/products.api';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { isRTL } = useLanguage();
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -98,9 +101,16 @@ const ProductDetail = () => {
                     {/* Product Info */}
                     <div className="space-y-6">
                         <div>
-                            <h2 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-                                {product.name}
-                            </h2>
+                            <div className="flex items-center gap-3 mb-2">
+                                <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
+                                    {product.name}
+                                </h2>
+                                {product.isOffer && (
+                                    <span className="px-2 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider animate-pulse">
+                                        Offer
+                                    </span>
+                                )}
+                            </div>
                             {product.nameAr && (
                                 <h3 className="text-xl text-slate-600 dark:text-slate-400 mb-4">
                                     {product.nameAr}
@@ -109,9 +119,16 @@ const ProductDetail = () => {
                         </div>
 
                         <div className="flex items-center gap-4">
-                            <div className="flex items-center gap-2 text-3xl font-bold text-primary">
-                                <DollarSign size={28} />
-                                <span>{Number(product.price).toFixed(2)}</span>
+                            <div className="flex flex-col">
+                                <div className="flex items-center gap-2 text-3xl font-bold text-primary">
+                                    <DollarSign size={28} />
+                                    <span>{Number(product.price).toFixed(2)}</span>
+                                </div>
+                                {product.comparePrice && Number(product.comparePrice) > Number(product.price) && (
+                                    <div className="text-sm text-slate-400 line-through mt-1">
+                                        Was: {Number(product.comparePrice).toFixed(2)}
+                                    </div>
+                                )}
                             </div>
                             <div className="flex items-center gap-2">
                                 {product.isAvailable ? (
@@ -129,10 +146,10 @@ const ProductDetail = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                            <div className={clsx("flex items-center gap-2 text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse text-right")}>
                                 <Package size={20} />
-                                <span className="font-semibold">Category:</span>
-                                <span>{product.category?.name || 'Uncategorized'}</span>
+                                <span className="font-semibold">{isRTL ? 'التصنيف:' : 'Category:'}</span>
+                                <span>{(isRTL ? product.category?.nameAr || product.category?.name : product.category?.name) || (isRTL ? 'غير مصنف' : 'Uncategorized')}</span>
                             </div>
                         </div>
 

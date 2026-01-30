@@ -18,6 +18,9 @@ export const fetchDashboardStats = async (user: any) => {
         let reviewsCount = 0;
         let categoriesCount = 0;
         let pendingOrders = 0;
+        let averageRating = 0;
+        let topRatedProducts: any[] = [];
+        let topCategories: any[] = [];
 
         if (userRole === UserRole.SUPER_ADMIN) {
             const adminStats = await apiService.get('/stats/admin-summary');
@@ -58,17 +61,29 @@ export const fetchDashboardStats = async (user: any) => {
             // Only fetch followers if we have a storeId
             if (storeId) {
                 promises.push(apiService.get(`/follows/stats/store/${storeId}`).catch(() => ({ followersCount: 0 })));
+                // Also fetch store rating
+                promises.push(apiService.get(`/stores/my-store`).catch(() => ({ averageRating: 0 })));
             } else {
                 promises.push(Promise.resolve({ followersCount: 0 }));
+                promises.push(Promise.resolve({ averageRating: 0 }));
             }
 
-            const [productsRes, clientsRes, reviewsRes, categoriesRes, followersRes] = await Promise.all(promises);
+            const [productsRes, clientsRes, reviewsRes, categoriesRes, followersRes, storeRes] = await Promise.all(promises);
+
+            // 3. Fetch Top Rated Products & Top Categories
+            const [topRatedRes, topCatsRes] = await Promise.all([
+                apiService.get('/products/store-products?sortBy=averageRating&sort=DESC&limit=5').catch(() => ({ data: [] })),
+                apiService.get('/categories/seller-categories?limit=5').catch(() => ({ data: [] }))
+            ]);
 
             productsCount = productsRes.meta?.total || productsRes.pagination?.total || 0;
             clientsCount = clientsRes.meta?.total || clientsRes.pagination?.total || 0;
             reviewsCount = reviewsRes.meta?.total || reviewsRes.pagination?.total || 0;
             categoriesCount = categoriesRes.meta?.total || categoriesRes.pagination?.total || 0;
             followersCount = followersRes.followersCount || 0;
+            averageRating = storeRes.averageRating || 0;
+            topRatedProducts = (topRatedRes as any).data || [];
+            topCategories = (topCatsRes as any).data || [];
         }
 
         return {
@@ -83,10 +98,12 @@ export const fetchDashboardStats = async (user: any) => {
             totalClients: clientsCount,
             totalFollowers: followersCount,
             totalReviews: reviewsCount,
-            totalCategories: categoriesCount
+            totalCategories: categoriesCount,
+            topRatedProducts: topRatedProducts,
+            topCategories: topCategories,
+            averageRating: averageRating
         };
     } catch (error) {
         throw error;
     }
 };
-

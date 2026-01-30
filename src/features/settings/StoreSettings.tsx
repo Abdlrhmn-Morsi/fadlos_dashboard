@@ -286,9 +286,10 @@ const StoreSettings = () => {
             await updateStore(data);
             toast.success(t('common:success'));
             fetchData(); // Refresh data
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to update store:', error);
-            toast.error(t('common:errorUpdatingData'));
+            const errorMessage = error.response?.data?.message || t('common:errorUpdatingData');
+            toast.error(errorMessage);
         } finally {
             setSaving(false);
         }
@@ -738,17 +739,17 @@ const StoreSettings = () => {
                                     <label htmlFor="isAcceptingOrders" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
                                         {t('acceptingOrders')}
                                     </label>
-                                    <div className="relative inline-block w-10 h-6 align-middle select-none transition duration-200 ease-in">
+                                    <label className="relative inline-flex items-center cursor-pointer">
                                         <input
                                             type="checkbox"
                                             name="isAcceptingOrders"
                                             id="isAcceptingOrders"
+                                            className="sr-only peer"
                                             checked={formData.isAcceptingOrders}
                                             onChange={handleChange}
-                                            className="toggle-checkbox absolute block w-4 h-4 rounded-full bg-white border-4 appearance-none cursor-pointer translate-x-1 top-1 checked:translate-x-5 checked:border-primary transition-transform duration-200"
                                         />
-                                        <label htmlFor="isAcceptingOrders" className={clsx("toggle-label block overflow-hidden h-6 rounded-full cursor-pointer border-2", formData.isAcceptingOrders ? "bg-primary border-primary" : "bg-slate-300 border-slate-300")}></label>
-                                    </div>
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                                    </label>
                                 </div>
                             </div>
 
