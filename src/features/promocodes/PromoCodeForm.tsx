@@ -275,7 +275,7 @@ const PromoCodeForm = () => {
                                         <option value="we_miss_you">{t('weMissYou')}</option>
                                         <option value="favorite_product">{t('favoriteProduct')}</option>
                                         <option value="category_based">{t('categoryBased')}</option>
-                                        <option value="store_wide">{t('storeWide')}</option>
+                                        <option value="store_customer">{t('storeCustomer')}</option>
                                         <option value="specific_customers">{t('specificCustomers')}</option>
                                         <option value="specific_products">{t('specificProducts')}</option>
                                     </select>
@@ -288,7 +288,7 @@ const PromoCodeForm = () => {
                                         {formData.ruleType === 'we_miss_you' && t('weMissYouSubtitle')}
                                         {formData.ruleType === 'favorite_product' && t('favoriteProductSubtitle')}
                                         {formData.ruleType === 'category_based' && t('categoryBasedSubtitle')}
-                                        {formData.ruleType === 'store_wide' && t('storeWideSubtitle')}
+                                        {formData.ruleType === 'store_customer' && t('storeCustomerSubtitle')}
                                         {formData.ruleType === 'specific_customers' && t('specificCustomersSubtitle')}
                                         {formData.ruleType === 'specific_products' && t('specificProductsSubtitle')}
                                     </p>
