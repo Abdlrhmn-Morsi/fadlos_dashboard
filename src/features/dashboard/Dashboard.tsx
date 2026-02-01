@@ -294,14 +294,14 @@ const Dashboard: React.FC = () => {
             {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}
             {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                 <div className={clsx(
-                    "relative overflow-hidden group rounded-none border border-white/20 shadow-2xl transition-all duration-500 hover:shadow-primary/10",
+                    "relative overflow-hidden group rounded-none",
                     "p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8",
                     isRTL ? "text-right" : "text-left"
                 )}>
                     {/* Background: Direct Primary to Secondary Gradient - Direction Aware */}
                     <div className={clsx(
                         "absolute inset-0",
-                        isRTL ? "bg-gradient-to-l from-primary to-secondary" : "bg-gradient-to-r from-primary to-secondary"
+                        isRTL ? "bg-gradient-to-l from-primary to-primary" : "bg-gradient-to-r from-primary to-primary"
                     )} />
                     <div className="absolute inset-0 bg-black/5 mix-blend-overlay" />
 
