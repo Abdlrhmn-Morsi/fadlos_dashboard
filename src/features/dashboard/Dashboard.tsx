@@ -10,7 +10,7 @@ import {
     Tooltip,
     ResponsiveContainer
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit } from 'lucide-react';
+import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
 import { UserRole } from '../../types/user-role';
@@ -291,28 +291,57 @@ const Dashboard: React.FC = () => {
                 />
             </div>
 
-            {/* Quick Actions for Sellers */}
+            {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}
             {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                 <div className={clsx(
-                    "bg-gradient-to-r from-primary to-primary-dark p-8 rounded-none border border-primary/20 shadow-xl shadow-primary/20 flex flex-col md:flex-row items-center justify-between gap-6 overflow-hidden relative group",
-                    isRTL && "md:flex-row-reverse"
+                    "relative overflow-hidden group rounded-none border border-white/20 shadow-2xl transition-all duration-500 hover:shadow-primary/10",
+                    "p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8",
+                    isRTL ? "text-right" : "text-left"
                 )}>
-                    <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-white/10 rounded-none rotate-12 transition-transform group-hover:scale-110" />
-                    <div className={clsx("relative z-10 flex items-center gap-6", isRTL && "flex-row-reverse")}>
-                        <div className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-none flex items-center justify-center text-white shadow-inner">
-                            <Store size={40} />
+                    {/* Background: Direct Primary to Secondary Gradient - Direction Aware */}
+                    <div className={clsx(
+                        "absolute inset-0",
+                        isRTL ? "bg-gradient-to-l from-primary to-secondary" : "bg-gradient-to-r from-primary to-secondary"
+                    )} />
+                    <div className="absolute inset-0 bg-black/5 mix-blend-overlay" />
+
+                    {/* Subtle Glass Accents */}
+                    <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
+                    <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-black/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
+
+                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 grow">
+                        {/* 1. Icon (Start) */}
+                        <div className="shrink-0">
+                            <div className="w-20 h-20 bg-white/10 backdrop-blur-xl border border-white/30 rounded-none flex items-center justify-center text-white shadow-xl transform group-hover:rotate-6 transition-transform duration-500">
+                                <Store size={44} strokeWidth={1} />
+                            </div>
                         </div>
-                        <div className={isRTL ? "text-right" : "text-left"}>
-                            <h3 className="text-2xl font-black text-white uppercase tracking-tight mb-1">{t('common:manageYourStore')}</h3>
-                            <p className="text-white/80 font-medium">{t('common:updateStoreDirectly')}</p>
+
+                        {/* 2. Content (Center) */}
+                        <div className="flex-1 space-y-1">
+                            <h3 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tight leading-none">
+                                {t('common:manageYourStore')}
+                            </h3>
+                            <p className="text-white/80 font-medium text-lg md:text-xl opacity-90">
+                                {t('common:updateStoreDirectly')}
+                            </p>
                         </div>
                     </div>
-                    <button
-                        onClick={() => navigate('/store-settings')}
-                        className="relative z-10 px-8 py-4 bg-white text-primary font-black uppercase tracking-widest text-sm rounded-none hover:-translate-y-1 transition-all shadow-lg active:scale-95 whitespace-nowrap"
-                    >
-                        {t('common:storeSettings')}
-                    </button>
+
+                    {/* 3. Action Block (End) */}
+                    <div className="relative z-10 shrink-0">
+                        <button
+                            onClick={() => navigate('/store-settings')}
+                            className={clsx(
+                                "group/btn relative px-10 py-5 bg-white text-slate-900 overflow-hidden transition-all duration-300 shadow-xl active:scale-95 hover:bg-slate-900 hover:text-white"
+                            )}
+                        >
+                            <span className="relative z-10 flex items-center gap-4 font-black uppercase tracking-[0.2em] text-[10px]">
+                                {t('common:storeSettings')}
+                                <ChevronRight size={18} className={clsx("transition-transform group-hover/btn:translate-x-1", isRTL && "rotate-180")} />
+                            </span>
+                        </button>
+                    </div>
                 </div>
             )}
 

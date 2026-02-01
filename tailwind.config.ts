@@ -14,6 +14,11 @@ export default {
                     hover: '#E65100',
                     light: '#FFF3E0',
                 },
+                secondary: {
+                    DEFAULT: '#22A699',
+                    hover: '#1B8E82',
+                    light: '#E0F2F1',
+                },
             },
             borderRadius: {
                 '3xl': '0px',
