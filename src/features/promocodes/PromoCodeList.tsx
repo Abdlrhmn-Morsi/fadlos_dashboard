@@ -9,11 +9,14 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import promoCodesApi from './api/promocodes.api';
 import { toast } from '../../utils/toast';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 
 const PromoCodeList = () => {
     const { t } = useTranslation(['promocodes', 'common']);
     const { isRTL } = useLanguage();
+    const { hasPermission } = useAuth();
     const navigate = useNavigate();
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -79,13 +82,15 @@ const PromoCodeList = () => {
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('title')}</h1>
                     <p className="text-sm text-slate-500 dark:text-slate-400">{t('subtitle')}</p>
                 </div>
-                <Link
-                    to="/promocodes/new"
-                    className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-100 dark:shadow-none font-semibold text-sm"
-                >
-                    <Plus size={18} />
-                    <span>{t('createCampaign')}</span>
-                </Link>
+                {hasPermission(Permissions.PROMO_CODES_CREATE) && (
+                    <Link
+                        to="/promocodes/new"
+                        className="flex items-center gap-2 bg-indigo-600 text-white px-5 py-2.5 rounded-lg hover:bg-indigo-700 transition-all shadow-sm shadow-indigo-100 dark:shadow-none font-semibold text-sm"
+                    >
+                        <Plus size={18} />
+                        <span>{t('createCampaign')}</span>
+                    </Link>
+                )}
             </div>
 
             {/* Content Control */}
@@ -221,27 +226,33 @@ const PromoCodeList = () => {
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="flex items-center justify-end gap-1 translate-x-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
-                                                <button
-                                                    onClick={() => toggleStatus(promo.id, promo.isActive)}
-                                                    className={`p-2 rounded-lg transition-colors ${promo.isActive ? 'text-slate-400 hover:text-rose-500 hover:bg-rose-50' : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'}`}
-                                                    title={promo.isActive ? t('deactivate') : t('activate')}
-                                                >
-                                                    {promo.isActive ? <PowerOff size={18} /> : <Power size={18} />}
-                                                </button>
-                                                <button
-                                                    onClick={() => navigate(`/promocodes/edit/${promo.id}`)}
-                                                    className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
-                                                    title={t('edit')}
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(promo.id)}
-                                                    className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
-                                                    title={t('delete')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                {hasPermission(Permissions.PROMO_CODES_UPDATE) && (
+                                                    <>
+                                                        <button
+                                                            onClick={() => toggleStatus(promo.id, promo.isActive)}
+                                                            className={`p-2 rounded-lg transition-colors ${promo.isActive ? 'text-slate-400 hover:text-rose-500 hover:bg-rose-50' : 'text-slate-400 hover:text-emerald-500 hover:bg-emerald-50'}`}
+                                                            title={promo.isActive ? t('deactivate') : t('activate')}
+                                                        >
+                                                            {promo.isActive ? <PowerOff size={18} /> : <Power size={18} />}
+                                                        </button>
+                                                        <button
+                                                            onClick={() => navigate(`/promocodes/edit/${promo.id}`)}
+                                                            className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors"
+                                                            title={t('edit')}
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                    </>
+                                                )}
+                                                {hasPermission(Permissions.PROMO_CODES_DELETE) && (
+                                                    <button
+                                                        onClick={() => handleDelete(promo.id)}
+                                                        className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                                                        title={t('delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

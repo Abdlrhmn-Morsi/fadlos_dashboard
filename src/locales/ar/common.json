@@ -1,5 +1,6 @@
 {
     "dashboard": "لوحة التحكم",
+    "welcome": "مرحباً",
     "users": "مستخدمي النظام",
     "stores": "المتاجر",
     "cities": "المدن",
@@ -22,6 +23,8 @@
     "errorUpdatingData": "خطأ في تحديث البيانات",
     "errorFetchingData": "خطأ في جلب البيانات",
     "success": "نجاح",
+    "emailAlreadyExists": "هذا البريد الإلكتروني مستخدم بالفعل من قبل مستخدم آخر.",
+    "phoneAlreadyExists": "رقم الهاتف هذا مستخدم بالفعل من قبل مستخدم آخر.",
     "email": "البريد الإلكتروني",
     "phone": "رقم الهاتف",
     "actions": "الإجراءات",
@@ -106,5 +109,223 @@
     "notificationsTitle": "الإشعارات",
     "loadEarlierNotifications": "تحميل الإشعارات السابقة",
     "newest": "الأحدث",
-    "completeStoreInfo": "يرجى إكمال معلومات متجرك"
+    "completeStoreInfo": "يرجى إكمال معلومات متجرك",
+    "team": "فريق العمل",
+    "roles": "الأدوار والصلاحيات",
+    "employees": "الموظفين",
+    "addRole": "إضافة دور",
+    "roleName": "اسم الدور",
+    "description": "الوصف",
+    "permissionsTitle": "الصلاحيات",
+    "manageRolesDesc": "إدارة أدوار المستخدمين والصلاحيات",
+    "noRolesFound": "لا توجد أدوار",
+    "createRole": "إنشاء دور جديد",
+    "editRole": "تعديل الدور",
+    "roleDetails": "تفاصيل الدور",
+    "selected": "محدد",
+    "manageEmployeesDesc": "إدارة موظفي المتجر وصلاحيات وصولهم",
+    "addEmployee": "إضافة موظف",
+    "firstName": "الاسم الأول",
+    "lastName": "اسم العائلة",
+    "employee": "الموظف",
+    "contact": "جهات الاتصال",
+    "role": "الدور",
+    "selectRole": "اختر الدور",
+    "password": "كلمة المرور",
+    "accountAccess": "الوصول للحساب",
+    "activeStatus": "حالة النشاط",
+    "createEmployee": "إضافة موظف جديد",
+    "editEmployee": "تعديل بيانات الموظف",
+    "deleteRole": "حذف الدور",
+    "deleteRoleConfirmation": "هل أنت متأكد أنك تريد حذف هذا الدور؟",
+    "deleteEmployee": "حذف الموظف",
+    "deleteEmployeeConfirmation": "هل أنت متأكد أنك تريد حذف هذا الموظف؟",
+    "activateEmployee": "تفعيل الموظف",
+    "deactivateEmployee": "تعطيل الموظف",
+    "deactivate": "تعطيل",
+    "toggleEmployeeStatusConfirmation": "هل أنت متأكد أنك تريد تغيير حالة هذا الموظف؟",
+    "employeeActiveDesc": "السماح بالوصول للوحة التحكم",
+    "roleActiveDesc": "تفعيل هذا الدور",
+    "super_admin": "مدير فائق",
+    "admin": "مدير",
+    "store_owner": "صاحب متجر",
+    "customer": "عميل",
+    "roleNamePlaceholder": "مثال: مدير المبيعات",
+    "roleDescriptionPlaceholder": "وصف لهذا الدور...",
+    "permissionsCount": "صلاحيات",
+    "Store Management": "إدارة المتجر",
+    "User Management": "إدارة المستخدمين",
+    "Employee Management": "إدارة الموظفين",
+    "Product Management": "إدارة المنتجات",
+    "Category Management": "إدارة التصنيفات",
+    "Order Management": "إدارة الطلبات",
+    "Analytics": "التحليلات",
+    "Settings": "الإعدادات",
+    "Promo Codes": "أكواد الخصم",
+    "Variants": "المتغيرات",
+    "searchEmployeePlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
+    "activate": "تفعيل",
+    "leaveBlankToKeepCurrent": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
+    "searchPlaceholder": "بحث...",
+    "personalInfo": "المعلومات الشخصية",
+    "permissions": {
+        "store": {
+            "view": {
+                "name": "عرض معلومات المتجر",
+                "description": "عرض معلومات المتجر الأساسية والإعدادات"
+            },
+            "update": {
+                "name": "تحديث معلومات المتجر",
+                "description": "تعديل تفاصيل المتجر وتكوينه"
+            }
+        },
+        "users": {
+            "view": {
+                "name": "عرض المستخدمين",
+                "description": "عرض موظفي المتجر وتفاصيلهم"
+            },
+            "create": {
+                "name": "دعوة مستخدمين",
+                "description": "دعوة موظفين جدد للمتجر"
+            },
+            "update": {
+                "name": "تحديث المستخدمين",
+                "description": "تعديل تفاصيل المستخدمين وأدوارهم"
+            },
+            "delete": {
+                "name": "إزالة المستخدمين",
+                "description": "إزالة الموظفين من المتجر"
+            }
+        },
+        "employees": {
+            "view": {
+                "name": "عرض الموظفين",
+                "description": "عرض معلومات الموظفين والجداول"
+            },
+            "create": {
+                "name": "إضافة موظف",
+                "description": "إضافة موظف جديد للنظام"
+            },
+            "update": {
+                "name": "تحديث الموظف",
+                "description": "تعديل بيانات الموظف والجداول"
+            },
+            "delete": {
+                "name": "حذف الموظف",
+                "description": "حذف الموظف من النظام"
+            }
+        },
+        "products": {
+            "view": {
+                "name": "عرض المنتجات",
+                "description": "تصفح كتالوج المنتجات والمخزون"
+            },
+            "create": {
+                "name": "إضافة منتج",
+                "description": "إضافة منتجات جديدة للكتالوج"
+            },
+            "update": {
+                "name": "تحديث المنتج",
+                "description": "تعديل بيانات المنتجات الحالية"
+            },
+            "delete": {
+                "name": "حذف المنتج",
+                "description": "إزالة المنتجات من الكتالوج"
+            }
+        },
+        "categories": {
+            "view": {
+                "name": "عرض التصنيفات",
+                "description": "تصفح تصنيفات المنتجات والهيكل"
+            },
+            "create": {
+                "name": "إضافة تصنيف",
+                "description": "إضافة تصنيفات منتجات جديدة"
+            },
+            "update": {
+                "name": "تحديث التصنيف",
+                "description": "تعديل التصنيفات الحالية وهيكلها"
+            },
+            "delete": {
+                "name": "حذف التصنيف",
+                "description": "إزالة التصنيفات من النظام"
+            }
+        },
+        "orders": {
+            "view": {
+                "name": "عرض الطلبات",
+                "description": "عرض طلبات العملاء وسجل الطلبات"
+            },
+            "update": {
+                "name": "تحديث حالة الطلب",
+                "description": "تغيير حالة الطلب وتفاصيل التنفيذ"
+            },
+            "cancel": {
+                "name": "إلغاء الطلبات",
+                "description": "إلغاء طلبات العملاء عند الضرورة"
+            }
+        },
+        "analytics": {
+            "view": {
+                "name": "عرض التحليلات",
+                "description": "الوصول لتقارير المبيعات ومؤشرات الأداء"
+            },
+            "export": {
+                "name": "تصدير البيانات",
+                "description": "تصدير بيانات التحليلات والتقارير"
+            }
+        },
+        "settings": {
+            "view": {
+                "name": "عرض الإعدادات",
+                "description": "عرض تكوين المتجر والتفضيلات"
+            },
+            "update": {
+                "name": "تحديث الإعدادات",
+                "description": "تعديل إعدادات المتجر والتفضيلات"
+            }
+        },
+        "roles": {
+            "manage": {
+                "name": "إدارة الأدوار",
+                "description": "إنشاء وتعديل وحذف أدوار المستخدمين"
+            }
+        },
+        "promo_codes": {
+            "view": {
+                "name": "عرض أكواد الخصم",
+                "description": "عرض أكواد الخصم المتاحة"
+            },
+            "create": {
+                "name": "إضافة كود خصم",
+                "description": "إضافة أكواد خصم جديدة"
+            },
+            "update": {
+                "name": "تحديث كود الخصم",
+                "description": "تعديل أكواد الخصم الحالية"
+            },
+            "delete": {
+                "name": "حذف كود الخصم",
+                "description": "حذف أكواد الخصم"
+            }
+        },
+        "variants": {
+            "view": {
+                "name": "عرض المتغيرات",
+                "description": "عرض متغيرات المنتجات والخيارات"
+            },
+            "create": {
+                "name": "إضافة متغير",
+                "description": "إضافة متغيرات منتجات جديدة"
+            },
+            "update": {
+                "name": "تحديث المتغير",
+                "description": "تعديل متغيرات المنتجات الحالية"
+            },
+            "delete": {
+                "name": "حذف المتغير",
+                "description": "حذف متغيرات المنتجات"
+            }
+        }
+    }
 }

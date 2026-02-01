@@ -40,7 +40,7 @@ export const updateStoreStatus = async (id: string, data: { status: string; reas
 
 export const getMyStore = async () => {
     try {
-        const response = await apiService.get('/stores/mystore');
+        const response = await apiService.get('/stores/my-store');
         return response.store || response;
     } catch (error) {
         throw error;

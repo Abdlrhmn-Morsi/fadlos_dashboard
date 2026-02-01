@@ -11,6 +11,8 @@ import InputModal from '../../components/ui/InputModal';
 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 
 const OrderDetail = () => {
@@ -18,6 +20,7 @@ const OrderDetail = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
+    const { hasPermission } = useAuth();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -48,6 +51,7 @@ const OrderDetail = () => {
 
     const handleStatusClick = (status: string) => {
         if (!status || status === order.status) return;
+        if (!hasPermission(Permissions.ORDERS_UPDATE)) return;
         setStatusModal({ isOpen: true, status });
     };
 
@@ -265,7 +269,7 @@ const OrderDetail = () => {
                                         const isCompleted = statuses.indexOf(order.status) >= index;
                                         const isCurrent = order.status === status;
                                         const isFuture = statuses.indexOf(order.status) < index;
-                                        const isClickable = statuses.indexOf(order.status) === index - 1; // Can only click direct next step
+                                        const isClickable = statuses.indexOf(order.status) === index - 1 && hasPermission(Permissions.ORDERS_UPDATE); // Can only click direct next step
 
                                         return (
                                             <div key={status} className="flex gap-4 relative pb-8 last:pb-0">
@@ -419,7 +423,7 @@ const OrderDetail = () => {
                     </div>
 
                     {/* Cancel Order Section */}
-                    {order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
+                    {hasPermission(Permissions.ORDERS_CANCEL) && order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                             <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
                                 <AlertCircle className="text-rose-500" size={20} />

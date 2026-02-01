@@ -5,105 +5,108 @@ import { OrderStatus } from '../../../types/order-status';
 export const fetchDashboardStats = async (user: any) => {
     try {
         const userRole = user.role;
-        let revenue = 0;
-        let ordersCount = 0;
-        let usersCount = 0;
-        let storesCount = 0;
-        let productsCount = 0;
-        let avgValue = 0;
+        // Default empty stats
+        const stats = {
+            totalRevenue: 0,
+            totalOrders: 0,
+            pendingOrders: 0,
+            totalUsers: 0,
+            totalStores: 0,
+            totalProducts: 0,
+            avgOrderValue: 0,
+            totalClients: 0,
+            totalFollowers: 0,
+            totalReviews: 0,
+            totalCategories: 0,
+            topRatedProducts: [],
+            topCategories: [],
+            averageRating: 0
+        };
 
-        // New Seller Stats
-        let clientsCount = 0;
-        let followersCount = 0;
-        let reviewsCount = 0;
-        let categoriesCount = 0;
-        let pendingOrders = 0;
-        let averageRating = 0;
-        let topRatedProducts: any[] = [];
-        let topCategories: any[] = [];
+        // Helper to check permission
+        const hasPerm = (perm: string) => {
+            if (userRole === UserRole.SUPER_ADMIN || userRole === UserRole.ADMIN || userRole === UserRole.STORE_OWNER) return true;
+            if (userRole === UserRole.EMPLOYEE) {
+                return user.employeeRole?.permissions?.includes(perm) || false;
+            }
+            return false;
+        };
 
         if (userRole === UserRole.SUPER_ADMIN) {
             const adminStats = await apiService.get('/stats/admin-summary');
             const data = adminStats.data || adminStats;
-
-            usersCount = data.totalUsers || 0;
-            storesCount = data.totalStores || 0;
-            productsCount = data.totalProducts || 0;
-            ordersCount = data.totalOrders || 0;
-            revenue = data.totalRevenue || 0;
-            avgValue = data.avgOrderValue || 0;
-            pendingOrders = data.statusCounts?.pending || 0;
+            return {
+                ...stats,
+                ...data
+            };
         } else {
             // Store Owner / Employee
             const storeId = user.store?.id || user.storeId;
 
-            // 1. Order Stats
-            const responseBody = await apiService.get('/orders/stats/summary?period=30d');
-            const data = responseBody.data || responseBody;
-
-            revenue = data.totalRevenue || 0;
-            ordersCount = data.totalOrders || 0;
-            avgValue = data.averageOrderValue || 0;
-            pendingOrders = data.statusCounts?.pending || 0;
-
-            // 2. Fetch other stats using parallel requests
-            const promises = [
-                // Products
-                apiService.get('/products/store-products?limit=1').catch(() => ({ meta: { total: 0 } })),
-                // Clients
-                apiService.get('/store/clients?limit=1').catch(() => ({ meta: { total: 0 } })),
-                // Reviews
-                apiService.get('/reviews/store-management?limit=1').catch(() => ({ meta: { total: 0 } })),
-                // Categories
-                apiService.get('/categories/seller-categories?limit=1').catch(() => ({ meta: { total: 0 } }))
-            ];
-
-            // Only fetch followers if we have a storeId
-            if (storeId) {
-                promises.push(apiService.get(`/follows/stats/store/${storeId}`).catch(() => ({ followersCount: 0 })));
-                // Also fetch store rating
-                promises.push(apiService.get(`/stores/my-store`).catch(() => ({ averageRating: 0 })));
-            } else {
-                promises.push(Promise.resolve({ followersCount: 0 }));
-                promises.push(Promise.resolve({ averageRating: 0 }));
+            // 1. Order Stats (Requires orders.view OR analytics.view)
+            // If the user only has orders.update, they might not be allowed to see stats.
+            // We'll require orders.view for now as it's the safest bet for "reading" order data.
+            if (hasPerm('orders.view') || hasPerm('analytics.view')) {
+                try {
+                    const responseBody = await apiService.get('/orders/stats/summary?period=30d');
+                    const data = responseBody.data || responseBody;
+                    stats.totalRevenue = data.totalRevenue || 0;
+                    stats.totalOrders = data.totalOrders || 0;
+                    stats.avgOrderValue = data.averageOrderValue || 0;
+                    stats.pendingOrders = data.statusCounts?.pending || 0;
+                } catch (e) {
+                    console.warn('Failed to fetch order stats', e);
+                }
             }
 
-            const [productsRes, clientsRes, reviewsRes, categoriesRes, followersRes, storeRes] = await Promise.all(promises);
+            // 2. Parallel requests for other sections, strictly guarded
+            const promises: Promise<any>[] = [];
 
-            // 3. Fetch Top Rated Products & Top Categories
-            const [topRatedRes, topCatsRes] = await Promise.all([
-                apiService.get('/products/store-products?sortBy=averageRating&sort=DESC&limit=5').catch(() => ({ data: [] })),
-                apiService.get('/categories/seller-categories?limit=5').catch(() => ({ data: [] }))
-            ]);
+            // Products count (Default for all employees)
+            promises.push(apiService.get('/products/store-products?limit=1').then(res => ({ key: 'products', val: res.meta?.total || 0 })).catch(() => ({ key: 'products', val: 0 })));
 
-            productsCount = productsRes.meta?.total || productsRes.pagination?.total || 0;
-            clientsCount = clientsRes.meta?.total || clientsRes.pagination?.total || 0;
-            reviewsCount = reviewsRes.meta?.total || reviewsRes.pagination?.total || 0;
-            categoriesCount = categoriesRes.meta?.total || categoriesRes.pagination?.total || 0;
-            followersCount = followersRes.followersCount || 0;
-            averageRating = storeRes.averageRating || 0;
-            topRatedProducts = (topRatedRes as any).data || [];
-            topCategories = (topCatsRes as any).data || [];
+            // Clients count (users.view or clients.view)
+            if (hasPerm('users.view')) {
+                promises.push(apiService.get('/store/clients?limit=1').then(res => ({ key: 'clients', val: res.meta?.total || 0 })).catch(() => ({ key: 'clients', val: 0 })));
+            }
+
+            // Reviews count (store.view)
+            if (hasPerm('store.view')) {
+                promises.push(apiService.get('/reviews/store-management?limit=1').then(res => ({ key: 'reviews', val: res.meta?.total || 0 })).catch(() => ({ key: 'reviews', val: 0 })));
+            }
+
+            // Categories count (Default for all employees)
+            promises.push(apiService.get('/categories/seller-categories?limit=1').then(res => ({ key: 'categories', val: res.meta?.total || 0 })).catch(() => ({ key: 'categories', val: 0 })));
+
+            // Followers (store.view) - Assuming store view allows seeing followers
+            if (storeId && hasPerm('store.view')) {
+                promises.push(apiService.get(`/follows/stats/store/${storeId}`).then(res => ({ key: 'followers', val: res.followersCount || 0 })).catch(() => ({ key: 'followers', val: 0 })));
+                promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0 })).catch(() => ({ key: 'rating', val: 0 })));
+            }
+
+            // Top Rated Products (Default for all employees)
+            promises.push(apiService.get('/products/store-products?sortBy=averageRating&sort=DESC&limit=5').then(res => ({ key: 'topProducts', val: (res as any).data || [] })).catch(() => ({ key: 'topProducts', val: [] })));
+
+            // Top Categories (Default for all employees)
+            promises.push(apiService.get('/categories/seller-categories?limit=5').then(res => ({ key: 'topCategories', val: (res as any).data || [] })).catch(() => ({ key: 'topCategories', val: [] })));
+
+            const results = await Promise.all(promises);
+
+            results.forEach((res: any) => {
+                if (res.key === 'products') stats.totalProducts = res.val;
+                if (res.key === 'clients') stats.totalClients = res.val;
+                if (res.key === 'reviews') stats.totalReviews = res.val;
+                if (res.key === 'categories') stats.totalCategories = res.val;
+                if (res.key === 'followers') stats.totalFollowers = res.val;
+                if (res.key === 'rating') stats.averageRating = res.val;
+                if (res.key === 'topProducts') stats.topRatedProducts = res.val;
+                if (res.key === 'topCategories') stats.topCategories = res.val;
+            });
         }
 
-        return {
-            totalRevenue: revenue,
-            totalOrders: ordersCount,
-            pendingOrders: pendingOrders,
-            totalUsers: usersCount,
-            totalStores: storesCount,
-            totalProducts: productsCount,
-            avgOrderValue: avgValue,
-            // Seller specific
-            totalClients: clientsCount,
-            totalFollowers: followersCount,
-            totalReviews: reviewsCount,
-            totalCategories: categoriesCount,
-            topRatedProducts: topRatedProducts,
-            topCategories: topCategories,
-            averageRating: averageRating
-        };
+        return stats;
     } catch (error) {
+        console.error('Fetch Dashboard Stats Error', error);
         throw error;
     }
 };

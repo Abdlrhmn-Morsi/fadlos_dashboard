@@ -9,9 +9,12 @@ import { toast } from '../../utils/toast';
 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
 import { Pagination } from '../../components/common/Pagination';
 
 const ProductList = () => {
+    const { hasPermission } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation(['products', 'common']);
     const { isRTL } = useLanguage();
@@ -127,13 +130,15 @@ const ProductList = () => {
                         {t('subtitle')}
                     </p>
                 </div>
-                <Link
-                    to="/products/new"
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                >
-                    <Plus size={20} />
-                    <span>{t('addProduct')}</span>
-                </Link>
+                {hasPermission(Permissions.PRODUCTS_CREATE) && (
+                    <Link
+                        to="/products/new"
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                    >
+                        <Plus size={20} />
+                        <span>{t('addProduct')}</span>
+                    </Link>
+                )}
             </div>
 
             {/* Search and Filters Bar */}
@@ -351,20 +356,24 @@ const ProductList = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={clsx("flex items-center gap-2 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
-                                                <button
-                                                    onClick={() => navigate(`/products/edit/${product.id}`)}
-                                                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                    title={t('common:edit')}
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(product.id)}
-                                                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
-                                                    title={t('common:delete')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                {hasPermission(Permissions.PRODUCTS_UPDATE) && (
+                                                    <button
+                                                        onClick={() => navigate(`/products/edit/${product.id}`)}
+                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                        title={t('common:edit')}
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                )}
+                                                {hasPermission(Permissions.PRODUCTS_DELETE) && (
+                                                    <button
+                                                        onClick={() => handleDelete(product.id)}
+                                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                        title={t('common:delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

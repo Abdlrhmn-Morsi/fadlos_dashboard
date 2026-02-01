@@ -69,7 +69,7 @@ const Dashboard: React.FC = () => {
     const [chartData, setChartData] = useRecoilState(dashboardChartDataState);
     const [storeDetails, setStoreDetails] = useState<any>(null);
 
-    const { user } = useAuth();
+    const { user, hasPermission } = useAuth();
 
     useEffect(() => {
         const loadDashboardData = async () => {
@@ -127,6 +127,7 @@ const Dashboard: React.FC = () => {
 
     const renderStatusBanner = () => {
         if (!storeDetails || storeDetails.status?.toUpperCase() === 'ACTIVE') return null;
+        if (!hasPermission('store.view')) return null;
 
         const status = storeDetails.status?.toUpperCase();
         const reason = storeDetails.statusReason;
@@ -185,26 +186,30 @@ const Dashboard: React.FC = () => {
         <div className="p-6 space-y-8 animate-in animate-fade">
             {renderStatusBanner()}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {/* Revenue - Common for all */}
-                <StatCard
-                    title={t('totalRevenue')}
-                    value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                    change="+12.5%"
-                    icon={DollarSign}
-                    color="emerald"
-                    comparisonText={t('vsLastPeriod')}
-                />
+                {/* Revenue - Common for all, but check permission for analytics */}
+                {hasPermission('analytics.view') && (
+                    <StatCard
+                        title={t('totalRevenue')}
+                        value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                        change="+12.5%"
+                        icon={DollarSign}
+                        color="emerald"
+                        comparisonText={t('vsLastPeriod')}
+                    />
+                )}
 
-                <StatCard
-                    title={t('totalOrders')}
-                    value={stats.totalOrders || 0}
-                    change="+5.2%"
-                    icon={ShoppingBag}
-                    color="orange"
-                    comparisonText={t('vsLastPeriod')}
-                />
+                {(hasPermission('orders.view') || hasPermission('orders.update')) && (
+                    <StatCard
+                        title={t('totalOrders')}
+                        value={stats.totalOrders || 0}
+                        change="+5.2%"
+                        icon={ShoppingBag}
+                        color="orange"
+                        comparisonText={t('vsLastPeriod')}
+                    />
+                )}
 
-                {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                {(hasPermission('orders.view') || hasPermission('orders.update')) && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                     <StatCard
                         title={t('pendingOrders')}
                         value={stats.pendingOrders || 0}
@@ -245,54 +250,64 @@ const Dashboard: React.FC = () => {
                     </>
                 ) : (
                     <>
-                        <StatCard
-                            title={t('totalClients')}
-                            value={stats.totalClients || 0}
-                            change="+4.1%"
-                            icon={Users}
-                            color="blue"
-                            comparisonText={t('newThisMonth')}
-                        />
-                        <StatCard
-                            title={t('totalFollowers')}
-                            value={stats.totalFollowers || 0}
-                            change="+8.5%"
-                            icon={Heart}
-                            color="rose"
-                            comparisonText={t('newFollowers')}
-                        />
-                        <StatCard
-                            title={t('totalReviews')}
-                            value={stats.totalReviews || 0}
-                            change="+2.0%"
-                            icon={Star}
-                            color="yellow"
-                            comparisonText={t('avgStars', { stars: Number(stats.averageRating || 0).toFixed(1) })}
-                        />
-                        <StatCard
-                            title={t('totalProducts')}
-                            value={stats.totalProducts || 0}
-                            change="+1"
-                            icon={Layers}
-                            color="indigo"
-                            comparisonText={t('activeItems')}
-                        />
+                        {hasPermission('users.view') && (
+                            <StatCard
+                                title={t('totalClients')}
+                                value={stats.totalClients || 0}
+                                change="+4.1%"
+                                icon={Users}
+                                color="blue"
+                                comparisonText={t('newThisMonth')}
+                            />
+                        )}
+                        {hasPermission('users.view') && (
+                            <StatCard
+                                title={t('totalFollowers')}
+                                value={stats.totalFollowers || 0}
+                                change="+8.5%"
+                                icon={Heart}
+                                color="rose"
+                                comparisonText={t('newFollowers')}
+                            />
+                        )}
+                        {hasPermission('store.view') && (
+                            <StatCard
+                                title={t('totalReviews')}
+                                value={stats.totalReviews || 0}
+                                change="+2.0%"
+                                icon={Star}
+                                color="yellow"
+                                comparisonText={t('avgStars', { stars: Number(stats.averageRating || 0).toFixed(1) })}
+                            />
+                        )}
+                        {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                            <StatCard
+                                title={t('totalProducts')}
+                                value={stats.totalProducts || 0}
+                                change="+1"
+                                icon={Layers}
+                                color="indigo"
+                                comparisonText={t('activeItems')}
+                            />
+                        )}
                     </>
                 )}
 
                 {/* Avg Order Value - Common */}
-                <StatCard
-                    title={t('avgOrderValue')}
-                    value={`${(stats.avgOrderValue || 0).toFixed(2)} ${t('common:currencySymbol')}`}
-                    change="+1.2%"
-                    icon={TrendingUp}
-                    color="amber"
-                    comparisonText={t('vsLastPeriod')}
-                />
+                {hasPermission('analytics.view') && (
+                    <StatCard
+                        title={t('avgOrderValue')}
+                        value={`${(stats.avgOrderValue || 0).toFixed(2)} ${t('common:currencySymbol')}`}
+                        change="+1.2%"
+                        icon={TrendingUp}
+                        color="amber"
+                        comparisonText={t('vsLastPeriod')}
+                    />
+                )}
             </div>
 
             {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+            {hasPermission('store.update') && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                 <div className={clsx(
                     "relative overflow-hidden group rounded-none",
                     "p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8",
@@ -366,9 +381,11 @@ const Dashboard: React.FC = () => {
                                 className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative"
                                 onClick={() => navigate(`/products/edit/${product.id}`)}
                             >
-                                <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
-                                    <Edit size={14} className="text-primary" />
-                                </div>
+                                {hasPermission('products.update') && (
+                                    <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
+                                        <Edit size={14} className="text-primary" />
+                                    </div>
+                                )}
                                 <div className="aspect-square w-full mb-3 overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
                                     {product.coverImage ? (
                                         <img
@@ -400,7 +417,7 @@ const Dashboard: React.FC = () => {
                 </div>
             )}
 
-            {/* Top Categories Section */}
+            {/* Top Categories Section - Visible to all Owner/Employees */}
             {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && stats.topCategories && stats.topCategories.length > 0 && (
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors mt-8">
                     <div className="flex items-center justify-between mb-6">
@@ -421,9 +438,11 @@ const Dashboard: React.FC = () => {
                                 className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative flex flex-col items-center justify-center text-center"
                                 onClick={() => navigate('/categories')}
                             >
-                                <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
-                                    <Edit size={14} className="text-primary" />
-                                </div>
+                                {hasPermission('categories.update') && (
+                                    <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
+                                        <Edit size={14} className="text-primary" />
+                                    </div>
+                                )}
                                 <div className="w-16 h-16 mb-3 rounded-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
                                     <Layers size={32} strokeWidth={1.5} />
                                 </div>
@@ -440,72 +459,76 @@ const Dashboard: React.FC = () => {
             )}
 
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
-                    <div className="flex items-center justify-between mb-8">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
-                        <select className={clsx(
-                            "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-none px-3 py-1.5 focus:ring-primary focus:border-primary outline-none",
-                            isRTL && "text-right"
-                        )}>
-                            <option>{t('last30Days')}</option>
-                            <option>{t('last90Days')}</option>
-                        </select>
+                {hasPermission('analytics.view') && (
+                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
+                            <select className={clsx(
+                                "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-none px-3 py-1.5 focus:ring-primary focus:border-primary outline-none",
+                                isRTL && "text-right"
+                            )}>
+                                <option>{t('last30Days')}</option>
+                                <option>{t('last90Days')}</option>
+                            </select>
+                        </div>
+                        <div className="h-[300px]">
+                            <ResponsiveContainer width="100%" height="100%">
+                                <BarChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                                    <XAxis
+                                        dataKey="name"
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: textColor, fontSize: 12 }}
+                                        dy={10}
+                                        reversed={isRTL}
+                                    />
+                                    <YAxis
+                                        axisLine={false}
+                                        tickLine={false}
+                                        tick={{ fill: textColor, fontSize: 12 }}
+                                        dx={isRTL ? 10 : -10}
+                                        tickFormatter={(val) => `${val} ${t('common:currencySymbol')}`}
+                                        orientation={isRTL ? "right" : "left"}
+                                    />
+                                    <Tooltip
+                                        cursor={{ fill: cursorFill }}
+                                        contentStyle={{
+                                            backgroundColor: tooltipBg,
+                                            borderRadius: '0px',
+                                            border: `1px solid ${tooltipBorder}`,
+                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                            fontSize: '14px',
+                                            color: isDark ? '#f1f5f9' : '#0f172a',
+                                            textAlign: isRTL ? 'right' : 'left'
+                                        }}
+                                    />
+                                    <Bar dataKey="revenue" fill="var(--primary)" radius={[6, 6, 0, 0]} barSize={32} />
+                                </BarChart>
+                            </ResponsiveContainer>
+                        </div>
                     </div>
-                    <div className="h-[300px]">
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData}>
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
-                                <XAxis
-                                    dataKey="name"
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: textColor, fontSize: 12 }}
-                                    dy={10}
-                                    reversed={isRTL}
-                                />
-                                <YAxis
-                                    axisLine={false}
-                                    tickLine={false}
-                                    tick={{ fill: textColor, fontSize: 12 }}
-                                    dx={isRTL ? 10 : -10}
-                                    tickFormatter={(val) => `${val} ${t('common:currencySymbol')}`}
-                                    orientation={isRTL ? "right" : "left"}
-                                />
-                                <Tooltip
-                                    cursor={{ fill: cursorFill }}
-                                    contentStyle={{
-                                        backgroundColor: tooltipBg,
-                                        borderRadius: '0px',
-                                        border: `1px solid ${tooltipBorder}`,
-                                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                        fontSize: '14px',
-                                        color: isDark ? '#f1f5f9' : '#0f172a',
-                                        textAlign: isRTL ? 'right' : 'left'
-                                    }}
-                                />
-                                <Bar dataKey="revenue" fill="var(--primary)" radius={[6, 6, 0, 0]} barSize={32} />
-                            </BarChart>
-                        </ResponsiveContainer>
-                    </div>
-                </div>
+                )}
 
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col transition-colors">
-                    <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100 mb-6", isRTL && "text-right")}>{t('recentActivity')}</h3>
-                    <div className="space-y-6 flex-grow">
-                        {[1, 2, 3].map((_, i) => (
-                            <div key={i} className={clsx("flex gap-4 group cursor-pointer", isRTL && "flex-row-reverse text-right")}>
-                                <div className="flex-1">
-                                    <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{t('statsSynchronized')}</p>
-                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('justNow')}</p>
+                {hasPermission('orders.view') && (
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col transition-colors">
+                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100 mb-6", isRTL && "text-right")}>{t('recentActivity')}</h3>
+                        <div className="space-y-6 flex-grow">
+                            {[1, 2, 3].map((_, i) => (
+                                <div key={i} className={clsx("flex gap-4 group cursor-pointer", isRTL && "flex-row-reverse text-right")}>
+                                    <div className="flex-1">
+                                        <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{t('statsSynchronized')}</p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('justNow')}</p>
+                                    </div>
+                                    <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform shrink-0" />
                                 </div>
-                                <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform shrink-0" />
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                        <button className="mt-6 w-full py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-none transition-colors">
+                            {t('viewAllActivity')}
+                        </button>
                     </div>
-                    <button className="mt-6 w-full py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-none transition-colors">
-                        {t('viewAllActivity')}
-                    </button>
-                </div>
+                )}
             </div>
         </div>
     );

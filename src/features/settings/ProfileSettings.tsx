@@ -22,7 +22,7 @@ import clsx from 'clsx';
 const ProfileSettings = () => {
     const { t } = useTranslation(['dashboard', 'common']);
     const { isRTL } = useLanguage();
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const activeTab = searchParams.get('tab') || 'profile';
 
     const [savingProfile, setSavingProfile] = useState(false);
@@ -161,6 +161,7 @@ const ProfileSettings = () => {
                 </div>
             </div>
 
+            {/* Personal Information Section */}
             {activeTab === 'profile' && (
                 <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
@@ -270,8 +271,9 @@ const ProfileSettings = () => {
                 </section>
             )}
 
+            {/* Security Section */}
             {activeTab === 'security' && (
-                <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                         <Lock size={20} className="text-primary" />
                         <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:updatePassword')}</h3>

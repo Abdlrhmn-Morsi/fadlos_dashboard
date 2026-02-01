@@ -15,7 +15,8 @@ import {
   LayoutGrid,
   Truck,
   LucideIcon,
-  Bell
+  Bell,
+  Shield
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -27,6 +28,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { NotificationBadge } from '../features/notification/components/NotificationBadge';
 import { NotificationList } from '../features/notification/components/NotificationList';
 import { useAuth } from '../contexts/AuthContext';
+import { Permissions } from '../types/permissions';
 
 interface SidebarItemProps {
   to: string;
@@ -75,7 +77,7 @@ const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation('common');
   const { isRTL } = useLanguage();
-  const { user, logout } = useAuth(); // Use AuthContext
+  const { user, logout, hasPermission } = useAuth(); // Use AuthContext
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -84,6 +86,24 @@ const DashboardLayout: React.FC = () => {
   const confirmLogout = async () => {
     await logout();
     navigate('/login');
+  };
+
+  const getRoleLabel = () => {
+    if (!user) return '';
+
+    // Show the custom employee role name if it exists (e.g., "AAAA", "Manager", etc.)
+    if (user.employeeRole?.name) {
+      return user.employeeRole.name;
+    }
+
+    // Fallback to translated role names
+    if (user.role === UserRole.SUPER_ADMIN) return t('super_admin');
+    if (user.role === UserRole.ADMIN) return t('admin');
+    if (user.role === UserRole.STORE_OWNER) return t('store_owner');
+    if (user.role === UserRole.CUSTOMER) return t('customer');
+    if (user.role === UserRole.EMPLOYEE) return t('employee');
+
+    return user.role;
   };
 
   return (
@@ -126,6 +146,18 @@ const DashboardLayout: React.FC = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
+          {!collapsed && (
+            <div className="mb-4 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-none border border-slate-100 dark:border-slate-800">
+              <div className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t('welcome')} {user?.name}</div>
+              <div className="font-bold text-slate-900 dark:text-slate-100 truncate">
+                {user?.role === UserRole.SUPER_ADMIN ? t('super_admin') : user?.role === UserRole.ADMIN ? t('admin') : user?.role === UserRole.STORE_OWNER ? t('store_owner') : user?.role === UserRole.CUSTOMER ? t('customer') : user?.role === UserRole.EMPLOYEE ? t('employee') : user?.role}
+              </div>
+              <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] truncate">
+                {getRoleLabel()}
+              </div>
+            </div>
+          )}
+
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} />
 
           {/* Admin Links */}
@@ -150,7 +182,7 @@ const DashboardLayout: React.FC = () => {
             </>
           )}
 
-          {/* Store Owner Links */}
+          {/* Store Owner & Employee Links */}
           {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
             <>
               {!collapsed && (
@@ -161,22 +193,57 @@ const DashboardLayout: React.FC = () => {
                   {t('management')}
                 </div>
               )}
-              <SidebarItem to="/products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
-              <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
-              <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
-              <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
-              <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
-              <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
-              <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
-              <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
-              <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
+              {(hasPermission(Permissions.PRODUCTS_CREATE) || hasPermission(Permissions.PRODUCTS_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
+                <SidebarItem to="/products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
+              )}
+              {(hasPermission(Permissions.CATEGORIES_CREATE) || hasPermission(Permissions.CATEGORIES_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
+                <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
+              )}
+              {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
+                <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
+              )}
+              {hasPermission(Permissions.STORE_VIEW) && ( // Assuming feedback is store view? Or we need feedback perm
+                <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
+              )}
+              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && (
+                <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
+              )}
+              {hasPermission(Permissions.USERS_VIEW) && ( // View customers?
+                <>
+                  <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
+                  <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
+                </>
+              )}
+              {hasPermission(Permissions.SETTINGS_VIEW) && (
+                <>
+                  <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
+                  <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
+                </>
+              )}
+
+              {!collapsed && (
+                <div className={clsx(
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]",
+                  isRTL ? "text-right" : "text-left"
+                )}>
+                  {t('team')}
+                </div>
+              )}
+              {hasPermission(Permissions.EMPLOYEES_VIEW) && (
+                <SidebarItem to="/employees" icon={Users} label={t('employees')} collapsed={collapsed} />
+              )}
+              {hasPermission(Permissions.ROLES_MANAGE) && (
+                <SidebarItem to="/roles" icon={Shield} label={t('roles')} collapsed={collapsed} />
+              )}
             </>
           )}
 
 
 
           <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
-          <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
+          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
+            <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
+          )}
         </nav>
 
         <div className="p-4 border-t border-slate-100 dark:border-slate-800">
@@ -240,7 +307,7 @@ const DashboardLayout: React.FC = () => {
             >
               <div className={clsx("flex flex-col items-end hidden xs:flex", isRTL ? "ml-2 text-left" : "mr-2 text-right")}>
                 <span className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tighter">
-                  {user?.role === UserRole.SUPER_ADMIN ? t('administrator') : user?.role === UserRole.STORE_OWNER ? t('storeOwner') : user?.role}
+                  {getRoleLabel()}
                 </span>
                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{user?.role === UserRole.SUPER_ADMIN ? t('superControl') : t('dashboard')}</span>
               </div>
@@ -250,6 +317,7 @@ const DashboardLayout: React.FC = () => {
             </div>
           </div>
         </header>
+
 
         <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative z-10 custom-scrollbar transition-colors">
           <div className="max-w-[1600px] mx-auto">

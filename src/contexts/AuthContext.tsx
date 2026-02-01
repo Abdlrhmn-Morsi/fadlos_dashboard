@@ -13,6 +13,11 @@ interface User {
     store?: any;
     isActive?: boolean;
     isEmailVerified?: boolean;
+    employeeRole?: {
+        id: string;
+        name: string;
+        permissions: string[];
+    };
 }
 
 interface AuthContextType {
@@ -22,6 +27,7 @@ interface AuthContextType {
     login: (user: User) => void;
     logout: () => Promise<void>;
     refreshProfile: () => Promise<void>;
+    hasPermission: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -29,6 +35,22 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+
+    const hasPermission = useCallback((permission: string): boolean => {
+        if (!user) return false;
+
+        // Super admins and Store Owners have all permissions in their scope
+        if (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === UserRole.STORE_OWNER) {
+            return true;
+        }
+
+        // Employees check their role permissions
+        if (user.role === UserRole.EMPLOYEE) {
+            return user.employeeRole?.permissions?.includes(permission) || false;
+        }
+
+        return false;
+    }, [user]);
 
     const refreshProfile = useCallback(async () => {
         try {
@@ -72,7 +94,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isLoading,
             login,
             logout,
-            refreshProfile
+            refreshProfile,
+            hasPermission
         }}>
             {children}
         </AuthContext.Provider>

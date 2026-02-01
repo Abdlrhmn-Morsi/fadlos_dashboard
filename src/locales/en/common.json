@@ -1,5 +1,6 @@
 {
     "dashboard": "Dashboard",
+    "welcome": "Welcome",
     "users": "System Users",
     "stores": "Stores",
     "cities": "Cities",
@@ -23,6 +24,8 @@
     "errorUpdatingData": "Error updating data",
     "errorFetchingData": "Error fetching data",
     "success": "Success",
+    "emailAlreadyExists": "This email is already in use by another user.",
+    "phoneAlreadyExists": "This phone number is already in use by another user.",
     "email": "Email Address",
     "phone": "Phone Number",
     "actions": "Actions",
@@ -106,5 +109,223 @@
     "notificationsTitle": "Notifications",
     "loadEarlierNotifications": "Load earlier notifications",
     "newest": "Newest",
-    "completeStoreInfo": "please complete user store info"
+    "completeStoreInfo": "please complete user store info",
+    "team": "Team Members",
+    "roles": "Roles",
+    "employees": "Employees",
+    "addRole": "Add Role",
+    "roleName": "Role Name",
+    "description": "Description",
+    "permissionsTitle": "Permissions",
+    "manageRolesDesc": "Manage roles and permissions",
+    "noRolesFound": "No roles found",
+    "createRole": "Create Role",
+    "editRole": "Edit Role",
+    "roleDetails": "Role Details",
+    "selected": "Selected",
+    "manageEmployeesDesc": "Manage store staff and their access",
+    "addEmployee": "Add Employee",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "employee": "Employee",
+    "contact": "Contact",
+    "role": "Role",
+    "selectRole": "Select Role",
+    "password": "Password",
+    "accountAccess": "Account Access",
+    "activeStatus": "Active Status",
+    "createEmployee": "Create Employee",
+    "editEmployee": "Edit Employee",
+    "deleteRole": "Delete Role",
+    "deleteRoleConfirmation": "Are you sure you want to delete this role?",
+    "deleteEmployee": "Delete Employee",
+    "deleteEmployeeConfirmation": "Are you sure you want to delete this employee?",
+    "activateEmployee": "Activate Employee",
+    "deactivateEmployee": "Deactivate Employee",
+    "deactivate": "Deactivate",
+    "toggleEmployeeStatusConfirmation": "Are you sure you want to change this employee's status?",
+    "employeeActiveDesc": "Allow access to dashboard",
+    "roleActiveDesc": "Enable this role",
+    "super_admin": "Super Admin",
+    "admin": "Admin",
+    "store_owner": "Store Owner",
+    "customer": "Customer",
+    "roleNamePlaceholder": "e.g. Manager",
+    "roleDescriptionPlaceholder": "Description of the role",
+    "permissionsCount": "permissions",
+    "Store Management": "Store Management",
+    "User Management": "User Management",
+    "Employee Management": "Employee Management",
+    "Product Management": "Product Management",
+    "Category Management": "Category Management",
+    "Order Management": "Order Management",
+    "Analytics": "Analytics",
+    "Settings": "Settings",
+    "Promo Codes": "Promo Codes",
+    "Variants": "Variants",
+    "searchEmployeePlaceholder": "Search by name or email...",
+    "activate": "Activate",
+    "leaveBlankToKeepCurrent": "Leave blank to keep current",
+    "searchPlaceholder": "Search...",
+    "personalInfo": "Personal Information",
+    "permissions": {
+        "store": {
+            "view": {
+                "name": "View Store Info",
+                "description": "View basic store information and settings"
+            },
+            "update": {
+                "name": "Update Store Info",
+                "description": "Modify store details and configuration"
+            }
+        },
+        "users": {
+            "view": {
+                "name": "View Users",
+                "description": "View store staff and their details"
+            },
+            "create": {
+                "name": "Invite Users",
+                "description": "Invite new staff members to the store"
+            },
+            "update": {
+                "name": "Update Users",
+                "description": "Modify user details and roles"
+            },
+            "delete": {
+                "name": "Remove Users",
+                "description": "Remove staff members from the store"
+            }
+        },
+        "employees": {
+            "view": {
+                "name": "View Employees",
+                "description": "View employee information and schedules"
+            },
+            "create": {
+                "name": "Create Employees",
+                "description": "Add new employees to the system"
+            },
+            "update": {
+                "name": "Update Employees",
+                "description": "Modify employee information and schedules"
+            },
+            "delete": {
+                "name": "Delete Employees",
+                "description": "Remove employees from the system"
+            }
+        },
+        "products": {
+            "view": {
+                "name": "View Products",
+                "description": "Browse product catalog and inventory"
+            },
+            "create": {
+                "name": "Create Products",
+                "description": "Add new products to the catalog"
+            },
+            "update": {
+                "name": "Update Products",
+                "description": "Modify existing product information"
+            },
+            "delete": {
+                "name": "Delete Products",
+                "description": "Remove products from the catalog"
+            }
+        },
+        "categories": {
+            "view": {
+                "name": "View Categories",
+                "description": "Browse product categories and hierarchy"
+            },
+            "create": {
+                "name": "Create Categories",
+                "description": "Add new product categories"
+            },
+            "update": {
+                "name": "Update Categories",
+                "description": "Modify existing categories and their structure"
+            },
+            "delete": {
+                "name": "Delete Categories",
+                "description": "Remove categories from the system"
+            }
+        },
+        "orders": {
+            "view": {
+                "name": "View Orders",
+                "description": "View customer orders and order history"
+            },
+            "update": {
+                "name": "Update Order Status",
+                "description": "Change order status and fulfillment details"
+            },
+            "cancel": {
+                "name": "Cancel Orders",
+                "description": "Cancel customer orders when necessary"
+            }
+        },
+        "analytics": {
+            "view": {
+                "name": "View Analytics",
+                "description": "Access sales reports and performance metrics"
+            },
+            "export": {
+                "name": "Export Data",
+                "description": "Export analytics data and reports"
+            }
+        },
+        "settings": {
+            "view": {
+                "name": "View Settings",
+                "description": "View store configuration and preferences"
+            },
+            "update": {
+                "name": "Update Settings",
+                "description": "Modify store settings and preferences"
+            }
+        },
+        "roles": {
+            "manage": {
+                "name": "Manage Roles",
+                "description": "Create, edit, and delete user roles"
+            }
+        },
+        "promo_codes": {
+            "view": {
+                "name": "View Promo Codes",
+                "description": "View available promotion codes"
+            },
+            "create": {
+                "name": "Create Promo Codes",
+                "description": "Add new promotion codes"
+            },
+            "update": {
+                "name": "Update Promo Codes",
+                "description": "Modify existing promotion codes"
+            },
+            "delete": {
+                "name": "Delete Promo Codes",
+                "description": "Remove promotion codes"
+            }
+        },
+        "variants": {
+            "view": {
+                "name": "View Variants",
+                "description": "View product variants and options"
+            },
+            "create": {
+                "name": "Create Variants",
+                "description": "Add new product variants"
+            },
+            "update": {
+                "name": "Update Variants",
+                "description": "Modify existing product variants"
+            },
+            "delete": {
+                "name": "Delete Variants",
+                "description": "Remove product variants"
+            }
+        }
+    }
 }

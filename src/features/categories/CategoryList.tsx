@@ -7,11 +7,14 @@ import { toast } from '../../utils/toast';
 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 
 const CategoryList = () => {
     const { t } = useTranslation(['categories', 'common']);
     const { isRTL } = useLanguage();
+    const { hasPermission } = useAuth();
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -85,13 +88,15 @@ const CategoryList = () => {
                         {t('subtitle')}
                     </p>
                 </div>
-                <button
-                    onClick={handleAdd}
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                >
-                    <Plus size={20} />
-                    <span>{t('addCategory')}</span>
-                </button>
+                {hasPermission(Permissions.CATEGORIES_CREATE) && (
+                    <button
+                        onClick={handleAdd}
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                    >
+                        <Plus size={20} />
+                        <span>{t('addCategory')}</span>
+                    </button>
+                )}
             </div>
 
             {/* Search and Filter Bar */}
@@ -181,20 +186,24 @@ const CategoryList = () => {
                                         </td>
                                         <td className="px-6 py-4 text-end">
                                             <div className="flex items-center gap-2 transition-opacity duration-200 justify-end">
-                                                <button
-                                                    onClick={() => handleEdit(category)}
-                                                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                    title={t('common:edit')}
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDeleteClick(category.id)}
-                                                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
-                                                    title={t('common:delete')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                {hasPermission(Permissions.CATEGORIES_UPDATE) && (
+                                                    <button
+                                                        onClick={() => handleEdit(category)}
+                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                        title={t('common:edit')}
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                )}
+                                                {hasPermission(Permissions.CATEGORIES_DELETE) && (
+                                                    <button
+                                                        onClick={() => handleDeleteClick(category.id)}
+                                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                        title={t('common:delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

@@ -31,7 +31,7 @@ const Settings = () => {
             path: '/store-settings',
             color: 'text-primary',
             bgColor: 'bg-primary-light',
-            visible: isSeller
+            visible: isSeller && (user?.role === UserRole.STORE_OWNER || (user?.role === UserRole.EMPLOYEE && user?.employeeRole?.permissions?.includes('store.view')))
         },
         {
             id: 'profile',

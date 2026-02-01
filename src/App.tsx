@@ -30,11 +30,16 @@ import { BranchesList } from './features/branches/BranchesList';
 import AppUpdateSettings from './features/settings/AppUpdateSettings';
 import AppVersionHistory from './features/settings/AppVersionHistory';
 import { NotificationPage } from './features/notification/pages/NotificationPage';
+import RolesList from './features/roles/components/RolesList';
+import RoleForm from './features/roles/components/RoleForm';
+import EmployeesList from './features/employees/components/EmployeesList';
+import EmployeeForm from './features/employees/components/EmployeeForm';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
 import { NotificationProvider } from './features/notification/context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { Permissions } from './types/permissions';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -49,6 +54,18 @@ const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
   return <Outlet />;
+};
+
+const PermissionGate = ({ permission, children }: { permission: string, children: React.ReactNode }) => {
+  const { hasPermission, isLoading } = useAuth();
+
+  if (isLoading) return null;
+
+  if (!hasPermission(permission)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
 };
 
 const AppContent = () => {
@@ -66,26 +83,26 @@ const AppContent = () => {
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
 
-            {/* Store Owner Routes */}
+            {/* Store Owner & Employee Routes */}
             <Route path="products" element={<ProductList />} />
-            <Route path="products/new" element={<ProductForm />} />
-            <Route path="products/edit/:id" element={<ProductForm />} />
+            <Route path="products/new" element={<PermissionGate permission={Permissions.PRODUCTS_CREATE}><ProductForm /></PermissionGate>} />
+            <Route path="products/edit/:id" element={<PermissionGate permission={Permissions.PRODUCTS_UPDATE}><ProductForm /></PermissionGate>} />
 
             <Route path="categories" element={<CategoryList />} />
 
-            <Route path="orders" element={<OrderList />} />
-            <Route path="orders/:id" element={<OrderDetail />} />
+            <Route path="orders" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderList /></PermissionGate>} />
+            <Route path="orders/:id" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderDetail /></PermissionGate>} />
 
-            <Route path="promocodes" element={<PromoCodeList />} />
-            <Route path="promocodes/new" element={<PromoCodeForm />} />
-            <Route path="promocodes/edit/:id" element={<PromoCodeForm />} />
+            <Route path="promocodes" element={<PermissionGate permission={Permissions.PROMO_CODES_VIEW}><PromoCodeList /></PermissionGate>} />
+            <Route path="promocodes/new" element={<PermissionGate permission={Permissions.PROMO_CODES_CREATE}><PromoCodeForm /></PermissionGate>} />
+            <Route path="promocodes/edit/:id" element={<PermissionGate permission={Permissions.PROMO_CODES_UPDATE}><PromoCodeForm /></PermissionGate>} />
 
-            <Route path="reviews" element={<ReviewList />} />
+            <Route path="reviews" element={<PermissionGate permission={Permissions.STORE_VIEW}><ReviewList /></PermissionGate>} />
 
-            <Route path="clients" element={<ClientList />} />
-            <Route path="followers" element={<FollowerList />} />
-            <Route path="delivery-areas" element={<DeliveryAreasPage />} />
-            <Route path="branches" element={<BranchesList />} />
+            <Route path="clients" element={<PermissionGate permission={Permissions.USERS_VIEW}><ClientList /></PermissionGate>} />
+            <Route path="followers" element={<PermissionGate permission={Permissions.USERS_VIEW}><FollowerList /></PermissionGate>} />
+            <Route path="delivery-areas" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><DeliveryAreasPage /></PermissionGate>} />
+            <Route path="branches" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><BranchesList /></PermissionGate>} />
 
             {/* Admin Routes */}
             <Route path="users" element={<Users />} />
@@ -94,12 +111,21 @@ const AppContent = () => {
             <Route path="towns" element={<Towns />} />
             <Route path="business-types" element={<BusinessTypes />} />
 
-            <Route path="store-settings" element={<StoreSettings />} />
+            <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
             <Route path="profile-settings" element={<ProfileSettings />} />
             <Route path="settings" element={<Settings />} />
             <Route path="app-updates" element={<AppUpdateSettings />} />
             <Route path="app-version-history" element={<AppVersionHistory />} />
             <Route path="notifications" element={<NotificationPage />} />
+
+            {/* Team Management Routes */}
+            <Route path="roles" element={<PermissionGate permission={Permissions.ROLES_MANAGE}><RolesList /></PermissionGate>} />
+            <Route path="roles/new" element={<PermissionGate permission={Permissions.ROLES_MANAGE}><RoleForm /></PermissionGate>} />
+            <Route path="roles/edit/:id" element={<PermissionGate permission={Permissions.ROLES_MANAGE}><RoleForm /></PermissionGate>} />
+
+            <Route path="employees" element={<PermissionGate permission={Permissions.EMPLOYEES_VIEW}><EmployeesList /></PermissionGate>} />
+            <Route path="employees/new" element={<PermissionGate permission={Permissions.EMPLOYEES_CREATE}><EmployeeForm /></PermissionGate>} />
+            <Route path="employees/edit/:id" element={<PermissionGate permission={Permissions.EMPLOYEES_UPDATE}><EmployeeForm /></PermissionGate>} />
 
             {/* Redirect unknown to dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />
