@@ -81,5 +81,9 @@
     "available": "متوفر",
     "categoryCreated": "تم إنشاء التصنيف! يمكنك الآن اختياره.",
     "saveSuccess": "تم حفظ المنتج بنجاح",
-    "updateSuccess": "تم تحديث المنتج بنجاح"
+    "updateSuccess": "تم تحديث المنتج بنجاح",
+    "frequentlyBoughtTogether": "غالباً ما يتم شراؤها معاً",
+    "searchRelatedProducts": "البحث عن المنتجات ذات الصلة...",
+    "noRelatedProductsFound": "لم يتم العثور على منتجات ذات صلة",
+    "loadingProducts": "جاري تحميل المنتجات..."
 }

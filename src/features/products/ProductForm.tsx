@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
     ArrowLeft, Upload, Save, Image as ImageIcon,
     Box, DollarSign, Layers, Globe, RefreshCcw,
-    Loader2, Trash2, Plus, X
+    Loader2, Trash2, Plus, X, Search, CheckCircle2
 } from 'lucide-react';
 import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
@@ -80,8 +80,13 @@ const ProductForm = () => {
         isActive: true,
         isOffer: false,
         sortOrder: '0',
-        variants: [] as Variant[]
+        variants: [] as Variant[],
+        relatedProductIds: [] as string[]
     });
+
+    const [allProducts, setAllProducts] = useState<any[]>([]);
+    const [searchingProducts, setSearchingProducts] = useState(false);
+    const [relatedSearchTerm, setRelatedSearchTerm] = useState('');
 
     // Media State
     const [currCoverImage, setCurrCoverImage] = useState<string | null>(null);
@@ -94,10 +99,25 @@ const ProductForm = () => {
 
     useEffect(() => {
         fetchCategories();
+        fetchAllProductsForSelection();
         if (isEditMode) {
             fetchProduct();
         }
     }, [id]);
+
+    const fetchAllProductsForSelection = async () => {
+        try {
+            setSearchingProducts(true);
+            const res: any = await productsApi.getSellerProducts({ limit: 100 });
+            // Filter out current product from selection if editing
+            const list = (res.data || []).filter((p: any) => p.id !== id);
+            setAllProducts(list);
+        } catch (error) {
+            console.error('Error fetching products for selection', error);
+        } finally {
+            setSearchingProducts(false);
+        }
+    };
 
     const fetchCategories = async (selectNewId?: string) => {
         try {
@@ -148,7 +168,8 @@ const ProductForm = () => {
                         price: String(val.price || 0),
                         sortOrder: String(val.sortOrder || 0)
                     })) : []
-                })) : []
+                })) : [],
+                relatedProductIds: data.relatedProducts ? data.relatedProducts.map((p: any) => p.id) : []
             });
             setCurrCoverImage(data.coverImage);
             setExistingImages(data.images || []);
@@ -259,7 +280,7 @@ const ProductForm = () => {
             // Append basic fields
             console.log('Final FormData state before appending:', formData);
             Object.keys(formData).forEach(key => {
-                if (key === 'variants') return; // Handle manually
+                if (key === 'variants' || key === 'relatedProductIds') return; // Handle manually
                 const value = (formData as any)[key];
                 if (value !== null && value !== undefined && value !== '') {
                     // Start Debug
@@ -317,6 +338,11 @@ const ProductForm = () => {
                     data.append(`variants[${vIdx}][values][${valIdx}][sortOrder]`, val.sortOrder);
                     if (val.id) data.append(`variants[${vIdx}][values][${valIdx}][id]`, val.id);
                 });
+            });
+
+            // Append related product IDs
+            formData.relatedProductIds.forEach((prodId, idx) => {
+                data.append(`relatedProductIds[${idx}]`, prodId);
             });
 
 
@@ -702,6 +728,85 @@ const ProductForm = () => {
                                     )}
                                 </div>
                             </InputGroup>
+                        </div>
+
+                        {/* Frequently Bought Together Section */}
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-indigo-500" />
+                                {t('frequentlyBoughtTogether')}
+                            </h2>
+
+                            <div className="space-y-4">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder={t('searchRelatedProducts')}
+                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        value={relatedSearchTerm}
+                                        onChange={(e) => setRelatedSearchTerm(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-1">
+                                    {allProducts
+                                        .filter(p => {
+                                            const name = (isRTL ? p.nameAr : p.name) || p.name || '';
+                                            return name.toLowerCase().includes(relatedSearchTerm.toLowerCase());
+                                        })
+                                        .map(p => {
+                                            const isSelected = formData.relatedProductIds.includes(p.id);
+                                            return (
+                                                <div
+                                                    key={p.id}
+                                                    onClick={() => {
+                                                        const newIds = isSelected
+                                                            ? formData.relatedProductIds.filter(id => id !== p.id)
+                                                            : [...formData.relatedProductIds, p.id];
+                                                        setFormData({ ...formData, relatedProductIds: newIds });
+                                                    }}
+                                                    className={clsx(
+                                                        "relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer group",
+                                                        isSelected
+                                                            ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
+                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300"
+                                                    )}
+                                                >
+                                                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
+                                                        {p.coverImage ? (
+                                                            <img src={p.coverImage} className="w-full h-full object-cover" alt="" />
+                                                        ) : (
+                                                            <ImageIcon className="w-6 h-6 absolute inset-0 m-auto text-slate-300" />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                                            {isRTL ? (p.nameAr || p.name) : p.name}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                            {p.price} {t('common:currencySymbol', { defaultValue: 'LE' })}
+                                                        </p>
+                                                    </div>
+                                                    {isSelected && (
+                                                        <CheckCircle2 className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    {searchingProducts && (
+                                        <div className="col-span-full py-8 flex flex-col items-center justify-center gap-2 text-slate-400">
+                                            <Loader2 className="w-6 h-6 animate-spin" />
+                                            <span className="text-xs">{t('loadingProducts')}</span>
+                                        </div>
+                                    )}
+                                    {!searchingProducts && allProducts.length === 0 && (
+                                        <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
+                                            {t('noRelatedProductsFound')}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
 
