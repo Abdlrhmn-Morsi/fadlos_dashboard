@@ -7,12 +7,14 @@ import { ConfirmModal } from '../../../components/ConfirmModal';
 import { toast } from '../../../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
 import { Role } from '../models/role.model';
 
 const RolesList = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -24,9 +26,50 @@ const RolesList = () => {
         fetchRoles();
     }, []);
 
+    // Refetch data when component becomes visible (e.g., navigating back from form)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                fetchRoles();
+            }
+        };
+
+        const handleFocus = () => {
+            fetchRoles();
+        };
+
+        // Listen for visibility changes and window focus
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []);
+
     const fetchRoles = async () => {
         try {
             setLoading(true);
+
+            // Check cache first
+            const cacheKey = 'roles';
+            const cachedData = getCache<any>(cacheKey);
+            if (cachedData) {
+                let rolesData: Role[] = [];
+                const rawData = cachedData.data || cachedData;
+
+                if (Array.isArray(rawData)) {
+                    rolesData = rawData;
+                } else if (rawData && Array.isArray(rawData.data)) {
+                    rolesData = rawData.data;
+                }
+
+                setRoles(rolesData);
+                setLoading(false);
+                return;
+            }
+
             const response = await RolesService.getRoles();
             let rolesData: Role[] = [];
 
@@ -41,6 +84,8 @@ const RolesList = () => {
             }
 
             setRoles(rolesData);
+            // Cache the response
+            setCache(cacheKey, response);
         } catch (error) {
             console.error('Failed to fetch roles', error);
             toast.error(t('errorFetchingData'));
@@ -59,10 +104,22 @@ const RolesList = () => {
         try {
             await RolesService.deleteRole(deleteId);
             toast.success(t('success'));
-            fetchRoles();
+
+            // Immediately remove from local state for better UX
+            setRoles(prevRoles => prevRoles.filter(role => role.id !== deleteId));
+
+            // Invalidate cache after delete
+            invalidateCache('roles');
+
+            // Small delay to ensure cache invalidation completes
+            setTimeout(() => {
+                fetchRoles();
+            }, 100);
         } catch (error) {
             console.error('Failed to delete role', error);
             toast.error(t('error'));
+            // Refetch on error to restore correct state
+            fetchRoles();
         } finally {
             setConfirmOpen(false);
             setDeleteId(null);

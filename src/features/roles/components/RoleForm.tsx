@@ -5,12 +5,14 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, Shield, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
 import { RolesService } from '../api/roles.api';
 import { PermissionGroup } from '../../../types/permission';
 
 const RoleForm = () => {
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
+    const { invalidateCache } = useCache();
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
@@ -110,6 +112,10 @@ const RoleForm = () => {
                 await RolesService.createRole(formData);
                 toast.success(t('success'));
             }
+
+            // Invalidate roles cache to refresh the list
+            invalidateCache('roles');
+
             navigate('/roles');
         } catch (error: any) {
             console.error('Failed to save role', error);

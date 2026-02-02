@@ -85,5 +85,6 @@
     "frequentlyBoughtTogether": "Frequently Bought Together",
     "searchRelatedProducts": "Search related products...",
     "noRelatedProductsFound": "No related products found",
-    "loadingProducts": "Loading products..."
+    "loadingProducts": "Loading products...",
+    "comparePriceError": "Compare price must be greater than the regular price"
 }

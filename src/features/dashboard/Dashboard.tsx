@@ -24,6 +24,7 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 
 interface StatCardProps {
@@ -68,6 +69,7 @@ const Dashboard: React.FC = () => {
     const [error, setError] = useRecoilState(dashboardErrorState);
     const [chartData, setChartData] = useRecoilState(dashboardChartDataState);
     const [storeDetails, setStoreDetails] = useState<any>(null);
+    const { getCache, setCache } = useCache();
 
     const { user, hasPermission } = useAuth();
 
@@ -76,22 +78,52 @@ const Dashboard: React.FC = () => {
             if (!user) return; // Add check
             setLoading(true);
             try {
+                // Create cache key based on user role for better cache management
+                const dashboardCacheKey = `dashboard-stats-${user.role}`;
+                const storeCacheKey = 'store-details';
 
-                const dashboardData = await fetchDashboardStats(user);
-                setStats(dashboardData);
+                // Check cache for dashboard stats
+                const cachedStats = getCache<any>(dashboardCacheKey);
+                if (cachedStats) {
+                    setStats(cachedStats);
 
-                // Update chart data
-                setChartData([
-                    { name: t('week', { number: 1 }), revenue: (dashboardData.totalRevenue || 0) * 0.1 },
-                    { name: t('week', { number: 2 }), revenue: (dashboardData.totalRevenue || 0) * 0.2 },
-                    { name: t('week', { number: 3 }), revenue: (dashboardData.totalRevenue || 0) * 0.3 },
-                    { name: t('week', { number: 4 }), revenue: (dashboardData.totalRevenue || 0) * 0.4 },
-                ]);
+                    // Update chart data from cached stats
+                    setChartData([
+                        { name: t('week', { number: 1 }), revenue: (cachedStats.totalRevenue || 0) * 0.1 },
+                        { name: t('week', { number: 2 }), revenue: (cachedStats.totalRevenue || 0) * 0.2 },
+                        { name: t('week', { number: 3 }), revenue: (cachedStats.totalRevenue || 0) * 0.3 },
+                        { name: t('week', { number: 4 }), revenue: (cachedStats.totalRevenue || 0) * 0.4 },
+                    ]);
+                } else {
+                    // Fetch from API if not cached
+                    const dashboardData = await fetchDashboardStats(user);
+                    setStats(dashboardData);
+
+                    // Update chart data
+                    setChartData([
+                        { name: t('week', { number: 1 }), revenue: (dashboardData.totalRevenue || 0) * 0.1 },
+                        { name: t('week', { number: 2 }), revenue: (dashboardData.totalRevenue || 0) * 0.2 },
+                        { name: t('week', { number: 3 }), revenue: (dashboardData.totalRevenue || 0) * 0.3 },
+                        { name: t('week', { number: 4 }), revenue: (dashboardData.totalRevenue || 0) * 0.4 },
+                    ]);
+
+                    // Cache the dashboard stats
+                    setCache(dashboardCacheKey, dashboardData);
+                }
 
                 // Fetch store details for sellers
                 if (user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) {
-                    const storeData = await getMyStore();
-                    setStoreDetails(storeData);
+                    // Check cache for store details
+                    const cachedStore = getCache<any>(storeCacheKey);
+                    if (cachedStore) {
+                        setStoreDetails(cachedStore);
+                    } else {
+                        const storeData = await getMyStore();
+                        setStoreDetails(storeData);
+
+                        // Cache store details
+                        setCache(storeCacheKey, storeData);
+                    }
                 }
 
                 setError(null);
@@ -104,7 +136,7 @@ const Dashboard: React.FC = () => {
         };
 
         loadDashboardData();
-    }, [setStats, setLoading, setError, setChartData, user, t]); // Add user and t to deps
+    }, [setStats, setLoading, setError, setChartData, user, t, getCache, setCache]); // Add cache methods to deps
 
     // Dynamic Chart Colors
     const gridColor = isDark ? '#334155' : '#f1f5f9'; // slate-700 : slate-100

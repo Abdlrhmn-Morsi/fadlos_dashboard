@@ -4,6 +4,7 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Save, User, Key, Mail, Phone, Shield } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
 import clsx from 'clsx';
 import { EmployeesService } from '../api/employees.api';
 import { RolesService } from '../../roles/api/roles.api';
@@ -12,6 +13,7 @@ import { Role } from '../../roles/models/role.model';
 const EmployeeForm = () => {
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
+    const { invalidateCache } = useCache();
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
@@ -109,6 +111,10 @@ const EmployeeForm = () => {
                 await EmployeesService.createEmployee(formData);
                 toast.success(t('success'));
             }
+
+            // Invalidate employees cache to refresh the list
+            invalidateCache('employees');
+
             navigate('/employees');
         } catch (error: any) {
             console.error('Failed to save employee', error);

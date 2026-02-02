@@ -8,6 +8,7 @@ import { toast } from '../../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 
@@ -15,6 +16,7 @@ const CategoryList = () => {
     const { t } = useTranslation(['categories', 'common']);
     const { isRTL } = useLanguage();
     const { hasPermission } = useAuth();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -29,11 +31,47 @@ const CategoryList = () => {
         fetchCategories();
     }, []);
 
+    // Refetch data when component becomes visible (e.g., navigating back from modal)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                fetchCategories();
+            }
+        };
+
+        const handleFocus = () => {
+            fetchCategories();
+        };
+
+        // Listen for visibility changes and window focus
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []);
+
     const fetchCategories = async () => {
         try {
             setLoading(true);
+
+            // Check cache first
+            const cachedCategories = getCache<any>('categories');
+            if (cachedCategories) {
+                setCategories(cachedCategories.data || cachedCategories);
+                setLoading(false);
+                return;
+            }
+
+            // Fetch from API if not cached
             const data: any = await categoriesApi.getSellerCategories();
-            setCategories(data.data || []);
+            const categoriesData = data.data || [];
+            setCategories(categoriesData);
+
+            // Cache the data
+            setCache('categories', categoriesData);
         } catch (error) {
             console.error('Failed to fetch categories', error);
             toast.error(t('loadFailed'));
@@ -52,6 +90,10 @@ const CategoryList = () => {
         try {
             await categoriesApi.deleteCategory(deleteId);
             toast.success(t('deleteSuccess'));
+
+            // Invalidate cache to force refresh
+            invalidateCache('categories');
+
             fetchCategories();
         } catch (error) {
             console.error('Failed to delete category', error);
@@ -221,6 +263,10 @@ const CategoryList = () => {
                     onClose={() => setIsModalOpen(false)}
                     onSuccess={() => {
                         setIsModalOpen(false);
+
+                        // Invalidate cache to force refresh
+                        invalidateCache('categories');
+
                         fetchCategories();
                         toast.success(editingCategory ? t('saveSuccess') : t('saveSuccess'));
                     }}

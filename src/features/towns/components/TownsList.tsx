@@ -29,11 +29,13 @@ import { getCities } from '../../cities/api/cities.api';
 import StatusModal from '../../../components/common/StatusModal';
 import Modal from '../../../components/common/Modal';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
 import clsx from 'clsx';
 
 const TownsList = () => {
     const { t } = useTranslation(['towns', 'common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [towns, setTowns] = useRecoilState(townsState);
     const [cities, setCities] = useRecoilState(citiesState);
     const [loading, setLoading] = useRecoilState(townsLoadingState);
@@ -42,7 +44,7 @@ const TownsList = () => {
     const [modal, setModal] = useRecoilState(townModalState);
     const [statusModal, setStatusModal] = useRecoilState(townStatusModalState);
 
-    const openStatus = (type: any, title: string, message: string, onConfirm: any = null) => {
+    const openStatus = (type: 'success' | 'error' | 'confirm', title: string, message: string, onConfirm?: () => void) => {
         setStatusModal({ isOpen: true, type, title, message, onConfirm });
     };
 
@@ -53,12 +55,30 @@ const TownsList = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
+            // Check cache for towns
+            const townsCacheKey = 'towns';
+            const citiesCacheKey = 'cities';
+
+            const cachedTowns = getCache<any>(townsCacheKey);
+            const cachedCities = getCache<any>(citiesCacheKey);
+
+            if (cachedTowns && cachedCities) {
+                setTowns(Array.isArray(cachedTowns) ? cachedTowns : []);
+                setCities(Array.isArray(cachedCities) ? cachedCities : []);
+                setLoading(false);
+                return;
+            }
+
             const [townsData, citiesData] = await Promise.all([
                 getTowns({ includeAll: true }),
                 getCities({ includeAll: true })
             ]);
             setTowns(townsData);
             setCities(citiesData);
+
+            // Cache the responses
+            setCache(townsCacheKey, townsData);
+            setCache(citiesCacheKey, citiesData);
         } catch (error) {
             console.error('Failed to fetch data:', error);
         } finally {
@@ -86,6 +106,8 @@ const TownsList = () => {
                 await createTown(townData);
             }
             setModal((prev: any) => ({ ...prev, isOpen: false }));
+            // Invalidate cache after create/update
+            invalidateCache('towns');
             fetchData();
             openStatus('success', t('common:success'), modal.isEditing ? t('updatedSuccess') : t('createdSuccess'));
         } catch (error: any) {
@@ -101,6 +123,8 @@ const TownsList = () => {
             async () => {
                 try {
                     await deleteTown(id);
+                    // Invalidate cache after delete
+                    invalidateCache('towns');
                     fetchData();
                     openStatus('success', t('common:success'), t('deletedSuccess'));
                 } catch (error: any) {
@@ -113,6 +137,8 @@ const TownsList = () => {
     const handleToggleStatus = async (town: any) => {
         try {
             await toggleTownStatus(town.id, town.isActive);
+            // Invalidate cache after status toggle
+            invalidateCache('towns');
             fetchData();
             openStatus('success', t('statusUpdated'), t('statusUpdateMessage', { status: town.isActive ? t('deactivated') : t('activated') }));
         } catch (error: any) {

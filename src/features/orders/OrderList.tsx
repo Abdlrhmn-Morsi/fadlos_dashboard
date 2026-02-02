@@ -6,6 +6,7 @@ import { OrderStatus } from '../../types/order-status';
 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
 
@@ -13,6 +14,7 @@ const OrderList = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache } = useCache();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
@@ -40,6 +42,22 @@ const OrderList = () => {
             };
             if (statusFilter) params.status = statusFilter;
 
+            // Check cache first
+            const cacheKey = 'orders';
+            const cachedData = getCache<any>(cacheKey, params);
+            if (cachedData) {
+                if (cachedData.data && Array.isArray(cachedData.data)) {
+                    setOrders(cachedData.data);
+                    if (cachedData.meta) {
+                        setTotalPages(cachedData.meta.totalPages || 1);
+                    }
+                } else if (Array.isArray(cachedData)) {
+                    setOrders(cachedData);
+                }
+                setLoading(false);
+                return;
+            }
+
             const response: any = await ordersApi.getOrders(params);
 
             // Handle paginated response { data: [...], meta: {...} } or plain array
@@ -48,13 +66,19 @@ const OrderList = () => {
                 if (response.meta) {
                     setTotalPages(response.meta.totalPages || 1);
                 }
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else if (response && typeof response === 'object' && 'orders' in response && Array.isArray(response.orders)) {
                 setOrders(response.orders);
                 if (response.pagination) {
                     setTotalPages(response.pagination.totalPages || 1);
                 }
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else if (Array.isArray(response)) {
                 setOrders(response);
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else {
                 console.warn('Unexpected response format:', response);
                 setOrders([]);

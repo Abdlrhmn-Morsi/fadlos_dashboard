@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState, useCallback, use
 import OneSignal from 'react-onesignal';
 import api from '../../../services/api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { useCache } from '../../../contexts/CacheContext';
 import { toast } from '../../../utils/toast';
 import { useTranslation } from 'react-i18next';
 
@@ -41,6 +42,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const initialized = useRef(false);
     const { user: authUser } = useAuth(); // Get user from AuthContext
     const { t } = useTranslation(['dashboard', 'common']);
+    const { getCache, setCache, invalidateCache } = useCache();
 
     const fetchUnreadCount = useCallback(async () => {
         try {
@@ -55,16 +57,48 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const fetchNotifications = useCallback(async (page = 1, markAll = false) => {
         setIsLoading(true);
         const params: any = { page, limit: 10 };
-        if (markAll) {
-            params.markAll = true;
-        }
 
         try {
+            // Check cache for first page
+            if (page === 1) {
+                const cacheKey = 'notifications';
+                const cachedData = getCache<Notification[]>(cacheKey, params);
+                if (cachedData && Array.isArray(cachedData)) {
+                    console.log('[Cache] Loading notifications from cache:', cachedData.length);
+                    setNotifications(cachedData);
+                    setIsLoading(false);
+
+                    // If markAll is requested, make a separate API call to mark as seen
+                    if (markAll) {
+                        try {
+                            await api.get('/notifications', { params: { ...params, markAll: true } });
+                            fetchUnreadCount();
+                        } catch (error) {
+                            // Silently handle
+                        }
+                    } else {
+                        fetchUnreadCount();
+                    }
+                    return;
+                }
+                console.log('[Cache] No cached notifications found');
+            }
+
+            console.log('[API] Fetching notifications from API');
+
+            // Add markAll to params if needed
+            if (markAll) {
+                params.markAll = true;
+            }
+
             const response = await api.get('/notifications', { params });
             const newNotifications = response.data.data?.data || response.data.data || [];
 
             if (page === 1) {
                 setNotifications(Array.isArray(newNotifications) ? newNotifications : []);
+                // Always cache first page (without markAll in the cache key)
+                const cacheParams = { page, limit: 10 };
+                setCache('notifications', newNotifications, cacheParams);
             } else {
                 setNotifications(prev => [...prev, ...(Array.isArray(newNotifications) ? newNotifications : [])]);
             }
@@ -74,7 +108,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         } finally {
             setIsLoading(false);
         }
-    }, [fetchUnreadCount]);
+    }, [fetchUnreadCount, getCache, setCache]);
 
     const playNotificationSound = (soundPath = '/notification_sound.mp3') => {
         try {
@@ -101,6 +135,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                 prev.map(n => n.id === id ? { ...n, isRead: true } : n)
             );
             setUnreadCount(prev => Math.max(0, prev - 1));
+            // Invalidate cache when marking as read
+            invalidateCache('notifications');
         } catch (error) {
             // Silently handle
         }
@@ -111,6 +147,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             await api.patch('/notifications/mark-all-read');
             setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
             setUnreadCount(0);
+            // Invalidate cache when marking all as read
+            invalidateCache('notifications');
         } catch (error) {
             // Silently handle
         }
@@ -189,6 +227,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     }
 
                     playNotificationSound(soundToPlay);
+                    // Invalidate cache when new notification arrives
+                    invalidateCache('notifications');
                     fetchUnreadCount();
                     fetchNotifications(1);
                 });

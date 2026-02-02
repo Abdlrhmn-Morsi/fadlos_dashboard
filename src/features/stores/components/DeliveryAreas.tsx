@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
 import { getCities } from '../../cities/api/cities.api';
 import {
     assignTownToStore,
@@ -30,6 +31,7 @@ import StatusModal from '../../../components/common/StatusModal';
 const DeliveryAreas = () => {
     const { t, i18n } = useTranslation(['stores', 'common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [loading, setLoading] = useState(true);
     const [cities, setCities] = useState<any[]>([]);
     const [deliveryAreas, setDeliveryAreas] = useState<any[]>([]);
@@ -45,12 +47,30 @@ const DeliveryAreas = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
+            // Check cache first
+            const cachedCities = getCache<any[]>('cities', { limit: 1000 });
+            const cachedAreas = getCache<any[]>('delivery-areas');
+
+            if (cachedCities && cachedAreas) {
+                console.log('[Cache] Loading delivery areas and cities from cache');
+                setCities(cachedCities);
+                setDeliveryAreas(cachedAreas);
+                setLoading(false);
+                return;
+            }
+
+            console.log('[API] Fetching delivery areas and cities from API');
             const [allCities, areas] = await Promise.all([
                 getCities({ limit: 1000 }),
                 getMyStoreDeliveryAreas()
             ]);
+
             setCities(allCities);
             setDeliveryAreas(areas);
+
+            // Store in cache
+            setCache('cities', allCities, { limit: 1000 });
+            setCache('delivery-areas', areas);
         } catch (error) {
             console.error('Failed to fetch delivery areas:', error);
             toast.error(t('common:errorFetchingData'));
@@ -72,6 +92,8 @@ const DeliveryAreas = () => {
                 defaultPrice: defaultPrice
             });
             toast.success(t('common:success'));
+            // Invalidate cache after adding new delivery area
+            invalidateCache('delivery-areas');
             fetchData();
             setSelectedCityId('');
             setDefaultPrice(0);
@@ -88,6 +110,8 @@ const DeliveryAreas = () => {
             await updateDeliveryArea(id, { price });
             toast.success(t('common:success'));
             setDeliveryAreas(prev => prev.map(area => area.id === id ? { ...area, price } : area));
+            // Invalidate cache after updating delivery area
+            invalidateCache('delivery-areas');
         } catch (error) {
             console.error('Failed to update price:', error);
             toast.error(t('common:errorUpdatingData'));
@@ -99,6 +123,8 @@ const DeliveryAreas = () => {
             await removeDeliveryArea(id);
             toast.success(t('common:success'));
             setDeliveryAreas(prev => prev.filter(area => area.id !== id));
+            // Invalidate cache after removing delivery area
+            invalidateCache('delivery-areas');
         } catch (error) {
             console.error('Failed to remove delivery area:', error);
             toast.error(t('common:errorUpdatingData'));
@@ -113,6 +139,8 @@ const DeliveryAreas = () => {
             setDeliveryAreas([]);
             setFilterTownId('all');
             setShowResetConfirm(false);
+            // Invalidate cache after resetting all delivery areas
+            invalidateCache('delivery-areas');
         } catch (error) {
             console.error('Failed to reset delivery areas:', error);
             toast.error(t('common:errorUpdatingData'));

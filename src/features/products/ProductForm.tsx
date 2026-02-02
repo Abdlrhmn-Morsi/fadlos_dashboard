@@ -12,6 +12,7 @@ import toolsApi from '../../services/tools.api';
 import CategoryFormModal from '../categories/components/CategoryFormModal';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 
 const InputGroup = ({ label, children, required = false, subtitle = '' }: any) => (
@@ -56,6 +57,7 @@ const generateSKU = (name: string) => {
 const ProductForm = () => {
     const { t } = useTranslation(['products', 'common']);
     const { isRTL } = useLanguage();
+    const { invalidateCache } = useCache();
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
@@ -273,6 +275,13 @@ const ProductForm = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        // Validate comparePrice before submission
+        if (formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0')) {
+            toast.error(t('comparePriceError'));
+            return;
+        }
+
         setSubmitting(true);
         try {
             const data = new FormData();
@@ -370,6 +379,10 @@ const ProductForm = () => {
                 await productsApi.createProduct(data);
                 toast.success(t('saveSuccess'));
             }
+
+            // Invalidate cache to force refresh on product list
+            invalidateCache(['products', 'categories']);
+
             navigate('/products');
         } catch (error: any) {
             console.error('Error saving product', error);
@@ -934,11 +947,22 @@ const ProductForm = () => {
                                         <input
                                             type="number"
                                             step="0.01"
-                                            className="w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all ps-8 pe-4"
+                                            className={clsx(
+                                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all ps-8 pe-4",
+                                                formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0')
+                                                    ? "border-rose-500 focus:border-rose-500"
+                                                    : "border-slate-200 dark:border-slate-700 focus:border-indigo-500"
+                                            )}
                                             value={formData.comparePrice}
                                             onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
                                         />
                                     </div>
+                                    {formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0') && (
+                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
+                                            <X size={12} />
+                                            {t('comparePriceError')}
+                                        </p>
+                                    )}
                                 </InputGroup>
                             </div>
                         </div>

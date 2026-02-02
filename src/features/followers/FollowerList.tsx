@@ -3,6 +3,7 @@ import { User, Loader2, Users, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCache } from '../../contexts/CacheContext';
 import followersApi from './api/followers.api';
 import clsx from 'clsx';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
@@ -11,6 +12,7 @@ const FollowerList = () => {
     const { t } = useTranslation(['followers', 'common']);
     const { isRTL } = useLanguage();
     const { user } = useAuth();
+    const { getCache, setCache } = useCache();
     const [followers, setFollowers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -32,12 +34,29 @@ const FollowerList = () => {
                 return;
             }
 
+            // Check cache first
+            const cacheKey = 'followers';
+            const cachedData = getCache<any>(cacheKey);
+            if (cachedData) {
+                if (cachedData.data && Array.isArray(cachedData.data)) {
+                    setFollowers(cachedData.data);
+                } else if (Array.isArray(cachedData)) {
+                    setFollowers(cachedData);
+                }
+                setLoading(false);
+                return;
+            }
+
             const response: any = await followersApi.getStoreFollowers(storeId);
 
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
                 setFollowers(response.data);
+                // Cache the response
+                setCache(cacheKey, response);
             } else if (Array.isArray(response)) {
                 setFollowers(response);
+                // Cache the response
+                setCache(cacheKey, response);
             } else {
                 setFollowers([]);
             }

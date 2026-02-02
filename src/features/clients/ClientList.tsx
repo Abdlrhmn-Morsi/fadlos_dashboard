@@ -8,6 +8,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCache } from '../../contexts/CacheContext';
 import clientsApi from './api/clients.api';
 import ordersApi from '../orders/api/orders.api';
 import { toast } from '../../utils/toast';
@@ -19,6 +20,7 @@ const ClientList = () => {
     const { t } = useTranslation(['clients', 'common']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
+    const { getCache, setCache } = useCache();
     const [clients, setClients] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -59,6 +61,26 @@ const ClientList = () => {
                 limit,
                 search: searchTerm || undefined
             };
+
+            // Check cache first
+            const cacheKey = 'clients';
+            const cachedData = getCache<any>(cacheKey, params);
+            if (cachedData) {
+                if (cachedData.data) {
+                    setClients(cachedData.data);
+                    if (cachedData.pagination) {
+                        setTotalPages(cachedData.pagination.totalPages || 1);
+                    } else if (cachedData.meta) {
+                        setTotalPages(cachedData.meta.totalPages || 1);
+                    }
+                } else if (Array.isArray(cachedData)) {
+                    setClients(cachedData);
+                    setTotalPages(1);
+                }
+                setLoading(false);
+                return;
+            }
+
             const response: any = await clientsApi.getStoreClients(params);
 
             if (response && response.data) {
@@ -68,9 +90,13 @@ const ClientList = () => {
                 } else if (response.meta) {
                     setTotalPages(response.meta.totalPages || 1);
                 }
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else if (Array.isArray(response)) {
                 setClients(response);
                 setTotalPages(1);
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else {
                 setClients([]);
                 setTotalPages(1);

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCache } from '../../contexts/CacheContext';
 import { branchesApi } from './api/branches.api';
 import { Branch, CreateBranchDto, UpdateBranchDto } from '../../types/branch';
 import { BranchForm } from './components/BranchForm';
@@ -13,6 +14,7 @@ import clsx from 'clsx';
 export const BranchesList: React.FC = () => {
     const { t } = useTranslation(['branches', 'common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [branches, setBranches] = useState<Branch[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,8 +31,19 @@ export const BranchesList: React.FC = () => {
 
     const fetchBranches = async () => {
         try {
+            // Check cache first
+            const cacheKey = 'branches';
+            const cachedData = getCache<Branch[]>(cacheKey);
+            if (cachedData) {
+                setBranches(Array.isArray(cachedData) ? cachedData : []);
+                setLoading(false);
+                return;
+            }
+
             const data = await branchesApi.findAllByStore();
             setBranches(data);
+            // Cache the response
+            setCache(cacheKey, data);
         } catch (error) {
             toast.error(t('loadError'));
         } finally {
@@ -42,12 +55,36 @@ export const BranchesList: React.FC = () => {
         fetchBranches();
     }, []);
 
+    // Refetch data when component becomes visible (e.g., navigating back or closing modal)
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) {
+                fetchBranches();
+            }
+        };
+
+        const handleFocus = () => {
+            fetchBranches();
+        };
+
+        // Listen for visibility changes and window focus
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, []);
+
     const handleCreate = async (data: CreateBranchDto) => {
         setIsSaving(true);
         try {
             await branchesApi.create(data);
             toast.success(t('createSuccess'));
             setIsModalOpen(false);
+            // Invalidate cache after create
+            invalidateCache('branches');
             fetchBranches();
         } catch (error) {
             toast.error(t('createError'));
@@ -63,6 +100,8 @@ export const BranchesList: React.FC = () => {
             toast.success(t('updateSuccess'));
             setIsModalOpen(false);
             setEditingBranch(null);
+            // Invalidate cache after update
+            invalidateCache('branches');
             fetchBranches();
         } catch (error) {
             toast.error(t('updateError'));
@@ -83,6 +122,8 @@ export const BranchesList: React.FC = () => {
             toast.success(t('deleteSuccess'));
             setBranches(branches.filter(b => b.id !== branchToDelete));
             setBranchToDelete(null);
+            // Invalidate cache after delete
+            invalidateCache('branches');
         } catch (error) {
             toast.error(t('deleteError'));
         } finally {

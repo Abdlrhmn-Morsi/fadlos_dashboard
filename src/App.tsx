@@ -39,6 +39,7 @@ import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
 import { NotificationProvider } from './features/notification/context/NotificationContext';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { CacheProvider } from './contexts/CacheContext';
 import { Permissions } from './types/permissions';
 
 const ProtectedRoute = () => {
@@ -140,10 +141,12 @@ function App() {
   return (
     <ThemeProvider>
       <AuthProvider>
-        <NotificationProvider>
-          <Toaster position="top-right" />
-          <AppContent />
-        </NotificationProvider>
+        <CacheProvider>
+          <NotificationProvider>
+            <Toaster position="top-right" />
+            <AppContent />
+          </NotificationProvider>
+        </CacheProvider>
       </AuthProvider>
     </ThemeProvider>
   );

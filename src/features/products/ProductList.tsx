@@ -10,6 +10,7 @@ import { toast } from '../../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
@@ -19,6 +20,7 @@ const ProductList = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['products', 'common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -52,8 +54,20 @@ const ProductList = () => {
 
     const fetchCategories = async () => {
         try {
+            // Check cache first
+            const cachedCategories = getCache<any[]>('categories');
+            if (cachedCategories) {
+                setCategories(cachedCategories);
+                return;
+            }
+
+            // Fetch from API if not cached
             const res: any = await categoriesApi.getSellerCategories();
-            setCategories(res.data || []);
+            const categoriesData = res.data || [];
+            setCategories(categoriesData);
+
+            // Cache the data
+            setCache('categories', categoriesData);
         } catch (error) {
             console.error('Failed to fetch categories', error);
         }
@@ -78,6 +92,17 @@ const ProductList = () => {
             if (isOfferFilter !== undefined) params.isOffer = isOfferFilter;
             if (hasDiscountFilter !== undefined) params.hasDiscount = hasDiscountFilter;
 
+            // Check cache first
+            const cacheKey = 'products';
+            const cachedData = getCache<any>(cacheKey, params);
+            if (cachedData) {
+                setProducts(cachedData.data || []);
+                setTotalPages(cachedData.meta?.totalPages || 1);
+                setLoading(false);
+                return;
+            }
+
+            // Fetch from API if not cached
             const data: any = await productsApi.getSellerProducts(params);
 
             if (data && data.data) {
@@ -85,6 +110,9 @@ const ProductList = () => {
                 if (data.meta) {
                     setTotalPages(data.meta.totalPages || 1);
                 }
+
+                // Cache the data
+                setCache(cacheKey, data, params);
             } else {
                 setProducts([]);
                 setTotalPages(1);
@@ -109,10 +137,17 @@ const ProductList = () => {
         try {
             await productsApi.deleteProduct(deleteId);
             toast.success(t('deleteSuccess'));
-            fetchProducts();
+
+            // Immediately remove the product from the list for better UX
+            setProducts(prevProducts => prevProducts.filter(p => p.id !== deleteId));
+
+            // Invalidate products cache to force refresh on next load
+            invalidateCache('products');
         } catch (error) {
             console.error('Failed to delete product', error);
             toast.error(t('deleteFailed'));
+            // Refetch to restore the list if deletion failed
+            fetchProducts();
         } finally {
             setConfirmOpen(false);
             setDeleteId(null);

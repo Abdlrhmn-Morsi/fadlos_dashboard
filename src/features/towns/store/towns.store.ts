@@ -30,13 +30,19 @@ export const townModalState = atom<TownModalState>({
     }
 });
 
-export const townStatusModalState = atom({
+export const townStatusModalState = atom<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'confirm';
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+}>({
     key: 'townStatusModalState',
     default: {
         isOpen: false,
         type: 'success',
         title: '',
         message: '',
-        onConfirm: null
+        onConfirm: undefined
     }
 });

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useCache } from '../../contexts/CacheContext';
 import reviewsApi from './api/reviews.api';
 import { Star, Loader2, MessageSquare, User, Calendar, Package, Quote } from 'lucide-react';
 import clsx from 'clsx';
@@ -10,6 +11,7 @@ import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 const ReviewList = () => {
     const { t } = useTranslation(['reviews', 'common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache } = useCache();
     const [reviews, setReviews] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('STORE'); // STORE or PRODUCT
@@ -36,6 +38,24 @@ const ReviewList = () => {
                 page,
                 limit
             };
+
+            // Check cache first
+            const cacheKey = 'reviews';
+            const cachedData = getCache<any>(cacheKey, params);
+            if (cachedData) {
+                if (cachedData.data) {
+                    setReviews(cachedData.data);
+                    if (cachedData.meta) {
+                        setTotalPages(cachedData.meta.totalPages || 1);
+                    }
+                } else if (Array.isArray(cachedData)) {
+                    setReviews(cachedData);
+                    setTotalPages(1);
+                }
+                setLoading(false);
+                return;
+            }
+
             const response: any = await reviewsApi.getStoreManagementReviews(params);
 
             if (response && response.data) {
@@ -43,9 +63,13 @@ const ReviewList = () => {
                 if (response.meta) {
                     setTotalPages(response.meta.totalPages || 1);
                 }
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else if (Array.isArray(response)) {
                 setReviews(response);
                 setTotalPages(1);
+                // Cache the response
+                setCache(cacheKey, response, params);
             } else {
                 setReviews([]);
                 setTotalPages(1);

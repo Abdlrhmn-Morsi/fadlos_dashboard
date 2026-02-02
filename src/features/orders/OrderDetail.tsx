@@ -12,6 +12,7 @@ import InputModal from '../../components/ui/InputModal';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
@@ -22,6 +23,7 @@ const OrderDetail = () => {
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
     const { hasPermission } = useAuth();
+    const { invalidateCache } = useCache();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -66,6 +68,9 @@ const OrderDetail = () => {
             await ordersApi.updateOrderStatus(id!, status);
             setOrder({ ...order, status: status });
             setStatusModal({ isOpen: false, status: '' });
+
+            // Invalidate orders cache to refresh list
+            invalidateCache('orders');
         } catch (error) {
             console.error('Failed to update status', error);
         } finally {
@@ -79,6 +84,10 @@ const OrderDetail = () => {
             setUpdating(true);
             await ordersApi.cancelOrder(id!, reason);
             setCancelModal(false);
+
+            // Invalidate orders cache to refresh list
+            invalidateCache('orders');
+
             window.location.reload();
         } catch (error) {
             console.error('Failed to cancel order', error);

@@ -10,6 +10,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import promoCodesApi from './api/promocodes.api';
 import { toast } from '../../utils/toast';
 import { useAuth } from '../../contexts/AuthContext';
+import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 
@@ -17,6 +18,7 @@ const PromoCodeList = () => {
     const { t } = useTranslation(['promocodes', 'common']);
     const { isRTL } = useLanguage();
     const { hasPermission } = useAuth();
+    const { getCache, setCache, invalidateCache } = useCache();
     const navigate = useNavigate();
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,8 +31,21 @@ const PromoCodeList = () => {
     const fetchPromoCodes = async () => {
         try {
             setLoading(true);
+
+            // Check cache first
+            const cachedData = getCache<any>('promocodes');
+            if (cachedData) {
+                setPromoCodes(cachedData.data || cachedData || []);
+                setLoading(false);
+                return;
+            }
+
             const data: any = await promoCodesApi.getPromoCodes();
-            setPromoCodes(data.data || data || []);
+            const promoData = data.data || data || [];
+            setPromoCodes(promoData);
+
+            // Cache the data
+            setCache('promocodes', promoData);
         } catch (error) {
             console.error('Failed to fetch promo codes', error);
             toast.error('Failed to load promo codes');
@@ -44,6 +59,9 @@ const PromoCodeList = () => {
             await promoCodesApi.togglePromoCodeStatus(id);
             setPromoCodes(prev => prev.map(p => p.id === id ? { ...p, isActive: !currentStatus } : p));
             toast.success(t(currentStatus ? 'deactivated' : 'activated', { defaultValue: `Promo code ${!currentStatus ? 'activated' : 'deactivated'}` }));
+
+            // Invalidate cache
+            invalidateCache('promocodes');
         } catch (error) {
             console.error('Failed to toggle status', error);
             toast.error(t('common:errorUpdatingData'));
@@ -56,6 +74,9 @@ const PromoCodeList = () => {
                 await promoCodesApi.deletePromoCode(id);
                 setPromoCodes(prev => prev.filter(p => p.id !== id));
                 toast.success(t('common:success'));
+
+                // Invalidate cache
+                invalidateCache('promocodes');
             } catch (error) {
                 console.error('Failed to delete promo code', error);
                 toast.error(t('common:errorUpdatingData'));

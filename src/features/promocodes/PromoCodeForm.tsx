@@ -9,6 +9,7 @@ import clientsApi from '../clients/api/clients.api';
 import categoriesApi from '../categories/api/categories.api';
 import { Modal } from '../../components/ui/Modal';
 import { toast } from '../../utils/toast';
+import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 
 const InputGroup = ({ label, children, icon: Icon, required = false, subtitle = '' }: any) => {
@@ -31,6 +32,7 @@ const PromoCodeForm = () => {
     const { isRTL } = useLanguage();
     const { id } = useParams();
     const navigate = useNavigate();
+    const { invalidateCache } = useCache();
     const isEditMode = !!id;
 
     const [loading, setLoading] = useState(false);
@@ -189,6 +191,10 @@ const PromoCodeForm = () => {
                 await promoCodesApi.createPromoCode(payload);
                 toast.success(t('common:success'));
             }
+
+            // Invalidate cache to refresh list
+            invalidateCache('promocodes');
+
             navigate('/promocodes');
         } catch (error: any) {
             console.error('Failed to save promo code', error);
