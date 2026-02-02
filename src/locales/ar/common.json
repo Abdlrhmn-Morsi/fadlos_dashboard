@@ -14,6 +14,7 @@
     "viewAll": "عرض الكل",
     "delete": "حذف",
     "save": "حفظ",
+    "updateChanges": "تحديث التغييرات",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
     "yes": "نعم",
@@ -57,6 +58,7 @@
     "management": "الإدارة",
     "products": "المنتجات",
     "categories": "التصنيفات",
+    "addons": "الإضافات",
     "orders": "الطلبات",
     "feedback": "الآراء والملاحظات",
     "promoCodes": "أكواد الخصم",
@@ -163,6 +165,7 @@
     "Settings": "الإعدادات",
     "Promo Codes": "أكواد الخصم",
     "Variants": "المتغيرات",
+    "Addon Management": "إدارة الإضافات",
     "searchEmployeePlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
     "activate": "تفعيل",
     "leaveBlankToKeepCurrent": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
@@ -325,6 +328,24 @@
             "delete": {
                 "name": "حذف المتغير",
                 "description": "حذف متغيرات المنتجات"
+            }
+        },
+        "addons": {
+            "view": {
+                "name": "عرض الإضافات",
+                "description": "عرض قائمة الإضافات المتاحة"
+            },
+            "create": {
+                "name": "إضافة صفة",
+                "description": "إنشاء إضافات جديدة للمنتجات"
+            },
+            "update": {
+                "name": "تعديل الصفة",
+                "description": "تعديل بيانات الإضافات الحالية"
+            },
+            "delete": {
+                "name": "حذف الصفة",
+                "description": "إزالة الإضافات من النظام"
             }
         }
     },

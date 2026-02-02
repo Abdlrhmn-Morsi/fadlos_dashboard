@@ -16,7 +16,8 @@ import {
   Truck,
   LucideIcon,
   Bell,
-  Shield
+  Shield,
+  Layers
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -199,6 +200,9 @@ const DashboardLayout: React.FC = () => {
               {(hasPermission(Permissions.CATEGORIES_CREATE) || hasPermission(Permissions.CATEGORIES_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
                 <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
               )}
+              {(hasPermission(Permissions.ADDONS_VIEW) || hasPermission(Permissions.ADDONS_CREATE) || user?.role === UserRole.EMPLOYEE) && (
+                <SidebarItem to="/addons" icon={Layers} label={t('addons')} collapsed={collapsed} />
+              )}
               {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
                 <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
               )}
@@ -282,11 +286,18 @@ const DashboardLayout: React.FC = () => {
             >
               <Menu size={24} className={isRTL ? "rotate-180" : ""} />
             </button>
-            <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 hidden sm:block">
-              {user?.role === UserRole.SUPER_ADMIN
-                ? t('adminConsole')
-                : (isRTL ? (user?.store?.nameAr || user?.store?.name) : user?.store?.name) || t('adminConsole')}
-            </h1>
+            <div className="flex items-center gap-3">
+              {user?.store?.logo && (
+                <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 flex-shrink-0 bg-white">
+                  <img src={user.store.logo} alt="" className="w-full h-full object-contain" />
+                </div>
+              )}
+              <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 hidden sm:block">
+                {user?.role === UserRole.SUPER_ADMIN
+                  ? t('adminConsole')
+                  : (isRTL ? (user?.store?.nameAr || user?.store?.name) : user?.store?.name) || t('adminConsole')}
+              </h1>
+            </div>
           </div>
 
           <div className="flex items-center gap-3">

@@ -52,4 +52,10 @@ export enum Permissions {
     VARIANTS_CREATE = 'variants.create',
     VARIANTS_UPDATE = 'variants.update',
     VARIANTS_DELETE = 'variants.delete',
+
+    // Addon Management
+    ADDONS_VIEW = 'addons.view',
+    ADDONS_CREATE = 'addons.create',
+    ADDONS_UPDATE = 'addons.update',
+    ADDONS_DELETE = 'addons.delete',
 }

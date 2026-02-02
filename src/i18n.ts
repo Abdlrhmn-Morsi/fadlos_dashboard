@@ -34,6 +34,8 @@ import followersEN from './locales/en/followers.json';
 import followersAR from './locales/ar/followers.json';
 import branchesEN from './locales/en/branches.json';
 import branchesAR from './locales/ar/branches.json';
+import addonsEN from './locales/en/addons.json';
+import addonsAR from './locales/ar/addons.json';
 
 
 const resources = {
@@ -54,6 +56,7 @@ const resources = {
         clients: clientsEN,
         followers: followersEN,
         branches: branchesEN,
+        addons: addonsEN,
     },
     ar: {
         common: commonAR,
@@ -72,6 +75,7 @@ const resources = {
         clients: clientsAR,
         followers: followersAR,
         branches: branchesAR,
+        addons: addonsAR,
     },
 };
 

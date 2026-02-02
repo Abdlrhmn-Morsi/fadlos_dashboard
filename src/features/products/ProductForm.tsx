@@ -4,11 +4,12 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
     ArrowLeft, Upload, Save, Image as ImageIcon,
     Box, DollarSign, Layers, Globe, RefreshCcw,
-    Loader2, Trash2, Plus, X, Search, CheckCircle2
+    Loader2, Trash2, Plus, X, Search, CheckCircle2, Package
 } from 'lucide-react';
 import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
 import toolsApi from '../../services/tools.api';
+import addonsApi from '../addons/api/addons.api';
 import CategoryFormModal from '../categories/components/CategoryFormModal';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -83,12 +84,17 @@ const ProductForm = () => {
         isOffer: false,
         sortOrder: '0',
         variants: [] as Variant[],
-        relatedProductIds: [] as string[]
+        relatedProductIds: [] as string[],
+        addonIds: [] as string[]
     });
 
     const [allProducts, setAllProducts] = useState<any[]>([]);
     const [searchingProducts, setSearchingProducts] = useState(false);
     const [relatedSearchTerm, setRelatedSearchTerm] = useState('');
+
+    const [allAddons, setAllAddons] = useState<any[]>([]);
+    const [searchingAddons, setSearchingAddons] = useState(false);
+    const [addonSearchTerm, setAddonSearchTerm] = useState('');
 
     // Media State
     const [currCoverImage, setCurrCoverImage] = useState<string | null>(null);
@@ -102,10 +108,23 @@ const ProductForm = () => {
     useEffect(() => {
         fetchCategories();
         fetchAllProductsForSelection();
+        fetchAllAddonsForSelection();
         if (isEditMode) {
             fetchProduct();
         }
     }, [id]);
+
+    const fetchAllAddonsForSelection = async () => {
+        try {
+            setSearchingAddons(true);
+            const res: any = await addonsApi.getAddons({ limit: 100 });
+            setAllAddons(res.data || []);
+        } catch (error) {
+            console.error('Error fetching addons for selection', error);
+        } finally {
+            setSearchingAddons(false);
+        }
+    };
 
     const fetchAllProductsForSelection = async () => {
         try {
@@ -171,7 +190,8 @@ const ProductForm = () => {
                         sortOrder: String(val.sortOrder || 0)
                     })) : []
                 })) : [],
-                relatedProductIds: data.relatedProducts ? data.relatedProducts.map((p: any) => p.id) : []
+                relatedProductIds: data.relatedProducts ? data.relatedProducts.map((p: any) => p.id) : [],
+                addonIds: data.addons ? data.addons.map((a: any) => a.id) : []
             });
             setCurrCoverImage(data.coverImage);
             setExistingImages(data.images || []);
@@ -289,7 +309,7 @@ const ProductForm = () => {
             // Append basic fields
             console.log('Final FormData state before appending:', formData);
             Object.keys(formData).forEach(key => {
-                if (key === 'variants' || key === 'relatedProductIds') return; // Handle manually
+                if (key === 'variants' || key === 'relatedProductIds' || key === 'addonIds') return; // Handle manually
                 const value = (formData as any)[key];
                 if (value !== null && value !== undefined && value !== '') {
                     // Start Debug
@@ -352,6 +372,11 @@ const ProductForm = () => {
             // Append related product IDs
             formData.relatedProductIds.forEach((prodId, idx) => {
                 data.append(`relatedProductIds[${idx}]`, prodId);
+            });
+
+            // Append addon IDs
+            formData.addonIds.forEach((addonId, idx) => {
+                data.append(`addonIds[${idx}]`, addonId);
             });
 
 
@@ -798,11 +823,13 @@ const ProductForm = () => {
                                                             {isRTL ? (p.nameAr || p.name) : p.name}
                                                         </p>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                            {p.price} {t('common:currencySymbol', { defaultValue: 'LE' })}
+                                                            {p.price.toFixed(2)} {t('common:currencySymbol')}
                                                         </p>
                                                     </div>
                                                     {isSelected && (
-                                                        <CheckCircle2 className="w-5 h-5 text-indigo-600 flex-shrink-0" />
+                                                        <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-indigo-600 rounded-full text-white shadow-sm">
+                                                            <CheckCircle2 size={12} strokeWidth={3} />
+                                                        </div>
                                                     )}
                                                 </div>
                                             );
@@ -816,6 +843,89 @@ const ProductForm = () => {
                                     {!searchingProducts && allProducts.length === 0 && (
                                         <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
                                             {t('noRelatedProductsFound')}
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Add-ons Section */}
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-indigo-500" />
+                                {t('addons:title', { defaultValue: 'Add-ons' })}
+                            </h2>
+
+                            <div className="space-y-4">
+                                <div className="relative">
+                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                    <input
+                                        type="text"
+                                        placeholder={t('addons:searchPlaceholder', { defaultValue: 'Search Add-ons...' })}
+                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        value={addonSearchTerm}
+                                        onChange={(e) => setAddonSearchTerm(e.target.value)}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-1">
+                                    {allAddons
+                                        .filter(a => {
+                                            const name = (isRTL ? a.nameAr : a.name) || a.name || '';
+                                            return name.toLowerCase().includes(addonSearchTerm.toLowerCase());
+                                        })
+                                        .map(a => {
+                                            const isSelected = formData.addonIds.includes(a.id);
+                                            return (
+                                                <div
+                                                    key={a.id}
+                                                    onClick={() => {
+                                                        const newIds = isSelected
+                                                            ? formData.addonIds.filter(id => id !== a.id)
+                                                            : [...formData.addonIds, a.id];
+                                                        setFormData({ ...formData, addonIds: newIds });
+                                                    }}
+                                                    className={clsx(
+                                                        "relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer group",
+                                                        isSelected
+                                                            ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
+                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300"
+                                                    )}
+                                                >
+                                                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
+                                                        {a.image ? (
+                                                            <img src={a.image} className="w-full h-full object-cover" alt="" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                                <Package size={18} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1 min-w-0">
+                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                                            {isRTL ? (a.nameAr || a.name) : a.name}
+                                                        </p>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                            {a.price.toFixed(2)} {t('common:currencySymbol')}
+                                                        </p>
+                                                    </div>
+                                                    {isSelected && (
+                                                        <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-indigo-600 rounded-full text-white shadow-sm">
+                                                            <CheckCircle2 size={12} strokeWidth={3} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    {searchingAddons && (
+                                        <div className="col-span-full py-8 flex flex-col items-center justify-center gap-2 text-slate-400">
+                                            <Loader2 className="w-6 h-6 animate-spin" />
+                                            <span className="text-xs">{t('common:loading')}</span>
+                                        </div>
+                                    )}
+                                    {!searchingAddons && allAddons.length === 0 && (
+                                        <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
+                                            {t('addons:noAddonsFound', { defaultValue: 'No add-ons found' })}
                                         </div>
                                     )}
                                 </div>

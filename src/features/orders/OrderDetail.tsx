@@ -142,6 +142,16 @@ const OrderDetail = () => {
         }).filter(Boolean).join(' | ');
     };
 
+    // Helper to resolve addon names
+    const getAddonDetails = (item: any) => {
+        if (!item.selectedAddons || item.selectedAddons.length === 0) return null;
+
+        return item.selectedAddons.map((sa: any) => {
+            const name = isRTL ? sa.nameAr || sa.name : sa.name;
+            return `+ ${name} (${sa.price.toFixed(2)} ${t('common:currencySymbol')})`;
+        }).join(', ');
+    };
+
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="max-w-6xl mx-auto space-y-6">
@@ -218,8 +228,13 @@ const OrderDetail = () => {
                                                 <span>x {item.quantity}</span>
                                             </div>
                                             {getVariantDetails(item) && (
-                                                <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium">
+                                                <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-1">
                                                     {getVariantDetails(item)}
+                                                </p>
+                                            )}
+                                            {getAddonDetails(item) && (
+                                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">
+                                                    {getAddonDetails(item)}
                                                 </p>
                                             )}
                                         </div>

@@ -34,6 +34,8 @@ import RolesList from './features/roles/components/RolesList';
 import RoleForm from './features/roles/components/RoleForm';
 import EmployeesList from './features/employees/components/EmployeesList';
 import EmployeeForm from './features/employees/components/EmployeeForm';
+import AddonsList from './features/addons/components/AddonsList';
+import AddonForm from './features/addons/components/AddonForm';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
@@ -88,6 +90,10 @@ const AppContent = () => {
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<PermissionGate permission={Permissions.PRODUCTS_CREATE}><ProductForm /></PermissionGate>} />
             <Route path="products/edit/:id" element={<PermissionGate permission={Permissions.PRODUCTS_UPDATE}><ProductForm /></PermissionGate>} />
+
+            <Route path="addons" element={<AddonsList />} />
+            <Route path="addons/new" element={<PermissionGate permission={Permissions.ADDONS_CREATE}><AddonForm /></PermissionGate>} />
+            <Route path="addons/edit/:id" element={<PermissionGate permission={Permissions.ADDONS_UPDATE}><AddonForm /></PermissionGate>} />
 
             <Route path="categories" element={<CategoryList />} />
 
