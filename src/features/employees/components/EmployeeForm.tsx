@@ -104,36 +104,8 @@ const EmployeeForm = () => {
                 toast.success(t('success'));
             }
 
-            // Optimistic Cache Update
-            try {
-                const cacheKey = 'employees';
-                const cachedData = getCache<any>(cacheKey);
-
-                // Ensure we have a valid cache structure to update
-                if (cachedData && Array.isArray(cachedData.data)) {
-                    let updatedList;
-                    if (isEditMode && id) {
-                        // Update existing
-                        updatedList = cachedData.data.map((emp: any) => emp.id === id ? savedEmployee : emp);
-                    } else {
-                        // Add new
-                        updatedList = [savedEmployee, ...cachedData.data];
-                    }
-
-                    // Update the cache directly so the list view uses it immediately
-                    setCache(cacheKey, {
-                        ...cachedData,
-                        data: updatedList
-                    });
-                } else {
-                    // If no cache, invalidating ensures fresh fetch
-                    invalidateCache('employees');
-                }
-            } catch (e) {
-                console.error('Failed to update cache optimistically', e);
-                invalidateCache('employees');
-            }
-
+            // Invalidate cache to ensure list view fetches fresh data
+            invalidateCache('employees');
             navigate('/employees');
         } catch (error: any) {
             console.error('Failed to save employee', error);
