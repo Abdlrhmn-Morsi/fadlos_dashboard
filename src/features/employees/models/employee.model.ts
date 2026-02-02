@@ -8,18 +8,19 @@ export interface Employee extends User {
 }
 
 export interface CreateEmployeeDto {
-    firstName: string;
-    lastName: string;
+    name: string;
+    username: string;
     email: string;
     phone?: string;
     password: string;
     roleId: string;
     storeId?: string;
+    isActive?: boolean;
 }
 
 export interface UpdateEmployeeDto {
-    firstName?: string;
-    lastName?: string;
+    name?: string;
+    username?: string;
     email?: string;
     phone?: string;
     roleId?: string;

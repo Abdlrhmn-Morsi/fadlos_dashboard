@@ -24,7 +24,7 @@ interface AuthContextType {
     user: User | null;
     isAuthenticated: boolean;
     isLoading: boolean;
-    login: (user: User) => void;
+    login: (user: User) => Promise<void>;
     logout: () => Promise<void>;
     refreshProfile: () => Promise<void>;
     hasPermission: (permission: string) => boolean;
@@ -73,8 +73,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         refreshProfile();
     }, [refreshProfile]);
 
-    const login = (userData: User) => {
+    const login = async (userData: User) => {
         setUser(userData);
+        await refreshProfile();
     };
 
     const logout = async () => {

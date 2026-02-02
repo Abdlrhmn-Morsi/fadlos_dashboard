@@ -327,5 +327,7 @@
                 "description": "Remove product variants"
             }
         }
-    }
+    },
+    "submit": "Submit",
+    "understood": "Understood"
 }

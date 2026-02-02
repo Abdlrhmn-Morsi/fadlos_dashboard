@@ -14,6 +14,7 @@ interface ConfirmationModalProps {
 }
 
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useTranslation } from 'react-i18next';
 
 const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     isOpen,
@@ -21,13 +22,17 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     message,
     onConfirm,
     onCancel,
-    confirmLabel = 'Confirm',
-    cancelLabel = 'Cancel',
+    confirmLabel,
+    cancelLabel,
     isLoading = false,
     type = 'info'
 }) => {
+    const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
     if (!isOpen) return null;
+
+    const finalConfirmLabel = confirmLabel || t('confirm');
+    const finalCancelLabel = cancelLabel || t('cancel');
 
     const getIcon = () => {
         switch (type) {
@@ -59,7 +64,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                             disabled={isLoading}
                             className="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium transition-colors disabled:opacity-50"
                         >
-                            {cancelLabel}
+                            {finalCancelLabel}
                         </button>
                         <button
                             onClick={onConfirm}
@@ -72,7 +77,7 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                                 }`}
                         >
                             {isLoading && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>}
-                            {confirmLabel}
+                            {finalConfirmLabel}
                         </button>
                     </div>
                 </div>

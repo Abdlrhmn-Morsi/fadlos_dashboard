@@ -23,8 +23,8 @@ const EmployeeForm = () => {
     const [roles, setRoles] = useState<Role[]>([]);
 
     const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
+        name: '',
+        username: '',
         email: '',
         phone: '',
         password: '',
@@ -63,11 +63,9 @@ const EmployeeForm = () => {
             const response = await EmployeesService.getEmployee(id);
             const employee = (response as any).data || response;
 
-            // Split name if needed or assume user has generic name field
-            const [firstName, ...lastNameParts] = (employee.name || '').split(' ');
             setFormData({
-                firstName: firstName || '',
-                lastName: lastNameParts.join(' ') || '',
+                name: employee.name || '',
+                username: employee.username || '',
                 email: employee.email || '',
                 phone: employee.phone || '',
                 password: '', // Don't fill password on edit
@@ -195,25 +193,25 @@ const EmployeeForm = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-1.5">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('firstName', { defaultValue: 'First Name' })} <span className="text-rose-500">*</span>
+                                {t('fullName', { defaultValue: 'Full Name' })} <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 required
-                                value={formData.firstName}
-                                onChange={e => setFormData({ ...formData, firstName: e.target.value })}
+                                value={formData.name}
+                                onChange={e => setFormData({ ...formData, name: e.target.value })}
                                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                             />
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('lastName', { defaultValue: 'Last Name' })} <span className="text-rose-500">*</span>
+                                {t('username', { defaultValue: 'Username' })} <span className="text-rose-500">*</span>
                             </label>
                             <input
                                 type="text"
                                 required
-                                value={formData.lastName}
-                                onChange={e => setFormData({ ...formData, lastName: e.target.value })}
+                                value={formData.username}
+                                onChange={e => setFormData({ ...formData, username: e.target.value })}
                                 className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                             />
                         </div>

@@ -13,6 +13,8 @@ interface InputModalProps {
     submitLabel?: string;
 }
 
+import { useTranslation } from 'react-i18next';
+
 const InputModal: React.FC<InputModalProps> = ({
     isOpen,
     title,
@@ -21,8 +23,9 @@ const InputModal: React.FC<InputModalProps> = ({
     onSubmit,
     onCancel,
     isLoading = false,
-    submitLabel = 'Submit'
+    submitLabel
 }) => {
+    const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
     const [value, setValue] = useState('');
 
@@ -31,6 +34,8 @@ const InputModal: React.FC<InputModalProps> = ({
     }, [isOpen]);
 
     if (!isOpen) return null;
+
+    const finalSubmitLabel = submitLabel || t('submit');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -76,7 +81,7 @@ const InputModal: React.FC<InputModalProps> = ({
                             disabled={isLoading}
                             className="px-5 py-2.5 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-700 font-medium transition-colors"
                         >
-                            Cancel
+                            {t('cancel')}
                         </button>
                         <button
                             type="submit"
@@ -84,7 +89,7 @@ const InputModal: React.FC<InputModalProps> = ({
                             className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium transition-all shadow-lg shadow-rose-500/20 hover:shadow-xl hover:shadow-rose-500/30 disabled:opacity-50 disabled:shadow-none flex items-center gap-2"
                         >
                             {isLoading && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>}
-                            {submitLabel}
+                            {finalSubmitLabel}
                         </button>
                     </div>
                 </form>

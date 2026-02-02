@@ -14,6 +14,8 @@ interface StatusModalProps {
     cancelText?: string;
 }
 
+import { useTranslation } from 'react-i18next';
+
 const StatusModal: React.FC<StatusModalProps> = ({
     isOpen,
     onClose,
@@ -21,11 +23,15 @@ const StatusModal: React.FC<StatusModalProps> = ({
     title,
     message,
     onConfirm,
-    confirmText = 'Confirm',
-    cancelText = 'Cancel'
+    confirmText,
+    cancelText
 }) => {
+    const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
     if (!isOpen) return null;
+
+    const finalConfirmText = confirmText || t('confirm');
+    const finalCancelText = cancelText || t('cancel');
 
     const getIcon = () => {
         switch (type) {
@@ -82,7 +88,7 @@ const StatusModal: React.FC<StatusModalProps> = ({
                                 className="flex-1 px-6 py-3.5 text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-none hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
                                 onClick={onClose}
                             >
-                                {cancelText}
+                                {finalCancelText}
                             </button>
                             <button
                                 className="flex-1 px-6 py-3.5 text-sm font-bold text-white bg-rose-600 rounded-none hover:bg-rose-700 shadow-lg shadow-rose-200 dark:shadow-rose-900/20 transition-all active:scale-95"
@@ -91,7 +97,7 @@ const StatusModal: React.FC<StatusModalProps> = ({
                                     onClose();
                                 }}
                             >
-                                {confirmText}
+                                {finalConfirmText}
                             </button>
                         </>
                     ) : (
@@ -99,7 +105,7 @@ const StatusModal: React.FC<StatusModalProps> = ({
                             className="w-full px-6 py-3.5 text-sm font-bold text-white bg-primary rounded-none-none hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95"
                             onClick={onClose}
                         >
-                            Understood
+                            {t('understood')}
                         </button>
                     )}
                 </div>
