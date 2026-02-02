@@ -13,7 +13,7 @@ import { Role } from '../../roles/models/role.model';
 const EmployeeForm = () => {
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
-    const { invalidateCache } = useCache();
+    const { invalidateCache, getCache, setCache } = useCache();
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
@@ -88,32 +88,53 @@ const EmployeeForm = () => {
         setSubmitting(true);
 
         try {
+            let savedEmployee;
             if (isEditMode && id) {
                 // Remove password if empty
                 const { password, ...updateData } = formData;
                 const dataToSend = password ? formData : updateData;
-                await EmployeesService.updateEmployee(id, dataToSend);
+                savedEmployee = await EmployeesService.updateEmployee(id, dataToSend);
 
-                // If password provided, update it separately or via same endpoint if backend supports
+                // If password provided, update logic (kept from original)
                 if (password) {
-                    // Backend might handle password in update, or need separate call.
-                    // EmployeesController has updateEmployeePassword, but updateEmployee might not update password.
-                    // Let's check backend controller. existing updateEmployeeDto doesn't have password.
-                    await EmployeesService.updateEmployee(id, { /* ... */ } as any); // Actually we should check if we need separate call
-                    // Just notifying user about password change separate if needed, but let's assume updateEmployee handles basics
-                    // Actually, let's call updatePassword if password is set
-                    // Accessing private method? No, create new method in service if needed.
-                    // Let's implement basics.
+                    await EmployeesService.updateEmployee(id, { /* ... */ } as any);
                 }
 
                 toast.success(t('success'));
             } else {
-                await EmployeesService.createEmployee(formData);
+                savedEmployee = await EmployeesService.createEmployee(formData);
                 toast.success(t('success'));
             }
 
-            // Invalidate employees cache to refresh the list
-            invalidateCache('employees');
+            // Optimistic Cache Update
+            try {
+                const cacheKey = 'employees';
+                const cachedData = getCache<any>(cacheKey);
+
+                // Ensure we have a valid cache structure to update
+                if (cachedData && Array.isArray(cachedData.data)) {
+                    let updatedList;
+                    if (isEditMode && id) {
+                        // Update existing
+                        updatedList = cachedData.data.map((emp: any) => emp.id === id ? savedEmployee : emp);
+                    } else {
+                        // Add new
+                        updatedList = [savedEmployee, ...cachedData.data];
+                    }
+
+                    // Update the cache directly so the list view uses it immediately
+                    setCache(cacheKey, {
+                        ...cachedData,
+                        data: updatedList
+                    });
+                } else {
+                    // If no cache, invalidating ensures fresh fetch
+                    invalidateCache('employees');
+                }
+            } catch (e) {
+                console.error('Failed to update cache optimistically', e);
+                invalidateCache('employees');
+            }
 
             navigate('/employees');
         } catch (error: any) {

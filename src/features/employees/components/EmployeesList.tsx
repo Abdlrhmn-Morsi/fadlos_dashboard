@@ -124,22 +124,17 @@ const EmployeesList = () => {
 
                 // Invalidate cache after delete
                 invalidateCache('employees');
-
-                // Small delay to ensure cache invalidation completes
-                setTimeout(() => {
-                    fetchEmployees();
-                }, 100);
             } else if (actionType === 'toggle' && actionId) {
                 await EmployeesService.toggleStatus(actionId, !isActiveStatus);
                 toast.success(t('success'));
 
-                // Invalidate cache after status toggle
-                invalidateCache('employees');
+                // Optimistic update
+                setEmployees(prev => prev.map(emp =>
+                    emp.id === actionId ? { ...emp, isActive: !isActiveStatus } : emp
+                ));
 
-                // Refetch to get updated data
-                setTimeout(() => {
-                    fetchEmployees();
-                }, 100);
+                // Invalidate cache
+                invalidateCache('employees');
             }
         } catch (error) {
             console.error('Failed to perform action', error);
@@ -237,7 +232,7 @@ const EmployeesList = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                                                    {emp.name.charAt(0).toUpperCase()}
+                                                    {(emp.name || '').charAt(0).toUpperCase()}
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-slate-800 dark:text-white">

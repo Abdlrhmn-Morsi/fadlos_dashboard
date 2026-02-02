@@ -80,12 +80,17 @@ export const BranchesList: React.FC = () => {
     const handleCreate = async (data: CreateBranchDto) => {
         setIsSaving(true);
         try {
-            await branchesApi.create(data);
+            const newBranch: any = await branchesApi.create(data);
+            const branchData = newBranch.data || newBranch; // Handle potential response wrapping
+
             toast.success(t('createSuccess'));
             setIsModalOpen(false);
-            // Invalidate cache after create
+
+            // Optimistic update
+            setBranches(prev => [...prev, branchData]);
+
+            // Invalidate cache
             invalidateCache('branches');
-            fetchBranches();
         } catch (error) {
             toast.error(t('createError'));
         } finally {
@@ -96,13 +101,18 @@ export const BranchesList: React.FC = () => {
     const handleUpdate = async (id: string, data: UpdateBranchDto) => {
         setIsSaving(true);
         try {
-            await branchesApi.update(id, data);
+            const updatedBranch: any = await branchesApi.update(id, data);
+            const branchData = updatedBranch.data || updatedBranch; // Handle potential response wrapping
+
             toast.success(t('updateSuccess'));
             setIsModalOpen(false);
             setEditingBranch(null);
-            // Invalidate cache after update
+
+            // Optimistic update
+            setBranches(prev => prev.map(b => b.id === id ? branchData : b));
+
+            // Invalidate cache
             invalidateCache('branches');
-            fetchBranches();
         } catch (error) {
             toast.error(t('updateError'));
         } finally {
