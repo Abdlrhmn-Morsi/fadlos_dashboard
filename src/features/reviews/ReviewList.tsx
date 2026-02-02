@@ -5,6 +5,7 @@ import reviewsApi from './api/reviews.api';
 import { Star, Loader2, MessageSquare, User, Calendar, Package, Quote } from 'lucide-react';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
 const ReviewList = () => {
     const { t } = useTranslation(['reviews', 'common']);
@@ -137,7 +138,7 @@ const ReviewList = () => {
                                     <div className="flex items-center gap-4">
                                         <div className="w-14 h-14 rounded-2xl bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden ring-4 ring-transparent group-hover:ring-primary/5 transition-all">
                                             {review.customer?.profileImage ? (
-                                                <img src={review.customer.profileImage} alt={review.customer.name} className="w-full h-full object-cover" />
+                                                <ImageWithFallback src={review.customer.profileImage} alt={review.customer.name || 'Customer'} className="w-full h-full object-cover" />
                                             ) : (
                                                 <User size={24} />
                                             )}

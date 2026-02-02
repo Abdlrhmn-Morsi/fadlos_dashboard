@@ -14,6 +14,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
 const OrderDetail = () => {
     const { id } = useParams();
@@ -187,7 +188,7 @@ const OrderDetail = () => {
                                     <div key={item.id} className="p-6 flex items-start gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                                         <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 font-medium shrink-0 overflow-hidden">
                                             {item.product?.coverImage ? (
-                                                <img src={item.product.coverImage} alt={item.productName} className="w-full h-full object-cover" />
+                                                <ImageWithFallback src={item.product.coverImage} alt={item.productName} className="w-full h-full object-cover" />
                                             ) : (
                                                 <span>x{item.quantity}</span>
                                             )}

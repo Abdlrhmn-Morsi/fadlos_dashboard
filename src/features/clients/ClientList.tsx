@@ -13,6 +13,7 @@ import ordersApi from '../orders/api/orders.api';
 import { toast } from '../../utils/toast';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
 const ClientList = () => {
     const { t } = useTranslation(['clients', 'common']);
@@ -252,7 +253,7 @@ const ClientList = () => {
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 overflow-hidden ring-2 ring-transparent group-hover:ring-primary/20 transition-all">
                                                         {client?.profileImage ? (
-                                                            <img src={client.profileImage} alt={client.name} className="w-full h-full object-cover" />
+                                                            <ImageWithFallback src={client.profileImage} alt={client.name || 'Client'} className="w-full h-full object-cover" />
                                                         ) : (
                                                             <User size={24} />
                                                         )}
@@ -396,7 +397,7 @@ const ClientList = () => {
                                                     {order.items?.slice(0, 3).map((item: any, i: number) => (
                                                         <div key={i} title={item.productName} className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 border-2 border-white dark:border-slate-900 flex items-center justify-center overflow-hidden">
                                                             {item.product?.coverImage ? (
-                                                                <img src={item.product.coverImage} alt="" className="w-full h-full object-cover" />
+                                                                <ImageWithFallback src={item.product.coverImage} alt={item.productName || 'Product'} className="w-full h-full object-cover" />
                                                             ) : (
                                                                 <Package size={14} className="text-slate-400" />
                                                             )}
@@ -452,7 +453,7 @@ const ClientList = () => {
                                                     <div key={item.id} className="flex gap-4 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800">
                                                         <div className="w-12 h-12 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center justify-center overflow-hidden shrink-0">
                                                             {item.product?.coverImage ? (
-                                                                <img src={item.product.coverImage} className="w-full h-full object-cover" />
+                                                                <ImageWithFallback src={item.product.coverImage} alt={item.productName || 'Product'} className="w-full h-full object-cover" />
                                                             ) : (
                                                                 <Package size={20} className="text-slate-300" />
                                                             )}

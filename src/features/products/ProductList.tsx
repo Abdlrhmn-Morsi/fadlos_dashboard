@@ -12,6 +12,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { Permissions } from '../../types/permissions';
 import { Pagination } from '../../components/common/Pagination';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
 const ProductList = () => {
     const { hasPermission } = useAuth();
@@ -279,7 +280,7 @@ const ProductList = () => {
                                             <div className="flex items-center gap-4">
                                                 <div className="relative">
                                                     {product.coverImage ? (
-                                                        <img src={product.coverImage} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform duration-200" />
+                                                        <ImageWithFallback src={product.coverImage} alt={product.name} className="w-12 h-12 rounded-lg object-cover border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform duration-200" />
                                                     ) : (
                                                         <div className="w-12 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 border border-slate-200 dark:border-slate-700 group-hover:scale-105 transition-transform duration-200">
                                                             <Package size={20} strokeWidth={1.5} />

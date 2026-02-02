@@ -5,6 +5,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import followersApi from './api/followers.api';
 import clsx from 'clsx';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
 const FollowerList = () => {
     const { t } = useTranslation(['followers', 'common']);
@@ -97,7 +98,7 @@ const FollowerList = () => {
                                     <div className="flex items-center gap-4">
                                         <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden group-hover:scale-110 transition-transform duration-500">
                                             {user.profileImage ? (
-                                                <img src={user.profileImage} alt="" className="w-full h-full object-cover" />
+                                                <ImageWithFallback src={user.profileImage} alt={displayName} className="w-full h-full object-cover" />
                                             ) : (
                                                 <User size={24} className="group-hover:text-primary transition-colors" />
                                             )}
