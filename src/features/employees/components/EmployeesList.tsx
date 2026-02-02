@@ -231,8 +231,12 @@ const EmployeesList = () => {
                                     <tr key={emp.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm">
-                                                    {(emp.name || '').charAt(0).toUpperCase()}
+                                                <div className="w-10 h-10 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm border-2 border-white dark:border-slate-800 shadow-sm">
+                                                    {emp.profileImage ? (
+                                                        <img src={emp.profileImage} alt={emp.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        (emp.name || '').charAt(0).toUpperCase()
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <div className="font-semibold text-slate-800 dark:text-white">

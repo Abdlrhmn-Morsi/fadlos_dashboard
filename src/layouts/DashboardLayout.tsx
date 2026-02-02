@@ -311,8 +311,12 @@ const DashboardLayout: React.FC = () => {
                 </span>
                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{user?.role === UserRole.SUPER_ADMIN ? t('superControl') : t('dashboard')}</span>
               </div>
-              <div className="w-10 h-10 rounded-none bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20">
-                {user?.username?.substring(0, 2).toUpperCase() || 'AD'}
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20 border-2 border-white dark:border-slate-800">
+                {user?.profileImage ? (
+                  <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
+                ) : (
+                  user?.username?.substring(0, 2).toUpperCase() || 'AD'
+                )}
               </div>
             </div>
           </div>

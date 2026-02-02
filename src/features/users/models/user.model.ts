@@ -6,6 +6,7 @@ export interface User {
     phone: string | null;
     role: string;
     isActive: boolean;
+    profileImage: string | null;
     createdAt: string;
 }
 
