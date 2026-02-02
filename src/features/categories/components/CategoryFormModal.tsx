@@ -10,7 +10,7 @@ import clsx from 'clsx';
 interface CategoryFormModalProps {
     category?: any;
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: (savedCategory: any) => void;
 }
 
 const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose, onSuccess }) => {
@@ -54,12 +54,17 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
         setSubmitting(true);
 
         try {
+            let response;
             if (category) {
-                await categoriesApi.updateCategory(category.id, formData);
+                response = await categoriesApi.updateCategory(category.id, formData);
             } else {
-                await categoriesApi.createCategory(formData);
+                response = await categoriesApi.createCategory(formData);
             }
-            onSuccess();
+
+            // Extract the category from response (handle both { data: category } and direct category)
+            const savedCategory = response.data || response;
+
+            onSuccess(savedCategory);
         } catch (err: any) {
             console.error('Failed to save category', err);
             toast.error(err.response?.data?.message || 'Failed to save category. Please try again.');

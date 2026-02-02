@@ -91,13 +91,16 @@ const CategoryList = () => {
             await categoriesApi.deleteCategory(deleteId);
             toast.success(t('deleteSuccess'));
 
-            // Invalidate cache to force refresh
-            invalidateCache('categories');
+            // Immediately remove from local state
+            setCategories(prevCategories => prevCategories.filter(cat => cat.id !== deleteId));
 
-            fetchCategories();
+            // Invalidate cache
+            invalidateCache('categories');
         } catch (error) {
             console.error('Failed to delete category', error);
             toast.error(t('common:error', { defaultValue: 'Error' }));
+            // Refetch on error to restore correct state
+            fetchCategories();
         } finally {
             setConfirmOpen(false);
             setDeleteId(null);
@@ -261,14 +264,25 @@ const CategoryList = () => {
                 <CategoryFormModal
                     category={editingCategory}
                     onClose={() => setIsModalOpen(false)}
-                    onSuccess={() => {
+                    onSuccess={(savedCategory) => {
                         setIsModalOpen(false);
 
-                        // Invalidate cache to force refresh
-                        invalidateCache('categories');
+                        if (editingCategory) {
+                            // Update: Replace the existing category in the list
+                            setCategories(prevCategories =>
+                                prevCategories.map(cat =>
+                                    cat.id === savedCategory.id ? savedCategory : cat
+                                )
+                            );
+                            toast.success(t('saveSuccess'));
+                        } else {
+                            // Create: Add the new category to the list
+                            setCategories(prevCategories => [...prevCategories, savedCategory]);
+                            toast.success(t('saveSuccess'));
+                        }
 
-                        fetchCategories();
-                        toast.success(editingCategory ? t('saveSuccess') : t('saveSuccess'));
+                        // Invalidate cache
+                        invalidateCache('categories');
                     }}
                 />
             )}
