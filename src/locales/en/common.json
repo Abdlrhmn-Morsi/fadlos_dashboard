@@ -51,6 +51,8 @@
     "darkMode": "Dark Mode",
     "geoAndOrg": "Geographic & Org",
     "settings": "Settings",
+    "appUpdates": "App Updates",
+    "manageAppUpdatesDesc": "Manage minimum versions, blocked updates, and maintenance mode",
     "deliveryAreas": "Delivery Areas",
     "branches": "Branches",
     "storeSettings": "Store Settings",

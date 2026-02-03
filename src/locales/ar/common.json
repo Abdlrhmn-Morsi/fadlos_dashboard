@@ -50,6 +50,8 @@
     "darkMode": "الوضع الداكن",
     "geoAndOrg": "الجغرافي والتنظيمي",
     "settings": "الإعدادات",
+    "appUpdates": "تحديثات التطبيق",
+    "manageAppUpdatesDesc": "إدارة الحد الأدنى للإصدارات، التحديثات المحظورة، ووضع الصيانة",
     "deliveryAreas": "مناطق التوصيل",
     "branches": "الفروع",
     "storeSettings": "إعدادات المتجر",
