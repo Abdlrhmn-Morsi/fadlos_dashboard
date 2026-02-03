@@ -164,7 +164,7 @@ textarea:focus {
 }
 
 .table-header-cell {
-  @apply px-6 py-4 text-left text-[11px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800;
+  @apply px-6 py-4 text-start text-[11px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800;
 }
 
 .table-row {

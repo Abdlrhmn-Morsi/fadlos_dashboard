@@ -25,13 +25,19 @@ export const businessTypeModalState = atom<BusinessTypeModalState>({
     }
 });
 
-export const businessTypeStatusModalState = atom({
+export const businessTypeStatusModalState = atom<{
+    isOpen: boolean;
+    type: 'success' | 'error' | 'confirm';
+    title: string;
+    message: string;
+    onConfirm?: () => void;
+}>({
     key: 'businessTypeStatusModalState',
     default: {
         isOpen: false,
         type: 'success',
         title: '',
         message: '',
-        onConfirm: null
+        onConfirm: undefined
     }
 });

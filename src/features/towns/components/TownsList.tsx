@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import { useRecoilState } from 'recoil';
 import {
     MapPin,
@@ -30,12 +30,15 @@ import StatusModal from '../../../components/common/StatusModal';
 import Modal from '../../../components/common/Modal';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
+import { Pagination } from '../../../components/common/Pagination';
 import clsx from 'clsx';
 
 const TownsList = () => {
     const { t } = useTranslation(['towns', 'common']);
     const { isRTL } = useLanguage();
     const { getCache, setCache, invalidateCache } = useCache();
+
+    // Recoil State
     const [towns, setTowns] = useRecoilState(townsState);
     const [cities, setCities] = useRecoilState(citiesState);
     const [loading, setLoading] = useRecoilState(townsLoadingState);
@@ -43,6 +46,39 @@ const TownsList = () => {
     const [cityFilter, setCityFilter] = useRecoilState(townsCityFilterState);
     const [modal, setModal] = useRecoilState(townModalState);
     const [statusModal, setStatusModal] = useRecoilState(townStatusModalState);
+
+    // Local State
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0
+    });
+    const [debouncedSearch, setDebouncedSearch] = useState(search);
+
+    // Refs for stable fetching
+    const searchRef = useRef(search);
+    const filterRef = useRef(cityFilter);
+
+    // Update refs and handle debounce
+    useEffect(() => {
+        searchRef.current = debouncedSearch;
+    }, [debouncedSearch]);
+
+    useEffect(() => {
+        filterRef.current = cityFilter;
+    }, [cityFilter]);
+
+    // Refs for change detection in effects
+    const prevFilterRef = useRef(cityFilter);
+    const prevSearchRef = useRef(debouncedSearch);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(search);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [search]);
 
     const openStatus = (type: 'success' | 'error' | 'confirm', title: string, message: string, onConfirm?: () => void) => {
         setStatusModal({ isOpen: true, type, title, message, onConfirm });
@@ -52,43 +88,104 @@ const TownsList = () => {
         setStatusModal((prev: any) => ({ ...prev, isOpen: false }));
     };
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async (pageToFetch: number) => {
+        const currentSearch = searchRef.current;
+        const currentFilter = filterRef.current;
+        const limitToFetch = pagination.limit; // Using state is fine here as it doesn't change often/triggers re-fetch if it does
+
         setLoading(true);
         try {
-            // Check cache for towns
-            const townsCacheKey = 'towns';
+            // Check cache for cities
             const citiesCacheKey = 'cities';
-
-            const cachedTowns = getCache<any>(townsCacheKey);
             const cachedCities = getCache<any>(citiesCacheKey);
 
-            if (cachedTowns && cachedCities) {
-                setTowns(Array.isArray(cachedTowns) ? cachedTowns : []);
+            if (cachedCities) {
                 setCities(Array.isArray(cachedCities) ? cachedCities : []);
+            } else {
+                const citiesData = await getCities({ includeAll: true });
+                setCities(citiesData);
+                setCache(citiesCacheKey, citiesData);
+            }
+
+            // Caching for Towns
+            const townsCacheKey = 'towns';
+            const cacheParams = {
+                page: pageToFetch,
+                limit: limitToFetch,
+                search: currentSearch || undefined,
+                townId: currentFilter === 'all' ? undefined : currentFilter,
+                includeAll: true
+            };
+
+            const cachedTowns = getCache<any>(townsCacheKey, cacheParams);
+            if (cachedTowns) {
+                if (cachedTowns.data && Array.isArray(cachedTowns.data)) {
+                    setTowns(cachedTowns.data);
+                    setPagination(prev => ({
+                        ...prev,
+                        page: pageToFetch,
+                        total: cachedTowns.total,
+                        totalPages: cachedTowns.totalPages
+                    }));
+                } else if (Array.isArray(cachedTowns)) {
+                    setTowns(cachedTowns);
+                }
                 setLoading(false);
                 return;
             }
 
-            const [townsData, citiesData] = await Promise.all([
-                getTowns({ includeAll: true }),
-                getCities({ includeAll: true })
-            ]);
-            setTowns(townsData);
-            setCities(citiesData);
+            // Fetch from API
+            const townsResponse = await getTowns(cacheParams);
 
-            // Cache the responses
-            setCache(townsCacheKey, townsData);
-            setCache(citiesCacheKey, citiesData);
+            if (townsResponse.data && Array.isArray(townsResponse.data)) {
+                setTowns(townsResponse.data);
+                setPagination(prev => ({
+                    ...prev,
+                    page: pageToFetch,
+                    total: townsResponse.total,
+                    totalPages: townsResponse.totalPages
+                }));
+                // Set Cache
+                setCache(townsCacheKey, townsResponse, cacheParams);
+            } else if (Array.isArray(townsResponse)) {
+                // Fallback
+                setTowns(townsResponse);
+                setCache(townsCacheKey, townsResponse, cacheParams);
+            }
+
         } catch (error) {
             console.error('Failed to fetch data:', error);
         } finally {
             setLoading(false);
         }
-    };
+    }, [pagination.limit, getCache, setCache, setCities, setTowns, setLoading]);
 
+    // Consolidated Effects
+
+    // 1. Handle Page Changes
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(pagination.page);
+    }, [pagination.page, fetchData]);
+
+    // 2. Handle Filter/Search Changes (Reset Page or Fetch)
+    useEffect(() => {
+        const filterChanged = cityFilter !== prevFilterRef.current;
+        const searchChanged = debouncedSearch !== prevSearchRef.current;
+
+        if (filterChanged || searchChanged) {
+            prevFilterRef.current = cityFilter;
+            prevSearchRef.current = debouncedSearch;
+
+            // Since we use refs in fetchData, we just need to decide whether to reset page or fetch
+            if (pagination.page !== 1) {
+                setPagination(prev => ({ ...prev, page: 1 }));
+                // Changing page will trigger Effect 1
+            } else {
+                // If page is already 1, we must trigger fetch manually because Effect 1 won't run
+                fetchData(1);
+            }
+        }
+    }, [cityFilter, debouncedSearch, fetchData, pagination.page]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -106,9 +203,8 @@ const TownsList = () => {
                 await createTown(townData);
             }
             setModal((prev: any) => ({ ...prev, isOpen: false }));
-            // Invalidate cache after create/update
             invalidateCache('towns');
-            fetchData();
+            fetchData(pagination.page);
             openStatus('success', t('common:success'), modal.isEditing ? t('updatedSuccess') : t('createdSuccess'));
         } catch (error: any) {
             openStatus('error', t('common:error'), error.response?.data?.message || error.message);
@@ -123,9 +219,8 @@ const TownsList = () => {
             async () => {
                 try {
                     await deleteTown(id);
-                    // Invalidate cache after delete
                     invalidateCache('towns');
-                    fetchData();
+                    fetchData(pagination.page);
                     openStatus('success', t('common:success'), t('deletedSuccess'));
                 } catch (error: any) {
                     openStatus('error', t('common:error'), error.response?.data?.message || error.message);
@@ -137,22 +232,16 @@ const TownsList = () => {
     const handleToggleStatus = async (town: any) => {
         try {
             await toggleTownStatus(town.id, town.isActive);
-            // Invalidate cache after status toggle
             invalidateCache('towns');
-            fetchData();
+            fetchData(pagination.page);
             openStatus('success', t('statusUpdated'), t('statusUpdateMessage', { status: town.isActive ? t('deactivated') : t('activated') }));
         } catch (error: any) {
             openStatus('error', t('updateFailed'), error.response?.data?.message || error.message);
         }
     };
 
-    const filteredTowns = towns.filter(town => {
-        const matchesSearch = (town.enName?.toLowerCase() || '').includes(search.toLowerCase()) ||
-            (town.arName || '').includes(search);
-        const townCityId = town.town?.id || town.townId;
-        const matchesCity = cityFilter === 'all' || townCityId === cityFilter;
-        return matchesSearch && matchesCity;
-    });
+    // Use server-side data directly
+    const filteredTowns = towns;
 
     return (
         <div className="list-page-container p-6">
@@ -216,7 +305,10 @@ const TownsList = () => {
                     </div>
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
+                        <table
+                            dir={isRTL ? 'rtl' : 'ltr'}
+                            className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}
+                        >
                             <thead>
                                 <tr className="bg-slate-50/80 dark:bg-slate-800/80">
                                     <th className="table-header-cell">{t('sectorEn')}</th>
@@ -297,6 +389,13 @@ const TownsList = () => {
                     </div>
                 )}
             </div>
+
+            <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+                isLoading={loading}
+            />
 
             <Modal
                 isOpen={modal.isOpen}

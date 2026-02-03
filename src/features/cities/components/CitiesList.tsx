@@ -25,18 +25,20 @@ import {
 import StatusModal from '../../../components/common/StatusModal';
 import Modal from '../../../components/common/Modal';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
 import clsx from 'clsx';
 
 const CitiesList = () => {
     const { t } = useTranslation(['cities', 'common']);
     const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
     const [cities, setCities] = useRecoilState(citiesState);
     const [loading, setLoading] = useRecoilState(citiesLoadingState);
     const [search, setSearch] = useRecoilState(citiesSearchState);
     const [modal, setModal] = useRecoilState(cityModalState);
     const [statusModal, setStatusModal] = useRecoilState(cityStatusModalState);
 
-    const openStatus = (type: any, title: string, message: string, onConfirm: any = null) => {
+    const openStatus = (type: 'success' | 'error' | 'confirm', title: string, message: string, onConfirm?: () => void) => {
         setStatusModal({ isOpen: true, type, title, message, onConfirm });
     };
 
@@ -47,8 +49,18 @@ const CitiesList = () => {
     const fetchCities = async () => {
         setLoading(true);
         try {
+            const cacheKey = 'cities';
+            const cachedData = getCache<any>(cacheKey);
+
+            if (cachedData) {
+                setCities(Array.isArray(cachedData) ? cachedData : []);
+                setLoading(false);
+                return;
+            }
+
             const data = await getCities({ includeAll: true });
             setCities(data);
+            setCache(cacheKey, data);
         } catch (error) {
             console.error('Failed to fetch cities:', error);
         } finally {
@@ -75,6 +87,7 @@ const CitiesList = () => {
                 await createCity(cityData);
             }
             setModal((prev: any) => ({ ...prev, isOpen: false }));
+            invalidateCache('cities');
             fetchCities();
             openStatus('success', t('common:success'), modal.isEditing ? t('updatedSuccess') : t('createdSuccess'));
         } catch (error: any) {
@@ -90,6 +103,7 @@ const CitiesList = () => {
             async () => {
                 try {
                     await deleteCity(id);
+                    invalidateCache('cities');
                     fetchCities();
                     openStatus('success', t('common:success'), t('deletedSuccess'));
                 } catch (error: any) {
@@ -102,6 +116,7 @@ const CitiesList = () => {
     const handleToggleStatus = async (city: any) => {
         try {
             await toggleCityStatus(city.id, city.isActive);
+            invalidateCache('cities');
             fetchCities();
             openStatus('success', t('statusUpdated'), t('statusUpdateMessage', { status: city.isActive ? t('deactivated') : t('activated') }));
         } catch (error: any) {
@@ -160,7 +175,10 @@ const CitiesList = () => {
                     </div>
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
+                        <table
+                            dir={isRTL ? 'rtl' : 'ltr'}
+                            className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}
+                        >
                             <thead>
                                 <tr className="bg-slate-50/80 dark:bg-slate-800/80">
                                     <th className="table-header-cell">{t('domainEn')}</th>

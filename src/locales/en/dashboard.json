@@ -42,5 +42,20 @@
         "ready": "Ready",
         "delivered": "Delivered",
         "cancelled": "Cancelled"
-    }
+    },
+    "appUpdates": "App Update Controls",
+    "unsavedChangesSpecific": "Unsaved changes are specific to the active tab.",
+    "viewVersionHistory": "View Version History",
+    "storeUrl": "Store URL",
+    "storeUrlDesc": "Link to the app updates.",
+    "latestVersion": "Latest Version",
+    "latestVersionDesc": "Current semantic version.",
+    "minSupportedVersion": "Minimum Supported Version",
+    "minSupportedVersionDesc": "Versions lower than this will be forced to update.",
+    "exactBlockedVersion": "Exact Blocked Version",
+    "exactBlockedVersionDesc": "Block a specific buggy version from accessing the API.",
+    "forceUpdate": "Force Update (Recommended for critical updates)",
+    "maintenanceMode": "Maintenance Mode",
+    "maintenanceMessage": "Maintenance Message",
+    "savePlatformSettings": "Save {{platform}} Settings"
 }

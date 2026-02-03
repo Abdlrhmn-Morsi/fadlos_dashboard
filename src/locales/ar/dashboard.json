@@ -42,5 +42,20 @@
         "ready": "جاهز للاستلام",
         "delivered": "تم التوصيل",
         "cancelled": "ملغي"
-    }
+    },
+    "appUpdates": "التحكم في تحديثات التطبيق",
+    "unsavedChangesSpecific": "التغييرات غير المحفوظة خاصة بعلامة التبويب النشطة.",
+    "viewVersionHistory": "عرض سجل الإصدارات",
+    "storeUrl": "رابط المتجر",
+    "storeUrlDesc": "رابط لتحديثات التطبيق.",
+    "latestVersion": "أحدث إصدار",
+    "latestVersionDesc": "الإصدار الحالي.",
+    "minSupportedVersion": "الحد الأدنى للإصدار المدعوم",
+    "minSupportedVersionDesc": "سيتم إجبار الإصدارات الأقل من هذا على التحديث.",
+    "exactBlockedVersion": "إصدار محظور محدد",
+    "exactBlockedVersionDesc": "حظر إصدار معين من الوصول إلى واجهة التطبيق.",
+    "forceUpdate": "تحديث إجباري (موصى به للتحديثات المهمة)",
+    "maintenanceMode": "وضع الصيانة",
+    "maintenanceMessage": "رسالة الصيانة",
+    "savePlatformSettings": "حفظ إعدادات {{platform}}"
 }

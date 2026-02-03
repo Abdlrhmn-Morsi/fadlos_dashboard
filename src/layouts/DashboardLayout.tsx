@@ -180,6 +180,7 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />
               <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />
               <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />
+              <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />
             </>
           )}
 

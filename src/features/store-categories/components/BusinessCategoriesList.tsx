@@ -1,38 +1,43 @@
 import React, { useEffect } from 'react';
 import { useRecoilState } from 'recoil';
 import {
-    Briefcase,
+    Tags,
     Plus,
     Search,
     Edit2,
+    Filter,
 } from 'lucide-react';
 import {
-    getBusinessTypes,
-    createBusinessType,
-    updateBusinessType,
-    toggleBusinessTypeStatus
-} from '../api/business-types.api';
+    getBusinessCategories,
+    createBusinessCategory,
+    updateBusinessCategory,
+    toggleBusinessCategoryStatus
+} from '../api/business-categories.api';
+import { getBusinessTypes } from '../../business-types/api/business-types.api';
 import { useTranslation } from 'react-i18next';
 import {
-    businessTypesState,
-    businessTypesLoadingState,
-    businessTypesSearchState,
-    businessTypeModalState,
-    businessTypeStatusModalState
-} from '../store/business-types.store';
+    businessCategoriesState,
+    businessCategoriesLoadingState,
+    businessCategoriesSearchState,
+    businessCategoriesFilterState,
+    businessCategoryModalState,
+    businessCategoryStatusModalState
+} from '../store/business-categories.store';
 import StatusModal from '../../../components/common/StatusModal';
 import Modal from '../../../components/common/Modal';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import clsx from 'clsx';
 
-const BusinessTypesList = () => {
-    const { t } = useTranslation(['businessTypes', 'common']);
+const BusinessCategoriesList = () => {
+    const { t } = useTranslation(['businessCategories', 'common']);
     const { isRTL } = useLanguage();
-    const [businessTypes, setBusinessTypes] = useRecoilState(businessTypesState);
-    const [loading, setLoading] = useRecoilState(businessTypesLoadingState);
-    const [search, setSearch] = useRecoilState(businessTypesSearchState);
-    const [modal, setModal] = useRecoilState(businessTypeModalState);
-    const [statusModal, setStatusModal] = useRecoilState(businessTypeStatusModalState);
+    const [categories, setCategories] = useRecoilState(businessCategoriesState);
+    const [loading, setLoading] = useRecoilState(businessCategoriesLoadingState);
+    const [search, setSearch] = useRecoilState(businessCategoriesSearchState);
+    const [filter, setFilter] = useRecoilState(businessCategoriesFilterState);
+    const [modal, setModal] = useRecoilState(businessCategoryModalState);
+    const [statusModal, setStatusModal] = useRecoilState(businessCategoryStatusModalState);
+    const [businessTypes, setBusinessTypes] = React.useState<any[]>([]);
 
     const openStatus = (type: 'success' | 'error' | 'confirm', title: string, message: string, onConfirm?: () => void) => {
         setStatusModal({ isOpen: true, type, title, message, onConfirm });
@@ -43,12 +48,21 @@ const BusinessTypesList = () => {
     };
 
     const fetchBusinessTypes = async () => {
-        setLoading(true);
         try {
             const data = await getBusinessTypes();
             setBusinessTypes(data);
         } catch (error) {
             console.error('Failed to fetch business types:', error);
+        }
+    };
+
+    const fetchCategories = async () => {
+        setLoading(true);
+        try {
+            const data = await getBusinessCategories(filter || '');
+            setCategories(data);
+        } catch (error) {
+            console.error('Failed to fetch business categories:', error);
         } finally {
             setLoading(false);
         }
@@ -56,45 +70,49 @@ const BusinessTypesList = () => {
 
     useEffect(() => {
         fetchBusinessTypes();
-    }, []);
+        fetchCategories();
+    }, [filter]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
             const payload = {
-                en_name: modal.currentType.en_name,
-                ar_name: modal.currentType.ar_name,
-                // Code is auto-generated in backend
-                is_active: modal.currentType.is_active
+                name: modal.currentCategory.name,
+                nameAr: modal.currentCategory.nameAr,
+                businessTypeId: modal.currentCategory.businessTypeId,
+                isActive: modal.currentCategory.isActive,
+                sort: modal.currentCategory.sort || 0,
             };
 
-            if (modal.isEditing) {
-                await updateBusinessType(modal.currentType.id, payload);
+            if (modal.isEditing && modal.currentCategory.id) {
+                await updateBusinessCategory(modal.currentCategory.id, payload);
             } else {
-                await createBusinessType(payload);
+                await createBusinessCategory(payload);
             }
             setModal((prev: any) => ({ ...prev, isOpen: false }));
-            fetchBusinessTypes();
-            openStatus('success', t('success'), modal.isEditing ? t('updatedSuccess') : t('createdSuccess'));
+            fetchCategories();
+            openStatus('success', t('common:success'), modal.isEditing ? t('updatedSuccess') : t('createdSuccess'));
         } catch (error: any) {
             openStatus('error', t('common:error'), error.response?.data?.message || error.message);
         }
     };
 
-    const handleToggleStatus = async (type: any) => {
+    const handleToggleStatus = async (category: any) => {
         try {
-            await toggleBusinessTypeStatus(type.id, type.is_active);
-            fetchBusinessTypes();
-            openStatus('success', t('statusUpdated'), t('statusUpdateMessage', { status: type.is_active ? t('deactivated') : t('activated') }));
+            await toggleBusinessCategoryStatus(category.id);
+            fetchCategories();
+            openStatus('success', t('statusUpdated'), t('statusUpdateMessage', { status: category.isActive ? t('deactivated') : t('activated') }));
         } catch (error: any) {
             openStatus('error', t('updateFailed'), error.response?.data?.message || error.message);
         }
     };
 
-    const filteredTypes = businessTypes.filter(type =>
-        (type.en_name?.toLowerCase() || '').includes(search.toLowerCase()) ||
-        (type.ar_name || '').includes(search) ||
-        (type.code?.toLowerCase() || '').includes(search.toLowerCase())
+    const filteredCategories = categories.filter(category =>
+        (category.name?.toLowerCase() || '').includes(search.toLowerCase()) ||
+        (category.nameAr || '').includes(search) ||
+        (category.code?.toLowerCase() || '').includes(search.toLowerCase()) ||
+        (category.businessType?.en_name?.toLowerCase() || '').includes(search.toLowerCase()) ||
+        (category.businessType?.ar_name || '').includes(search)
     );
 
     return (
@@ -102,7 +120,7 @@ const BusinessTypesList = () => {
             <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "flex-row-reverse")}>
                 <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
                     <div className="p-3 bg-primary-light rounded-none animate-float">
-                        <Briefcase size={24} className="text-primary" />
+                        <Tags size={24} className="text-primary" />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
@@ -120,13 +138,39 @@ const BusinessTypesList = () => {
                             onChange={(e) => setSearch(e.target.value)}
                         />
                     </div>
+                    <div className="relative group">
+                        <Filter size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none", isRTL ? "right-4" : "left-4")} />
+                        <select
+                            value={filter}
+                            onChange={(e) => setFilter(e.target.value)}
+                            className={clsx(
+                                "py-3 w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
+                            )}
+                        >
+                            <option value="">{t('allBusinessTypes')}</option>
+                            {businessTypes.map((type) => (
+                                <option key={type.id} value={type.id}>
+                                    {isRTL ? type.ar_name : type.en_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                     <button
                         className="btn btn-primary"
                         onClick={() => {
                             setModal({
                                 isOpen: true,
                                 isEditing: false,
-                                currentType: { id: '', en_name: '', ar_name: '', code: '', is_active: true }
+                                currentCategory: {
+                                    id: '',
+                                    name: '',
+                                    nameAr: '',
+                                    code: '',
+                                    businessTypeId: '',
+                                    isActive: true,
+                                    sort: 0,
+                                }
                             });
                         }}
                     >
@@ -139,48 +183,54 @@ const BusinessTypesList = () => {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-6">
                         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-none animate-spin" />
-                        <div className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('classifying')}</div>
+                        <div className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('loading')}</div>
                     </div>
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
                             <thead>
                                 <tr className="bg-slate-50/80 dark:bg-slate-800/80">
-                                    <th className="table-header-cell">{t('industryEn')}</th>
-                                    <th className="table-header-cell">{t('industryAr')}</th>
-                                    <th className="table-header-cell">{t('systemCode')}</th>
-                                    <th className="table-header-cell">{t('lifecycle')}</th>
-                                    <th className={clsx("table-header-cell", isRTL ? "text-left" : "text-right")}>{t('governance')}</th>
+                                    <th className="table-header-cell">{t('nameEn')}</th>
+                                    <th className="table-header-cell">{t('nameAr')}</th>
+                                    <th className="table-header-cell">{t('businessType')}</th>
+                                    <th className="table-header-cell">{t('code')}</th>
+                                    <th className="table-header-cell">{t('status')}</th>
+                                    <th className={clsx("table-header-cell", isRTL ? "text-left" : "text-right")}>{t('actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
-                                {filteredTypes.length > 0 ? (
-                                    filteredTypes.map((type: any) => (
-                                        <tr key={type.id} className="table-row group">
+                                {filteredCategories.length > 0 ? (
+                                    filteredCategories.map((category: any) => (
+                                        <tr key={category.id} className="table-row group">
                                             <td className="table-cell">
-                                                <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{type.en_name}</div>
+                                                <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{category.name}</div>
                                             </td>
                                             <td className="table-cell">
-                                                <div className="text-sm text-slate-600 dark:text-slate-400 font-bold">{type.ar_name}</div>
+                                                <div className="text-sm text-slate-600 dark:text-slate-400 font-bold">{category.nameAr}</div>
+                                            </td>
+                                            <td className="table-cell">
+                                                <div className="text-sm text-slate-600 dark:text-slate-400 font-bold">
+                                                    {isRTL ? category.businessType?.ar_name : category.businessType?.en_name}
+                                                </div>
                                             </td>
                                             <td className="table-cell">
                                                 <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-none text-[10px] font-black tracking-widest uppercase">
-                                                    {type.code}
+                                                    {category.code}
                                                 </code>
                                             </td>
                                             <td className="table-cell">
                                                 <button
-                                                    onClick={() => handleToggleStatus(type)}
+                                                    onClick={() => handleToggleStatus(category)}
                                                     className={clsx(
                                                         "inline-flex items-center gap-2 px-3 py-1 rounded-none text-[10px] font-black uppercase tracking-widest transition-all",
                                                         isRTL && "flex-row-reverse",
-                                                        type.is_active
+                                                        category.isActive
                                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-900'
                                                             : 'bg-slate-50 text-slate-400 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700'
                                                     )}
                                                 >
-                                                    <div className={`w-1.5 h-1.5 rounded-none ${type.is_active ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
-                                                    {type.is_active ? t('active') : t('locked')}
+                                                    <div className={`w-1.5 h-1.5 rounded-none ${category.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                                                    {category.isActive ? t('active') : t('inactive')}
                                                 </button>
                                             </td>
                                             <td className={clsx("table-cell", isRTL ? "text-left" : "text-right")}>
@@ -190,7 +240,7 @@ const BusinessTypesList = () => {
                                                         setModal({
                                                             isOpen: true,
                                                             isEditing: true,
-                                                            currentType: type
+                                                            currentCategory: category
                                                         });
                                                     }}
                                                 >
@@ -201,10 +251,10 @@ const BusinessTypesList = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={5} className="text-center py-32">
+                                        <td colSpan={6} className="text-center py-32">
                                             <div className="flex flex-col items-center gap-3">
-                                                <Briefcase size={48} className="text-slate-200" />
-                                                <div className="text-slate-400 font-bold text-sm tracking-tight italic">{t('noTypesFound')}</div>
+                                                <Tags size={48} className="text-slate-200" />
+                                                <div className="text-slate-400 font-bold text-sm tracking-tight italic">{t('noCategoriesFound')}</div>
                                             </div>
                                         </td>
                                     </tr>
@@ -218,20 +268,20 @@ const BusinessTypesList = () => {
             <Modal
                 isOpen={modal.isOpen}
                 onClose={() => setModal((prev: any) => ({ ...prev, isOpen: false }))}
-                title={modal.isEditing ? t('sectorOptimization') : t('sectorIntegration')}
+                title={modal.isEditing ? t('editCategory') : t('createCategory')}
             >
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
                             <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
-                                {t('identityEn')}
+                                {t('nameEn')}
                             </label>
                             <input
                                 type="text"
-                                value={modal.currentType.en_name}
-                                onChange={(e) => setModal({ ...modal, currentType: { ...modal.currentType, en_name: e.target.value } })}
+                                value={modal.currentCategory.name || ''}
+                                onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, name: e.target.value } })}
                                 required
-                                placeholder={t('placeholderEn')}
+                                placeholder={t('nameEnPlaceholder')}
                                 className={clsx(
                                     "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
                                     isRTL && "text-right"
@@ -240,14 +290,14 @@ const BusinessTypesList = () => {
                         </div>
                         <div className="space-y-3">
                             <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
-                                {t('identityAr')}
+                                {t('nameAr')}
                             </label>
                             <input
                                 type="text"
-                                value={modal.currentType.ar_name}
-                                onChange={(e) => setModal({ ...modal, currentType: { ...modal.currentType, ar_name: e.target.value } })}
+                                value={modal.currentCategory.nameAr || ''}
+                                onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, nameAr: e.target.value } })}
                                 required
-                                placeholder={t('placeholderAr')}
+                                placeholder={t('nameArPlaceholder')}
                                 className={clsx(
                                     "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
                                     isRTL && "text-right"
@@ -255,37 +305,54 @@ const BusinessTypesList = () => {
                             />
                         </div>
                     </div>
-                    {!modal.isEditing && (
-                        <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
-                                {t('systemCode')}
-                            </label>
-                            <div className={clsx(
-                                "px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none text-slate-500 dark:text-slate-400 font-mono text-sm",
+                    <div className="space-y-3">
+                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                            {t('businessType')}
+                        </label>
+                        <select
+                            value={modal.currentCategory.businessTypeId || ''}
+                            onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, businessTypeId: e.target.value } })}
+                            required
+                            className={clsx(
+                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
                                 isRTL && "text-right"
-                            )}>
-                                {modal.currentType.en_name
-                                    ?.toLowerCase()
-                                    .replace(/[^a-z0-9]+/g, '_')
-                                    .replace(/^_+|_+$/g, '') || t('codePlaceholder')}
-                            </div>
-                            <p className={clsx("text-[10px] font-bold text-slate-400 uppercase tracking-tight", isRTL ? "mr-1 block text-right" : "ml-1")}>
-                                {t('codeWarning')}
-                            </p>
-                        </div>
-                    )}
+                            )}
+                        >
+                            <option value="">{t('selectBusinessType')}</option>
+                            {businessTypes.map((type) => (
+                                <option key={type.id} value={type.id}>
+                                    {isRTL ? type.ar_name : type.en_name}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="space-y-3">
+                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                            {t('sortOrder')}
+                        </label>
+                        <input
+                            type="number"
+                            value={modal.currentCategory.sort || 0}
+                            onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, sort: parseInt(e.target.value) || 0 } })}
+                            className={clsx(
+                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
+                                isRTL && "text-right"
+                            )}
+                            placeholder={t('sortOrderPlaceholder')}
+                        />
+                    </div>
                     <div className={clsx(
                         "flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/50 p-5 rounded-none border border-slate-100 dark:border-slate-700 transition-all hover:bg-slate-50 dark:hover:bg-slate-800",
                         isRTL && "flex-row-reverse"
                     )}>
                         <input
                             type="checkbox"
-                            checked={modal.currentType.is_active}
-                            onChange={(e) => setModal({ ...modal, currentType: { ...modal.currentType, is_active: e.target.checked } })}
-                            id="type-active"
+                            checked={modal.currentCategory.isActive ?? true}
+                            onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, isActive: e.target.checked } })}
+                            id="category-active"
                             className="w-6 h-6 rounded-none border-slate-300 dark:border-slate-600 text-primary shadow-sm"
                         />
-                        <label htmlFor="type-active" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">{t('operationalAuthorization')}</label>
+                        <label htmlFor="category-active" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">{t('activeStatus')}</label>
                     </div>
                     <div className={clsx("flex items-center gap-3 pt-4", isRTL ? "justify-start flex-row-reverse" : "justify-end")}>
                         <button
@@ -299,12 +366,11 @@ const BusinessTypesList = () => {
                             type="submit"
                             className="btn btn-primary"
                         >
-                            {modal.isEditing ? t('common:update') : t('common:create')}
+                            {modal.isEditing ? t('updateCategory') : t('createCategory')}
                         </button>
                     </div>
                 </form>
             </Modal>
-
 
             <StatusModal
                 isOpen={statusModal.isOpen}
@@ -314,8 +380,8 @@ const BusinessTypesList = () => {
                 message={statusModal.message}
                 onConfirm={statusModal.onConfirm}
             />
-        </div >
+        </div>
     );
 };
 
-export default BusinessTypesList;
+export default BusinessCategoriesList;

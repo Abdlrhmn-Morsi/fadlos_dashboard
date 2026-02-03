@@ -18,6 +18,8 @@ import townsEN from './locales/en/towns.json';
 import townsAR from './locales/ar/towns.json';
 import businessTypesEN from './locales/en/businessTypes.json';
 import businessTypesAR from './locales/ar/businessTypes.json';
+import businessCategoriesEN from './locales/en/businessCategories.json';
+import businessCategoriesAR from './locales/ar/businessCategories.json';
 import productsEN from './locales/en/products.json';
 import productsAR from './locales/ar/products.json';
 import categoriesEN from './locales/en/categories.json';
@@ -48,6 +50,7 @@ const resources = {
         cities: citiesEN,
         towns: townsEN,
         businessTypes: businessTypesEN,
+        businessCategories: businessCategoriesEN,
         products: productsEN,
         categories: categoriesEN,
         orders: ordersEN,
@@ -67,6 +70,7 @@ const resources = {
         cities: citiesAR,
         towns: townsAR,
         businessTypes: businessTypesAR,
+        businessCategories: businessCategoriesAR,
         products: productsAR,
         categories: categoriesAR,
         orders: ordersAR,

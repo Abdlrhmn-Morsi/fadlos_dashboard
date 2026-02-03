@@ -5,8 +5,9 @@ export const getTowns = async (params: any = {}) => {
         // Use admin endpoint if asking for all records (which implies admin access)
         const url = params.includeAll ? '/places/admin' : '/places';
         const responseBody = await apiService.get(url, { params });
-        const data = responseBody.data || responseBody;
-        return Array.isArray(data) ? data : (data.data || []);
+        // Return full response if pagination is requested
+        if (params.page) return responseBody;
+        return responseBody.data || responseBody;
     } catch (error) {
         throw error;
     }

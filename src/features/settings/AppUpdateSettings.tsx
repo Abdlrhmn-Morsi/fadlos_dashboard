@@ -300,7 +300,7 @@ const AppUpdateSettings: React.FC = () => {
                             className="flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
                         >
                             <Save className="h-4 w-4 me-2" />
-                            {loading ? t('common:saving') : t('savePlatformSettings', { defaultValue: `Save ${activeTab === PlatformType.ANDROID ? 'Android' : 'iOS'} Settings` })}
+                            {loading ? t('common:saving') : t('savePlatformSettings', { platform: activeTab === PlatformType.ANDROID ? 'Android' : 'iOS', defaultValue: `Save ${activeTab === PlatformType.ANDROID ? 'Android' : 'iOS'} Settings` })}
                         </button>
                     </div>
                 </div>

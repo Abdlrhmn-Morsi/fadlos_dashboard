@@ -11,6 +11,7 @@ import Stores from './features/stores/Stores';
 import Cities from './features/cities/Cities';
 import Towns from './features/towns/Towns';
 import BusinessTypes from './features/business-types/BusinessTypes';
+import BusinessCategories from './features/store-categories/BusinessCategories';
 import ProductList from './features/products/ProductList';
 import ProductForm from './features/products/ProductForm';
 import ProductDetail from './features/products/ProductDetail';
@@ -117,6 +118,8 @@ const AppContent = () => {
             <Route path="cities" element={<Cities />} />
             <Route path="towns" element={<Towns />} />
             <Route path="business-types" element={<BusinessTypes />} />
+            <Route path="business-categories" element={<BusinessCategories />} />
+
 
             <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
             <Route path="profile-settings" element={<ProfileSettings />} />
