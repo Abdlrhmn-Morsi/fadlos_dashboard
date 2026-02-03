@@ -130,26 +130,51 @@ const OrderDetail = () => {
     };
 
     // Helper to resolve variant names
-    const getVariantDetails = (item: any) => {
-        if (!item.selectedVariants || !item.product?.variants) return null;
+    const getVariantDetails = (item: any): string[] => {
+        if (!item.selectedVariants || item.selectedVariants.length === 0) return [];
 
         return item.selectedVariants.map((sv: any) => {
-            const variant = item.product.variants.find((v: any) => v.id === sv.variantId);
-            if (!variant) return null;
-            const value = variant.values.find((val: any) => val.id === sv.valueId);
-            if (!value) return null;
-            return `${variant.name}: ${value.value}`;
-        }).filter(Boolean).join(' | ');
+            // Use snapshot data if available (this is what the backend currently sends)
+            if (sv.variant && sv.variantValue) {
+                const vName = isRTL ? sv.variant.nameAr || sv.variant.name : sv.variant.name;
+                const valName = isRTL ? sv.variantValue.valueAr || sv.variantValue.value : sv.variantValue.value;
+                const price = sv.variantValue.price > 0
+                    ? ` (+${Number(sv.variantValue.price).toFixed(2)} ${t('common:currencySymbol')})`
+                    : '';
+                return `${vName}: ${valName}${price}`;
+            }
+
+            // Fallback for older or simpler data structures
+            if (sv.variantId && sv.valueId && item.product?.variants) {
+                const variant = item.product.variants.find((v: any) => v.id === sv.variantId);
+                if (!variant) return null;
+                const value = variant.values.find((val: any) => val.id === sv.valueId);
+                if (!value) return null;
+
+                const vName = isRTL ? variant.nameAr || variant.name : variant.name;
+                const valName = isRTL ? value.valueAr || value.value : value.value;
+                const price = value.price > 0
+                    ? ` (+${Number(value.price).toFixed(2)} ${t('common:currencySymbol')})`
+                    : '';
+                return `${vName}: ${valName}${price}`;
+            }
+
+            return null;
+        }).filter(Boolean);
     };
 
     // Helper to resolve addon names
-    const getAddonDetails = (item: any) => {
-        if (!item.selectedAddons || item.selectedAddons.length === 0) return null;
+    const getAddonDetails = (item: any): string[] => {
+        if (!item.selectedAddons || item.selectedAddons.length === 0) return [];
 
         return item.selectedAddons.map((sa: any) => {
             const name = isRTL ? sa.nameAr || sa.name : sa.name;
-            return `+ ${name} (${sa.price.toFixed(2)} ${t('common:currencySymbol')})`;
-        }).join(', ');
+            const quantity = sa.quantity > 1 ? ` x${sa.quantity}` : '';
+            const price = sa.price > 0
+                ? ` (+${(Number(sa.price) * (sa.quantity || 1)).toFixed(2)} ${t('common:currencySymbol')})`
+                : '';
+            return `${name}${quantity}${price}`;
+        });
     };
 
     return (
@@ -227,16 +252,24 @@ const OrderDetail = () => {
                                                 </span>
                                                 <span>x {item.quantity}</span>
                                             </div>
-                                            {getVariantDetails(item) && (
-                                                <p className="text-sm text-indigo-600 dark:text-indigo-400 font-medium mt-1">
-                                                    {getVariantDetails(item)}
-                                                </p>
-                                            )}
-                                            {getAddonDetails(item) && (
-                                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-medium mt-1">
-                                                    {getAddonDetails(item)}
-                                                </p>
-                                            )}
+                                            <div className="mt-2 space-y-1">
+                                                {getVariantDetails(item).map((detail, idx) => (
+                                                    <div key={idx} className="flex items-center gap-2">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                                                        <p className="text-sm text-slate-600 dark:text-slate-400 font-medium">
+                                                            {detail}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                                {getAddonDetails(item).map((detail, idx) => (
+                                                    <div key={idx} className="flex items-center gap-2">
+                                                        <span className="text-emerald-500 font-bold text-xs shrink-0">+</span>
+                                                        <p className="text-xs text-slate-500 dark:text-slate-500 italic">
+                                                            {detail}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
                                 ))}
@@ -445,26 +478,26 @@ const OrderDetail = () => {
                             </div>
                         </div>
 
+                        {/* Cancel Order Section */}
+                        {hasPermission(Permissions.ORDERS_CANCEL) && order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                    <AlertCircle className="text-rose-500" size={20} />
+                                    {t('cancelOrder')}
+                                </h3>
+                                <p className="text-sm text-slate-500 mb-4">
+                                    {t('cancelOrderWarning')}
+                                </p>
+                                <button
+                                    onClick={() => setCancelModal(true)}
+                                    className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
+                                >
+                                    {t('cancelOrder')}
+                                </button>
+                            </div>
+                        )}
                     </div>
 
-                    {/* Cancel Order Section */}
-                    {hasPermission(Permissions.ORDERS_CANCEL) && order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
-                        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                            <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                                <AlertCircle className="text-rose-500" size={20} />
-                                {t('cancelOrder')}
-                            </h3>
-                            <p className="text-sm text-slate-500 mb-4">
-                                {t('cancelOrderWarning')}
-                            </p>
-                            <button
-                                onClick={() => setCancelModal(true)}
-                                className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
-                            >
-                                {t('cancelOrder')}
-                            </button>
-                        </div>
-                    )}
 
                 </div>
             </div>

@@ -40,6 +40,8 @@
     "previous": "Previous",
     "next": "Next",
     "noDataFound": "No data found",
+    "noResults": "No results found",
+    "adjustSearch": "Try adjusting your search terms",
     "language": "Language",
     "theme": "Theme",
     "lightMode": "Light Mode",

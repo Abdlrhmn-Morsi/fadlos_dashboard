@@ -9,6 +9,7 @@ import { toast } from '../../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useNotification } from '../notification/context/NotificationContext';
+import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 
 const CustomSelect = ({ label, icon: Icon, options, value, onChange, placeholder, disabled = false }: any) => {
@@ -95,6 +96,7 @@ const Register = () => {
     const [error, setError] = useState<string | null>(null);
     const [step, setStep] = useState(1);
     const { loginOneSignal } = useNotification();
+    const { clearAllCache } = useCache();
 
     // Data lists
     const [businessTypes, setBusinessTypes] = useState<any[]>([]);
@@ -183,6 +185,7 @@ const Register = () => {
 
         try {
             const responseData: any = await authApi.registerStoreOwner(formData);
+            clearAllCache();
             if (responseData.requiresVerification) {
                 navigate('/verify-email', { state: { token: responseData.verificationToken } });
             } else {

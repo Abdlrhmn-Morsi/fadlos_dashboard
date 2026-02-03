@@ -842,7 +842,8 @@ const ProductForm = () => {
                                     )}
                                     {!searchingProducts && allProducts.length === 0 && (
                                         <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
-                                            {t('noRelatedProductsFound')}
+                                            <p>{t('noRelatedProductsFound')}</p>
+                                            <p className="text-xs mt-1">{t('common:adjustSearch')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -925,7 +926,8 @@ const ProductForm = () => {
                                     )}
                                     {!searchingAddons && allAddons.length === 0 && (
                                         <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
-                                            {t('addons:noAddonsFound', { defaultValue: 'No add-ons found' })}
+                                            <p>{t('addons:noAddonsFound', { defaultValue: 'No add-ons found' })}</p>
+                                            <p className="text-xs mt-1">{t('common:adjustSearch')}</p>
                                         </div>
                                     )}
                                 </div>
@@ -1004,7 +1006,7 @@ const ProductForm = () => {
                                     {categories.length === 0 ? (
                                         <div className="space-y-3">
                                             <div className="p-4 bg-slate-50 dark:bg-slate-800/50 border border-dashed border-slate-300 dark:border-slate-700 rounded-lg text-center">
-                                                <p className="text-xs text-slate-500 mb-2">{t('common:noResults', { defaultValue: 'No categories found' })}</p>
+                                                <p className="text-xs text-slate-500 mb-2">{t('categories:noCategoriesFound')}</p>
                                                 <button
                                                     type="button"
                                                     onClick={() => setIsCategoryModalOpen(true)}

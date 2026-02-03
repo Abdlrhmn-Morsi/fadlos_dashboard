@@ -146,14 +146,14 @@ const AppContent = () => {
 function App() {
   return (
     <ThemeProvider>
-      <AuthProvider>
-        <CacheProvider>
+      <CacheProvider>
+        <AuthProvider>
           <NotificationProvider>
             <Toaster position="top-right" />
             <AppContent />
           </NotificationProvider>
-        </CacheProvider>
-      </AuthProvider>
+        </AuthProvider>
+      </CacheProvider>
     </ThemeProvider>
   );
 }

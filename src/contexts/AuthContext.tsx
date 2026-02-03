@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
 import api from '../services/api';
 import { UserRole } from '../types/user-role';
+import { useCache } from './CacheContext';
 
 interface User {
     id: string;
@@ -35,6 +36,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { clearAllCache } = useCache();
 
     const hasPermission = useCallback((permission: string): boolean => {
         if (!user) return false;
@@ -74,6 +76,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [refreshProfile]);
 
     const login = async (userData: User) => {
+        clearAllCache();
         setUser(userData);
         await refreshProfile();
     };
@@ -84,6 +87,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         } catch (error) {
             // Even if API fails, we clear state
         } finally {
+            clearAllCache();
             setUser(null);
         }
     };
