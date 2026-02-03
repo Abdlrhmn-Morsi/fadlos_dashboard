@@ -14,6 +14,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
+import { UserRole } from '../../types/user-role';
 import clsx from 'clsx';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
@@ -22,7 +23,7 @@ const OrderDetail = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
-    const { hasPermission } = useAuth();
+    const { user, hasPermission } = useAuth();
     const { invalidateCache } = useCache();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -479,23 +480,26 @@ const OrderDetail = () => {
                         </div>
 
                         {/* Cancel Order Section */}
-                        {hasPermission(Permissions.ORDERS_CANCEL) && order.status !== OrderStatus.DELIVERED && order.status !== OrderStatus.CANCELLED && (
-                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
-                                <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                                    <AlertCircle className="text-rose-500" size={20} />
-                                    {t('cancelOrder')}
-                                </h3>
-                                <p className="text-sm text-slate-500 mb-4">
-                                    {t('cancelOrderWarning')}
-                                </p>
-                                <button
-                                    onClick={() => setCancelModal(true)}
-                                    className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
-                                >
-                                    {t('cancelOrder')}
-                                </button>
-                            </div>
-                        )}
+                        {hasPermission(Permissions.ORDERS_CANCEL) &&
+                            order.status !== OrderStatus.DELIVERED &&
+                            order.status !== OrderStatus.CANCELLED &&
+                            (user?.role !== UserRole.CUSTOMER || order.status === OrderStatus.PENDING) && (
+                                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                    <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                        <AlertCircle className="text-rose-500" size={20} />
+                                        {t('cancelOrder')}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 mb-4">
+                                        {t('cancelOrderWarning')}
+                                    </p>
+                                    <button
+                                        onClick={() => setCancelModal(true)}
+                                        className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
+                                    >
+                                        {t('cancelOrder')}
+                                    </button>
+                                </div>
+                            )}
                     </div>
 
 
