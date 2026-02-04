@@ -10,6 +10,7 @@
     "inventory": "Inventory",
     "trackInventory": "Track Inventory",
     "isActive": "Is Active",
+    "isRequired": "Is Required",
     "image": "Image",
     "noAddonsFound": "No add-ons found",
     "getStarted": "Create your first add-on to enhance your products",

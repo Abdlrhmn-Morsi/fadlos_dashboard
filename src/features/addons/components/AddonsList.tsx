@@ -181,9 +181,11 @@ const AddonsList = () => {
                                                         <Package size={20} />
                                                     </div>
                                                 )}
-                                                <p className="font-semibold text-slate-800 dark:text-white">
-                                                    {isRTL ? addon.nameAr || addon.name : addon.name}
-                                                </p>
+                                                <div className="flex flex-col">
+                                                    <p className="font-semibold text-slate-800 dark:text-white">
+                                                        {isRTL ? addon.nameAr || addon.name : addon.name}
+                                                    </p>
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">
@@ -233,15 +235,17 @@ const AddonsList = () => {
                 </div>
             </div>
 
-            {totalPages > 1 && (
-                <div className="flex justify-center mt-8">
-                    <Pagination
-                        currentPage={page}
-                        totalPages={totalPages}
-                        onPageChange={setPage}
-                    />
-                </div>
-            )}
+            {
+                totalPages > 1 && (
+                    <div className="flex justify-center mt-8">
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
+                )
+            }
 
             <ConfirmModal
                 isOpen={confirmOpen}
@@ -250,7 +254,7 @@ const AddonsList = () => {
                 onConfirm={confirmDelete}
                 onCancel={() => setConfirmOpen(false)}
             />
-        </div>
+        </div >
     );
 };
 

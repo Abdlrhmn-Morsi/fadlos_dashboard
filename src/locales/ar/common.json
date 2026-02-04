@@ -23,6 +23,7 @@
     "yes": "نعم",
     "no": "لا",
     "loading": "جاري التحميل",
+    "required": "مطلوب",
     "error": "خطأ",
     "errorUpdatingData": "خطأ في تحديث البيانات",
     "errorFetchingData": "خطأ في جلب البيانات",

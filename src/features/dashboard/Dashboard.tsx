@@ -431,9 +431,11 @@ const Dashboard: React.FC = () => {
                                         </div>
                                     )}
                                 </div>
-                                <h4 className={clsx("font-bold text-sm text-slate-800 dark:text-slate-200 truncate mb-1", isRTL && "text-right")}>
-                                    {isRTL ? product.nameAr || product.name : product.name}
-                                </h4>
+                                <div className="flex items-center justify-between gap-2 mb-1">
+                                    <h4 className={clsx("font-bold text-sm text-slate-800 dark:text-slate-200 truncate flex-1", isRTL && "text-right")}>
+                                        {isRTL ? product.nameAr || product.name : product.name}
+                                    </h4>
+                                </div>
                                 <div className={clsx("flex items-center gap-1", isRTL && "flex-row-reverse")}>
                                     <Star size={14} className="fill-yellow-400 text-yellow-400" />
                                     <span className="text-xs font-black text-slate-700 dark:text-slate-400">

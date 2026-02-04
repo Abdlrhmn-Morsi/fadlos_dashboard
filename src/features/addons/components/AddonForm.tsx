@@ -228,6 +228,54 @@ const AddonForm = () => {
                             </div>
                         </div>
 
+                        {/* Inventory */}
+                        <div className="space-y-2">
+                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                {t('inventory')}
+                            </label>
+                            <input
+                                type="number"
+                                disabled={!formData.trackInventory}
+                                className={clsx(
+                                    "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border disabled:opacity-50",
+                                    isRTL && "text-right"
+                                )}
+                                placeholder={t('inventoryPlaceholder')}
+                                value={formData.inventory}
+                                onChange={(e) => setFormData({ ...formData, inventory: parseInt(e.target.value) || 0 })}
+                            />
+                        </div>
+
+                        {/* Toggles Group */}
+                        <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
+
+                            <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('trackInventory')}</span>
+                                <div className="relative inline-flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.trackInventory}
+                                        onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
+                                    />
+                                    <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </div>
+                            </label>
+
+                            <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                                <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isActive')}</span>
+                                <div className="relative inline-flex items-center">
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.isActive}
+                                        onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
+                                    />
+                                    <div className="w-10 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                </div>
+                            </label>
+                        </div>
+
                         {/* Image */}
                         <div className="space-y-2 md:col-span-2">
                             <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
@@ -254,54 +302,6 @@ const AddonForm = () => {
                                 )}
                             </div>
                         </div>
-
-                        {/* Inventory */}
-                        <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('inventory')}
-                            </label>
-                            <input
-                                type="number"
-                                disabled={!formData.trackInventory}
-                                className={clsx(
-                                    "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border disabled:opacity-50",
-                                    isRTL && "text-right"
-                                )}
-                                placeholder={t('inventoryPlaceholder')}
-                                value={formData.inventory}
-                                onChange={(e) => setFormData({ ...formData, inventory: parseInt(e.target.value) || 0 })}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
-                        {/* Track Inventory Toggle */}
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <div className="relative inline-flex items-center">
-                                <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    checked={formData.trackInventory}
-                                    onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
-                                />
-                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-500/20 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                            </div>
-                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('trackInventory')}</span>
-                        </label>
-
-                        {/* Active Toggle */}
-                        <label className="flex items-center gap-3 cursor-pointer group">
-                            <div className="relative inline-flex items-center">
-                                <input
-                                    type="checkbox"
-                                    className="sr-only peer"
-                                    checked={formData.isActive}
-                                    onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                                />
-                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-500/20 rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
-                            </div>
-                            <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isActive')}</span>
-                        </label>
                     </div>
                 </div>
 

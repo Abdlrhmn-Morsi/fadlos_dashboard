@@ -10,6 +10,7 @@
     "inventory": "المخزون",
     "trackInventory": "تتبع المخزون",
     "isActive": "نشط",
+    "isRequired": "مطلوب",
     "image": "الصورة",
     "noAddonsFound": "لم يتم العثور على إضافات",
     "getStarted": "أنشئ أول إضافة لك لتعزيز منتجاتك",

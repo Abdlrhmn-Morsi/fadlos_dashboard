@@ -24,6 +24,7 @@
     "yes": "Yes",
     "no": "No",
     "loading": "Loading",
+    "required": "Required",
     "error": "Error",
     "errorUpdatingData": "Error updating data",
     "errorFetchingData": "Error fetching data",

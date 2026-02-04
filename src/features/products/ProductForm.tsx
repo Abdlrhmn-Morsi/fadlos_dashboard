@@ -41,6 +41,7 @@ interface Variant {
     name: string;
     nameAr: string;
     isColor: boolean;
+    isRequired: boolean;
     sortOrder: string;
     values: VariantValue[];
 }
@@ -85,7 +86,8 @@ const ProductForm = () => {
         sortOrder: '0',
         variants: [] as Variant[],
         relatedProductIds: [] as string[],
-        addonIds: [] as string[]
+        addonIds: [] as string[],
+        addonsRequired: false
     });
 
     const [allProducts, setAllProducts] = useState<any[]>([]);
@@ -180,6 +182,7 @@ const ProductForm = () => {
                     name: v.name,
                     nameAr: v.nameAr || '',
                     isColor: !!v.isColor,
+                    isRequired: !!v.isRequired,
                     sortOrder: String(v.sortOrder || 0),
                     values: v.values ? v.values.map((val: any) => ({
                         id: val.id,
@@ -191,7 +194,8 @@ const ProductForm = () => {
                     })) : []
                 })) : [],
                 relatedProductIds: data.relatedProducts ? data.relatedProducts.map((p: any) => p.id) : [],
-                addonIds: data.addons ? data.addons.map((a: any) => a.id) : []
+                addonIds: data.addons ? data.addons.map((a: any) => a.id) : [],
+                addonsRequired: !!data.addonsRequired
             });
             setCurrCoverImage(data.coverImage);
             setExistingImages(data.images || []);
@@ -258,7 +262,7 @@ const ProductForm = () => {
     const addVariant = () => {
         setFormData(prev => ({
             ...prev,
-            variants: [...prev.variants, { name: '', nameAr: '', isColor: false, sortOrder: '0', values: [] }]
+            variants: [...prev.variants, { name: '', nameAr: '', isColor: false, isRequired: false, sortOrder: '0', values: [] }]
         }));
     };
 
@@ -356,6 +360,7 @@ const ProductForm = () => {
                 data.append(`variants[${vIdx}][name]`, variant.name);
                 data.append(`variants[${vIdx}][nameAr]`, variant.nameAr);
                 data.append(`variants[${vIdx}][isColor]`, String(variant.isColor));
+                data.append(`variants[${vIdx}][isRequired]`, String(variant.isRequired));
                 data.append(`variants[${vIdx}][sortOrder]`, variant.sortOrder);
                 if (variant.id) data.append(`variants[${vIdx}][id]`, variant.id);
 
@@ -545,29 +550,32 @@ const ProductForm = () => {
                             <div className="space-y-6">
                                 {formData.variants.map((variant, vIdx) => (
                                     <div key={vIdx} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
-                                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                                            <InputGroup label={t('optionNameAr')} isRTL={isRTL}>
-                                                <input
-                                                    type="text"
-                                                    value={variant.nameAr}
-                                                    onChange={e => updateVariant(vIdx, 'nameAr', e.target.value)}
-                                                    onBlur={() => handleVariantTranslate(variant.nameAr, (trans) => updateVariant(vIdx, 'name', trans))}
-                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                    placeholder={t('optionNameArPlaceholder')}
-                                                />
-                                            </InputGroup>
-                                            <InputGroup label={t('optionNameEn')} isRTL={isRTL}>
-                                                <input
-                                                    type="text"
-                                                    value={variant.name}
-                                                    onChange={e => updateVariant(vIdx, 'name', e.target.value)}
-                                                    className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
-                                                    placeholder={t('optionNameEnPlaceholder')}
-                                                    dir="ltr"
-                                                />
-                                            </InputGroup>
-                                            <div className="flex items-end gap-2">
-                                                <div className="flex-1 flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
+                                        <div className="space-y-4 mb-6">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                <InputGroup label={t('optionNameAr')} isRTL={isRTL}>
+                                                    <input
+                                                        type="text"
+                                                        value={variant.nameAr}
+                                                        onChange={e => updateVariant(vIdx, 'nameAr', e.target.value)}
+                                                        onBlur={() => handleVariantTranslate(variant.nameAr, (trans) => updateVariant(vIdx, 'name', trans))}
+                                                        className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                                        placeholder={t('optionNameArPlaceholder')}
+                                                    />
+                                                </InputGroup>
+                                                <InputGroup label={t('optionNameEn')} isRTL={isRTL}>
+                                                    <input
+                                                        type="text"
+                                                        value={variant.name}
+                                                        onChange={e => updateVariant(vIdx, 'name', e.target.value)}
+                                                        className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                                        placeholder={t('optionNameEnPlaceholder')}
+                                                        dir="ltr"
+                                                    />
+                                                </InputGroup>
+                                            </div>
+
+                                            <div className="flex flex-wrap items-center gap-4">
+                                                <div className="flex-1 min-w-[140px] flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
                                                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isColor')}</span>
                                                     <label className="relative inline-flex items-center cursor-pointer">
                                                         <input
@@ -579,14 +587,28 @@ const ProductForm = () => {
                                                         <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
                                                     </label>
                                                 </div>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => removeVariant(vIdx)}
-                                                    className="p-2.5 text-rose-500 hover:bg-rose-50 rounded-lg transition-colors"
-                                                    title={t('removeOption')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                <div className="flex-1 min-w-[140px] flex items-center justify-between px-3 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
+                                                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isRequired')}</span>
+                                                    <label className="relative inline-flex items-center cursor-pointer">
+                                                        <input
+                                                            type="checkbox"
+                                                            className="sr-only peer"
+                                                            checked={variant.isRequired}
+                                                            onChange={e => updateVariant(vIdx, 'isRequired', e.target.checked)}
+                                                        />
+                                                        <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600"></div>
+                                                    </label>
+                                                </div>
+                                                <div className="flex items-center justify-center p-1">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeVariant(vIdx)}
+                                                        className="p-2.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-colors"
+                                                        title={t('removeOption')}
+                                                    >
+                                                        <Trash2 size={20} />
+                                                    </button>
+                                                </div>
                                             </div>
                                         </div>
 
@@ -850,12 +872,27 @@ const ProductForm = () => {
                             </div>
                         </div>
 
-                        {/* Add-ons Section */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-indigo-500" />
-                                {t('addons:title', { defaultValue: 'Add-ons' })}
-                            </h2>
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                                    <Plus className="w-5 h-5 text-indigo-500" />
+                                    {t('addons:title', { defaultValue: 'Add-ons' })}
+                                </h2>
+                                <label className="flex items-center gap-2 cursor-pointer group">
+                                    <span className="text-xs font-semibold text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors uppercase tracking-wider">
+                                        {t('common:required', { defaultValue: 'Required' })}
+                                    </span>
+                                    <div className="relative inline-flex items-center">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={formData.addonsRequired}
+                                            onChange={e => setFormData({ ...formData, addonsRequired: e.target.checked })}
+                                        />
+                                        <div className="w-9 h-5 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-rose-500"></div>
+                                    </div>
+                                </label>
+                            </div>
 
                             <div className="space-y-4">
                                 <div className="relative">
@@ -903,9 +940,11 @@ const ProductForm = () => {
                                                         )}
                                                     </div>
                                                     <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                                                            {isRTL ? (a.nameAr || a.name) : a.name}
-                                                        </p>
+                                                        <div className="flex items-center gap-2">
+                                                            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                                                {isRTL ? (a.nameAr || a.name) : a.name}
+                                                            </p>
+                                                        </div>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
                                                             {a.price.toFixed(2)} {t('common:currencySymbol')}
                                                         </p>
