@@ -58,42 +58,51 @@ const ProductDetail = () => {
                     >
                         <ArrowLeft size={24} className="text-slate-600 dark:text-slate-400" />
                     </button>
-                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('productDetails')}</h1>
+                    <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('products:productDetails')}</h1>
                 </div>
                 <button
                     onClick={() => navigate(`/products/edit/${product.id}`)}
                     className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition-colors"
                 >
                     <Edit size={18} />
-                    <span>{t('editProduct')}</span>
+                    <span>{t('products:editProduct')}</span>
                 </button>
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                     {/* Product Image / Media */}
-                    <div className="space-y-4">
-                        <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t('media')}</h4>
-                        {product.coverImage ? (
-                            <img
-                                src={product.coverImage}
-                                alt={product.name}
-                                className="w-full h-80 object-cover rounded-lg"
-                            />
-                        ) : (
-                            <div className="w-full h-80 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
-                                <Tag size={64} className="text-slate-400" />
-                            </div>
-                        )}
+                    <div className="space-y-6">
+                        <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t('products:media')}</h4>
+
+                        <div className="space-y-2">
+                            <h5 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                {t('products:coverImage')}
+                            </h5>
+                            <p className="text-[10px] text-slate-500 mb-2 leading-tight">
+                                {t('products:coverImageSubtitle')}
+                            </p>
+                            {product.coverImage ? (
+                                <img
+                                    src={product.coverImage}
+                                    alt={product.name}
+                                    className="w-full h-80 object-cover rounded-lg border border-slate-200 dark:border-slate-800"
+                                />
+                            ) : (
+                                <div className="w-full h-80 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+                                    <Tag size={64} className="text-slate-400" />
+                                </div>
+                            )}
+                        </div>
 
                         {/* Additional Images */}
                         {product.images && product.images.length > 0 && (
-                            <div className="space-y-2">
+                            <div className="space-y-2 border-t border-slate-100 dark:border-slate-800/50 pt-4">
                                 <h5 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                    {t('galleryImages')}
+                                    {t('products:galleryImages')}
                                 </h5>
                                 <p className="text-[10px] text-slate-500 mb-2 leading-tight">
-                                    {t('galleryImagesSubtitle')}
+                                    {t('products:galleryImagesSubtitle')}
                                 </p>
                                 <div className="grid grid-cols-4 gap-2">
                                     {product.images.map((img: string, idx: number) => (
@@ -101,7 +110,7 @@ const ProductDetail = () => {
                                             key={idx}
                                             src={img}
                                             alt={`${product.name} ${idx + 1}`}
-                                            className="w-full h-20 object-cover rounded"
+                                            className="w-full h-20 object-cover rounded border border-slate-200 dark:border-slate-800"
                                         />
                                     ))}
                                 </div>
@@ -118,7 +127,7 @@ const ProductDetail = () => {
                                 </h2>
                                 {product.isOffer && (
                                     <span className="px-2 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider animate-pulse">
-                                        {t('offer')}
+                                        {t('products:offer')}
                                     </span>
                                 )}
                             </div>
@@ -133,11 +142,11 @@ const ProductDetail = () => {
                             <div className="flex flex-col">
                                 <div className="flex items-center gap-2 text-3xl font-bold text-primary">
                                     <DollarSign size={28} />
-                                    <span>{Number(product.price).toFixed(2)}</span>
+                                    <span>{Number(product.price).toFixed(2)}</span> {t('common:currencySymbol')}
                                 </div>
                                 {product.comparePrice && Number(product.comparePrice) > Number(product.price) && (
                                     <div className="text-sm text-slate-400 line-through mt-1">
-                                        {t('originalPrice')}: {Number(product.comparePrice).toFixed(2)}
+                                        {t('originalPrice')}: {Number(product.comparePrice).toFixed(2)} {t('common:currencySymbol')}
                                     </div>
                                 )}
                             </div>
@@ -159,15 +168,15 @@ const ProductDetail = () => {
                         <div className="space-y-2">
                             <div className={clsx("flex items-center gap-2 text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse text-right")}>
                                 <Package size={20} />
-                                <span className="font-semibold">{t('category')}:</span>
-                                <span>{(isRTL ? product.category?.nameAr || product.category?.name : product.category?.name) || t('uncategorized')}</span>
+                                <span className="font-semibold">{t('products:category')}:</span>
+                                <span>{(isRTL ? product.category?.nameAr || product.category?.name : product.category?.name) || t('products:uncategorized')}</span>
                             </div>
                         </div>
 
                         <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                            <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t('description')}</h4>
+                            <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t('products:description')}</h4>
                             <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                                {product.description || t('noDescription')}
+                                {product.description || t('products:noDescription')}
                             </p>
                             {product.descriptionAr && (
                                 <p className="text-slate-600 dark:text-slate-300 leading-relaxed mt-3 text-right" dir="rtl">
@@ -179,7 +188,7 @@ const ProductDetail = () => {
                         {/* Product Variants */}
                         {product.variants && product.variants.length > 0 && (
                             <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
-                                <h4 className="font-bold text-slate-800 dark:text-white mb-3">{t('variants')}</h4>
+                                <h4 className="font-bold text-slate-800 dark:text-white mb-3">{t('products:variants')}</h4>
                                 <div className="space-y-3">
                                     {product.variants.map((variant: any) => (
                                         <div key={variant.id} className="bg-slate-50 dark:bg-slate-800 p-3 rounded">
@@ -239,7 +248,7 @@ const ProductDetail = () => {
                                                     </p>
                                                 </div>
                                                 <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    {Number(addon.price).toFixed(2)} {isRTL ? 'د.ك' : 'KWD'}
+                                                    {Number(addon.price).toFixed(2)} {t('common:currencySymbol')}
                                                 </p>
                                             </div>
                                         </div>

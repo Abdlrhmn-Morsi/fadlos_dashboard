@@ -737,7 +737,7 @@ const ProductForm = () => {
                             </div>
 
                             {/* Gallery Images */}
-                            <InputGroup label="Gallery Images" subtitle="Additional images for the product detail view (Max 8).">
+                            <InputGroup label={t('galleryImages')} subtitle={t('galleryImagesSubtitle')}>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                     {/* Existing Images */}
                                     {existingImages.map((url, idx) => (
