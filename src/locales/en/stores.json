@@ -63,5 +63,6 @@
         "fri": "Fri",
         "sat": "Sat"
     },
-    "selectType": "Select Type"
+    "selectType": "Select Type",
+    "selectTypeFirst": "Please select a business type first to see categories"
 }
