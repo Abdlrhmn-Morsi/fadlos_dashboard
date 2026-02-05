@@ -306,6 +306,14 @@ const ProductForm = () => {
             return;
         }
 
+        // Validate variants
+        for (const variant of formData.variants) {
+            if (!variant.values || variant.values.length === 0) {
+                toast.error(isRTL ? 'يجب إضافة قيمة واحدة على الأقل لكل خيار' : 'Each option must have at least one value');
+                return;
+            }
+        }
+
         setSubmitting(true);
         try {
             const data = new FormData();
@@ -480,7 +488,7 @@ const ProductForm = () => {
                                 {t('productInformation')}
                             </h2>
                             <div className="space-y-6">
-                                <InputGroup label={t('productNameAr')} required>
+                                <InputGroup label={t('productNameAr')} required subtitle={`${formData.nameAr?.length || 0}/50`}>
                                     <input
                                         type="text"
                                         className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
@@ -489,14 +497,16 @@ const ProductForm = () => {
                                         onChange={e => setFormData({ ...formData, nameAr: e.target.value })}
                                         onBlur={() => handleTranslate('name', formData.nameAr)}
                                         required
+                                        maxLength={50}
                                     />
                                 </InputGroup>
-                                <InputGroup label={t('productNameEn')}>
+                                <InputGroup label={t('productNameEn')} required subtitle={`${formData.name?.length || 0}/50`}>
                                     <div className="relative">
                                         <input
                                             type="text"
                                             className="w-full text-left px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all pe-24"
                                             placeholder={t('placeholderNameEn')}
+                                            required
                                             value={formData.name}
                                             onChange={e => setFormData({ ...formData, name: e.target.value })}
                                             onBlur={() => {
@@ -505,26 +515,29 @@ const ProductForm = () => {
                                                 }
                                             }}
                                             dir="ltr"
+                                            maxLength={50}
                                         />
                                     </div>
                                 </InputGroup>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                    <InputGroup label={t('descriptionAr')}>
+                                    <InputGroup label={t('descriptionAr')} subtitle={`${formData.descriptionAr?.length || 0}/255`}>
                                         <textarea
                                             className="w-full h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
                                             placeholder={t('placeholderDescAr')}
                                             value={formData.descriptionAr}
                                             onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })}
                                             onBlur={() => handleTranslate('description', formData.descriptionAr)}
+                                            maxLength={255}
                                         />
                                     </InputGroup>
-                                    <InputGroup label={t('descriptionEn')}>
+                                    <InputGroup label={t('descriptionEn')} subtitle={`${formData.description?.length || 0}/255`}>
                                         <textarea
                                             className="w-full text-left h-32 px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
                                             placeholder={t('placeholderDescEn')}
                                             value={formData.description}
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                             dir="ltr"
+                                            maxLength={255}
                                         />
                                     </InputGroup>
                                 </div>
@@ -552,7 +565,7 @@ const ProductForm = () => {
                                     <div key={vIdx} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                                         <div className="space-y-4 mb-6">
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                                <InputGroup label={t('optionNameAr')} isRTL={isRTL}>
+                                                <InputGroup label={t('optionNameAr')} isRTL={isRTL} required>
                                                     <input
                                                         type="text"
                                                         value={variant.nameAr}
@@ -560,9 +573,10 @@ const ProductForm = () => {
                                                         onBlur={() => handleVariantTranslate(variant.nameAr, (trans) => updateVariant(vIdx, 'name', trans))}
                                                         className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                                         placeholder={t('optionNameArPlaceholder')}
+                                                        required
                                                     />
                                                 </InputGroup>
-                                                <InputGroup label={t('optionNameEn')} isRTL={isRTL}>
+                                                <InputGroup label={t('optionNameEn')} isRTL={isRTL} required>
                                                     <input
                                                         type="text"
                                                         value={variant.name}
@@ -570,6 +584,7 @@ const ProductForm = () => {
                                                         className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
                                                         placeholder={t('optionNameEnPlaceholder')}
                                                         dir="ltr"
+                                                        required
                                                     />
                                                 </InputGroup>
                                             </div>
@@ -639,6 +654,7 @@ const ProductForm = () => {
                                                             onBlur={() => handleVariantTranslate(val.valueAr, (trans) => updateVariantValue(vIdx, valIdx, 'value', trans))}
                                                             className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
                                                             placeholder={t('valueArLabel')}
+                                                            required
                                                         />
                                                     </div>
                                                     <div className="flex-1 min-w-[120px]">
@@ -649,6 +665,7 @@ const ProductForm = () => {
                                                             className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
                                                             placeholder={t('valueEnLabel')}
                                                             dir="ltr"
+                                                            required
                                                         />
                                                     </div>
                                                     <div className="w-[100px]">
@@ -1068,6 +1085,16 @@ const ProductForm = () => {
                                             ))}
                                         </select>
                                     )}
+                                </InputGroup>
+
+                                <InputGroup label={t('sortOrder')}>
+                                    <input
+                                        type="number"
+                                        className="w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                        value={formData.sortOrder}
+                                        onChange={e => setFormData({ ...formData, sortOrder: e.target.value })}
+                                        placeholder="0"
+                                    />
                                 </InputGroup>
                             </div>
                         </div>

@@ -255,6 +255,7 @@ const ProductList = () => {
                             <option value="orderCount:DESC">{t('topSelling')}</option>
                             <option value="orderCount:ASC">{t('lowSelling')}</option>
                             <option value="averageRating:DESC">{t('topRated')}</option>
+                            <option value="averageRating:ASC">{t('lowRated')}</option>
                             <option value="createdAt:DESC">{t('common:newest')}</option>
                         </select>
                     </div>
@@ -269,6 +270,7 @@ const ProductList = () => {
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('product')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('sku')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('sortOrder')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('rating', { defaultValue: 'Rating' })}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('stock')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('price')}</th>
@@ -345,6 +347,13 @@ const ProductList = () => {
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-400 font-mono text-xs">
                                             {product.sku || '—'}
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded-md w-fit border border-slate-200 dark:border-slate-700">
+                                                <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                    #{product.sort || 0}
+                                                </span>
+                                            </div>
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-1.5 bg-yellow-50 dark:bg-yellow-900/20 px-2 py-1 rounded-md w-fit border border-yellow-100 dark:border-yellow-900/40">
