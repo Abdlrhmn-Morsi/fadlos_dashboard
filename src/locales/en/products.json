@@ -81,6 +81,7 @@
     "lowSelling": "Low Selling",
     "comparePriceSubtitle": "Original price before discount",
     "inventory": "Inventory",
+    "trackInventory": "Track Inventory",
     "trackQuantity": "Track Quantity",
     "quantity": "Quantity",
     "unlimitedStockWarning": "The customer can order this product even if the quantity is 0.",

@@ -34,6 +34,8 @@ interface VariantValue {
     hex?: string;
     price: string;
     sortOrder: string;
+    inventory: string;
+    trackInventory: boolean;
 }
 
 interface Variant {
@@ -190,7 +192,9 @@ const ProductForm = () => {
                         valueAr: val.valueAr || '',
                         hex: val.hex || '',
                         price: String(val.price || 0),
-                        sortOrder: String(val.sortOrder || 0)
+                        sortOrder: String(val.sortOrder || 0),
+                        inventory: String(val.inventory || 0),
+                        trackInventory: !!val.trackInventory
                     })) : []
                 })) : [],
                 relatedProductIds: data.relatedProducts ? data.relatedProducts.map((p: any) => p.id) : [],
@@ -281,7 +285,15 @@ const ProductForm = () => {
 
     const addVariantValue = (variantIndex: number) => {
         const newVariants = [...formData.variants];
-        newVariants[variantIndex].values.push({ value: '', valueAr: '', hex: '#000000', price: '0', sortOrder: '0' });
+        newVariants[variantIndex].values.push({
+            value: '',
+            valueAr: '',
+            hex: '#000000',
+            price: '0',
+            sortOrder: '0',
+            inventory: '0',
+            trackInventory: false
+        });
         setFormData({ ...formData, variants: newVariants });
     };
 
@@ -378,6 +390,8 @@ const ProductForm = () => {
                     if (val.hex) data.append(`variants[${vIdx}][values][${valIdx}][hex]`, val.hex);
                     data.append(`variants[${vIdx}][values][${valIdx}][price]`, val.price);
                     data.append(`variants[${vIdx}][values][${valIdx}][sortOrder]`, val.sortOrder);
+                    data.append(`variants[${vIdx}][values][${valIdx}][inventory]`, val.inventory);
+                    data.append(`variants[${vIdx}][values][${valIdx}][trackInventory]`, String(val.trackInventory));
                     if (val.id) data.append(`variants[${vIdx}][values][${valIdx}][id]`, val.id);
                 });
             });
@@ -564,7 +578,7 @@ const ProductForm = () => {
                                 {formData.variants.map((variant, vIdx) => (
                                     <div key={vIdx} className="p-4 border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/50">
                                         <div className="space-y-4 mb-6">
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                                                 <InputGroup label={t('optionNameAr')} isRTL={isRTL} required>
                                                     <input
                                                         type="text"
@@ -585,6 +599,15 @@ const ProductForm = () => {
                                                         placeholder={t('optionNameEnPlaceholder')}
                                                         dir="ltr"
                                                         required
+                                                    />
+                                                </InputGroup>
+                                                <InputGroup label={t('sortOrder')}>
+                                                    <input
+                                                        type="number"
+                                                        value={variant.sortOrder}
+                                                        onChange={e => updateVariant(vIdx, 'sortOrder', e.target.value)}
+                                                        className="w-full px-4 py-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                                        placeholder="0"
                                                     />
                                                 </InputGroup>
                                             </div>
@@ -628,62 +651,103 @@ const ProductForm = () => {
                                         </div>
 
                                         {/* Variant Values */}
-                                        <div className="border-indigo-200 dark:border-indigo-900 space-y-3 ps-4 border-s-2">
+                                        <div className="border-indigo-200 dark:border-indigo-900 space-y-4 ps-4 border-s-2">
                                             {variant.values.map((val, valIdx) => (
-                                                <div key={valIdx} className="flex flex-wrap md:flex-nowrap items-center gap-3">
-                                                    {variant.isColor && (
-                                                        <div className="w-[50px] relative">
-                                                            <div
-                                                                className="w-10 h-10 rounded-lg border border-slate-200 shadow-sm overflow-hidden"
-                                                                style={{ backgroundColor: val.hex || '#000000' }}
-                                                            >
-                                                                <input
-                                                                    type="color"
-                                                                    value={val.hex || '#000000'}
-                                                                    onChange={e => updateVariantValue(vIdx, valIdx, 'hex', e.target.value)}
-                                                                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                                                                />
+                                                <div key={valIdx} className="bg-white dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm space-y-3">
+                                                    {/* Row 1: Basic Info */}
+                                                    <div className="flex flex-wrap md:flex-nowrap items-center gap-3">
+                                                        {variant.isColor && (
+                                                            <div className="w-[50px] relative">
+                                                                <div
+                                                                    className="w-10 h-10 rounded-lg border border-slate-200 shadow-sm overflow-hidden"
+                                                                    style={{ backgroundColor: val.hex || '#000000' }}
+                                                                >
+                                                                    <input
+                                                                        type="color"
+                                                                        value={val.hex || '#000000'}
+                                                                        onChange={e => updateVariantValue(vIdx, valIdx, 'hex', e.target.value)}
+                                                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                                    />
+                                                                </div>
                                                             </div>
+                                                        )}
+                                                        <div className="flex-1 min-w-[120px]">
+                                                            <label className="text-xs font-semibold text-slate-500 mb-1 block">{t('valueArLabel')}</label>
+                                                            <input
+                                                                type="text"
+                                                                value={val.valueAr}
+                                                                onChange={e => updateVariantValue(vIdx, valIdx, 'valueAr', e.target.value)}
+                                                                onBlur={() => handleVariantTranslate(val.valueAr, (trans) => updateVariantValue(vIdx, valIdx, 'value', trans))}
+                                                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                                required
+                                                            />
                                                         </div>
-                                                    )}
-                                                    <div className="flex-1 min-w-[120px]">
-                                                        <input
-                                                            type="text"
-                                                            value={val.valueAr}
-                                                            onChange={e => updateVariantValue(vIdx, valIdx, 'valueAr', e.target.value)}
-                                                            onBlur={() => handleVariantTranslate(val.valueAr, (trans) => updateVariantValue(vIdx, valIdx, 'value', trans))}
-                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                            placeholder={t('valueArLabel')}
-                                                            required
-                                                        />
+                                                        <div className="flex-1 min-w-[120px]">
+                                                            <label className="text-xs font-semibold text-slate-500 mb-1 block">{t('valueEnLabel')}</label>
+                                                            <input
+                                                                type="text"
+                                                                value={val.value}
+                                                                onChange={e => updateVariantValue(vIdx, valIdx, 'value', e.target.value)}
+                                                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                                dir="ltr"
+                                                                required
+                                                            />
+                                                        </div>
+                                                        <div className="w-full md:w-[100px]">
+                                                            <label className="text-xs font-semibold text-slate-500 mb-1 block">{t('price')}</label>
+                                                            <input
+                                                                type="number"
+                                                                value={val.price}
+                                                                onChange={e => updateVariantValue(vIdx, valIdx, 'price', e.target.value)}
+                                                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                                placeholder="0"
+                                                            />
+                                                        </div>
+                                                        <div className="w-full md:w-[80px]">
+                                                            <label className="text-xs font-semibold text-slate-500 mb-1 block">{t('sortOrder')}</label>
+                                                            <input
+                                                                type="number"
+                                                                value={val.sortOrder}
+                                                                onChange={e => updateVariantValue(vIdx, valIdx, 'sortOrder', e.target.value)}
+                                                                className="w-full px-3 py-2 text-sm bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg"
+                                                                placeholder="0"
+                                                            />
+                                                        </div>
+
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => removeVariantValue(vIdx, valIdx)}
+                                                            className="p-2 text-slate-400 hover:text-rose-500 transition-colors self-end mb-0.5"
+                                                        >
+                                                            <X size={16} />
+                                                        </button>
                                                     </div>
-                                                    <div className="flex-1 min-w-[120px]">
-                                                        <input
-                                                            type="text"
-                                                            value={val.value}
-                                                            onChange={e => updateVariantValue(vIdx, valIdx, 'value', e.target.value)}
-                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                            placeholder={t('valueEnLabel')}
-                                                            dir="ltr"
-                                                            required
-                                                        />
+
+                                                    {/* Row 2: Inventory */}
+                                                    <div className="flex items-center gap-4 bg-slate-50 dark:bg-slate-900/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                                                        <label className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-400 cursor-pointer">
+                                                            <input
+                                                                type="checkbox"
+                                                                checked={val.trackInventory}
+                                                                onChange={e => updateVariantValue(vIdx, valIdx, 'trackInventory', e.target.checked)}
+                                                                className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                                                            />
+                                                            {t('trackInventory')}
+                                                        </label>
+
+                                                        <div className={clsx("flex items-center gap-2 transition-opacity", !val.trackInventory && "opacity-50")}>
+                                                            <span className="text-xs text-slate-400">|</span>
+                                                            <label className="text-xs font-medium text-slate-600 dark:text-slate-400 whitespace-nowrap">{t('inventory')}:</label>
+                                                            <input
+                                                                type="number"
+                                                                value={val.inventory}
+                                                                onChange={e => updateVariantValue(vIdx, valIdx, 'inventory', e.target.value)}
+                                                                className="w-24 px-2 py-1 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded disabled:bg-slate-100 dark:disabled:bg-slate-900"
+                                                                placeholder="0"
+                                                                disabled={!val.trackInventory}
+                                                            />
+                                                        </div>
                                                     </div>
-                                                    <div className="w-[100px]">
-                                                        <input
-                                                            type="number"
-                                                            value={val.price}
-                                                            onChange={e => updateVariantValue(vIdx, valIdx, 'price', e.target.value)}
-                                                            className="w-full px-3 py-2 text-sm bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg"
-                                                            placeholder={`+ ${t('price')}`}
-                                                        />
-                                                    </div>
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeVariantValue(vIdx, valIdx)}
-                                                        className="p-2 text-slate-400 hover:text-rose-500 transition-colors"
-                                                    >
-                                                        <X size={16} />
-                                                    </button>
                                                 </div>
                                             ))}
                                             <button

@@ -81,6 +81,7 @@
     "lowSelling": "الأقل مبيعاً",
     "comparePriceSubtitle": "السعر الأصلي قبل التخفيض",
     "inventory": "المخزون",
+    "trackInventory": "تتبع المخزون",
     "trackQuantity": "تتبع الكمية",
     "quantity": "الكمية",
     "unlimitedStockWarning": "يمكن للعملاء طلب هذا المنتج حتى لو كانت الكمية 0.",
