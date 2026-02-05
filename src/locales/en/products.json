@@ -12,6 +12,7 @@
     "product": "Product",
     "sku": "SKU",
     "stock": "Stock",
+    "rating": "Rating",
     "price": "Price",
     "status": "Status",
     "actions": "Actions",
