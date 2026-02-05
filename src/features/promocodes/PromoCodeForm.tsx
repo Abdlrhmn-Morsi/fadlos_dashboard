@@ -7,6 +7,7 @@ import promoCodesApi from './api/promocodes.api';
 import productsApi from '../products/api/products.api';
 import clientsApi from '../clients/api/clients.api';
 import categoriesApi from '../categories/api/categories.api';
+import toolsApi from '../../services/tools.api';
 import { Modal } from '../../components/ui/Modal';
 import { toast } from '../../utils/toast';
 import { useCache } from '../../contexts/CacheContext';
@@ -39,6 +40,7 @@ const PromoCodeForm = () => {
     const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState<any>({
         code: '',
+        descriptionAr: '',
         description: '',
         type: 'percentage', // percentage or fixed_amount (lowercase for backend)
         value: '',
@@ -74,6 +76,7 @@ const PromoCodeForm = () => {
             const data: any = await promoCodesApi.getPromoCode(id!);
             setFormData({
                 code: data.code,
+                descriptionAr: data.descriptionAr || '',
                 description: data.description || '',
                 type: data.type,
                 value: String(data.value),
@@ -150,6 +153,20 @@ const PromoCodeForm = () => {
             item.subtitle.toLowerCase().includes(query.toLowerCase())
         );
         setModalData((prev: any) => ({ ...prev, searchQuery: query, filteredItems: filtered }));
+    };
+
+    const handleTranslate = async (field: 'description', value: string) => {
+        if (!value) return;
+        try {
+            const res: any = await toolsApi.translate(value, 'ar', 'en');
+            const translated = typeof res === 'string' ? res : res.translatedText;
+            if (translated && !formData[field]) {
+                setFormData((prev: any) => ({ ...prev, [field]: translated }));
+                toast.success(t('products:autoTranslated'));
+            }
+        } catch (error) {
+            console.error("Translation error", error);
+        }
     };
 
     const toggleSelection = (id: string, paramKey: string) => {
@@ -392,7 +409,7 @@ const PromoCodeForm = () => {
                                 </InputGroup>
 
                                 <InputGroup
-                                    label={t('description')}
+                                    label={t('descriptionAr')}
                                     icon={Info}
                                     required
                                     subtitle={t('descriptionSubtitle')}
@@ -400,11 +417,38 @@ const PromoCodeForm = () => {
                                     <div className="relative">
                                         <textarea
                                             className="w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
+                                            placeholder="مثلاً: خصم 20% لأول 100 طلب"
+                                            value={formData.descriptionAr}
+                                            onChange={e => setFormData({ ...formData, descriptionAr: e.target.value })}
+                                            onBlur={() => handleTranslate('description', formData.descriptionAr)}
+                                            maxLength={255}
+                                            required
+                                        />
+                                        <div className={clsx(
+                                            "absolute bottom-2 text-[10px] font-medium transition-colors",
+                                            isRTL ? "left-3" : "right-3",
+                                            formData.descriptionAr.length >= 250 ? "text-rose-500" : "text-slate-400"
+                                        )}>
+                                            {formData.descriptionAr.length} / 255
+                                        </div>
+                                    </div>
+                                </InputGroup>
+
+                                <InputGroup
+                                    label={t('descriptionEn')}
+                                    icon={Info}
+                                    required
+                                    subtitle={t('descriptionSubtitle')}
+                                >
+                                    <div className="relative">
+                                        <textarea
+                                            className="w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none text-left"
                                             placeholder="e.g. 20% off for first 100 orders"
                                             value={formData.description}
                                             onChange={e => setFormData({ ...formData, description: e.target.value })}
                                             maxLength={255}
                                             required
+                                            dir="ltr"
                                         />
                                         <div className={clsx(
                                             "absolute bottom-2 text-[10px] font-medium transition-colors",

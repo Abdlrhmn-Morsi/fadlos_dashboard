@@ -33,6 +33,8 @@
     "promoCode": "كود الخصم",
     "promoCodeSubtitle": "سيدخل العملاء هذا الكود عند الدفع.",
     "description": "الوصف",
+    "descriptionAr": "الوصف (بالعربية)",
+    "descriptionEn": "الوصف (بالإنجليزية)",
     "descriptionSubtitle": "ملاحظة داخلية حول كود الخصم هذا.",
     "discountConfiguration": "تكوين الخصم",
     "discountType": "نوع الخصم",

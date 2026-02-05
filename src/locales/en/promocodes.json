@@ -33,6 +33,8 @@
     "promoCode": "Promo Code",
     "promoCodeSubtitle": "Customers will enter this code at checkout.",
     "description": "Description",
+    "descriptionAr": "Description (Arabic)",
+    "descriptionEn": "Description (English)",
     "descriptionSubtitle": "Internal note about this promo code.",
     "discountConfiguration": "Discount Configuration",
     "discountType": "Discount Type",
