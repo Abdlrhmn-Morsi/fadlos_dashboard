@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { isRTL } = useLanguage();
+    const { language, isRTL } = useLanguage();
     const { t } = useTranslation(['products', 'common', 'addons']);
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -85,7 +85,7 @@ const ProductDetail = () => {
                             {product.coverImage ? (
                                 <img
                                     src={product.coverImage}
-                                    alt={product.name}
+                                    alt={language === 'ar' && product.nameAr ? product.nameAr : product.name}
                                     className="w-full h-80 object-cover rounded-lg border border-slate-200 dark:border-slate-800"
                                 />
                             ) : (
@@ -109,7 +109,7 @@ const ProductDetail = () => {
                                         <img
                                             key={idx}
                                             src={img}
-                                            alt={`${product.name} ${idx + 1}`}
+                                            alt={`${language === 'ar' && product.nameAr ? product.nameAr : product.name} ${idx + 1}`}
                                             className="w-full h-20 object-cover rounded border border-slate-200 dark:border-slate-800"
                                         />
                                     ))}
@@ -123,7 +123,7 @@ const ProductDetail = () => {
                         <div>
                             <div className="flex items-center gap-3 mb-2">
                                 <h2 className="text-3xl font-bold text-slate-800 dark:text-white">
-                                    {product.name}
+                                    {language === 'ar' && product.nameAr ? product.nameAr : product.name}
                                 </h2>
                                 {product.isOffer && (
                                     <span className="px-2 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider animate-pulse">
@@ -131,11 +131,6 @@ const ProductDetail = () => {
                                     </span>
                                 )}
                             </div>
-                            {product.nameAr && (
-                                <h3 className="text-xl text-slate-600 dark:text-slate-400 mb-4">
-                                    {product.nameAr}
-                                </h3>
-                            )}
                         </div>
 
                         <div className="flex items-center gap-4">
@@ -154,12 +149,12 @@ const ProductDetail = () => {
                                 {product.isAvailable ? (
                                     <span className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 rounded-full text-sm font-semibold">
                                         <CheckCircle size={16} />
-                                        {t('common:available')}
+                                        {t('products:available')}
                                     </span>
                                 ) : (
                                     <span className="flex items-center gap-1 px-3 py-1 bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-full text-sm font-semibold">
                                         <XCircle size={16} />
-                                        {t('common:unavailable')}
+                                        {t('products:unavailable')}
                                     </span>
                                 )}
                             </div>
@@ -175,14 +170,9 @@ const ProductDetail = () => {
 
                         <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                             <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t('products:description')}</h4>
-                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
-                                {product.description || t('products:noDescription')}
+                            <p className={clsx("text-slate-600 dark:text-slate-300 leading-relaxed", language === 'ar' && "text-right")} dir={language === 'ar' ? "rtl" : "ltr"}>
+                                {language === 'ar' && product.descriptionAr ? product.descriptionAr : (product.description || t('products:noDescription'))}
                             </p>
-                            {product.descriptionAr && (
-                                <p className="text-slate-600 dark:text-slate-300 leading-relaxed mt-3 text-right" dir="rtl">
-                                    {product.descriptionAr}
-                                </p>
-                            )}
                         </div>
 
                         {/* Product Variants */}

@@ -64,5 +64,10 @@
         "sat": "السبت"
     },
     "selectType": "اختر النوع",
-    "selectTypeFirst": "يرجى اختيار نوع العمل أولاً لرؤية الفئات"
+    "selectTypeFirst": "يرجى اختيار نوع العمل أولاً لرؤية الفئات",
+    "reviewsAndFeedback": "التقييمات والتعليقات",
+    "enableStoreReviews": "تفعيل تقييمات المتجر",
+    "enableStoreReviewsDesc": "السماح للعملاء بترك تقييمات وآراء عامة لمتجرك.",
+    "enableProductReviews": "تفعيل تقييمات المنتجات",
+    "enableProductReviewsDesc": "السماح للعملاء بترك تقييمات وآراء محددة للمنتجات الفردية."
 }

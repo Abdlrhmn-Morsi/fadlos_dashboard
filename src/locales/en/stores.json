@@ -64,5 +64,10 @@
         "sat": "Sat"
     },
     "selectType": "Select Type",
-    "selectTypeFirst": "Please select a business type first to see categories"
+    "selectTypeFirst": "Please select a business type first to see categories",
+    "reviewsAndFeedback": "Reviews & Feedback",
+    "enableStoreReviews": "Enable Store Reviews",
+    "enableStoreReviewsDesc": "Allow customers to leave overall reviews and ratings for your store.",
+    "enableProductReviews": "Enable Product Reviews",
+    "enableProductReviewsDesc": "Allow customers to leave specific reviews and ratings for individual products."
 }

@@ -87,6 +87,7 @@
     "unlimitedStockWarning": "The customer can order this product even if the quantity is 0.",
     "regenerateSKU": "Regenerate SKU",
     "available": "Available",
+    "unavailable": "Unavailable",
     "categoryCreated": "Category created! You can now select it.",
     "saveSuccess": "Product saved successfully",
     "updateSuccess": "Product updated successfully",

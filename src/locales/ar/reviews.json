@@ -15,5 +15,22 @@
     "status": "الحالة",
     "actions": "الإجراءات",
     "approved": "تمت الموافقة",
-    "pending": "قيد الانتظار"
+    "pending": "قيد الانتظار",
+    "report": "إبلاغ",
+    "reported": "مُبلغ عنه",
+    "reportReason": "سبب الإبلاغ",
+    "reportingReview": "إبلاغ عن تقييم",
+    "reportInstruction": "يرجى وصف سبب الإبلاغ عن هذا التقييم كمسيء أو غير لائق.",
+    "reportReasonPlaceholder": "أدخل السبب هنا...",
+    "submitReport": "إرسال البلاغ",
+    "deactivate": "إلغاء التنشيط",
+    "delete": "حذف",
+    "pleaseEnterReason": "يرجى إدخال سبب للبلاغ",
+    "reviewReportedSuccessfully": "تم الإبلاغ عن التقييم بنجاح",
+    "failedToReportReview": "فشل الإبلاغ عن التقييم",
+    "reviewDeactivatedSuccessfully": "تم إلغاء تنشيط التقييم بنجاح",
+    "failedToDeactivateReview": "فشل إلغاء تنشيط التقييم",
+    "reviewDeletedSuccessfully": "تم حذف التقييم بنجاح",
+    "failedToDeleteReview": "فشل حذف التقييم",
+    "confirmDeleteReview": "هل أنت متأكد من رغبتك في حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء."
 }

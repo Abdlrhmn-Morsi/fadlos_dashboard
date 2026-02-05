@@ -24,7 +24,8 @@ import {
     Clock,
     Calendar,
     AlertTriangle,
-    Languages
+    Languages,
+    MessageSquare
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -81,7 +82,9 @@ const StoreSettings = () => {
         workingDays: [] as number[],
         acceptOrdersIfOffDay: false,
         acceptOrdersInClosedHours: false,
-        isAcceptingOrders: true
+        isAcceptingOrders: true,
+        enableStoreReviews: true,
+        enableProductReviews: true
     });
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -129,7 +132,9 @@ const StoreSettings = () => {
                 workingDays: store.workingDays || [],
                 acceptOrdersIfOffDay: store.acceptOrdersIfOffDay || false,
                 acceptOrdersInClosedHours: store.acceptOrdersInClosedHours || false,
-                isAcceptingOrders: store.isAcceptingOrders !== undefined ? store.isAcceptingOrders : true
+                isAcceptingOrders: store.isAcceptingOrders !== undefined ? store.isAcceptingOrders : true,
+                enableStoreReviews: store.enableStoreReviews !== undefined ? store.enableStoreReviews : true,
+                enableProductReviews: store.enableProductReviews !== undefined ? store.enableProductReviews : true
             });
 
             setLogoPreview(store.logo);
@@ -326,6 +331,8 @@ const StoreSettings = () => {
             data.append('acceptOrdersIfOffDay', String(formData.acceptOrdersIfOffDay));
             data.append('acceptOrdersInClosedHours', String(formData.acceptOrdersInClosedHours));
             data.append('isAcceptingOrders', String(formData.isAcceptingOrders));
+            data.append('enableStoreReviews', String(formData.enableStoreReviews));
+            data.append('enableProductReviews', String(formData.enableProductReviews));
 
             if (formData.workingDays.length > 0) {
                 data.append('workingDays', JSON.stringify(formData.workingDays));
@@ -823,6 +830,52 @@ const StoreSettings = () => {
                                         </div>
                                     )}
                                 </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    {/* Reviews & Feedback Section */}
+                    <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
+                        <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
+                            <div className="p-2 bg-primary/10 rounded">
+                                <MessageSquare size={20} className="text-primary" />
+                            </div>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('reviewsAndFeedback')}</h3>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/30 rounded border border-slate-100 dark:border-slate-800/50 hover:border-primary/30 transition-colors">
+                                <div className="space-y-1">
+                                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('enableStoreReviews')}</h4>
+                                    <p className="text-slate-500 text-xs">{t('enableStoreReviewsDesc')}</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        name="enableStoreReviews"
+                                        className="sr-only peer"
+                                        checked={formData.enableStoreReviews}
+                                        onChange={handleChange}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
+                            </div>
+
+                            <div className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/30 rounded border border-slate-100 dark:border-slate-800/50 hover:border-primary/30 transition-colors">
+                                <div className="space-y-1">
+                                    <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('enableProductReviews')}</h4>
+                                    <p className="text-slate-500 text-xs">{t('enableProductReviewsDesc')}</p>
+                                </div>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        name="enableProductReviews"
+                                        className="sr-only peer"
+                                        checked={formData.enableProductReviews}
+                                        onChange={handleChange}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                </label>
                             </div>
                         </div>
                     </section>

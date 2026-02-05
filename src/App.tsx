@@ -90,6 +90,7 @@ const AppContent = () => {
             {/* Store Owner & Employee Routes */}
             <Route path="products" element={<ProductList />} />
             <Route path="products/new" element={<PermissionGate permission={Permissions.PRODUCTS_CREATE}><ProductForm /></PermissionGate>} />
+            <Route path="products/:id" element={<ProductDetail />} />
             <Route path="products/edit/:id" element={<PermissionGate permission={Permissions.PRODUCTS_UPDATE}><ProductForm /></PermissionGate>} />
 
             <Route path="addons" element={<AddonsList />} />
