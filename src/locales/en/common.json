@@ -38,6 +38,7 @@
     "active": "Active",
     "inactive": "Inactive",
     "pending": "Pending",
+    "sortOrder": "Sort Order",
     "total": "Total",
     "page": "Page",
     "of": "of",

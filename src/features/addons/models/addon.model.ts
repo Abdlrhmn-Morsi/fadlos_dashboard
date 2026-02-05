@@ -14,7 +14,7 @@ export interface Addon {
 
 export interface CreateAddonDto {
     name: string;
-    nameAr?: string;
+    nameAr: string;
     price: number;
     image?: string;
     inventory?: number;

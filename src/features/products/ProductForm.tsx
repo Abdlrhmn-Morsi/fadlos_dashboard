@@ -119,7 +119,7 @@ const ProductForm = () => {
     const fetchAllAddonsForSelection = async () => {
         try {
             setSearchingAddons(true);
-            const res: any = await addonsApi.getAddons({ limit: 100 });
+            const res: any = await addonsApi.getAddons({ limit: 100, isActive: true });
             setAllAddons(res.data || []);
         } catch (error) {
             console.error('Error fetching addons for selection', error);
@@ -829,8 +829,10 @@ const ProductForm = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-1">
                                     {allProducts
                                         .filter(p => {
-                                            const name = (isRTL ? p.nameAr : p.name) || p.name || '';
-                                            return name.toLowerCase().includes(relatedSearchTerm.toLowerCase());
+                                            const name = p.name || '';
+                                            const nameAr = p.nameAr || '';
+                                            const searchLower = relatedSearchTerm.toLowerCase();
+                                            return name.toLowerCase().includes(searchLower) || nameAr.toLowerCase().includes(searchLower);
                                         })
                                         .map(p => {
                                             const isSelected = formData.relatedProductIds.includes(p.id);
@@ -927,24 +929,31 @@ const ProductForm = () => {
                                     {allAddons
                                         .filter(a => {
                                             const name = (isRTL ? a.nameAr : a.name) || a.name || '';
-                                            return name.toLowerCase().includes(addonSearchTerm.toLowerCase());
+                                            const nameAr = a.nameAr || '';
+                                            const searchLower = addonSearchTerm.toLowerCase();
+                                            return name.toLowerCase().includes(searchLower) || nameAr.toLowerCase().includes(searchLower);
                                         })
                                         .map(a => {
                                             const isSelected = formData.addonIds.includes(a.id);
+                                            const isOutOfStock = a.trackInventory && a.inventory <= 0;
+                                            const isDisabled = isOutOfStock;
                                             return (
                                                 <div
                                                     key={a.id}
                                                     onClick={() => {
+                                                        if (isDisabled) return;
                                                         const newIds = isSelected
                                                             ? formData.addonIds.filter(id => id !== a.id)
                                                             : [...formData.addonIds, a.id];
                                                         setFormData({ ...formData, addonIds: newIds });
                                                     }}
                                                     className={clsx(
-                                                        "relative flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer group",
-                                                        isSelected
+                                                        "relative flex items-center gap-3 p-3 rounded-xl border transition-all",
+                                                        isDisabled ? "opacity-50 cursor-not-allowed" : "cursor-pointer group",
+                                                        isSelected && !isDisabled
                                                             ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
-                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 hover:border-indigo-300"
+                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800",
+                                                        !isDisabled && !isSelected && "hover:border-indigo-300"
                                                     )}
                                                 >
                                                     <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
@@ -961,6 +970,11 @@ const ProductForm = () => {
                                                             <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
                                                                 {isRTL ? (a.nameAr || a.name) : a.name}
                                                             </p>
+                                                            {isOutOfStock && (
+                                                                <span className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-[10px] font-bold rounded uppercase">
+                                                                    {t('addons:outOfStock', { defaultValue: 'Out of Stock' })}
+                                                                </span>
+                                                            )}
                                                         </div>
                                                         <p className="text-xs text-slate-500 dark:text-slate-400">
                                                             {a.price.toFixed(2)} {t('common:currencySymbol')}

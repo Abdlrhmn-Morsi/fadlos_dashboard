@@ -4,7 +4,7 @@
     "addAddon": "إضافة جديدة",
     "editAddon": "تعديل إضافة",
     "deleteAddon": "حذف إضافة",
-    "addonName": "اسم الإضافة",
+    "addonName": "الاسم بالإنجليزية",
     "addonNameAr": "الاسم بالعربية",
     "price": "السعر",
     "inventory": "المخزون",
@@ -31,5 +31,6 @@
         "priceMin": "يجب أن يكون السعر إيجابياً"
     },
     "inStock": "في المخزون",
-    "unlimited": "غير محدود"
+    "unlimited": "غير محدود",
+    "outOfStock": "نفد من المخزون"
 }

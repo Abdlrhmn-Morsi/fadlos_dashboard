@@ -97,12 +97,18 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                 <form onSubmit={handleSubmit} className="p-6 space-y-6" dir={isRTL ? 'rtl' : 'ltr'}>
                     <div className="space-y-4">
                         <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('categoryNameAr')} <span className="text-rose-500">*</span>
-                            </label>
+                            <div className="flex justify-between">
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    {t('categoryNameAr')} <span className="text-rose-500">*</span>
+                                </label>
+                                <span className="text-xs text-slate-400">
+                                    {formData.nameAr.length}/50
+                                </span>
+                            </div>
                             <input
                                 type="text"
                                 required
+                                maxLength={50}
                                 className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
                                 placeholder={t('placeholderNameAr')}
                                 value={formData.nameAr}
@@ -112,12 +118,18 @@ const CategoryFormModal: React.FC<CategoryFormModalProps> = ({ category, onClose
                         </div>
 
                         <div className="space-y-2">
-                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('categoryNameEn')} <span className="text-rose-500">*</span>
-                            </label>
+                            <div className="flex justify-between">
+                                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    {t('categoryNameEn')} <span className="text-rose-500">*</span>
+                                </label>
+                                <span className="text-xs text-slate-400">
+                                    {formData.name.length}/50
+                                </span>
+                            </div>
                             <input
                                 type="text"
                                 required
+                                maxLength={50}
                                 className="w-full px-4 py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
                                 placeholder={t('placeholderNameEn')}
                                 value={formData.name}

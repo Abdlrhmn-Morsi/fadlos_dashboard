@@ -167,11 +167,18 @@ const AddonForm = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         {/* Name AR */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('addonNameAr')}
-                            </label>
+                            <div className="flex justify-between">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    {t('addonNameAr')} <span className="text-rose-500">*</span>
+                                </label>
+                                <span className="text-xs text-slate-400">
+                                    {formData.nameAr.length}/100
+                                </span>
+                            </div>
                             <input
                                 type="text"
+                                required
+                                maxLength={100}
                                 className={clsx(
                                     "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border",
                                     "text-right"
@@ -185,12 +192,18 @@ const AddonForm = () => {
 
                         {/* Name EN */}
                         <div className="space-y-2">
-                            <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('addonName')} *
-                            </label>
+                            <div className="flex justify-between">
+                                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                    {t('addonName')} <span className="text-rose-500">*</span>
+                                </label>
+                                <span className="text-xs text-slate-400">
+                                    {formData.name.length}/100
+                                </span>
+                            </div>
                             <input
                                 type="text"
                                 required
+                                maxLength={100}
                                 className={clsx(
                                     "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border",
                                     isRTL && "text-right"
@@ -204,7 +217,7 @@ const AddonForm = () => {
                         {/* Price */}
                         <div className="space-y-2">
                             <label className="text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                {t('price')} *
+                                {t('price')} <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
                                 <input

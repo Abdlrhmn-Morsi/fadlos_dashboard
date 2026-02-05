@@ -4,7 +4,7 @@
     "addAddon": "Add Addon",
     "editAddon": "Edit Addon",
     "deleteAddon": "Delete Addon",
-    "addonName": "Add-on Name",
+    "addonName": "English Name",
     "addonNameAr": "Arabic Name",
     "price": "Price",
     "inventory": "Inventory",
@@ -31,5 +31,6 @@
         "priceMin": "Price must be positive"
     },
     "inStock": "in stock",
-    "unlimited": "Unlimited"
+    "unlimited": "Unlimited",
+    "outOfStock": "Out of Stock"
 }

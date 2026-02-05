@@ -118,7 +118,8 @@ const CategoryList = () => {
     };
 
     const filteredCategories = categories.filter(category =>
-        category.name?.toLowerCase().includes(searchTerm.toLowerCase())
+        category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        category.nameAr?.toLowerCase().includes(searchTerm.toLowerCase())
     );
 
     return (
