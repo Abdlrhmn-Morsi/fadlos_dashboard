@@ -17,7 +17,7 @@ import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 
 const ClientList = () => {
-    const { t } = useTranslation(['clients', 'common']);
+    const { t } = useTranslation(['clients', 'common', 'orders']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const { getCache, setCache } = useCache();
@@ -523,17 +523,57 @@ const ClientList = () => {
                                         {/* Delivery Info */}
                                         <div className="space-y-4">
                                             <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('logistics')}</h3>
-                                            <div className="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
-                                                <div className="flex items-center gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
-                                                    <MapPin size={16} className="text-primary" />
-                                                    <span className="uppercase tracking-tighter">{selectedOrder.deliveryAddress ? `${selectedOrder.deliveryAddress.street}, ${selectedOrder.deliveryAddress.city}` : t('pickup')}</span>
+                                            <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
+                                                <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                                        <User size={16} />
+                                                    </div>
+                                                    <span className="uppercase tracking-tight">{selectedOrder.clientInfo?.name || selectedOrder.client?.name}</span>
                                                 </div>
-                                                <div className="flex items-center gap-3 text-sm font-bold text-slate-600 dark:text-slate-300">
-                                                    <Phone size={16} className="text-primary" />
-                                                    <span className="tracking-tighter">{selectedOrder.client?.phone || t('noPhone')}</span>
+
+                                                <div className="flex items-start gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                    <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
+                                                        <MapPin size={16} />
+                                                    </div>
+                                                    <div className="flex flex-col gap-0.5 min-w-0">
+                                                        <span className="uppercase tracking-tight truncate">
+                                                            {selectedOrder.deliveryAddress ? (
+                                                                isRTL ?
+                                                                    `${selectedOrder.deliveryAddress.townArName}, ${selectedOrder.deliveryAddress.placeArName}` :
+                                                                    `${selectedOrder.deliveryAddress.townEnName}, ${selectedOrder.deliveryAddress.placeEnName}`
+                                                            ) : t('pickup')}
+                                                        </span>
+                                                        {selectedOrder.deliveryAddress?.addressDetails && (
+                                                            <span className="text-[11px] font-medium text-slate-500 normal-case leading-relaxed">
+                                                                {selectedOrder.deliveryAddress.addressDetails}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+
+                                                <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
+                                                        <Phone size={16} />
+                                                    </div>
+                                                    <span className="tracking-tighter">
+                                                        {selectedOrder.deliveryAddress?.phone || selectedOrder.clientInfo?.phone || selectedOrder.client?.phone || t('noPhone')}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        {/* Order Notes */}
+                                        {selectedOrder.notes && (
+                                            <div className="space-y-3">
+                                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('orders:orderNotes')}</h3>
+                                                <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/10 rounded-2xl relative overflow-hidden group">
+                                                    <div className="absolute top-0 bottom-0 left-0 w-1 bg-amber-400/50" />
+                                                    <p className="text-sm font-medium text-amber-950 dark:text-amber-200 leading-relaxed italic">
+                                                        "{selectedOrder.notes}"
+                                                    </p>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 )
                             )}
