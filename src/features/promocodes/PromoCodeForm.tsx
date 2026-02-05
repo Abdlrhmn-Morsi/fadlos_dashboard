@@ -185,7 +185,9 @@ const PromoCodeForm = () => {
             };
 
             if (isEditMode) {
-                await promoCodesApi.updatePromoCode(id!, payload);
+                // Remove 'code' from payload for updates, as it's not allowed in UpdatePromoCodeDto
+                const { code, ...updatePayload } = payload;
+                await promoCodesApi.updatePromoCode(id!, updatePayload);
                 toast.success(t('common:success'));
             } else {
                 await promoCodesApi.createPromoCode(payload);
@@ -389,13 +391,29 @@ const PromoCodeForm = () => {
                                     />
                                 </InputGroup>
 
-                                <InputGroup label={t('description')} icon={Info} subtitle={t('descriptionSubtitle')}>
-                                    <textarea
-                                        className="w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
-                                        placeholder="e.g. 20% off for first 100 orders"
-                                        value={formData.description}
-                                        onChange={e => setFormData({ ...formData, description: e.target.value })}
-                                    />
+                                <InputGroup
+                                    label={t('description')}
+                                    icon={Info}
+                                    required
+                                    subtitle={t('descriptionSubtitle')}
+                                >
+                                    <div className="relative">
+                                        <textarea
+                                            className="w-full h-24 px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
+                                            placeholder="e.g. 20% off for first 100 orders"
+                                            value={formData.description}
+                                            onChange={e => setFormData({ ...formData, description: e.target.value })}
+                                            maxLength={255}
+                                            required
+                                        />
+                                        <div className={clsx(
+                                            "absolute bottom-2 text-[10px] font-medium transition-colors",
+                                            isRTL ? "left-3" : "right-3",
+                                            formData.description.length >= 250 ? "text-rose-500" : "text-slate-400"
+                                        )}>
+                                            {formData.description.length} / 255
+                                        </div>
+                                    </div>
                                 </InputGroup>
                             </div>
                         </div>
