@@ -404,10 +404,10 @@ const StoreSettings = () => {
                     {/* Visual Identity Section */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded overflow-hidden shadow-xl shadow-slate-200/20 dark:shadow-none hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 group">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <ImageIcon size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <ImageIcon size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('visualIdentity')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('visualIdentity')}</h3>
                         </div>
 
                         <div className="p-8 space-y-8">
@@ -441,10 +441,10 @@ const StoreSettings = () => {
                             {/* Logo */}
                             <div className="relative -mt-24 inline-block group ms-8">
                                 <div
-                                    className="w-40 h-40 rounded bg-white dark:bg-slate-900 p-3 shadow-2xl border-4 border-white dark:border-slate-800 relative cursor-pointer group-hover:scale-105 transition-transform"
+                                    className="w-40 h-40 rounded-full bg-white dark:bg-slate-900 p-3 shadow-2xl border-4 border-white dark:border-slate-800 relative cursor-pointer group-hover:scale-105 transition-transform"
                                     onClick={() => logoInputRef.current?.click()}
                                 >
-                                    <div className="w-full h-full bg-slate-100 dark:bg-slate-800 rounded overflow-hidden relative flex items-center justify-center">
+                                    <div className="w-full h-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden relative flex items-center justify-center">
                                         {logoPreview ? (
                                             <img src={logoPreview} alt="Logo" className="w-full h-full object-cover" />
                                         ) : (
@@ -469,10 +469,10 @@ const StoreSettings = () => {
                     {/* Primary Information */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <Store size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Store size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('primaryInformation')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('primaryInformation')}</h3>
                         </div>
 
                         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -511,10 +511,10 @@ const StoreSettings = () => {
                     {/* Business Classification Section */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <Briefcase size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Briefcase size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('common:businessTypes')} & {t('common:businessCategories')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('common:businessTypes')} & {t('common:businessCategories')}</h3>
                         </div>
 
                         <div className="p-8 space-y-8">
@@ -605,10 +605,10 @@ const StoreSettings = () => {
                     {/* Description & Details Section */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <Languages size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Languages size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('common:description')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('common:description')}</h3>
                         </div>
 
                         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -644,10 +644,10 @@ const StoreSettings = () => {
                     {/* Contact & Support */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <Phone size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Phone size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('contactSupport')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('contactSupport')}</h3>
                         </div>
 
                         <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -696,10 +696,10 @@ const StoreSettings = () => {
                     {/* Social Media Links */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <Globe size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Globe size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('socialMedia')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('socialMedia')}</h3>
                         </div>
 
                         <div className="p-8">
@@ -768,10 +768,10 @@ const StoreSettings = () => {
 
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <MapPin size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <MapPin size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('serviceCoverage')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('serviceCoverage')}</h3>
                         </div>
 
                         <div className="p-8 space-y-8">
@@ -837,10 +837,10 @@ const StoreSettings = () => {
                     {/* Reviews & Feedback Section */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <MessageSquare size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <MessageSquare size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('reviewsAndFeedback')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('reviewsAndFeedback')}</h3>
                         </div>
 
                         <div className="p-8 space-y-6">
@@ -883,10 +883,10 @@ const StoreSettings = () => {
                     {/* Operating Hours & Settings */}
                     <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
                         <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                            <div className="p-2 bg-primary/10 rounded">
-                                <Clock size={20} className="text-primary" />
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Clock size={24} className="text-primary" />
                             </div>
-                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.2em] text-[10px]">{t('operatingHours')}</h3>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('operatingHours')}</h3>
                         </div>
 
                         <div className="p-8 space-y-8">
@@ -960,69 +960,76 @@ const StoreSettings = () => {
                                     ))}
                                 </div>
                             </div>
+                        </div>
+                    </section>
 
-                            <hr className="border-slate-100 dark:border-slate-800" />
-
-                            {/* Order Acceptance Rules */}
-                            <div className="space-y-4">
-                                <div className="flex items-center justify-between">
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-2">
-                                        {t('orderAcceptance')}
-                                    </label>
-                                    <div className="flex items-center gap-3 bg-primary/5 px-4 py-2 rounded-full">
-                                        <label htmlFor="isAcceptingOrders" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
-                                            {t('acceptingOrders')}
-                                        </label>
-                                        <label className="relative inline-flex items-center cursor-pointer">
-                                            <input
-                                                type="checkbox"
-                                                name="isAcceptingOrders"
-                                                id="isAcceptingOrders"
-                                                className="sr-only peer"
-                                                checked={formData.isAcceptingOrders}
-                                                onChange={handleChange}
-                                            />
-                                            <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                                        </label>
-                                    </div>
+                    {/* Order Acceptance Rules */}
+                    <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
+                        <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
+                            <div className="flex items-center gap-4">
+                                <div className="p-2.5 bg-primary/10 rounded-lg">
+                                    <CheckCircle size={24} className="text-primary" />
                                 </div>
+                                <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('orderAcceptance')}</h3>
+                            </div>
 
-                                <div className="space-y-3 opacity-90">
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            type="checkbox"
-                                            id="acceptOrdersIfOffDay"
-                                            name="acceptOrdersIfOffDay"
-                                            checked={formData.acceptOrdersIfOffDay}
-                                            onChange={handleChange}
-                                            className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
-                                        />
-                                        <label htmlFor="acceptOrdersIfOffDay" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
-                                            {t('acceptOffDay')}
-                                        </label>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <input
-                                            type="checkbox"
-                                            id="acceptOrdersInClosedHours"
-                                            name="acceptOrdersInClosedHours"
-                                            checked={formData.acceptOrdersInClosedHours}
-                                            onChange={handleChange}
-                                            className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
-                                        />
-                                        <label htmlFor="acceptOrdersInClosedHours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
-                                            {t('acceptClosedHours')}
-                                        </label>
-                                    </div>
+                            <div className="flex items-center gap-3">
+                                <span className={clsx(
+                                    "text-[10px] font-bold uppercase tracking-tight",
+                                    formData.isAcceptingOrders ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
+                                )}>
+                                    {formData.isAcceptingOrders ? t('acceptingOrders') : t('notAcceptingOrders')}
+                                </span>
+                                <label className="relative inline-flex items-center cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        name="isAcceptingOrders"
+                                        id="isAcceptingOrders"
+                                        className="sr-only peer"
+                                        checked={formData.isAcceptingOrders}
+                                        onChange={handleChange}
+                                    />
+                                    <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-sm"></div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="p-8 space-y-6">
+                            <div className="space-y-3 opacity-90">
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="acceptOrdersIfOffDay"
+                                        name="acceptOrdersIfOffDay"
+                                        checked={formData.acceptOrdersIfOffDay}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                    />
+                                    <label htmlFor="acceptOrdersIfOffDay" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                        {t('acceptOffDay')}
+                                    </label>
+                                </div>
+                                <div className="flex items-center gap-3">
+                                    <input
+                                        type="checkbox"
+                                        id="acceptOrdersInClosedHours"
+                                        name="acceptOrdersInClosedHours"
+                                        checked={formData.acceptOrdersInClosedHours}
+                                        onChange={handleChange}
+                                        className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                    />
+                                    <label htmlFor="acceptOrdersInClosedHours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                        {t('acceptClosedHours')}
+                                    </label>
                                 </div>
                             </div>
 
                             {!formData.isAcceptingOrders && (
-                                <div className="mx-8 mb-8 p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900 rounded flex items-start gap-3">
+                                <div className="p-5 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-900 rounded-lg flex items-start gap-3 animate-fadeIn">
                                     <AlertTriangle className="text-rose-600 dark:text-rose-400 shrink-0 mt-0.5" size={20} />
                                     <div>
                                         <h4 className="font-bold text-rose-700 dark:text-rose-300 text-sm">{t('notAcceptingOrders')}</h4>
-                                        <p className="text-rose-600 dark:text-rose-400 text-sm mt-1">
+                                        <p className="text-rose-600 dark:text-rose-400 text-sm mt-1 leading-relaxed">
                                             {t('notAcceptingOrdersMsg')}
                                         </p>
                                     </div>
@@ -1030,12 +1037,10 @@ const StoreSettings = () => {
                             )}
                         </div>
                     </section>
-
                 </div>
             </form>
         </div>
     );
 };
-
 
 export default StoreSettings;

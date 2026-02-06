@@ -49,6 +49,7 @@
     "closingTime": "Closing Time",
     "workingDays": "Working Days",
     "orderAcceptance": "Order Acceptance Rules",
+    "orderAcceptanceRules": "Order Acceptance Rules",
     "acceptingOrders": "Accepting Orders",
     "acceptOffDay": "Accept orders even on off days",
     "acceptClosedHours": "Accept orders even during closed hours",

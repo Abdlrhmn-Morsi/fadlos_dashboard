@@ -49,6 +49,7 @@
     "closingTime": "وقت الإغلاق",
     "workingDays": "أيام العمل",
     "orderAcceptance": "قواعد قبول الطلبات",
+    "orderAcceptanceRules": "قواعد قبول الطلبات",
     "acceptingOrders": "قبول الطلبات",
     "acceptOffDay": "قبول الطلبات حتى في أيام العطلة",
     "acceptClosedHours": "قبول الطلبات حتى في غير ساعات العمل",
