@@ -7,6 +7,7 @@ import { useCache } from '../../contexts/CacheContext';
 import followersApi from './api/followers.api';
 import clsx from 'clsx';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
+import { Pagination } from '../../components/common/Pagination';
 
 const FollowerList = () => {
     const { t } = useTranslation(['followers', 'common']);
@@ -14,14 +15,33 @@ const FollowerList = () => {
     const { user } = useAuth();
     const { getCache, setCache } = useCache();
     const [followers, setFollowers] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState(''); // Add debounced search state
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(20);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Debounce search term
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setPage(1); // Reset page when search changes
+        }, 2000);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+
 
     useEffect(() => {
         if (user) {
             fetchFollowers();
         }
-    }, [user]);
+    }, [user, debouncedSearch, page]); // Add page to dependencies
 
     const fetchFollowers = async () => {
         try {
@@ -34,31 +54,57 @@ const FollowerList = () => {
                 return;
             }
 
-            // Check cache first
+            // Check cache first (only if no search)
             const cacheKey = 'followers';
-            const cachedData = getCache<any>(cacheKey);
-            if (cachedData) {
-                if (cachedData.data && Array.isArray(cachedData.data)) {
-                    setFollowers(cachedData.data);
-                } else if (Array.isArray(cachedData)) {
-                    setFollowers(cachedData);
+            const params = { page, limit, search: debouncedSearch };
+
+            if (!debouncedSearch) {
+                const cachedData = getCache<any>(cacheKey, params);
+                if (cachedData) {
+                    if (cachedData.data && Array.isArray(cachedData.data)) {
+                        setFollowers(cachedData.data);
+                        if (cachedData.total) setTotalItems(cachedData.total);
+                        if (cachedData.totalPages) setTotalPages(cachedData.totalPages);
+                    } else if (Array.isArray(cachedData)) {
+                        setFollowers(cachedData);
+                        setTotalPages(1);
+                        setTotalItems(cachedData.length);
+                    }
+                    setLoading(false);
+                    return;
                 }
-                setLoading(false);
-                return;
             }
 
-            const response: any = await followersApi.getStoreFollowers(storeId);
+            // Pass debouncedSearch to API
+            const response: any = await followersApi.getStoreFollowers(storeId, debouncedSearch, page, limit);
 
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
                 setFollowers(response.data);
-                // Cache the response
-                setCache(cacheKey, response);
+
+                // Update pagination from response
+                if (response.total !== undefined) setTotalItems(response.total);
+                if (response.totalPages !== undefined) {
+                    setTotalPages(response.totalPages);
+                } else if (response.total !== undefined) {
+                    setTotalPages(Math.ceil(response.total / limit));
+                }
+
+                // Cache the response only if no search filter
+                if (!debouncedSearch) {
+                    setCache(cacheKey, response, params);
+                }
             } else if (Array.isArray(response)) {
                 setFollowers(response);
-                // Cache the response
-                setCache(cacheKey, response);
+                setTotalItems(response.length);
+                setTotalPages(1);
+
+                if (!debouncedSearch) {
+                    setCache(cacheKey, response, params);
+                }
             } else {
                 setFollowers([]);
+                setTotalItems(0);
+                setTotalPages(1);
             }
         } catch (error) {
             console.error('Failed to fetch followers', error);
@@ -71,19 +117,38 @@ const FollowerList = () => {
 
     return (
         <div className="max-w-[1600px] mx-auto p-6">
-            <div className="flex items-center justify-between mb-10">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
                     <div className="flex items-center gap-2 mt-1">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">
-                            {followers.length} {t('activeConnections')}
+                            {totalItems} {t('activeConnections')}
                         </p>
                     </div>
                 </div>
-                <div className="hidden md:flex items-center gap-2 p-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-sm">
-                    <Users size={18} className="text-primary" />
-                    <span className="font-black text-xs uppercase tracking-tight">{t('communityReach')}</span>
+
+                <div className="flex items-center gap-4">
+                    <div className="relative group">
+                        <div className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors", isRTL ? "right-3" : "left-3")}>
+                            <User size={16} />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder={t('searchPlaceholder') || "Search by name..."}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className={clsx(
+                                "w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl py-2.5 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all shadow-sm font-medium text-sm placeholder:text-slate-400",
+                                isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                            )}
+                        />
+                    </div>
+
+                    <div className="hidden md:flex items-center gap-2 p-2 px-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm">
+                        <Users size={16} className="text-primary" />
+                        <span className="font-black text-[10px] uppercase tracking-tight">{t('communityReach')}</span>
+                    </div>
                 </div>
             </div>
 
@@ -93,7 +158,7 @@ const FollowerList = () => {
                     {error}
                 </div>
             ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-4">
                     {loading ? (
                         <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 size={32} className="text-primary animate-spin" />
@@ -113,22 +178,20 @@ const FollowerList = () => {
                             const displayName = user.name || `${user.firstName || ''} ${user.lastName || ''}`.trim() || t('valuedFollower');
 
                             return (
-                                <div key={user.id} className="group bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden relative active:scale-[0.98]">
-                                    <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden group-hover:scale-110 transition-transform duration-500">
+                                <div key={user.id} className="group bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden relative active:scale-[0.98]">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden group-hover:scale-110 transition-transform duration-500 shrink-0">
                                             {user.profileImage ? (
                                                 <ImageWithFallback src={user.profileImage} alt={displayName} className="w-full h-full object-cover" />
                                             ) : (
-                                                <User size={24} className="group-hover:text-primary transition-colors" />
+                                                <User size={18} className="group-hover:text-primary transition-colors" />
                                             )}
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter truncate text-lg group-hover:text-primary transition-colors leading-none mb-1">
+                                            <h3 className="font-bold text-slate-900 dark:text-white truncate text-sm group-hover:text-primary transition-colors mb-0.5">
                                                 {displayName}
                                             </h3>
-
                                         </div>
-
                                     </div>
 
                                     {/* High-end accent details */}
@@ -137,6 +200,17 @@ const FollowerList = () => {
                             );
                         })
                     )}
+                </div>
+            )}
+
+            {!loading && !error && followers.length > 0 && (
+                <div className="mt-8">
+                    <Pagination
+                        currentPage={page}
+                        totalPages={totalPages}
+                        onPageChange={setPage}
+                        isLoading={loading}
+                    />
                 </div>
             )}
         </div>
