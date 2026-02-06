@@ -36,13 +36,15 @@ interface SidebarItemProps {
   icon: LucideIcon;
   label: string;
   collapsed: boolean;
+  replace?: boolean;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed, replace }) => {
   const { isRTL } = useLanguage();
   return (
     <NavLink
       to={to}
+      replace={replace}
       className={({ isActive }) => clsx(
         'flex items-center gap-3 px-4 py-3 rounded-none-none transition-all duration-200 group relative',
         isActive
@@ -129,7 +131,7 @@ const DashboardLayout: React.FC = () => {
         )}
       >
         <div className="h-[70px] flex items-center justify-between px-6 border-b border-slate-100 dark:border-slate-800">
-          <Link to="/" className={clsx('flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity', collapsed && 'justify-center w-full')}>
+          <Link to="/" replace className={clsx('flex items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity', collapsed && 'justify-center w-full')}>
             <img src={appLogo} alt="Logo" className="w-12 h-12 object-contain" />
           </Link>
           {!collapsed && (
@@ -148,7 +150,7 @@ const DashboardLayout: React.FC = () => {
 
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
 
-          <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} />
+          <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
 
           {/* Admin Links */}
           {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (

@@ -86,7 +86,7 @@ const VerifyEmail = () => {
                 login(response.user);
                 await loginOneSignal(response.user.id);
                 setMessage(t('emailVerifiedSuccess'));
-                setTimeout(() => navigate('/'), 1500);
+                setTimeout(() => navigate('/', { replace: true }), 1500);
             }
         } catch (err: any) {
             const msg = err.response?.data?.message || t('verificationFailed');

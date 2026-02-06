@@ -42,7 +42,7 @@ const Login = () => {
                 if (user.id) {
                     await loginOneSignal(user.id);
                 }
-                navigate('/');
+                navigate('/', { replace: true });
             } else if (responseData.requiresVerification) {
                 navigate('/verify-email', { state: { token: responseData.verificationToken } });
             } else {

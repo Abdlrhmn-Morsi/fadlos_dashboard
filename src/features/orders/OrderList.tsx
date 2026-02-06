@@ -186,7 +186,7 @@ const OrderList = () => {
                 >
                     <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{t('total')}</span>
                     <span className="text-2xl font-black text-slate-800 dark:text-slate-100">
-                        {Object.values(statusCounts).reduce((a, b) => a + b, 0)}
+                        {Object.values(OrderStatus).reduce((total, s) => total + (Number(statusCounts[s]) || 0), 0)}
                     </span>
                 </div>
                 {[
