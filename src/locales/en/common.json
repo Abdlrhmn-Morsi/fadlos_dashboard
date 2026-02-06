@@ -340,5 +340,8 @@
         }
     },
     "submit": "Submit",
-    "understood": "Understood"
+    "understood": "Understood",
+    "results": "results",
+    "copy": "Copy Link",
+    "copied": "Link copied to clipboard!"
 }

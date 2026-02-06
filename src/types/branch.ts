@@ -3,8 +3,7 @@ export interface Branch {
     addressAr: string;
     addressEn: string;
     phone: string;
-    latitude: number;
-    longitude: number;
+    link?: string;
     isActive: boolean;
     storeId: string;
     createdAt: string;
@@ -15,9 +14,9 @@ export interface CreateBranchDto {
     addressAr: string;
     addressEn: string;
     phone: string;
-    latitude: number;
-    longitude: number;
+    link?: string;
     isActive?: boolean;
 }
+
 
 export interface UpdateBranchDto extends Partial<CreateBranchDto> { }

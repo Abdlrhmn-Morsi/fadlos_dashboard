@@ -7,7 +7,8 @@ import { Branch, CreateBranchDto, UpdateBranchDto } from '../../types/branch';
 import { BranchForm } from './components/BranchForm';
 import { Modal } from '../../components/ui/Modal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home } from 'lucide-react';
+import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe } from 'lucide-react';
+
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 
@@ -156,137 +157,193 @@ export const BranchesList: React.FC = () => {
         setEditingBranch(null);
     };
 
-    if (loading) return <div>{t('common:loading')}</div>;
+    const handleCopyLink = (link?: string) => {
+        if (!link) return;
+        navigator.clipboard.writeText(link);
+        toast.success(t('common:copied'));
+    };
+
+
+    if (loading) return (
+        <div className="flex items-center justify-center min-h-[400px]">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+    );
 
     return (
-        <div className="px-4 sm:px-6 lg:px-8 py-8">
-            <div className="sm:flex sm:items-center">
-                <div className="sm:flex-auto">
-                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white underline decoration-indigo-500 decoration-4 underline-offset-8">{t('title')}</h1>
-                    <p className="mt-4 text-sm text-gray-600 dark:text-gray-400">
-                        {t('subtitle')}
-                    </p>
-                </div>
-                <div className={clsx("mt-4 sm:mt-0 sm:flex-none", isRTL ? "sm:mr-16" : "sm:ml-16")}>
+        <div className="px-4 sm:px-6 lg:px-8 py-10 bg-gray-50/50 dark:bg-gray-900/50 min-h-screen">
+            {/* Header Section */}
+            <div className="relative mb-12">
+                <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+                <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
+
+                <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-6">
+                    <div className="max-w-2xl">
+                        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none mb-4">
+                            {t('title')}
+                            <span className="text-indigo-600">.</span>
+                        </h1>
+                        <p className="text-lg text-gray-600 dark:text-gray-400 font-medium">
+                            {t('subtitle')}
+                        </p>
+                    </div>
+
                     <button
                         type="button"
                         onClick={openCreateModal}
-                        className="inline-flex items-center justify-center rounded-xl border border-transparent bg-indigo-600 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-200 dark:shadow-none hover:bg-indigo-700 hover:-translate-y-0.5 transition-all duration-200"
+                        className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
                     >
-                        <Plus size={20} className={isRTL ? "ml-2" : "mr-2"} />
+                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                        <Plus size={22} className={clsx(isRTL ? "ml-2" : "mr-2")} />
                         {t('addBranch')}
                     </button>
                 </div>
             </div>
 
-            <div className="mt-8">
-                <div className="flex flex-col sm:flex-row gap-4 justify-between items-center mb-8">
-                    <div className="relative w-full sm:max-w-md">
-                        <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none", isRTL ? "right-0 pr-3" : "left-0 pl-3")}>
-                            <Search className="h-5 w-5 text-gray-400" />
-                        </div>
-                        <input
-                            type="text"
-                            placeholder={t('searchPlaceholder')}
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className={clsx(
-                                "block w-full pr-3 py-3 border border-gray-200 rounded-xl leading-5 bg-white dark:bg-gray-800 dark:border-gray-700 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm transition-all duration-200 shadow-sm",
-                                isRTL ? "pr-10" : "pl-10"
-                            )}
-                        />
+            {/* Actions Bar */}
+            <div className="sticky top-4 z-10 backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white dark:border-gray-700 rounded p-4 shadow-sm mb-10 flex flex-col sm:flex-row gap-4 items-center justify-between transition-all duration-300">
+                <div className="relative w-full sm:max-w-md group">
+                    <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-500", isRTL ? "right-0 pr-4" : "left-0 pl-4")}>
+                        <Search className="h-5 w-5 text-gray-400" />
                     </div>
+                    <input
+                        type="text"
+                        placeholder={t('searchPlaceholder')}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className={clsx(
+                            "block w-full py-3.5 border-none rounded bg-gray-100/50 dark:bg-gray-700/50 dark:text-white placeholder-gray-500 focus:ring-2 focus:ring-indigo-500/20 sm:text-sm transition-all shadow-inner",
+                            isRTL ? "pr-12 pl-4" : "pl-12 pr-4"
+                        )}
+                    />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {filteredBranches.length > 0 ? (
-                        filteredBranches.map((branch) => (
-                            <div key={branch.id} className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col group relative">
-                                <div className="p-6 flex-1">
-                                    <div className="flex justify-between items-start mb-6">
-                                        <div className={clsx(
-                                            "inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider",
-                                            branch.isActive
-                                                ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
-                                                : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400'
-                                        )}>
-                                            <span className={clsx(
-                                                "h-2 w-2 rounded-full animate-pulse",
-                                                isRTL ? "ml-2" : "mr-2",
-                                                branch.isActive ? 'bg-emerald-500' : 'bg-rose-500'
-                                            )} />
-                                            {branch.isActive ? t('active') : t('inactive')}
-                                        </div>
-                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                                            <button
-                                                onClick={() => openEditModal(branch)}
-                                                className="p-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl hover:bg-indigo-100 dark:hover:bg-indigo-900/40 transition-colors shadow-sm"
-                                                title={t('editBranch')}
-                                            >
-                                                <Pencil className="h-4.5 w-4.5" />
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(branch.id)}
-                                                className="p-2.5 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-xl hover:bg-rose-100 dark:hover:bg-rose-900/40 transition-colors shadow-sm"
-                                                title={t('deleteBranch')}
-                                            >
-                                                <Trash2 className="h-4.5 w-4.5" />
-                                            </button>
-                                        </div>
+                <div className="hidden sm:flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 font-medium px-4">
+                    <span className="flex h-2 w-2 rounded-full bg-emerald-500"></span>
+                    {filteredBranches.length} {t('common:results')}
+                </div>
+            </div>
+
+            {/* Grid display */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+                {filteredBranches.length > 0 ? (
+                    filteredBranches.map((branch) => (
+                        <div key={branch.id} className="group relative bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.1)] transition-all duration-500 flex flex-col overflow-hidden">
+                            {/* Card Content */}
+                            <div className="p-8 flex-1">
+                                <div className="flex justify-between items-center mb-8">
+                                    <div className={clsx(
+                                        "flex items-center gap-2 rounded px-4 py-2 text-xs font-bold uppercase tracking-widest",
+                                        branch.isActive
+                                            ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                            : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'
+                                    )}>
+                                        <span className={clsx(
+                                            "h-2 w-2 rounded-full",
+                                            branch.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'
+                                        )} />
+                                        {branch.isActive ? t('active') : t('inactive')}
                                     </div>
 
-                                    <div className="space-y-5">
-                                        <div className="flex items-start gap-4">
-                                            <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl group-hover:scale-110 transition-transform duration-300">
-                                                <Home className="h-6 w-6 text-indigo-600 dark:text-indigo-400" />
-                                            </div>
-                                            <div className="flex-1">
-                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1.5">{t('branchLocation')}</p>
-                                                <p className="text-gray-900 dark:text-white font-bold text-xl leading-tight mb-1.5">{branch.addressAr}</p>
-                                                {branch.addressEn && (
-                                                    <p className="text-gray-500 dark:text-gray-400 text-sm font-medium italic">{branch.addressEn}</p>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        <div className="flex items-center gap-4">
-                                            <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 rounded-2xl group-hover:scale-110 transition-transform duration-300">
-                                                <Phone className="h-6 w-6 text-emerald-600 dark:text-emerald-400" />
-                                            </div>
-                                            <div>
-                                                <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">{t('contactDetails')}</p>
-                                                <p className="text-gray-900 dark:text-white font-bold">{branch.phone}</p>
-                                            </div>
-                                        </div>
+                                    <div className="flex items-center gap-2">
+                                        <button
+                                            onClick={() => openEditModal(branch)}
+                                            className="p-3 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300"
+                                            title={t('editBranch')}
+                                        >
+                                            <Pencil size={18} />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(branch.id)}
+                                            className="p-3 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 transition-all duration-300"
+                                            title={t('deleteBranch')}
+                                        >
+                                            <Trash2 size={18} />
+                                        </button>
                                     </div>
                                 </div>
 
-                                <div className="p-6 bg-gray-50 dark:bg-gray-800/30 border-t border-gray-100 dark:border-gray-700/50">
+                                <div className="space-y-8">
+                                    <div className="flex items-start gap-5">
+                                        <div className="flex-shrink-0 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-all duration-500">
+                                            <Home className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">{t('branchLocation')}</p>
+                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-snug mb-2 group-hover:text-indigo-600 transition-colors">
+                                                {branch.addressAr}
+                                            </h3>
+                                            {branch.addressEn && (
+                                                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed">
+                                                    {branch.addressEn}
+                                                </p>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="flex items-center gap-5">
+                                        <div className="flex-shrink-0 p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded group-hover:scale-110 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-all duration-500">
+                                            <Phone className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+                                        </div>
+                                        <div>
+                                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1.5">{t('contactDetails')}</p>
+                                            <p className="text-lg font-bold text-gray-900 dark:text-white tabular-nums tracking-wide">
+                                                {branch.phone}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Card Footer Actions */}
+                            {branch.link && (
+                                <div className="p-4 bg-gray-50/50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex gap-3">
                                     <a
-                                        href={`https://www.google.com/maps/search/?api=1&query=${branch.latitude},${branch.longitude}`}
+                                        href={branch.link}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-3 w-full py-3.5 px-6 bg-white dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-2xl text-sm font-bold text-gray-700 dark:text-gray-100 hover:bg-indigo-600 hover:text-white hover:border-indigo-600 dark:hover:bg-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 shadow-sm"
+                                        className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
                                     >
-                                        <MapPin className="h-5 w-5 text-emerald-500 group-hover:text-white" />
+                                        <MapPin size={18} className="text-emerald-500 group-hover/btn:text-white transition-colors" />
                                         <span>{t('navigateOnMaps')}</span>
                                     </a>
+                                    <button
+                                        onClick={() => handleCopyLink(branch.link)}
+                                        className="p-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 active:scale-90"
+                                        title={t('common:copy')}
+                                    >
+                                        <Globe size={18} />
+                                    </button>
                                 </div>
+                            )}
+
+                        </div>
+                    ))
+                ) : (
+                    <div className="col-span-full py-32 bg-white dark:bg-gray-800 rounded border-2 border-dashed border-gray-200 dark:border-gray-700 text-center flex flex-col items-center justify-center space-y-8 shadow-inner overflow-hidden relative">
+                        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent"></div>
+                        <div className="relative group">
+                            <div className="absolute -inset-4 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-500"></div>
+                            <div className="relative w-28 h-28 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center animate-bounce duration-[3s]">
+                                <Search className="h-12 w-12 text-indigo-400" />
                             </div>
-                        ))
-                    ) : (
-                        <div className="col-span-full py-24 bg-white dark:bg-gray-800 rounded-[2.5rem] border-2 border-dashed border-gray-200 dark:border-gray-700 text-center shadow-inner">
-                            <div className="mx-auto w-24 h-24 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center mb-6">
-                                <Search className="h-12 w-12 text-indigo-300" />
-                            </div>
-                            <h3 className="text-2xl font-black text-gray-900 dark:text-white mb-2">{t('noBranches')}</h3>
-                            <p className="text-gray-500 dark:text-gray-400 max-w-sm mx-auto font-medium">
+                        </div>
+                        <div className="max-w-sm px-6">
+                            <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">{t('noBranches')}</h3>
+                            <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
                                 {searchTerm ? t('noMatchingBranches', { term: searchTerm }) : t('emptyEcosystem')}
                             </p>
                         </div>
-                    )}
-                </div>
+                        <button
+                            onClick={openCreateModal}
+                            className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-8 py-3 rounded font-bold hover:bg-indigo-600 hover:text-white transition-all duration-300"
+                        >
+                            {t('addBranch')}
+                        </button>
+                    </div>
+                )}
             </div>
+
 
             <Modal
                 isOpen={isModalOpen}
