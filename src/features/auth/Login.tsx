@@ -10,6 +10,8 @@ import clsx from 'clsx';
 
 import InteractiveBackground from './InteractiveBackground';
 import appLogo from '../../assets/app_logo_primary.png';
+import LanguageSwitcher from '../../components/common/LanguageSwitcher';
+import ThemeToggle from '../../components/common/ThemeToggle';
 
 const Login = () => {
     const { t } = useTranslation('auth');
@@ -61,6 +63,16 @@ const Login = () => {
             isRTL && "text-right"
         )}>
             <InteractiveBackground />
+
+            {/* Top Bar for Switchers */}
+            <div className={clsx(
+                "fixed top-6 z-50 flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-500",
+                isRTL ? "left-6" : "right-6"
+            )}>
+                <LanguageSwitcher />
+                <ThemeToggle />
+            </div>
+
             <div className="w-full max-w-[440px] relative z-10 animate-in slide-in-from-bottom-5 duration-500">
                 <div className="flex flex-col items-center mb-8">
                     <img
@@ -119,7 +131,11 @@ const Login = () => {
 
                     <div className={clsx("flex items-center justify-between text-sm", isRTL && "flex-row-reverse")}>
                         <label className={clsx("flex items-center gap-2 text-slate-600 dark:text-slate-400 cursor-pointer group", isRTL && "flex-row-reverse")}>
-                            <input type="checkbox" className="w-4 h-4 rounded-none border-slate-300 dark:border-slate-600 text-primary focus:ring-primary appearance-none checked:bg-primary checked:border-primary checked:after:content-['✓'] checked:after:text-white checked:after:text-[10px] checked:after:flex checked:after:items-center checked:after:justify-center border bg-slate-50 dark:bg-slate-900" />
+                            <input
+                                type="checkbox"
+                                defaultChecked
+                                className="w-4 h-4 rounded-none border-slate-300 dark:border-slate-600 text-primary focus:ring-primary appearance-none checked:bg-primary checked:border-primary checked:after:content-['✓'] checked:after:text-white checked:after:text-[10px] checked:after:flex checked:after:items-center checked:after:justify-center border bg-slate-50 dark:bg-slate-900"
+                            />
                             <span className="font-medium group-hover:text-primary transition-colors">{t('rememberMe')}</span>
                         </label>
                         <Link to="/forgot-password" title="Go to forgot password page" className="text-primary font-bold hover:underline transition-all">
@@ -135,8 +151,9 @@ const Login = () => {
                         {loading ? (
                             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-none animate-spin" />
                         ) : (
-                            <div className={clsx("flex items-center gap-2", isRTL && "flex-row-reverse")}>
-                                {t('signIn')} <ArrowRight size={18} className={isRTL ? "rotate-180" : ""} />
+                            <div className="flex items-center gap-2">
+                                <span>{t('signIn')}</span>
+                                <ArrowRight size={18} className={isRTL ? "rotate-180" : ""} />
                             </div>
                         )}
                     </button>
