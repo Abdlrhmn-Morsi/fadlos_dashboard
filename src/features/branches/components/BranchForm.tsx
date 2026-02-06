@@ -50,8 +50,8 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 py-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                     <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('addressAr')} <span className="text-rose-500">*</span>
@@ -150,7 +150,7 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                 {errors.link && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.link.message}</p>}
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-800/50 p-6 rounded border border-gray-100 dark:border-gray-700/50 flex items-center justify-between group/status">
+            <div className="bg-gray-50 dark:bg-gray-800/50 p-4 rounded border border-gray-100 dark:border-gray-700/50 flex items-center justify-between group/status">
                 <div className="flex gap-4 items-center">
                     <div className={clsx(
                         "p-3 rounded transition-all duration-500",

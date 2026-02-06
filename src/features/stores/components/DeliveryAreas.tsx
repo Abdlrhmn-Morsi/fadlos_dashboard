@@ -44,14 +44,15 @@ const DeliveryAreas = () => {
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [resetting, setResetting] = useState(false);
 
-    const fetchData = async () => {
+    const fetchData = async (force = false) => {
         setLoading(true);
         try {
             // Check cache first
             const cachedCities = getCache<any[]>('cities', { limit: 1000 });
-            const cachedAreas = getCache<any[]>('delivery-areas');
+            const cachedAreas = force ? null : getCache<any[]>('delivery-areas');
 
             if (cachedCities && cachedAreas) {
+
                 console.log('[Cache] Loading delivery areas and cities from cache');
                 setCities(cachedCities);
                 setDeliveryAreas(cachedAreas);
@@ -94,7 +95,7 @@ const DeliveryAreas = () => {
             toast.success(t('common:success'));
             // Invalidate cache after adding new delivery area
             invalidateCache('delivery-areas');
-            fetchData();
+            fetchData(true);
             setSelectedCityId('');
             setDefaultPrice(0);
         } catch (error) {
@@ -279,7 +280,7 @@ const DeliveryAreas = () => {
 
                         <button
                             type="button"
-                            onClick={fetchData}
+                            onClick={() => fetchData(true)}
                             className="p-2 text-slate-400 hover:text-primary transition-colors"
                         >
                             <RefreshCw size={14} />

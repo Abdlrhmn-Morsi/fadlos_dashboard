@@ -10,7 +10,7 @@ const DeliveryAreasPage = () => {
     const { isRTL } = useLanguage();
 
     return (
-        <div className="p-6 max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="relative min-h-screen bg-slate-50 dark:bg-slate-950 p-6" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="flex flex-col gap-6 mb-10 sm:flex-row sm:items-center">
                 <div className="p-5 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/10 animate-float shadow-xl shadow-primary/5">
                     <Truck size={40} className="text-primary" />
@@ -25,7 +25,7 @@ const DeliveryAreasPage = () => {
                 </div>
             </div>
 
-            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm">
+            <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
                 <div className="p-8">
                     <DeliveryAreas />
                 </div>

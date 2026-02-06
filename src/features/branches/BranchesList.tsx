@@ -173,7 +173,7 @@ export const BranchesList: React.FC = () => {
     return (
         <div className="px-4 sm:px-6 lg:px-8 py-10 bg-gray-50/50 dark:bg-gray-900/50 min-h-screen">
             {/* Header Section */}
-            <div className="relative mb-12">
+            <div className="relative mb-6">
                 <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
                 <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-500/10 rounded-full blur-3xl"></div>
 
@@ -201,7 +201,7 @@ export const BranchesList: React.FC = () => {
             </div>
 
             {/* Actions Bar */}
-            <div className="sticky top-4 z-10 backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white dark:border-gray-700 rounded p-4 shadow-sm mb-10 flex flex-col sm:flex-row gap-4 items-center justify-between transition-all duration-300">
+            <div className="sticky top-4 z-10 backdrop-blur-xl bg-white/70 dark:bg-gray-800/70 border border-white dark:border-gray-700 rounded p-4 shadow-sm mb-6 flex flex-col sm:flex-row gap-4 items-center justify-between transition-all duration-300">
                 <div className="relative w-full sm:max-w-md group">
                     <div className={clsx("absolute inset-y-0 flex items-center pointer-events-none transition-colors group-focus-within:text-indigo-500", isRTL ? "right-0 pr-4" : "left-0 pl-4")}>
                         <Search className="h-5 w-5 text-gray-400" />
@@ -225,13 +225,13 @@ export const BranchesList: React.FC = () => {
             </div>
 
             {/* Grid display */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {filteredBranches.length > 0 ? (
                     filteredBranches.map((branch) => (
                         <div key={branch.id} className="group relative bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.1)] transition-all duration-500 flex flex-col overflow-hidden">
                             {/* Card Content */}
-                            <div className="p-8 flex-1">
-                                <div className="flex justify-between items-center mb-8">
+                            <div className="p-6 flex-1">
+                                <div className="flex justify-between items-center mb-6">
                                     <div className={clsx(
                                         "flex items-center gap-2 rounded px-4 py-2 text-xs font-bold uppercase tracking-widest",
                                         branch.isActive
@@ -263,7 +263,7 @@ export const BranchesList: React.FC = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-8">
+                                <div className="space-y-6">
                                     <div className="flex items-start gap-5">
                                         <div className="flex-shrink-0 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-all duration-500">
                                             <Home className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
@@ -286,7 +286,7 @@ export const BranchesList: React.FC = () => {
                                             <Phone className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1.5">{t('contactDetails')}</p>
+                                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('contactDetails')}</p>
                                             <p className="text-lg font-bold text-gray-900 dark:text-white tabular-nums tracking-wide">
                                                 {branch.phone}
                                             </p>
