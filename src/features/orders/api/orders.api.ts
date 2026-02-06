@@ -30,6 +30,13 @@ export const ordersApi = {
      */
     cancelOrder: async (id: string, reason: string) => {
         return apiService.delete(`/orders/${id}`, { data: { reason } });
+    },
+
+    /**
+     * Get order status counts
+     */
+    getStatusCounts: async () => {
+        return apiService.get('/orders/stats/status-counts');
     }
 };
 

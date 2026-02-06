@@ -38,5 +38,9 @@
     "cancelReasonPlaceholder": "سبب الإلغاء...",
     "updateStatusTitle": "تحديث حالة الطلب",
     "updateStatusConfirm": "هل أنت متأكد من تغيير الحالة إلى \"{{status}}\"؟ سيتم إخطار العميل.",
-    "confirmUpdateLabel": "تحديث الحالة"
+    "confirmUpdateLabel": "تحديث الحالة",
+    "orderNo": "رقم الطلب",
+    "storeName": "اسم المتجر",
+    "orderNumberPlaceholder": "رقم الطلب...",
+    "customerNamePlaceholder": "اسم العميل..."
 }

@@ -361,6 +361,13 @@
     "submit": "إرسال",
     "understood": "فهمت",
     "results": "نتائج",
+    "showingResults": "عرض {{start}}-{{end}} من أصل {{total}} نتيجة",
+    "pagination": {
+        "first": "الصفحة الأولى",
+        "previous": "الصفحة السابقة",
+        "next": "الصفحة التالية",
+        "last": "الصفحة الأخيرة"
+    },
     "copy": "نسخ الرابط",
     "copied": "تم نسخ الرابط إلى الحافظة!"
 }

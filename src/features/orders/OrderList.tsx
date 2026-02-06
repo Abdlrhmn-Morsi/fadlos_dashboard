@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, Search, Filter, Clock, CheckCircle, Package, Truck, AlertTriangle } from 'lucide-react';
+import { Eye, Search, Filter, Clock, CheckCircle, Package, Truck, AlertTriangle, Calendar, Hash, User } from 'lucide-react';
 import ordersApi from './api/orders.api';
 import { OrderStatus } from '../../types/order-status';
 
@@ -16,7 +16,7 @@ const OrderList = () => {
     const { isRTL } = useLanguage();
     const { getCache, setCache } = useCache();
     const [orders, setOrders] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState('');
 
     // Pagination State
@@ -24,9 +24,64 @@ const OrderList = () => {
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
 
+    // New Filters
+    const [orderNumberFilter, setOrderNumberFilter] = useState('');
+    const [dateFilter, setDateFilter] = useState('');
+    const [customerNameFilter, setCustomerNameFilter] = useState('');
+    const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
+
+    // Load cached data immediately on mount
     useEffect(() => {
-        fetchOrders();
-    }, [statusFilter, page]);
+        const params: any = { page, limit };
+        if (statusFilter) params.status = statusFilter;
+        if (orderNumberFilter) params.orderNumber = orderNumberFilter;
+        if (customerNameFilter) params.customerName = customerNameFilter;
+        if (dateFilter) {
+            params.startDate = `${dateFilter}T00:00:00`;
+            params.endDate = `${dateFilter}T23:59:59`;
+        }
+
+        const cachedData = getCache<any>('orders', params);
+        if (cachedData) {
+            if (cachedData.data && Array.isArray(cachedData.data)) {
+                setOrders(cachedData.data);
+                if (cachedData.meta) {
+                    setTotalPages(cachedData.meta.totalPages || 1);
+                }
+            } else if (Array.isArray(cachedData)) {
+                setOrders(cachedData);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchStatusCounts();
+    }, []);
+
+    const fetchStatusCounts = async () => {
+        try {
+            // Check cache first
+            const cachedCounts = getCache<Record<string, number>>('order-status-counts');
+            if (cachedCounts) {
+                setStatusCounts(cachedCounts);
+                return;
+            }
+
+            const counts: any = await ordersApi.getStatusCounts();
+            setStatusCounts(counts);
+            // Cache the status counts
+            setCache('order-status-counts', counts);
+        } catch (error) {
+            console.error('Failed to fetch status counts', error);
+        }
+    };
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            fetchOrders();
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [statusFilter, page, orderNumberFilter, dateFilter, customerNameFilter]);
 
     // Reset to page 1 when filter changes
     useEffect(() => {
@@ -35,12 +90,17 @@ const OrderList = () => {
 
     const fetchOrders = async () => {
         try {
-            setLoading(true);
             const params: any = {
                 page,
                 limit
             };
             if (statusFilter) params.status = statusFilter;
+            if (orderNumberFilter) params.orderNumber = orderNumberFilter;
+            if (customerNameFilter) params.customerName = customerNameFilter;
+            if (dateFilter) {
+                params.startDate = `${dateFilter}T00:00:00`;
+                params.endDate = `${dateFilter}T23:59:59`;
+            }
 
             // Check cache first
             const cacheKey = 'orders';
@@ -54,9 +114,12 @@ const OrderList = () => {
                 } else if (Array.isArray(cachedData)) {
                     setOrders(cachedData);
                 }
-                setLoading(false);
+                // Don't show loading if we have cached data
                 return;
             }
+
+            // Only show loading if we need to fetch from API
+            setLoading(true);
 
             const response: any = await ordersApi.getOrders(params);
 
@@ -110,9 +173,90 @@ const OrderList = () => {
 
     return (
         <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
+            {/* Status Counts Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+                <div
+                    onClick={() => setStatusFilter('')}
+                    className={clsx(
+                        "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                        statusFilter === ''
+                            ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-2 ring-indigo-500/20"
+                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
+                    )}
+                >
+                    <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{t('total')}</span>
+                    <span className="text-2xl font-black text-slate-800 dark:text-slate-100">
+                        {Object.values(statusCounts).reduce((a, b) => a + b, 0)}
+                    </span>
+                </div>
+                {[
+                    OrderStatus.PENDING,
+                    OrderStatus.CONFIRMED,
+                    OrderStatus.PREPARING,
+                    OrderStatus.READY,
+                    OrderStatus.DELIVERED,
+                    OrderStatus.CANCELLED
+                ].map(status => (
+                    <div
+                        key={status}
+                        onClick={() => setStatusFilter(status)}
+                        className={clsx(
+                            "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                            getStatusColor(status).replace('text-', 'border-').replace('bg-', 'bg-opacity-10 bg-') + ' border bg-opacity-5',
+                            statusFilter === status && getStatusColor(status).split(' ')[0], // Add text color class when active
+                            statusFilter === status && "ring-2 ring-offset-2 dark:ring-offset-slate-950 ring-current shadow-lg scale-[1.02]"
+                        )}
+                    >
+                        <span className={clsx("text-xs font-bold uppercase tracking-wider opacity-80", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                            {getLocalizedStatus(status)}
+                        </span>
+                        <span className={clsx("text-2xl font-black", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                            {statusCounts[status] || 0}
+                        </span>
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
                 <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('title')}</h1>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2 w-full lg:w-auto">
+                    <div className="relative">
+                        <Hash className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder={t('orderNumberPlaceholder')}
+                            className={clsx(
+                                "pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none w-48",
+                                isRTL && "text-right"
+                            )}
+                            value={orderNumberFilter}
+                            onChange={(e) => setOrderNumberFilter(e.target.value)}
+                        />
+                    </div>
+                    <div className="relative">
+                        <User className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <input
+                            type="text"
+                            placeholder={t('customerNamePlaceholder')}
+                            className={clsx(
+                                "pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none w-40",
+                                isRTL && "text-right"
+                            )}
+                            value={customerNameFilter}
+                            onChange={(e) => setCustomerNameFilter(e.target.value)}
+                        />
+                    </div>
+                    <div className="relative">
+                        <input
+                            type="date"
+                            className={clsx(
+                                "px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none",
+                                isRTL && "text-right"
+                            )}
+                            value={dateFilter}
+                            onChange={(e) => setDateFilter(e.target.value)}
+                        />
+                    </div>
                     <select
                         className={clsx(
                             "px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none",
@@ -137,7 +281,7 @@ const OrderList = () => {
                     <table className={clsx("w-full", isRTL ? "text-right" : "text-left")}>
                         <thead className="bg-slate-50 dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
                             <tr>
-                                <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('orderId')}</th>
+                                <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('orderNo')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('customer')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('date')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('total')}</th>
@@ -158,7 +302,7 @@ const OrderList = () => {
                                 orders.map((order) => (
                                     <tr key={order.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                         <td className="px-6 py-4 font-mono text-sm text-slate-500">
-                                            #{order.id.slice(0, 8)}
+                                            {order.orderNumber || order.id?.slice(0, 8)}
                                         </td>
                                         <td className="px-6 py-4 font-medium text-slate-800 dark:text-white">
                                             {order.client?.name || `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim() || t('common:guest', { defaultValue: 'Guest' })}

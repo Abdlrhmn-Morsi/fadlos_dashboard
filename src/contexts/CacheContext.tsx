@@ -12,6 +12,7 @@ interface CacheContextType {
     invalidateCache: (key: string | string[]) => void;
     clearAllCache: () => void;
     hasCache: (key: string, params?: Record<string, any>) => boolean;
+    updateCacheItem: <T = any>(key: string, itemId: string, updater: (item: T) => T, idField?: string) => void;
 }
 
 const CacheContext = createContext<CacheContextType | undefined>(undefined);
@@ -95,12 +96,66 @@ export const CacheProvider: React.FC<CacheProviderProps> = ({ children }) => {
         return cache.has(cacheKey);
     }, [cache, generateCacheKey]);
 
+    // Update a specific item in cached arrays
+    const updateCacheItem = useCallback(<T = any>(
+        key: string,
+        itemId: string,
+        updater: (item: T) => T,
+        idField: string = 'id'
+    ): void => {
+        setCacheState(prevCache => {
+            const newCache = new Map(prevCache);
+
+            // Find all cache entries that match the key pattern
+            Array.from(newCache.keys()).forEach(cacheKey => {
+                if (cacheKey === key || cacheKey.startsWith(`${key}:`)) {
+                    const entry = newCache.get(cacheKey);
+                    if (!entry) return;
+
+                    // Handle different response structures
+                    let updated = false;
+                    let newData = { ...entry.data };
+
+                    // Case 1: { data: [...], meta: {...} }
+                    if (newData.data && Array.isArray(newData.data)) {
+                        const itemIndex = newData.data.findIndex((item: any) => item[idField] === itemId);
+                        if (itemIndex !== -1) {
+                            newData.data = [...newData.data];
+                            newData.data[itemIndex] = updater(newData.data[itemIndex]);
+                            updated = true;
+                        }
+                    }
+                    // Case 2: Plain array
+                    else if (Array.isArray(newData)) {
+                        const itemIndex = newData.findIndex((item: any) => item[idField] === itemId);
+                        if (itemIndex !== -1) {
+                            newData = [...newData];
+                            newData[itemIndex] = updater(newData[itemIndex]);
+                            updated = true;
+                        }
+                    }
+
+                    if (updated) {
+                        newCache.set(cacheKey, {
+                            ...entry,
+                            data: newData,
+                            timestamp: Date.now()
+                        });
+                    }
+                }
+            });
+
+            return newCache;
+        });
+    }, []);
+
     const value: CacheContextType = {
         getCache,
         setCache,
         invalidateCache,
         clearAllCache,
-        hasCache
+        hasCache,
+        updateCacheItem
     };
 
     return (

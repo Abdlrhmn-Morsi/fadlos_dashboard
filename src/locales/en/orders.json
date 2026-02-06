@@ -38,5 +38,9 @@
     "cancelReasonPlaceholder": "Reason for cancellation...",
     "updateStatusTitle": "Update Order Status",
     "updateStatusConfirm": "Are you sure you want to change the status to \"{{status}}\"? The customer will be notified.",
-    "confirmUpdateLabel": "Update Status"
+    "confirmUpdateLabel": "Update Status",
+    "orderNo": "Order No.",
+    "storeName": "Store Name",
+    "orderNumberPlaceholder": "Order Number...",
+    "customerNamePlaceholder": "Customer Name..."
 }

@@ -24,7 +24,7 @@ const OrderDetail = () => {
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
     const { user, hasPermission } = useAuth();
-    const { invalidateCache } = useCache();
+    const { invalidateCache, updateCacheItem, getCache, setCache } = useCache();
     const [order, setOrder] = useState<any>(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -63,6 +63,8 @@ const OrderDetail = () => {
         const status = statusModal.status;
         if (!status) return;
 
+        const oldStatus = order.status; // Store old status for cache update
+
         try {
             setUpdating(true);
             setNewStatus(status);
@@ -70,8 +72,27 @@ const OrderDetail = () => {
             setOrder({ ...order, status: status });
             setStatusModal({ isOpen: false, status: '' });
 
-            // Invalidate orders cache to refresh list
-            invalidateCache('orders');
+            // Update the order in cache instead of invalidating
+            updateCacheItem('orders', id!, (order: any) => ({
+                ...order,
+                status: status
+            }));
+
+            // Update status counts cache
+            const cachedCounts = getCache<Record<string, number>>('order-status-counts');
+            if (cachedCounts) {
+                const updatedCounts = { ...cachedCounts };
+                // Decrease old status count
+                if (updatedCounts[oldStatus]) {
+                    updatedCounts[oldStatus] = Math.max(0, updatedCounts[oldStatus] - 1);
+                }
+                // Increase new status count
+                updatedCounts[status] = (updatedCounts[status] || 0) + 1;
+                setCache('order-status-counts', updatedCounts);
+            }
+
+            // Invalidate dashboard cache to refresh stats
+            invalidateCache('dashboard-stats');
         } catch (error) {
             console.error('Failed to update status', error);
         } finally {
@@ -81,14 +102,36 @@ const OrderDetail = () => {
     };
 
     const handleCancelOrder = async (reason: string) => {
+        const oldStatus = order.status; // Store old status for cache update
+
         try {
             setUpdating(true);
             await ordersApi.cancelOrder(id!, reason);
             setCancelModal(false);
 
-            // Invalidate orders cache to refresh list
-            invalidateCache('orders');
+            // Update the order in cache
+            updateCacheItem('orders', id!, (order: any) => ({
+                ...order,
+                status: OrderStatus.CANCELLED
+            }));
 
+            // Update status counts cache
+            const cachedCounts = getCache<Record<string, number>>('order-status-counts');
+            if (cachedCounts) {
+                const updatedCounts = { ...cachedCounts };
+                // Decrease old status count
+                if (updatedCounts[oldStatus]) {
+                    updatedCounts[oldStatus] = Math.max(0, updatedCounts[oldStatus] - 1);
+                }
+                // Increase cancelled count
+                updatedCounts[OrderStatus.CANCELLED] = (updatedCounts[OrderStatus.CANCELLED] || 0) + 1;
+                setCache('order-status-counts', updatedCounts);
+            }
+
+            // Invalidate dashboard cache to refresh stats
+            invalidateCache('dashboard-stats');
+
+            // Update local state and reload to show cancelled status
             window.location.reload();
         } catch (error) {
             console.error('Failed to cancel order', error);

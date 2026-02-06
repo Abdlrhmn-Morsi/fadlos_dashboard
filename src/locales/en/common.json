@@ -342,6 +342,13 @@
     "submit": "Submit",
     "understood": "Understood",
     "results": "results",
+    "showingResults": "Showing {{start}}-{{end}} of {{total}} results",
+    "pagination": {
+        "first": "First Page",
+        "previous": "Previous Page",
+        "next": "Next Page",
+        "last": "Last Page"
+    },
     "copy": "Copy Link",
     "copied": "Link copied to clipboard!"
 }

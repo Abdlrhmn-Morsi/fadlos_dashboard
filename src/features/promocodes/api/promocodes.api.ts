@@ -7,8 +7,10 @@ export const promoCodesApi = {
     /**
      * Fetch all promo codes
      */
-    getPromoCodes: async () => {
-        return apiService.get('/promo-codes');
+    getPromoCodes: async (params: any = {}) => {
+        return apiService.get('/promo-codes', {
+            params: params,
+        });
     },
 
     /**

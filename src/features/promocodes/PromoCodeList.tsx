@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
     Plus, Edit, Trash2, Tag, Calendar,
-    Check, X, Search, Percent, DollarSign,
-    MoreVertical, Power, PowerOff, Loader2
+    Search, Percent, DollarSign,
+    Power, PowerOff, Loader2
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -13,6 +13,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
+import { Pagination } from '../../components/common/Pagination';
 
 const PromoCodeList = () => {
     const { t } = useTranslation(['promocodes', 'common']);
@@ -23,29 +24,57 @@ const PromoCodeList = () => {
     const [promoCodes, setPromoCodes] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Debounce search term
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setPage(1); // Reset to page 1 on new search
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     useEffect(() => {
         fetchPromoCodes();
-    }, []);
+    }, [page, debouncedSearch]);
 
     const fetchPromoCodes = async () => {
         try {
             setLoading(true);
 
+            const params = {
+                page,
+                limit,
+                code: debouncedSearch
+            };
+
             // Check cache first
-            const cachedData = getCache<any>('promocodes');
+            const cachedData = getCache<any>('promocodes', params);
             if (cachedData) {
-                setPromoCodes(cachedData.data || cachedData || []);
+                setPromoCodes(cachedData.data || []);
+                setTotalPages(cachedData.meta?.totalPages || 1);
+                setTotalItems(cachedData.meta?.total || 0);
                 setLoading(false);
                 return;
             }
 
-            const data: any = await promoCodesApi.getPromoCodes();
-            const promoData = data.data || data || [];
+            const response: any = await promoCodesApi.getPromoCodes(params);
+
+            // The backend returns { data: [...], meta: {...} }
+            const promoData = response.data || [];
+            const meta = response.meta || { totalPages: 1, total: 0 };
+
             setPromoCodes(promoData);
+            setTotalPages(meta.totalPages);
+            setTotalItems(meta.total);
 
             // Cache the data
-            setCache('promocodes', promoData);
+            setCache('promocodes', { data: promoData, meta }, params);
         } catch (error) {
             console.error('Failed to fetch promo codes', error);
             toast.error('Failed to load promo codes');
@@ -77,16 +106,19 @@ const PromoCodeList = () => {
 
                 // Invalidate cache
                 invalidateCache('promocodes');
+
+                // If we're on a page and delete the last item, we should probably go back a page
+                if (promoCodes.length === 1 && page > 1) {
+                    setPage(page - 1);
+                } else {
+                    fetchPromoCodes(); // Refresh data to get next item from next page if available
+                }
             } catch (error) {
                 console.error('Failed to delete promo code', error);
                 toast.error(t('common:errorUpdatingData'));
             }
         }
     };
-
-    const filteredCodes = promoCodes.filter(promo =>
-        promo.code.toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     const getStatusColor = (isActive: boolean, expiresAt: string) => {
         const isExpired = expiresAt && new Date(expiresAt) < new Date();
@@ -158,7 +190,7 @@ const PromoCodeList = () => {
                                         </div>
                                     </td>
                                 </tr>
-                            ) : filteredCodes.length === 0 ? (
+                            ) : promoCodes.length === 0 ? (
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="max-w-xs mx-auto space-y-2">
@@ -171,7 +203,7 @@ const PromoCodeList = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredCodes.map((promo) => (
+                                promoCodes.map((promo) => (
                                     <tr key={promo.id} className="group hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-all">
                                         <td className="px-6 py-5">
                                             <div className="flex items-center gap-3">
@@ -246,7 +278,7 @@ const PromoCodeList = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <div className="flex items-center justify-end gap-1 translate-x-3 opacity-0 group-hover:opacity-100 group-hover:translate-x-0 transition-all">
+                                            <div className="flex items-center justify-end gap-1">
                                                 {hasPermission(Permissions.PROMO_CODES_UPDATE) && (
                                                     <>
                                                         <button
@@ -281,6 +313,25 @@ const PromoCodeList = () => {
                             )}
                         </tbody>
                     </table>
+                </div>
+
+                {/* Pagination */}
+                <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p className="text-sm text-slate-500">
+                            {t('common:showingResults', {
+                                start: (page - 1) * limit + 1,
+                                end: Math.min(page * limit, totalItems),
+                                total: totalItems
+                            })}
+                        </p>
+                        <Pagination
+                            currentPage={page}
+                            totalPages={totalPages}
+                            onPageChange={(p) => setPage(p)}
+                            isLoading={loading}
+                        />
+                    </div>
                 </div>
             </div>
         </div>
