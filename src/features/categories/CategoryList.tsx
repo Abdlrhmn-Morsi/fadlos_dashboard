@@ -10,6 +10,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
+import { Pagination } from '../../components/common/Pagination';
 import clsx from 'clsx';
 
 const CategoryList = () => {
@@ -20,16 +21,37 @@ const CategoryList = () => {
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingCategory, setEditingCategory] = useState<any>(null);
+
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
 
     // Delete confirmation state
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
+    // Search Debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // Fetch when params change
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [page, debouncedSearch]);
+
+    // Reset page when search changes
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch]);
 
     // Refetch data when component becomes visible (e.g., navigating back from modal)
     useEffect(() => {
@@ -51,30 +73,59 @@ const CategoryList = () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('focus', handleFocus);
         };
-    }, []);
+    }, [page, debouncedSearch]);
 
     const fetchCategories = async () => {
         try {
             setLoading(true);
 
+            const params: any = {
+                page,
+                limit,
+                search: debouncedSearch || undefined
+            };
+
             // Check cache first
-            const cachedCategories = getCache<any>('categories');
-            if (cachedCategories) {
-                setCategories(cachedCategories.data || cachedCategories);
+            const cacheKey = 'categories';
+            const cachedData = getCache<any>(cacheKey, params);
+            if (cachedData) {
+                if (cachedData.data) {
+                    setCategories(cachedData.data);
+                    setTotalPages(cachedData.meta?.totalPages || 1);
+                } else if (Array.isArray(cachedData)) {
+                    // Fallback for array cache
+                    setCategories(cachedData);
+                    setTotalPages(1);
+                }
                 setLoading(false);
                 return;
             }
 
             // Fetch from API if not cached
-            const data: any = await categoriesApi.getSellerCategories();
-            const categoriesData = data.data || [];
-            setCategories(categoriesData);
+            const response: any = await categoriesApi.getSellerCategories(params);
 
-            // Cache the data
-            setCache('categories', categoriesData);
+            if (response && response.data) {
+                setCategories(response.data);
+                if (response.meta) {
+                    setTotalPages(response.meta.totalPages || 1);
+                } else if (response.pagination) {
+                    setTotalPages(response.pagination.totalPages || 1);
+                }
+
+                // Cache the data
+                setCache(cacheKey, response, params);
+            } else if (Array.isArray(response)) {
+                setCategories(response);
+                setTotalPages(1);
+                setCache(cacheKey, response, params);
+            } else {
+                setCategories([]);
+                setTotalPages(1);
+            }
         } catch (error) {
             console.error('Failed to fetch categories', error);
             toast.error(t('loadFailed'));
+            setCategories([]);
         } finally {
             setLoading(false);
         }
@@ -117,11 +168,6 @@ const CategoryList = () => {
         setIsModalOpen(true);
     };
 
-    const filteredCategories = categories.filter(category =>
-        category.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        category.nameAr?.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
             {/* Header Section */}
@@ -159,6 +205,8 @@ const CategoryList = () => {
                 </div>
             </div>
 
+
+
             {/* Categories Grid/Table */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                 <div className="overflow-x-auto">
@@ -189,7 +237,7 @@ const CategoryList = () => {
                                         <td className="px-6 py-4"></td>
                                     </tr>
                                 ))
-                            ) : filteredCategories.length === 0 ? (
+                            ) : categories.length === 0 ? (
                                 <tr>
                                     <td colSpan={4} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
@@ -200,7 +248,7 @@ const CategoryList = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredCategories.map((category) => (
+                                categories.map((category) => (
                                     <tr
                                         key={category.id}
                                         className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200"
@@ -259,6 +307,13 @@ const CategoryList = () => {
                     </table>
                 </div>
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
 
             {/* Modals */}
             {isModalOpen && (

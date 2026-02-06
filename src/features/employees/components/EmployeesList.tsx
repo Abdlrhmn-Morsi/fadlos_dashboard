@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
 import { Employee } from '../models/employee.model';
+import { Pagination } from '../../../components/common/Pagination';
 
 const EmployeesList = () => {
     const navigate = useNavigate();
@@ -18,6 +19,13 @@ const EmployeesList = () => {
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+
+    // Pagination State
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -25,9 +33,23 @@ const EmployeesList = () => {
     const [actionId, setActionId] = useState<string | null>(null);
     const [isActiveStatus, setIsActiveStatus] = useState(false);
 
+    // Search Debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    // Fetch when params change
     useEffect(() => {
         fetchEmployees();
-    }, []);
+    }, [page, debouncedSearch]);
+
+    // Reset page when search changes
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch]);
 
     // Refetch data when component becomes visible (e.g., navigating back from form)
     useEffect(() => {
@@ -49,52 +71,65 @@ const EmployeesList = () => {
             document.removeEventListener('visibilitychange', handleVisibilityChange);
             window.removeEventListener('focus', handleFocus);
         };
-    }, []);
+    }, [page, debouncedSearch]);
 
     const fetchEmployees = async () => {
         try {
             setLoading(true);
 
+            const params: any = {
+                page,
+                limit,
+                search: debouncedSearch || undefined
+            };
+
             // Check cache first
             const cacheKey = 'employees';
-            const cachedData = getCache<any>(cacheKey);
+            const cachedData = getCache<any>(cacheKey, params);
             if (cachedData) {
-                let employeesData: Employee[] = [];
-                const rawData = cachedData.data || cachedData;
-
-                if (Array.isArray(rawData)) {
-                    employeesData = rawData;
-                } else if (rawData && Array.isArray(rawData.data)) {
-                    employeesData = rawData.data;
+                if (cachedData.data) {
+                    setEmployees(cachedData.data);
+                    if (cachedData.meta) {
+                        setTotalPages(cachedData.meta.totalPages || 1);
+                    } else if (cachedData.pagination) {
+                        setTotalPages(cachedData.pagination.totalPages || 1);
+                    }
+                } else if (Array.isArray(cachedData)) {
+                    setEmployees(cachedData);
+                    setTotalPages(1);
                 }
-
-                setEmployees(employeesData);
                 setLoading(false);
                 return;
             }
 
-            const response = await EmployeesService.getEmployees();
-            let employeesData: Employee[] = [];
+            const response: any = await EmployeesService.getEmployees(params);
 
-            // Extract the actual array from the potentially nested response
-            // Backend returns: { success: true, data: { data: [], pagination: {} } }
-            const rawData = (response as any).data || response;
+            // Handle different response structures
+            // EmployeesService.getEmployees return type says { data: Employee[], pagination: any }
+            // But checking what api actually returns is safer
 
-            if (Array.isArray(rawData)) {
-                employeesData = rawData;
-            } else if (rawData && Array.isArray((rawData as any).data)) {
-                employeesData = (rawData as any).data;
-            } else if (response && Array.isArray((response as any).data)) {
-                // Fallback for different nesting
-                employeesData = (response as any).data;
+            if (response && response.data) {
+                setEmployees(response.data);
+                if (response.pagination) {
+                    setTotalPages(response.pagination.totalPages || 1);
+                } else if (response.meta) {
+                    setTotalPages(response.meta.totalPages || 1);
+                }
+
+                setCache(cacheKey, response, params);
+            } else if (Array.isArray(response)) {
+                // Fallback if API returns array directly
+                setEmployees(response);
+                setTotalPages(1);
+                setCache(cacheKey, response, params);
+            } else {
+                setEmployees([]);
+                setTotalPages(1);
             }
-
-            setEmployees(employeesData);
-            // Cache the response
-            setCache(cacheKey, response);
         } catch (error) {
             console.error('Failed to fetch employees', error);
             toast.error(t('errorFetchingData'));
+            setEmployees([]);
         } finally {
             setLoading(false);
         }
@@ -147,11 +182,6 @@ const EmployeesList = () => {
             setActionId(null);
         }
     };
-
-    const filteredEmployees = employees.filter(emp =>
-        (emp.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
-        (emp.email || '').toLowerCase().includes(searchTerm.toLowerCase())
-    );
 
     return (
         <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -215,7 +245,7 @@ const EmployeesList = () => {
                                         <td className="px-6 py-4"></td>
                                     </tr>
                                 ))
-                            ) : filteredEmployees.length === 0 ? (
+                            ) : employees.length === 0 ? (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
@@ -227,7 +257,7 @@ const EmployeesList = () => {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredEmployees.map((emp) => (
+                                employees.map((emp) => (
                                     <tr key={emp.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
@@ -305,6 +335,13 @@ const EmployeesList = () => {
                     </table>
                 </div>
             </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
 
             <ConfirmModal
                 isOpen={confirmOpen}
