@@ -11,12 +11,29 @@ const LanguageContext = createContext<LanguageContextType | undefined>(undefined
 
 export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const { i18n } = useTranslation();
-    const [language, setLanguage] = useState(i18n.language || 'ar');
+
+    // Initialize language from localStorage or default to 'ar'
+    const getInitialLanguage = () => {
+        const savedLang = localStorage.getItem('language');
+        return savedLang || i18n.language || 'ar';
+    };
+
+    const [language, setLanguage] = useState(getInitialLanguage);
     const isRTL = language === 'ar';
+
+    // Set initial language in i18n
+    useEffect(() => {
+        const initialLang = getInitialLanguage();
+        if (i18n.language !== initialLang) {
+            i18n.changeLanguage(initialLang);
+        }
+    }, []);
 
     useEffect(() => {
         document.documentElement.lang = language;
         document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
+        // Save to localStorage whenever language changes
+        localStorage.setItem('language', language);
     }, [language, isRTL]);
 
     const toggleLanguage = () => {

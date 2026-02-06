@@ -31,6 +31,10 @@ const ClientList = () => {
     const [page, setPage] = useState(1);
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
+    const [totalItems, setTotalItems] = useState(0);
+
+    // Search Debounce State
+    const [debouncedSearch, setDebouncedSearch] = useState('');
 
     // Side panel state
     const [selectedClient, setSelectedClient] = useState<any>(null);
@@ -42,14 +46,22 @@ const ClientList = () => {
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [loadingOrderDetail, setLoadingOrderDetail] = useState(false);
 
+    // Search Debounce
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
     useEffect(() => {
         fetchClients();
-    }, [sortBy, order, page]);
+    }, [sortBy, order, page, debouncedSearch]);
 
     // Reset to page 1 when search or sort changes
     useEffect(() => {
         setPage(1);
-    }, [searchTerm, sortBy, order]);
+    }, [debouncedSearch, sortBy, order]);
 
     const fetchClients = async () => {
         try {
@@ -59,7 +71,7 @@ const ClientList = () => {
                 order,
                 page,
                 limit,
-                search: searchTerm || undefined
+                search: debouncedSearch || undefined
             };
 
             // Check cache first
@@ -70,12 +82,15 @@ const ClientList = () => {
                     setClients(cachedData.data);
                     if (cachedData.pagination) {
                         setTotalPages(cachedData.pagination.totalPages || 1);
+                        setTotalItems(cachedData.pagination.total || cachedData.pagination.totalItems || 0);
                     } else if (cachedData.meta) {
                         setTotalPages(cachedData.meta.totalPages || 1);
+                        setTotalItems(cachedData.meta.total || cachedData.meta.totalItems || cachedData.meta.totalCount || 0);
                     }
                 } else if (Array.isArray(cachedData)) {
                     setClients(cachedData);
                     setTotalPages(1);
+                    setTotalItems(cachedData.length);
                 }
                 setLoading(false);
                 return;
@@ -87,25 +102,30 @@ const ClientList = () => {
                 setClients(response.data);
                 if (response.pagination) {
                     setTotalPages(response.pagination.totalPages || 1);
+                    setTotalItems(response.pagination.total || response.pagination.totalItems || 0);
                 } else if (response.meta) {
                     setTotalPages(response.meta.totalPages || 1);
+                    setTotalItems(response.meta.total || response.meta.totalItems || response.meta.totalCount || 0);
                 }
                 // Cache the response
                 setCache(cacheKey, response, params);
             } else if (Array.isArray(response)) {
                 setClients(response);
                 setTotalPages(1);
+                setTotalItems(response.length);
                 // Cache the response
                 setCache(cacheKey, response, params);
             } else {
                 setClients([]);
                 setTotalPages(1);
+                setTotalItems(0);
             }
         } catch (error) {
             console.error('Failed to fetch clients', error);
             toast.error(t('common:errorFetchingData'));
             setClients([]);
             setTotalPages(1);
+            setTotalItems(0);
         } finally {
             setLoading(false);
         }
@@ -118,7 +138,14 @@ const ClientList = () => {
 
     const toggleSort = (field: string) => {
         if (sortBy === field) {
-            setOrder(order === 'ASC' ? 'DESC' : 'ASC');
+            // Cycle: DESC -> ASC -> NONE (Reset to default)
+            if (order === 'DESC') {
+                setOrder('ASC');
+            } else {
+                // If it was ASC, reset to default sorting
+                setSortBy('createdAt');
+                setOrder('DESC');
+            }
         } else {
             setSortBy(field);
             setOrder('DESC');
@@ -169,7 +196,12 @@ const ClientList = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
+                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded uppercase tracking-widest">
+                            {totalItems} {t('common:results')}
+                        </span>
+                    </div>
                     <p className="text-sm text-slate-500 font-medium">{t('subtitle')}</p>
                 </div>
 
@@ -191,7 +223,7 @@ const ClientList = () => {
             {/* Sorting Actions */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
                 <button
-                    onClick={() => { setSortBy('totalSpent'); setOrder('DESC'); }}
+                    onClick={() => toggleSort('totalSpent')}
                     className={clsx(
                         "p-4 rounded-xl border transition-all group",
                         isRTL ? "text-right" : "text-left",
@@ -207,7 +239,7 @@ const ClientList = () => {
                 </button>
 
                 <button
-                    onClick={() => { setSortBy('totalOrders'); setOrder('DESC'); }}
+                    onClick={() => toggleSort('totalOrders')}
                     className={clsx(
                         "p-4 rounded-xl border transition-all group",
                         isRTL ? "text-right" : "text-left",
