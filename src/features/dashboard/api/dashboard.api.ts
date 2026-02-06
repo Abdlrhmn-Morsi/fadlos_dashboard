@@ -20,7 +20,8 @@ export const fetchDashboardStats = async (user: any) => {
             totalCategories: 0,
             topRatedProducts: [],
             topCategories: [],
-            averageRating: 0
+            averageRating: 0,
+            chartData: []
         };
 
         // Helper to check permission
@@ -54,6 +55,7 @@ export const fetchDashboardStats = async (user: any) => {
                     stats.totalOrders = data.totalOrders || 0;
                     stats.avgOrderValue = data.averageOrderValue || 0;
                     stats.pendingOrders = data.statusCounts?.pending || 0;
+                    stats.chartData = data.chartData || [];
                 } catch (e) {
                     console.warn('Failed to fetch order stats', e);
                 }

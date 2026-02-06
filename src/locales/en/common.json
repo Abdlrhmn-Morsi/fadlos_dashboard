@@ -350,5 +350,8 @@
         "last": "Last Page"
     },
     "copy": "Copy Link",
-    "copied": "Link copied to clipboard!"
+    "copied": "Link copied to clipboard!",
+    "noDataAvailable": "No data available",
+    "addFirstProduct": "Add your first product",
+    "addFirstCategory": "Add your first category"
 }

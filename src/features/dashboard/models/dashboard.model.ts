@@ -14,9 +14,10 @@ export interface DashboardStats {
     topRatedProducts?: any[];
     topCategories?: any[];
     averageRating?: number;
+    chartData?: ChartDataItem[];
 }
 
 export interface ChartDataItem {
-    name: string;
+    date: string;
     revenue: number;
 }

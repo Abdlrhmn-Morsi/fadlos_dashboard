@@ -30,17 +30,15 @@ import clsx from 'clsx';
 interface StatCardProps {
     title: string;
     value: string | number;
-    change: string;
     icon: LucideIcon;
     color: string;
-    comparisonText: string;
 }
 
-const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, color, comparisonText }) => {
+const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color }) => {
     const { isRTL } = useLanguage();
     return (
         <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
-            <div className="flex justify-between items-start mb-4">
+            <div className="flex justify-between items-start">
                 <div className={isRTL ? "text-right" : "text-left"}>
                     <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
                     <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</h3>
@@ -48,12 +46,6 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, change, icon: Icon, c
                 <div className={`w-12 h-12 rounded-none flex items-center justify-center bg-${color}-50 dark:bg-${color}-900/20 text-${color}-600 dark:text-${color}-400`}>
                     <Icon size={24} />
                 </div>
-            </div>
-            <div className="flex items-center gap-2 text-sm">
-                <span className="text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-medium">
-                    <TrendingUp size={14} className={isRTL ? "rotate-180" : ""} /> {change}
-                </span>
-                <span className="text-slate-400 dark:text-slate-500">{comparisonText}</span>
             </div>
         </div>
     );
@@ -87,25 +79,38 @@ const Dashboard: React.FC = () => {
                 if (cachedStats) {
                     setStats(cachedStats);
 
-                    // Update chart data from cached stats
-                    setChartData([
-                        { name: t('week', { number: 1 }), revenue: (cachedStats.totalRevenue || 0) * 0.1 },
-                        { name: t('week', { number: 2 }), revenue: (cachedStats.totalRevenue || 0) * 0.2 },
-                        { name: t('week', { number: 3 }), revenue: (cachedStats.totalRevenue || 0) * 0.3 },
-                        { name: t('week', { number: 4 }), revenue: (cachedStats.totalRevenue || 0) * 0.4 },
-                    ]);
+                    // Update chart data from cached stats (real daily data)
+                    const data = cachedStats.chartData || [];
+                    if (data.length === 0) {
+                        const skeletonData = [];
+                        for (let i = 6; i >= 0; i--) {
+                            const d = new Date();
+                            d.setDate(d.getDate() - i);
+                            skeletonData.push({ date: d.toISOString().split('T')[0], revenue: 0 });
+                        }
+                        setChartData(skeletonData);
+                    } else {
+                        setChartData(data);
+                    }
                 } else {
                     // Fetch from API if not cached
                     const dashboardData = await fetchDashboardStats(user);
                     setStats(dashboardData);
 
-                    // Update chart data
-                    setChartData([
-                        { name: t('week', { number: 1 }), revenue: (dashboardData.totalRevenue || 0) * 0.1 },
-                        { name: t('week', { number: 2 }), revenue: (dashboardData.totalRevenue || 0) * 0.2 },
-                        { name: t('week', { number: 3 }), revenue: (dashboardData.totalRevenue || 0) * 0.3 },
-                        { name: t('week', { number: 4 }), revenue: (dashboardData.totalRevenue || 0) * 0.4 },
-                    ]);
+                    // Update chart data (real daily data)
+                    const data = dashboardData.chartData || [];
+                    if (data.length === 0) {
+                        // Generate skeleton data (last 7 days at 0)
+                        const skeletonData = [];
+                        for (let i = 6; i >= 0; i--) {
+                            const d = new Date();
+                            d.setDate(d.getDate() - i);
+                            skeletonData.push({ date: d.toISOString().split('T')[0], revenue: 0 });
+                        }
+                        setChartData(skeletonData);
+                    } else {
+                        setChartData(data);
+                    }
 
                     // Cache the dashboard stats
                     setCache(dashboardCacheKey, dashboardData);
@@ -223,10 +228,8 @@ const Dashboard: React.FC = () => {
                     <StatCard
                         title={t('totalRevenue')}
                         value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        change="+12.5%"
                         icon={DollarSign}
                         color="emerald"
-                        comparisonText={t('vsLastPeriod')}
                     />
                 )}
 
@@ -234,10 +237,8 @@ const Dashboard: React.FC = () => {
                     <StatCard
                         title={t('totalOrders')}
                         value={stats.totalOrders || 0}
-                        change="+5.2%"
                         icon={ShoppingBag}
                         color="orange"
-                        comparisonText={t('vsLastPeriod')}
                     />
                 )}
 
@@ -245,10 +246,8 @@ const Dashboard: React.FC = () => {
                     <StatCard
                         title={t('pendingOrders')}
                         value={stats.pendingOrders || 0}
-                        change=""
                         icon={Clock}
                         color="amber"
-                        comparisonText={t('needsAction')}
                     />
                 )}
 
@@ -258,26 +257,20 @@ const Dashboard: React.FC = () => {
                         <StatCard
                             title={t('totalStores')}
                             value={stats.totalStores || 0}
-                            change="+2.4%"
                             icon={Store}
                             color="blue"
-                            comparisonText={t('vsLastPeriod')}
                         />
                         <StatCard
                             title={t('platformUsers')}
                             value={stats.totalUsers || 0}
-                            change="+3.7%"
                             icon={Users}
                             color="violet"
-                            comparisonText={t('vsLastPeriod')}
                         />
                         <StatCard
                             title={t('totalProducts')}
                             value={stats.totalProducts || 0}
-                            change="+1.8%"
                             icon={Layers}
                             color="indigo"
-                            comparisonText={t('vsLastPeriod')}
                         />
                     </>
                 ) : (
@@ -286,40 +279,32 @@ const Dashboard: React.FC = () => {
                             <StatCard
                                 title={t('totalClients')}
                                 value={stats.totalClients || 0}
-                                change="+4.1%"
                                 icon={Users}
                                 color="blue"
-                                comparisonText={t('newThisMonth')}
                             />
                         )}
                         {hasPermission('users.view') && (
                             <StatCard
                                 title={t('totalFollowers')}
                                 value={stats.totalFollowers || 0}
-                                change="+8.5%"
                                 icon={Heart}
                                 color="rose"
-                                comparisonText={t('newFollowers')}
                             />
                         )}
                         {hasPermission('store.view') && (
                             <StatCard
                                 title={t('totalReviews')}
                                 value={stats.totalReviews || 0}
-                                change="+2.0%"
                                 icon={Star}
                                 color="yellow"
-                                comparisonText={t('avgStars', { stars: Number(stats.averageRating || 0).toFixed(1) })}
                             />
                         )}
                         {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                             <StatCard
                                 title={t('totalProducts')}
                                 value={stats.totalProducts || 0}
-                                change="+1"
                                 icon={Layers}
                                 color="indigo"
-                                comparisonText={t('activeItems')}
                             />
                         )}
                     </>
@@ -330,10 +315,8 @@ const Dashboard: React.FC = () => {
                     <StatCard
                         title={t('avgOrderValue')}
                         value={`${(stats.avgOrderValue || 0).toFixed(2)} ${t('common:currencySymbol')}`}
-                        change="+1.2%"
                         icon={TrendingUp}
                         color="amber"
-                        comparisonText={t('vsLastPeriod')}
                     />
                 )}
             </div>
@@ -393,177 +376,198 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* Top Rated Products Section */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && stats.topRatedProducts && stats.topRatedProducts.length > 0 && (
+            {/* Top Rated Products Section */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
                             {t('topRatedProducts')}
                         </h3>
-                        <button
-                            onClick={() => navigate('/products')}
-                            className="text-primary text-sm font-bold hover:underline"
-                        >
-                            {t('common:viewAll')}
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                        {stats.topRatedProducts.map((product: any) => (
-                            <div
-                                key={product.id}
-                                className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative"
-                                onClick={() => navigate(`/products/edit/${product.id}`)}
+                        {stats.topRatedProducts && stats.topRatedProducts.length > 0 && (
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="text-primary text-sm font-bold hover:underline"
                             >
-                                {hasPermission('products.update') && (
-                                    <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
-                                        <Edit size={14} className="text-primary" />
-                                    </div>
-                                )}
-                                <div className="aspect-square w-full mb-3 overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                                    {product.coverImage ? (
-                                        <img
-                                            src={product.coverImage}
-                                            alt={product.name}
-                                            className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                                        />
-                                    ) : (
-                                        <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                            <ShoppingBag size={32} strokeWidth={1} />
+                                {t('common:viewAll')}
+                            </button>
+                        )}
+                    </div>
+
+                    {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                            <ShoppingBag size={48} className="text-slate-300 mb-4" />
+                            <p className="text-slate-500 text-sm font-medium">{t('common:noDataAvailable')}</p>
+                            <button
+                                onClick={() => navigate('/products')}
+                                className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
+                            >
+                                {t('common:addFirstProduct')}
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                            {stats.topRatedProducts.map((product: any) => (
+                                <div
+                                    key={product.id}
+                                    className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative"
+                                    onClick={() => navigate(`/products/edit/${product.id}`)}
+                                >
+                                    {hasPermission('products.update') && (
+                                        <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
+                                            <Edit size={14} className="text-primary" />
                                         </div>
                                     )}
+                                    <div className="aspect-square w-full mb-3 overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
+                                        {product.coverImage ? (
+                                            <img
+                                                src={product.coverImage}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover transition-transform group-hover:scale-105"
+                                            />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                <ShoppingBag size={32} strokeWidth={1} />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex items-center justify-between gap-2 mb-1">
+                                        <h4 className={clsx("font-bold text-sm text-slate-800 dark:text-slate-200 truncate flex-1", isRTL && "text-right")}>
+                                            {isRTL ? product.nameAr || product.name : product.name}
+                                        </h4>
+                                    </div>
+                                    <div className={clsx("flex items-center gap-1", isRTL && "flex-row-reverse")}>
+                                        <Star size={14} className="fill-yellow-400 text-yellow-400" />
+                                        <span className="text-xs font-black text-slate-700 dark:text-slate-400">
+                                            {Number(product.averageRating || 0).toFixed(1)}
+                                        </span>
+                                        <span className="text-[10px] text-slate-400 lowercase">
+                                            {t('review_count', { count: product.reviewCount || 0 })}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div className="flex items-center justify-between gap-2 mb-1">
-                                    <h4 className={clsx("font-bold text-sm text-slate-800 dark:text-slate-200 truncate flex-1", isRTL && "text-right")}>
-                                        {isRTL ? product.nameAr || product.name : product.name}
-                                    </h4>
-                                </div>
-                                <div className={clsx("flex items-center gap-1", isRTL && "flex-row-reverse")}>
-                                    <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                                    <span className="text-xs font-black text-slate-700 dark:text-slate-400">
-                                        {Number(product.averageRating || 0).toFixed(1)}
-                                    </span>
-                                    <span className="text-[10px] text-slate-400 lowercase">
-                                        {t('review_count', { count: product.reviewCount || 0 })}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
+                            ))}
+                        </div>
+                    )}
                 </div>
             )}
 
-            {/* Top Categories Section - Visible to all Owner/Employees */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && stats.topCategories && stats.topCategories.length > 0 && (
+            {/* Top Categories Section */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                 <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors mt-8">
                     <div className="flex items-center justify-between mb-6">
                         <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
                             {t('topCategories')}
                         </h3>
-                        <button
-                            onClick={() => navigate('/categories')}
-                            className="text-primary text-sm font-bold hover:underline"
-                        >
-                            {t('common:viewAll')}
-                        </button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                        {stats.topCategories.map((category: any) => (
-                            <div
-                                key={category.id}
-                                className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative flex flex-col items-center justify-center text-center"
+                        {stats.topCategories && stats.topCategories.length > 0 && (
+                            <button
                                 onClick={() => navigate('/categories')}
+                                className="text-primary text-sm font-bold hover:underline"
                             >
-                                {hasPermission('categories.update') && (
-                                    <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
-                                        <Edit size={14} className="text-primary" />
-                                    </div>
-                                )}
-                                <div className="w-16 h-16 mb-3 rounded-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                    <Layers size={32} strokeWidth={1.5} />
-                                </div>
-                                <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate w-full">
-                                    {isRTL ? category.nameAr || category.name : category.name}
-                                </h4>
-                                <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider">
-                                    {t('product_count', { count: category.productCount || 0 })}
-                                </p>
-                            </div>
-                        ))}
+                                {t('common:viewAll')}
+                            </button>
+                        )}
                     </div>
-                </div>
-            )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {hasPermission('analytics.view') && (
-                    <div className="lg:col-span-2 bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
-                            <select className={clsx(
-                                "bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-sm rounded-none px-3 py-1.5 focus:ring-primary focus:border-primary outline-none",
-                                isRTL && "text-right"
-                            )}>
-                                <option>{t('last30Days')}</option>
-                                <option>{t('last90Days')}</option>
-                            </select>
+                    {!stats.topCategories || stats.topCategories.length === 0 ? (
+                        <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                            <Layers size={48} className="text-slate-300 mb-4" />
+                            <p className="text-slate-500 text-sm font-medium">{t('common:noDataAvailable')}</p>
+                            <button
+                                onClick={() => navigate('/categories')}
+                                className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
+                            >
+                                {t('common:addFirstCategory')}
+                            </button>
                         </div>
-                        <div className="h-[300px]">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart data={chartData}>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
-                                    <XAxis
-                                        dataKey="name"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: textColor, fontSize: 12 }}
-                                        dy={10}
-                                        reversed={isRTL}
-                                    />
-                                    <YAxis
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: textColor, fontSize: 12 }}
-                                        dx={isRTL ? 10 : -10}
-                                        tickFormatter={(val) => `${val} ${t('common:currencySymbol')}`}
-                                        orientation={isRTL ? "right" : "left"}
-                                    />
-                                    <Tooltip
-                                        cursor={{ fill: cursorFill }}
-                                        contentStyle={{
-                                            backgroundColor: tooltipBg,
-                                            borderRadius: '0px',
-                                            border: `1px solid ${tooltipBorder}`,
-                                            boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                            fontSize: '14px',
-                                            color: isDark ? '#f1f5f9' : '#0f172a',
-                                            textAlign: isRTL ? 'right' : 'left'
-                                        }}
-                                    />
-                                    <Bar dataKey="revenue" fill="var(--primary)" radius={[6, 6, 0, 0]} barSize={32} />
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </div>
-                )}
-
-                {hasPermission('orders.view') && (
-                    <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col transition-colors">
-                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100 mb-6", isRTL && "text-right")}>{t('recentActivity')}</h3>
-                        <div className="space-y-6 flex-grow">
-                            {[1, 2, 3].map((_, i) => (
-                                <div key={i} className={clsx("flex gap-4 group cursor-pointer", isRTL && "flex-row-reverse text-right")}>
-                                    <div className="flex-1">
-                                        <p className="text-sm text-slate-700 dark:text-slate-300 font-medium">{t('statsSynchronized')}</p>
-                                        <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{t('justNow')}</p>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                            {stats.topCategories.map((category: any) => (
+                                <div
+                                    key={category.id}
+                                    className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative flex flex-col items-center justify-center text-center"
+                                    onClick={() => navigate('/categories')}
+                                >
+                                    {hasPermission('categories.update') && (
+                                        <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
+                                            <Edit size={14} className="text-primary" />
+                                        </div>
+                                    )}
+                                    <div className="w-16 h-16 mb-3 rounded-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
+                                        <Layers size={32} strokeWidth={1.5} />
                                     </div>
-                                    <div className="w-2.5 h-2.5 rounded-none bg-primary mt-1.5 group-hover:scale-125 transition-transform shrink-0" />
+                                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate w-full">
+                                        {isRTL ? category.nameAr || category.name : category.name}
+                                    </h4>
+                                    <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider">
+                                        {t('product_count', { count: category.productCount || 0 })}
+                                    </p>
                                 </div>
                             ))}
                         </div>
-                        <button className="mt-6 w-full py-2.5 text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-none transition-colors">
-                            {t('viewAllActivity')}
-                        </button>
+                    )}
+                </div>
+            )}
+
+            {/* Revenue Performance section */}
+            {hasPermission('analytics.view') && (
+                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
+                    <div className="flex items-center justify-between mb-8">
+                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
                     </div>
-                )}
-            </div>
+                    <div className="h-[300px]">
+                        <ResponsiveContainer width="100%" height="100%">
+                            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                                <XAxis
+                                    dataKey="date"
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: textColor, fontSize: 10 }}
+                                    dy={10}
+                                    reversed={isRTL}
+                                    tickFormatter={(str) => {
+                                        const date = new Date(str);
+                                        return date.getDate().toString(); // Just show day numbers for bars to avoid overlap
+                                    }}
+                                />
+                                <YAxis
+                                    axisLine={false}
+                                    tickLine={false}
+                                    tick={{ fill: textColor, fontSize: 11 }}
+                                    dx={isRTL ? 10 : -10}
+                                    tickFormatter={(val) => `${val}`}
+                                    orientation={isRTL ? "right" : "left"}
+                                />
+                                <Tooltip
+                                    cursor={{ fill: cursorFill, opacity: 0.4 }}
+                                    contentStyle={{
+                                        backgroundColor: tooltipBg,
+                                        borderRadius: '0px',
+                                        border: `1px solid ${tooltipBorder}`,
+                                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                                        fontSize: '14px',
+                                        color: isDark ? '#f1f5f9' : '#0f172a',
+                                        textAlign: isRTL ? 'right' : 'left'
+                                    }}
+                                    formatter={(val: any) => [`${val.toLocaleString()} ${t('common:currencySymbol')}`, t('totalRevenue')]}
+                                    labelFormatter={(label) => {
+                                        const date = new Date(label);
+                                        return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                                    }}
+                                />
+                                <Bar
+                                    dataKey="revenue"
+                                    fill="#FF5C00"
+                                    radius={[2, 2, 0, 0]}
+                                    barSize={20}
+                                    minPointSize={4}
+                                    animationDuration={1500}
+                                />
+                            </BarChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
