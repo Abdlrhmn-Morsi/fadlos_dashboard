@@ -132,9 +132,9 @@ const StoreSettings = () => {
                 workingDays: store.workingDays || [],
                 acceptOrdersIfOffDay: store.acceptOrdersIfOffDay || false,
                 acceptOrdersInClosedHours: store.acceptOrdersInClosedHours || false,
-                isAcceptingOrders: store.isAcceptingOrders !== undefined ? store.isAcceptingOrders : true,
-                enableStoreReviews: store.enableStoreReviews !== undefined ? store.enableStoreReviews : true,
-                enableProductReviews: store.enableProductReviews !== undefined ? store.enableProductReviews : true
+                isAcceptingOrders: store.isAcceptingOrders === false ? false : true,
+                enableStoreReviews: store.enableStoreReviews === false ? false : true,
+                enableProductReviews: store.enableProductReviews === false ? false : true
             });
 
             setLogoPreview(store.logo);
@@ -857,7 +857,7 @@ const StoreSettings = () => {
                                         checked={formData.enableStoreReviews}
                                         onChange={handleChange}
                                     />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
                                 </label>
                             </div>
 
@@ -874,7 +874,7 @@ const StoreSettings = () => {
                                         checked={formData.enableProductReviews}
                                         onChange={handleChange}
                                     />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
                                 </label>
                             </div>
                         </div>
@@ -898,7 +898,7 @@ const StoreSettings = () => {
                                     name="is24Hours"
                                     checked={formData.is24Hours}
                                     onChange={handleChange}
-                                    className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                    className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500"
                                 />
                                 <label htmlFor="is24Hours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
                                     {t('open24Hours')}
@@ -989,7 +989,7 @@ const StoreSettings = () => {
                                         checked={formData.isAcceptingOrders}
                                         onChange={handleChange}
                                     />
-                                    <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-sm"></div>
+                                    <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 shadow-sm"></div>
                                 </label>
                             </div>
                         </div>
@@ -1003,7 +1003,7 @@ const StoreSettings = () => {
                                         name="acceptOrdersIfOffDay"
                                         checked={formData.acceptOrdersIfOffDay}
                                         onChange={handleChange}
-                                        className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                        className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500"
                                     />
                                     <label htmlFor="acceptOrdersIfOffDay" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
                                         {t('acceptOffDay')}
@@ -1016,7 +1016,7 @@ const StoreSettings = () => {
                                         name="acceptOrdersInClosedHours"
                                         checked={formData.acceptOrdersInClosedHours}
                                         onChange={handleChange}
-                                        className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                                        className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500"
                                     />
                                     <label htmlFor="acceptOrdersInClosedHours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
                                         {t('acceptClosedHours')}

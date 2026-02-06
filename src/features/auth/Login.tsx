@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { ArrowRight, AlertCircle } from 'lucide-react';
+import { ArrowRight, AlertCircle, Eye, EyeOff } from 'lucide-react';
 import authApi from './api/auth.api';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -19,6 +19,7 @@ const Login = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showPassword, setShowPassword] = useState(false);
     const [formData, setFormData] = useState({
         identifier: '',
         password: ''
@@ -115,18 +116,30 @@ const Login = () => {
                         <label htmlFor="password" title="password label" className="block text-sm font-bold text-slate-700 dark:text-slate-300 uppercase tracking-tight">
                             {t('password')}
                         </label>
-                        <input
-                            type="password"
-                            id="password"
-                            placeholder={t('passwordPlaceholder')}
-                            className={clsx(
-                                "w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500",
-                                isRTL && "text-right"
-                            )}
-                            value={formData.password}
-                            onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                            required
-                        />
+                        <div className="relative group">
+                            <input
+                                type={showPassword ? 'text' : 'password'}
+                                id="password"
+                                placeholder={t('passwordPlaceholder')}
+                                className={clsx(
+                                    "w-full px-4 py-3 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all placeholder:text-slate-400 dark:placeholder:text-slate-500",
+                                    isRTL ? "pl-12 pr-4 text-right" : "pr-12 pl-4"
+                                )}
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                required
+                            />
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className={clsx(
+                                    "absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors",
+                                    isRTL ? "left-4" : "right-4"
+                                )}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div className={clsx("flex items-center justify-between text-sm", isRTL && "flex-row-reverse")}>

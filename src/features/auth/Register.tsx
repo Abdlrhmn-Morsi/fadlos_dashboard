@@ -9,7 +9,9 @@ import {
     Type,
     ChevronRight,
     AlertCircle,
-    ArrowLeft
+    ArrowLeft,
+    Eye,
+    EyeOff
 } from 'lucide-react';
 import authApi from './api/auth.api';
 import InteractiveBackground from './InteractiveBackground';
@@ -45,6 +47,9 @@ const FormSection = ({ title, icon: Icon, children, description }: any) => {
 
 const FormInput = ({ label, icon: Icon, ...props }: any) => {
     const { isRTL } = useLanguage();
+    const [showPassword, setShowPassword] = useState(false);
+    const isPassword = props.type === 'password';
+
     return (
         <div className="space-y-1.5 flex-1">
             <label className={clsx("text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest", isRTL ? "mr-1 text-right block" : "ml-1")}>
@@ -52,18 +57,31 @@ const FormInput = ({ label, icon: Icon, ...props }: any) => {
             </label>
             <div className="relative group">
                 <div className={clsx(
-                    "absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors",
+                    "absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors z-10",
                     isRTL ? "right-4" : "left-4"
                 )}>
                     {Icon && <Icon size={18} />}
                 </div>
                 <input
                     {...props}
+                    type={isPassword ? (showPassword ? 'text' : 'password') : props.type}
                     className={clsx(
                         "w-full py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium",
-                        isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
+                        isRTL ? "pr-11 pl-12 text-right" : "pl-11 pr-12"
                     )}
                 />
+                {isPassword && (
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className={clsx(
+                            "absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-primary transition-colors",
+                            isRTL ? "left-4" : "right-4"
+                        )}
+                    >
+                        {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </button>
+                )}
             </div>
         </div>
     );

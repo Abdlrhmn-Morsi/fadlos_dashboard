@@ -543,7 +543,7 @@ const PromoCodeForm = () => {
                                             onChange={e => setFormData({ ...formData, isActive: e.target.checked })}
                                         />
                                         <div className={clsx(
-                                            "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500",
+                                            "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500",
                                             "after:start-[2px]",
                                             isRTL ? "peer-checked:after:-translate-x-full" : "peer-checked:after:translate-x-full"
                                         )}></div>
@@ -563,7 +563,7 @@ const PromoCodeForm = () => {
                                             onChange={e => setFormData({ ...formData, isAutoApply: e.target.checked })}
                                         />
                                         <div className={clsx(
-                                            "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-500",
+                                            "w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500",
                                             "after:start-[2px]",
                                             isRTL ? "peer-checked:after:-translate-x-full" : "peer-checked:after:translate-x-full"
                                         )}></div>

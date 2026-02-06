@@ -6,6 +6,9 @@ import InteractiveBackground from './InteractiveBackground';
 import appLogo from '../../assets/app_logo_primary.png';
 import { useAuth } from '../../contexts/AuthContext';
 import { useNotification } from '../notification/context/NotificationContext';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/common/LanguageSwitcher';
+import ThemeToggle from '../../components/common/ThemeToggle';
 
 const VerifyEmail = () => {
     const navigate = useNavigate();
@@ -13,6 +16,8 @@ const VerifyEmail = () => {
     const { token } = location.state || {}; // Get token from state
     const { login } = useAuth();
     const { loginOneSignal } = useNotification();
+    const { t, i18n } = useTranslation('auth');
+    const isRtl = i18n.language === 'ar';
 
     const [code, setCode] = useState(['', '', '', '', '', '']);
     const [loading, setLoading] = useState(false);
@@ -25,6 +30,9 @@ const VerifyEmail = () => {
     useEffect(() => {
         if (!token) {
             navigate('/login');
+        } else {
+            // Auto-focus first input
+            document.getElementById('code-0')?.focus();
         }
     }, [token, navigate]);
 
@@ -66,7 +74,7 @@ const VerifyEmail = () => {
         e.preventDefault();
         const verificationCode = code.join('');
         if (verificationCode.length !== 6) {
-            setError('Please enter all 6 digits');
+            setError(t('enterAllDigits'));
             return;
         }
 
@@ -77,11 +85,11 @@ const VerifyEmail = () => {
             if (response.user) {
                 login(response.user);
                 await loginOneSignal(response.user.id);
-                setMessage('Email verified successfully!');
+                setMessage(t('emailVerifiedSuccess'));
                 setTimeout(() => navigate('/'), 1500);
             }
         } catch (err: any) {
-            const msg = err.response?.data?.message || 'Verification failed. Please check the code.';
+            const msg = err.response?.data?.message || t('verificationFailed');
             setError(Array.isArray(msg) ? msg[0] : msg);
         } finally {
             setLoading(false);
@@ -96,11 +104,11 @@ const VerifyEmail = () => {
         setMessage(null);
         try {
             await authApi.resendVerificationCode(token);
-            setMessage('A new verification code has been sent to your email.');
+            setMessage(t('resendSuccess'));
             setCanResend(false);
             setCountdown(60);
         } catch (err: any) {
-            const msg = err.response?.data?.message || 'Failed to resend code.';
+            const msg = err.response?.data?.message || t('resendFailed');
             setError(Array.isArray(msg) ? msg[0] : msg);
         } finally {
             setResending(false);
@@ -108,17 +116,25 @@ const VerifyEmail = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 p-4 relative overflow-hidden transition-colors">
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-950 p-4 relative overflow-hidden transition-colors" dir={isRtl ? 'rtl' : 'ltr'}>
             <InteractiveBackground />
+
+            {/* Toggles */}
+            <div className={`absolute top-6 ${isRtl ? 'left-6' : 'right-6'} z-50 flex items-center gap-2`}>
+                <LanguageSwitcher />
+                <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1" />
+                <ThemeToggle />
+            </div>
+
             <div className="w-full max-w-[440px] relative z-10 animate-in slide-in-from-bottom-5 duration-500">
                 <div className="flex flex-col items-center mb-8">
                     <img src={appLogo} alt="Logo" className="h-20 object-contain mb-6" />
                     <div className="bg-primary/10 p-4 rounded-full mb-4">
                         <Mail className="text-primary" size={32} />
                     </div>
-                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">Verify your email</h1>
+                    <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">{t('verifyEmailTitle')}</h1>
                     <p className="text-slate-500 dark:text-slate-400 text-center text-sm">
-                        Enter the 6-digit code we sent to your email address.
+                        {t('verifyEmailSubtitle')}
                     </p>
                 </div>
 
@@ -162,7 +178,7 @@ const VerifyEmail = () => {
                             <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
                         ) : (
                             <>
-                                Verify Account <ArrowRight size={18} />
+                                {t('verifyAccount')} <ArrowRight size={18} className={isRtl ? 'rotate-180' : ''} />
                             </>
                         )}
                     </button>
@@ -170,7 +186,7 @@ const VerifyEmail = () => {
 
                 <div className="mt-8 text-center space-y-4">
                     <p className="text-sm text-slate-500 dark:text-slate-400">
-                        Didn't receive the code?
+                        {t('didNotReceiveCode')}
                     </p>
                     <button
                         onClick={handleResend}
@@ -178,14 +194,14 @@ const VerifyEmail = () => {
                         className="flex items-center gap-2 mx-auto text-primary font-bold hover:underline transition-all disabled:opacity-50 disabled:no-underline"
                     >
                         <RefreshCcw size={16} className={resending ? 'animate-spin' : ''} />
-                        {resending ? 'Resending...' : canResend ? 'Resend Code' : `Resend in ${countdown}s`}
+                        {resending ? t('resending') : canResend ? t('resendCode') : t('resendIn', { seconds: countdown })}
                     </button>
                     <div className="pt-4">
                         <button
                             onClick={() => navigate('/login')}
                             className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 text-sm font-medium transition-colors"
                         >
-                            Back to Login
+                            {t('backToLogin')}
                         </button>
                     </div>
                 </div>
