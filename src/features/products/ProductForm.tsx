@@ -1090,7 +1090,10 @@ const ProductForm = () => {
                                 </label>
                             </div>
                             <div className="flex items-center justify-between mb-4">
-                                <label className={clsx("text-sm font-medium text-slate-700 dark:text-slate-300", isRTL && "text-right")}>{t('active')}</label>
+                                <div className={isRTL ? "text-right" : "text-left"}>
+                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('active')}</label>
+                                    <p className="text-[10px] text-slate-400">{t('activeSubtitle')}</p>
+                                </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
@@ -1102,7 +1105,10 @@ const ProductForm = () => {
                                 </label>
                             </div>
                             <div className="flex items-center justify-between">
-                                <label className={clsx("text-sm font-medium text-slate-700 dark:text-slate-300", isRTL && "text-right")}>{t('available')}</label>
+                                <div className={isRTL ? "text-right" : "text-left"}>
+                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('available')}</label>
+                                    <p className="text-[10px] text-slate-400">{t('availableSubtitle')}</p>
+                                </div>
                                 <label className="relative inline-flex items-center cursor-pointer">
                                     <input
                                         type="checkbox"
