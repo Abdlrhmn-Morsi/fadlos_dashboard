@@ -238,7 +238,7 @@ const ReviewList = () => {
                     </div>
                 ) : (
                     reviews.map((review) => (
-                        <div key={review.id} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 relative">
+                        <div key={review.id} className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden hover:shadow-xl hover:shadow-primary/5 transition-all duration-300 relative flex flex-col">
                             {/* Reported Status Badge */}
                             {/* Reported Status Badge - Removed from top to avoid overlap */}
 
@@ -280,9 +280,9 @@ const ReviewList = () => {
                                     </div>
                                 </div>
                             ) : (
-                                <div className="p-4">
-                                    <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-3">
-                                        <div className="flex items-center gap-2.5">
+                                <div className="p-4 flex flex-col flex-1">
+                                    <div className={clsx("flex flex-col mb-4", isRTL ? "items-start" : "items-start")}>
+                                        <div className="flex items-center gap-2.5 w-full">
                                             <div className="w-9 h-9 rounded-lg bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden shrink-0">
                                                 {review.customer?.profileImage ? (
                                                     <ImageWithFallback src={review.customer.profileImage} alt={review.customer.name || 'Customer'} className="w-full h-full object-cover" />
@@ -290,7 +290,7 @@ const ReviewList = () => {
                                                     <User size={16} />
                                                 )}
                                             </div>
-                                            <div>
+                                            <div className="flex-1">
                                                 <h3 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1">
                                                     {review.customer?.name || t('common:anonymous')}
                                                 </h3>
@@ -300,19 +300,23 @@ const ReviewList = () => {
                                                 </div>
                                             </div>
                                         </div>
-                                        {renderStars(review.rating)}
+                                        <div className="mt-2">
+                                            {renderStars(review.rating)}
+                                        </div>
                                     </div>
 
                                     {review.product && (
-                                        <button
-                                            onClick={() => navigate(`/products/${review.product.id}`)}
-                                            className="flex items-center gap-2 mb-3 p-1.5 pr-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-100 dark:border-slate-700/50 w-fit group/tag hover:border-primary/40 hover:bg-primary/5 transition-all"
-                                        >
-                                            <Package size={11} className="text-primary" />
-                                            <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter group-hover/tag:text-primary transition-colors">
-                                                {language === 'ar' && review.product.nameAr ? review.product.nameAr : review.product.name}
-                                            </span>
-                                        </button>
+                                        <div className={clsx("flex mb-3", isRTL ? "justify-start" : "justify-start")}>
+                                            <button
+                                                onClick={() => navigate(`/products/${review.product.id}`)}
+                                                className="flex items-center gap-2 p-1.5 pr-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-100 dark:border-slate-700/50 group/tag hover:border-primary/40 hover:bg-primary/5 transition-all"
+                                            >
+                                                <Package size={11} className="text-primary" />
+                                                <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter group-hover/tag:text-primary transition-colors">
+                                                    {language === 'ar' && review.product.nameAr ? review.product.nameAr : review.product.name}
+                                                </span>
+                                            </button>
+                                        </div>
                                     )}
 
                                     <div className="relative mb-4">
@@ -334,7 +338,7 @@ const ReviewList = () => {
                                         </div>
                                     )}
 
-                                    <footer className="flex flex-wrap items-center justify-between gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                                    <footer className={clsx("flex flex-wrap items-center gap-4 pt-4 border-t border-slate-100 dark:border-slate-800 mt-auto", isRTL ? "justify-end" : "justify-end")}>
                                         <div className="flex items-center gap-4">
                                             {!review.isReported ? (
                                                 <button
