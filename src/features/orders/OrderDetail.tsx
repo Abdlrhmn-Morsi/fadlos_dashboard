@@ -381,8 +381,12 @@ const OrderDetail = () => {
                             </h3>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-                                    <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold">
-                                        {order.client?.name?.[0] || order.clientInfo?.name?.[0] || 'G'}
+                                    <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold overflow-hidden">
+                                        {(order.client?.profileImage || order.clientInfo?.profileImage) ? (
+                                            <ImageWithFallback src={order.client?.profileImage || order.clientInfo?.profileImage} alt={order.client?.name || order.clientInfo?.name} className="w-full h-full object-cover" />
+                                        ) : (
+                                            order.client?.name?.[0] || order.clientInfo?.name?.[0] || 'G'
+                                        )}
                                     </div>
                                     <div>
                                         <p className="font-bold text-slate-900 dark:text-white">
@@ -392,16 +396,7 @@ const OrderDetail = () => {
                                     </div>
                                 </div>
 
-                                <div className="space-y-3 text-sm">
-                                    <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors">
-                                        <Mail size={16} className="text-slate-400" />
-                                        <span>{order.client?.email || order.clientInfo?.email || t('noEmail')}</span>
-                                    </div>
-                                    <div className="flex items-center gap-3 text-slate-600 dark:text-slate-400 group cursor-pointer hover:text-indigo-600 transition-colors">
-                                        <Phone size={16} className="text-slate-400" />
-                                        <span>{order.client?.phone || order.clientInfo?.phone || t('noPhone')}</span>
-                                    </div>
-                                </div>
+
                             </div>
                         </div>
 

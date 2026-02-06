@@ -179,11 +179,11 @@ export const BranchesList: React.FC = () => {
 
                 <div className="relative flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div className="max-w-2xl">
-                        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none mb-4">
+                        <h1 className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none mb-2">
                             {t('title')}
                             <span className="text-indigo-600">.</span>
                         </h1>
-                        <p className="text-lg text-gray-600 dark:text-gray-400 font-medium">
+                        <p className="text-base text-gray-600 dark:text-gray-400 font-medium">
                             {t('subtitle')}
                         </p>
                     </div>
@@ -194,7 +194,7 @@ export const BranchesList: React.FC = () => {
                         className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
                     >
                         <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                        <Plus size={22} className={clsx(isRTL ? "ml-2" : "mr-2")} />
+                        <Plus size={18} className={clsx(isRTL ? "ml-2" : "mr-2")} />
                         {t('addBranch')}
                     </button>
                 </div>
@@ -230,10 +230,10 @@ export const BranchesList: React.FC = () => {
                     filteredBranches.map((branch) => (
                         <div key={branch.id} className="group relative bg-white dark:bg-gray-800 rounded border border-gray-100 dark:border-gray-700 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(79,70,229,0.1)] transition-all duration-500 flex flex-col overflow-hidden">
                             {/* Card Content */}
-                            <div className="p-6 flex-1">
-                                <div className="flex justify-between items-center mb-6">
+                            <div className="p-4 flex-1">
+                                <div className="flex justify-between items-center mb-4">
                                     <div className={clsx(
-                                        "flex items-center gap-2 rounded px-4 py-2 text-xs font-bold uppercase tracking-widest",
+                                        "flex items-center gap-2 rounded px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest",
                                         branch.isActive
                                             ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
                                             : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'
@@ -248,29 +248,29 @@ export const BranchesList: React.FC = () => {
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => openEditModal(branch)}
-                                            className="p-3 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300"
+                                            className="p-2 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-indigo-50 dark:hover:bg-indigo-900/30 hover:text-indigo-600 dark:hover:text-indigo-400 transition-all duration-300"
                                             title={t('editBranch')}
                                         >
-                                            <Pencil size={18} />
+                                            <Pencil size={16} />
                                         </button>
                                         <button
                                             onClick={() => handleDelete(branch.id)}
-                                            className="p-3 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 transition-all duration-300"
+                                            className="p-2 bg-gray-50 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded hover:bg-rose-50 dark:hover:bg-rose-900/30 hover:text-rose-600 dark:hover:text-rose-400 transition-all duration-300"
                                             title={t('deleteBranch')}
                                         >
-                                            <Trash2 size={18} />
+                                            <Trash2 size={16} />
                                         </button>
                                     </div>
                                 </div>
 
-                                <div className="space-y-6">
-                                    <div className="flex items-start gap-5">
-                                        <div className="flex-shrink-0 p-4 bg-indigo-50 dark:bg-indigo-500/10 rounded group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-all duration-500">
-                                            <Home className="h-7 w-7 text-indigo-600 dark:text-indigo-400" />
+                                <div className="space-y-4">
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0 p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-all duration-500">
+                                            <Home className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-2">{t('branchLocation')}</p>
-                                            <h3 className="text-xl font-bold text-gray-900 dark:text-white leading-snug mb-2 group-hover:text-indigo-600 transition-colors">
+                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('branchLocation')}</p>
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-snug mb-1 group-hover:text-indigo-600 transition-colors">
                                                 {branch.addressAr}
                                             </h3>
                                             {branch.addressEn && (
@@ -281,13 +281,13 @@ export const BranchesList: React.FC = () => {
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-5">
-                                        <div className="flex-shrink-0 p-4 bg-emerald-50 dark:bg-emerald-500/10 rounded group-hover:scale-110 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-all duration-500">
-                                            <Phone className="h-7 w-7 text-emerald-600 dark:text-emerald-400" />
+                                    <div className="flex items-center gap-4">
+                                        <div className="flex-shrink-0 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded group-hover:scale-110 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-all duration-500">
+                                            <Phone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                         </div>
                                         <div>
-                                            <p className="text-[10px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('contactDetails')}</p>
-                                            <p className="text-lg font-bold text-gray-900 dark:text-white tabular-nums tracking-wide">
+                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-0.5">{t('contactDetails')}</p>
+                                            <p className="text-base font-bold text-gray-900 dark:text-white tabular-nums tracking-wide">
                                                 {branch.phone}
                                             </p>
                                         </div>
@@ -302,17 +302,17 @@ export const BranchesList: React.FC = () => {
                                         href={branch.link}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex-1 flex items-center justify-center gap-3 py-4 px-6 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-sm font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
+                                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
                                     >
-                                        <MapPin size={18} className="text-emerald-500 group-hover/btn:text-white transition-colors" />
+                                        <MapPin size={16} className="text-emerald-500 group-hover/btn:text-white transition-colors" />
                                         <span>{t('navigateOnMaps')}</span>
                                     </a>
                                     <button
                                         onClick={() => handleCopyLink(branch.link)}
-                                        className="p-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 active:scale-90"
+                                        className="p-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 active:scale-90"
                                         title={t('common:copy')}
                                     >
-                                        <Globe size={18} />
+                                        <Globe size={16} />
                                     </button>
                                 </div>
                             )}

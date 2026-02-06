@@ -70,7 +70,7 @@ const FollowerList = () => {
     };
 
     return (
-        <div className="max-w-6xl mx-auto p-6">
+        <div className="max-w-[1600px] mx-auto p-6">
             <div className="flex items-center justify-between mb-10">
                 <div>
                     <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
@@ -115,7 +115,7 @@ const FollowerList = () => {
                             return (
                                 <div key={user.id} className="group bg-white dark:bg-slate-900 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 hover:border-primary/50 hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500 overflow-hidden relative active:scale-[0.98]">
                                     <div className="flex items-center gap-4">
-                                        <div className="w-16 h-16 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden group-hover:scale-110 transition-transform duration-500">
+                                        <div className="w-16 h-16 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden group-hover:scale-110 transition-transform duration-500">
                                             {user.profileImage ? (
                                                 <ImageWithFallback src={user.profileImage} alt={displayName} className="w-full h-full object-cover" />
                                             ) : (
@@ -126,13 +126,9 @@ const FollowerList = () => {
                                             <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-tighter truncate text-lg group-hover:text-primary transition-colors leading-none mb-1">
                                                 {displayName}
                                             </h3>
-                                            <span className="text-[10px] font-black text-emerald-500 uppercase tracking-[0.15em] flex items-center gap-1">
-                                                {t('verifiedReader')}
-                                            </span>
+
                                         </div>
-                                        <div className="opacity-0 group-hover:opacity-100 transition-all">
-                                            <ArrowUpRight size={18} className={clsx("text-slate-300", isRTL && "rotate-[-90deg]")} />
-                                        </div>
+
                                     </div>
 
                                     {/* High-end accent details */}

@@ -4,7 +4,7 @@ import {
     User, ShoppingBag, DollarSign, Calendar,
     Search, ArrowUpDown, ChevronRight, X,
     Loader2, TrendingUp, TrendingDown,
-    Clock, Package, ArrowLeft, Phone, MapPin, Eye
+    Clock, Package, ArrowLeft, Phone, MapPin, Eye, Mail
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -248,7 +248,7 @@ const ClientList = () => {
                                         <ArrowUpDown size={14} className={clsx("transition-opacity", sortBy === 'totalSpent' ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100")} />
                                     </button>
                                 </th>
-                                <th className="px-6 py-4 text-right"></th>
+
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -288,7 +288,7 @@ const ClientList = () => {
                                                         <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-tight">
                                                             {client?.name || t('anonymousUser')}
                                                         </h3>
-                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">{client?.email}</p>
+
                                                     </div>
                                                 </div>
                                             </td>
@@ -312,9 +312,7 @@ const ClientList = () => {
                                                     <span className="text-[10px] font-bold text-slate-400 uppercase">{t('avg')} {Number(stats?.averageOrderValue || 0).toFixed(2)}$</span>
                                                 </div>
                                             </td>
-                                            <td className="px-6 py-5 text-right rtl:text-left">
-                                                <ChevronRight size={20} className={clsx("text-slate-300 transition-all inline-block", isRTL ? "group-hover:text-primary group-hover:-translate-x-1 rotate-180" : "group-hover:text-primary group-hover:translate-x-1")} />
-                                            </td>
+
                                         </tr>
                                     );
                                 })
@@ -525,8 +523,12 @@ const ClientList = () => {
                                             <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('logistics')}</h3>
                                             <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
                                                 <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                                        <User size={16} />
+                                                    <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary overflow-hidden">
+                                                        {(selectedOrder.client?.profileImage || selectedOrder.clientInfo?.profileImage) ? (
+                                                            <ImageWithFallback src={selectedOrder.client?.profileImage || selectedOrder.clientInfo?.profileImage} alt={selectedOrder.client?.name || selectedOrder.clientInfo?.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <User size={14} />
+                                                        )}
                                                     </div>
                                                     <span className="uppercase tracking-tight">{selectedOrder.clientInfo?.name || selectedOrder.client?.name}</span>
                                                 </div>
@@ -551,14 +553,28 @@ const ClientList = () => {
                                                     </div>
                                                 </div>
 
-                                                <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
-                                                    <div className="p-2 bg-primary/10 rounded-lg text-primary">
-                                                        <Phone size={16} />
+                                                {selectedOrder.deliveryAddress && (selectedOrder.deliveryAddress.phone || selectedOrder.deliveryAddress.email) && (
+                                                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('orders:contactForDelivery')}</p>
+                                                        {selectedOrder.deliveryAddress.phone && (
+                                                            <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                                <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
+                                                                    <Phone size={14} />
+                                                                </div>
+                                                                <span className="tracking-tighter">{selectedOrder.deliveryAddress.phone}</span>
+                                                            </div>
+                                                        )}
+                                                        {selectedOrder.deliveryAddress.email && (
+                                                            <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                                                <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
+                                                                    <Mail size={14} />
+                                                                </div>
+                                                                <span className="truncate">{selectedOrder.deliveryAddress.email}</span>
+                                                            </div>
+                                                        )}
                                                     </div>
-                                                    <span className="tracking-tighter">
-                                                        {selectedOrder.deliveryAddress?.phone || selectedOrder.clientInfo?.phone || selectedOrder.client?.phone || t('noPhone')}
-                                                    </span>
-                                                </div>
+                                                )}
+
                                             </div>
                                         </div>
 
