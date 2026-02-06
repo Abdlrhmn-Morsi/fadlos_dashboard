@@ -147,17 +147,6 @@ const DashboardLayout: React.FC = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
-          {!collapsed && (
-            <div className="mb-4 px-4 py-3 bg-slate-50 dark:bg-slate-800/50 rounded-none border border-slate-100 dark:border-slate-800">
-              <div className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t('welcome')} {user?.name}</div>
-              <div className="font-bold text-slate-900 dark:text-slate-100 truncate">
-                {user?.role === UserRole.SUPER_ADMIN ? t('super_admin') : user?.role === UserRole.ADMIN ? t('admin') : user?.role === UserRole.STORE_OWNER ? t('store_owner') : user?.role === UserRole.CUSTOMER ? t('customer') : user?.role === UserRole.EMPLOYEE ? t('employee') : user?.role}
-              </div>
-              <div className="text-[10px] font-black text-primary uppercase tracking-[0.2em] truncate">
-                {getRoleLabel()}
-              </div>
-            </div>
-          )}
 
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} />
 
@@ -300,12 +289,7 @@ const DashboardLayout: React.FC = () => {
               </h1>
             </div>
           </div>
-
           <div className="flex items-center gap-3">
-            <div className="relative">
-              <NotificationBadge />
-              <NotificationList />
-            </div>
             <div
               className={clsx(
                 "flex items-center gap-3 transition-all duration-200",
@@ -317,11 +301,13 @@ const DashboardLayout: React.FC = () => {
                 }
               }}
             >
-              <div className={clsx("flex flex-col items-end hidden xs:flex", isRTL ? "ml-2 text-left" : "mr-2 text-right")}>
-                <span className="text-sm font-bold text-slate-900 dark:text-slate-100 uppercase tracking-tighter">
+              <div className={clsx("flex flex-col", isRTL ? "ml-3 text-left items-start" : "mr-3 text-right items-end")}>
+                <span className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none mb-1">
+                  {user?.name}
+                </span>
+                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none">
                   {getRoleLabel()}
                 </span>
-                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">{user?.role === UserRole.SUPER_ADMIN ? t('superControl') : t('dashboard')}</span>
               </div>
               <div className="w-10 h-10 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20 border-2 border-white dark:border-slate-800">
                 {user?.profileImage ? (
@@ -331,9 +317,12 @@ const DashboardLayout: React.FC = () => {
                 )}
               </div>
             </div>
+            <div className="relative">
+              <NotificationBadge />
+              <NotificationList />
+            </div>
           </div>
         </header>
-
 
         <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative z-10 custom-scrollbar transition-colors">
           <div className="max-w-[1600px] mx-auto">
