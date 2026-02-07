@@ -51,15 +51,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const memoizedFilters = useMemo(() => {
         if (authUser?.role !== UserRole.EMPLOYEE) return {};
 
-        const types = [];
-        if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) {
-            types.push('order');
-        }
+        // If employee has Store Management permissions, show all notifications related to their store
         if (hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE)) {
-            types.push('review');
+            return {}; // No type filter = see everything
         }
 
-        return types.length > 0 ? { type: types.join(',') } : { type: 'none' };
+        // If employee only has Order permissions, show only order notifications
+        if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) {
+            return { type: 'order' };
+        }
+
+        // If no relevant permissions, don't show notifications (or show 'none')
+        return { type: 'none' };
     }, [authUser?.role, hasPermission]);
 
     const fetchUnreadCount = useCallback(async (filters?: any) => {
@@ -186,6 +189,18 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     };
 
     useEffect(() => {
+        if (!authUser) {
+            setNotifications([]);
+            setUnreadCount(0);
+            initialized.current = false;
+            try {
+                if (OneSignal.User.externalId) {
+                    OneSignal.logout();
+                }
+            } catch (e) { }
+            return;
+        }
+
         if (initialized.current) return;
         initialized.current = true;
 
@@ -265,7 +280,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             window.removeEventListener('keydown', unlockAudio);
             window.removeEventListener('touchstart', unlockAudio);
         };
-    }, [fetchUnreadCount, fetchNotifications, authUser]);
+    }, [fetchUnreadCount, fetchNotifications, authUser, memoizedFilters]);
 
     return (
         <NotificationContext.Provider value={{
