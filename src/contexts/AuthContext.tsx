@@ -48,7 +48,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Employees check their role permissions
         if (user.role === UserRole.EMPLOYEE) {
-            return user.employeeRole?.permissions?.includes(permission) || false;
+            const permissions = user.employeeRole?.permissions || [];
+            if (permissions.includes(permission)) return true;
+
+            // Variants access fallback (flows from product management permissions)
+            if (permission.startsWith('variants.')) {
+                // If they have explicit variant permissions, it already returned true above
+
+                // Fallback: If they have ANY product management permission, they can at least VIEW variants
+                if (permission === 'variants.view' && (
+                    permissions.includes('products.create') ||
+                    permissions.includes('products.update') ||
+                    permissions.includes('products.delete')
+                )) return true;
+
+                // DO NOT automatically inherit create/update/delete if they are empty
+                // This allows fine-grained control: view-only vs full management
+            }
+
+            return false;
         }
 
         return false;

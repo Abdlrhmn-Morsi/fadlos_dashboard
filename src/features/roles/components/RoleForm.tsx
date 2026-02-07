@@ -159,7 +159,7 @@ const RoleForm = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="p-6 max-w-5xl mx-auto space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 max-w-7xl mx-auto space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">
@@ -322,7 +322,7 @@ const RoleForm = () => {
                                                                 )}>
                                                                     {t(`permissions.${perm.key}.name`, { defaultValue: perm.name })}
                                                                 </p>
-                                                                <p className="text-xs text-slate-500 dark:text-slate-500 leading-tight">
+                                                                <p className="text-xs text-slate-500 dark:text-slate-500 leading-tight whitespace-pre-line">
                                                                     {t(`permissions.${perm.key}.description`, { defaultValue: perm.description })}
                                                                 </p>
                                                             </div>

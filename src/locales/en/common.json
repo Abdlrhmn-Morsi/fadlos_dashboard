@@ -175,6 +175,7 @@
     "Settings": "Settings",
     "Promo Codes": "Promo Codes",
     "Variants": "Variants",
+    "Addons": "Add-ons",
     "searchEmployeePlaceholder": "Search by name or email...",
     "activate": "Activate",
     "leaveBlankToKeepCurrent": "Leave blank to keep current",
@@ -184,159 +185,177 @@
         "store": {
             "view": {
                 "name": "View Store Info",
-                "description": "View basic store information and settings"
+                "description": "• View store profile and QR codes\n• Access store contact details\n• See basic configuration"
             },
             "update": {
                 "name": "Update Store Info",
-                "description": "Modify store details and configuration"
+                "description": "• Modify store name and description\n• Update store logo and cover\n• Change operating hours and settings"
             }
         },
         "users": {
             "view": {
                 "name": "View Users",
-                "description": "View store staff and their details"
+                "description": "• Browse customer directory\n• View customer profiles and history\n• See follower list and statistics"
             },
             "create": {
                 "name": "Invite Users",
-                "description": "Invite new staff members to the store"
+                "description": "• Add new customer entries\n• Manually invite users to the store"
             },
             "update": {
                 "name": "Update Users",
-                "description": "Modify user details and roles"
+                "description": "• Edit customer information\n• Modify user status or badges"
             },
             "delete": {
                 "name": "Remove Users",
-                "description": "Remove staff members from the store"
+                "description": "• Remove customer records\n• Block users from the store"
             }
         },
         "employees": {
             "view": {
                 "name": "View Employees",
-                "description": "View employee information and schedules"
+                "description": "• See list of all staff members\n• View employee roles and status"
             },
             "create": {
                 "name": "Create Employees",
-                "description": "Add new employees to the system"
+                "description": "• Add new employees to the team\n• Set initial roles and credentials"
             },
             "update": {
                 "name": "Update Employees",
-                "description": "Modify employee information and schedules"
+                "description": "• Edit staff information\n• Change employee roles and permissions\n• Reset employee passwords"
             },
             "delete": {
                 "name": "Delete Employees",
-                "description": "Remove employees from the system"
+                "description": "• Remove employees from the system\n• Terminate staff access"
             }
         },
         "products": {
             "view": {
                 "name": "View Products",
-                "description": "Browse product catalog and inventory"
+                "description": "• Browse product catalog and inventory\n• View product details and pricing"
             },
             "create": {
                 "name": "Create Products",
-                "description": "Add new products to the catalog"
+                "description": "• Add new products to the catalog\n• Upload product images\n• Set prices and descriptions"
             },
             "update": {
                 "name": "Update Products",
-                "description": "Modify existing product information"
+                "description": "• Edit existing product details\n• Update inventory/stock levels\n• Manage product status"
             },
             "delete": {
                 "name": "Delete Products",
-                "description": "Remove products from the catalog"
+                "description": "• Remove products from the catalog\n• Delete product media and data"
             }
         },
         "categories": {
             "view": {
                 "name": "View Categories",
-                "description": "Browse product categories and hierarchy"
+                "description": "• Browse product categories and hierarchy\n• View category details"
             },
             "create": {
                 "name": "Create Categories",
-                "description": "Add new product categories"
+                "description": "• Create new product categories\n• Define category hierarchy"
             },
             "update": {
                 "name": "Update Categories",
-                "description": "Modify existing categories and their structure"
+                "description": "• Edit category names and icons\n• Reorder category display sequence"
             },
             "delete": {
                 "name": "Delete Categories",
-                "description": "Remove categories from the system"
+                "description": "• Remove product categories"
             }
         },
         "orders": {
             "view": {
                 "name": "View Orders",
-                "description": "View customer orders and order history"
+                "description": "• Access the order fulfillment dashboard\n• View order lists and details\n• Track order history"
             },
             "update": {
                 "name": "Update Order Status",
-                "description": "Change order status and fulfillment details"
+                "description": "• Change order status (Preparing, Ready, etc.)\n• Assign delivery drivers\n• Update fulfillment notes"
             },
             "cancel": {
                 "name": "Cancel Orders",
-                "description": "Cancel customer orders when necessary"
+                "description": "• Cancel customer orders\n• Process order rejections"
             }
         },
         "analytics": {
             "view": {
                 "name": "View Analytics",
-                "description": "Access sales reports and performance metrics"
+                "description": "• Access sales reports and graphs\n• View revenue performance\n• See top-selling products"
             },
             "export": {
                 "name": "Export Data",
-                "description": "Export analytics data and reports"
+                "description": "• Download analytics data as CSV/Excel\n• Generate printable reports"
             }
         },
         "settings": {
             "view": {
                 "name": "View Settings",
-                "description": "View store configuration and preferences"
+                "description": "• View system-wide settings\n• Access roles and permissions\n• View store branches and delivery areas"
             },
             "update": {
                 "name": "Update Settings",
-                "description": "Modify store settings and preferences"
+                "description": "• Modify branch details and delivery areas\n• Update delivery fees and thresholds\n• Manage system configurations"
             }
         },
         "roles": {
             "manage": {
                 "name": "Manage Roles",
-                "description": "Create, edit, and delete user roles"
+                "description": "• Create custom employee roles\n• Define permission sets for roles\n• Manage team access levels"
             }
         },
         "promo_codes": {
             "view": {
                 "name": "View Promo Codes",
-                "description": "View available promotion codes"
+                "description": "• View active and expired promo codes\n• Check usage statistics"
             },
             "create": {
                 "name": "Create Promo Codes",
-                "description": "Add new promotion codes"
+                "description": "• Create new discount coupons\n• Set expiry dates and usage limits"
             },
             "update": {
                 "name": "Update Promo Codes",
-                "description": "Modify existing promotion codes"
+                "description": "• Edit existing promo code details\n• Deactivate/Activate coupons"
             },
             "delete": {
                 "name": "Delete Promo Codes",
-                "description": "Remove promotion codes"
+                "description": "• Delete promo code records"
             }
         },
         "variants": {
             "view": {
                 "name": "View Variants",
-                "description": "View product variants and options"
+                "description": "• View product variant options (Size, Color, etc.)"
             },
             "create": {
                 "name": "Create Variants",
-                "description": "Add new product variants"
+                "description": "• Define new attribute groups\n• Add option values for products"
             },
             "update": {
                 "name": "Update Variants",
-                "description": "Modify existing product variants"
+                "description": "• Edit variant names and values"
             },
             "delete": {
                 "name": "Delete Variants",
-                "description": "Remove product variants"
+                "description": "• Remove variant configurations"
+            }
+        },
+        "addons": {
+            "view": {
+                "name": "View Addons",
+                "description": "• See available product addons and extras"
+            },
+            "create": {
+                "name": "Create Addons",
+                "description": "• Create new addons with prices\n• Add addon images"
+            },
+            "update": {
+                "name": "Update Addons",
+                "description": "• Modify addon details and pricing"
+            },
+            "delete": {
+                "name": "Delete Addons",
+                "description": "• Delete product addons"
             }
         }
     },
