@@ -7,6 +7,8 @@ import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
+import { Permissions } from '../../../types/permissions';
+import { toast } from '../../../utils/toast';
 
 export const NotificationPage = () => {
     const {
@@ -17,7 +19,7 @@ export const NotificationPage = () => {
         fetchNotifications,
         activeFilters
     } = useNotification();
-    const { user } = useAuth();
+    const { user, hasPermission } = useAuth();
     const navigate = useNavigate();
     const { isRTL } = useLanguage();
     const { t } = useTranslation('common');
@@ -35,10 +37,15 @@ export const NotificationPage = () => {
         markAsRead(notification.id);
 
         // Navigation logic based on type
-        if (notification.type === 'order' && notification.data?.order?.id) {
-            navigate(`/orders/${notification.data.order.id}`);
-        } else if (notification.type === 'order' && notification.data?.isOrder && notification.data?.order?.orderId) {
-            navigate(`/orders/${notification.data.order.orderId}`);
+        if (notification.type === 'order') {
+            const orderId = notification.data?.order?.id || notification.data?.order?.orderId;
+            if (orderId) {
+                if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW)) {
+                    navigate(`/orders/${orderId}`);
+                } else {
+                    toast.error(t('common:noPermission'));
+                }
+            }
         } else if (notification.type === 'review') {
             navigate(`/reviews`);
         } else if (notification.type === 'follow') {

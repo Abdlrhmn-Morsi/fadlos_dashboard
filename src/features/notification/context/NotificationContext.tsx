@@ -56,16 +56,36 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             return {}; // No type filter = see everything
         }
 
-        // If employee only has Order permissions, show only order notifications
+        const types: string[] = [];
+
+        // If employee has Order permissions, show order notifications
         if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) {
-            return { type: 'order' };
+            types.push('order');
         }
 
-        // If no relevant permissions, don't show notifications (or show 'none')
-        return { type: 'none' };
+        // If employee has User Management (clients) permissions, show review notifications
+        if (hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) {
+            types.push('review');
+        }
+
+        // If no relevant permissions, return special marker
+        if (types.length === 0) {
+            return { __none__: true };
+        }
+
+        return { type: types.join(',') };
     }, [authUser?.role, hasPermission]);
 
+    const filtersRef = useRef(memoizedFilters);
+    useEffect(() => {
+        filtersRef.current = memoizedFilters;
+    }, [memoizedFilters]);
+
     const fetchUnreadCount = useCallback(async (filters?: any) => {
+        if (filters?.__none__) {
+            setUnreadCount(0);
+            return;
+        }
         try {
             const params = { ...filters };
             const response = await api.get('/notifications/unread-count', { params });
@@ -77,6 +97,11 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     }, []);
 
     const fetchNotifications = useCallback(async (page = 1, markAll = false, filters?: any) => {
+        if (filters?.__none__) {
+            setNotifications([]);
+            setIsLoading(false);
+            return;
+        }
         setIsLoading(true);
         const params: any = { page, limit: 10, ...filters };
 
@@ -94,12 +119,12 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     if (markAll) {
                         try {
                             await api.get('/notifications', { params: { ...params, markAll: true } });
-                            fetchUnreadCount();
+                            fetchUnreadCount(filters);
                         } catch (error) {
                             // Silently handle
                         }
                     } else {
-                        fetchUnreadCount();
+                        fetchUnreadCount(filters);
                     }
                     return;
                 }
@@ -119,7 +144,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             if (page === 1) {
                 setNotifications(Array.isArray(newNotifications) ? newNotifications : []);
                 // Always cache first page (without markAll in the cache key)
-                const cacheParams = { page, limit: 10 };
+                const cacheParams = { page, limit: 10, ...filters };
                 setCache('notifications', newNotifications, cacheParams);
             } else {
                 setNotifications(prev => [...prev, ...(Array.isArray(newNotifications) ? newNotifications : [])]);
@@ -188,6 +213,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     };
 
+    // Initial Fetch when filters are ready
+    useEffect(() => {
+        if (authUser && authUser.id) {
+            fetchUnreadCount(memoizedFilters);
+            fetchNotifications(1, false, memoizedFilters);
+        }
+    }, [authUser?.id, memoizedFilters, fetchUnreadCount, fetchNotifications]);
+
+    // Initialization Logic (Audio & OneSignal)
     useEffect(() => {
         if (!authUser) {
             setNotifications([]);
@@ -229,9 +263,6 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         window.addEventListener('keydown', unlockAudio);
         window.addEventListener('touchstart', unlockAudio);
 
-        fetchUnreadCount(memoizedFilters);
-        fetchNotifications(1, false, memoizedFilters);
-
         const initOneSignal = async () => {
             try {
                 await OneSignal.init({
@@ -264,8 +295,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     playNotificationSound(soundToPlay);
                     // Invalidate cache when new notification arrives
                     invalidateCache('notifications');
-                    fetchUnreadCount(memoizedFilters);
-                    fetchNotifications(1, false, memoizedFilters);
+                    // Use latest filters from the ref
+                    fetchUnreadCount(filtersRef.current);
+                    fetchNotifications(1, false, filtersRef.current);
                 });
 
             } catch (error) {
@@ -280,7 +312,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             window.removeEventListener('keydown', unlockAudio);
             window.removeEventListener('touchstart', unlockAudio);
         };
-    }, [fetchUnreadCount, fetchNotifications, authUser, memoizedFilters]);
+    }, [authUser?.id]); // Only initialize when user ID changes
 
     return (
         <NotificationContext.Provider value={{

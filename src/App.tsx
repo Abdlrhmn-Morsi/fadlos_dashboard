@@ -102,7 +102,11 @@ const AppContent = () => {
             <Route path="categories" element={<CategoryList />} />
 
             <Route path="orders" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderList /></PermissionGate>} />
-            <Route path="orders/:id" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderDetail /></PermissionGate>} />
+            <Route path="orders/:id" element={
+              (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW))
+                ? <OrderDetail />
+                : <Navigate to="/" replace />
+            } />
 
             <Route path="promocodes" element={<PermissionGate permission={Permissions.PROMO_CODES_VIEW}><PromoCodeList /></PermissionGate>} />
             <Route path="promocodes/new" element={<PermissionGate permission={Permissions.PROMO_CODES_CREATE}><PromoCodeForm /></PermissionGate>} />
@@ -130,7 +134,10 @@ const AppContent = () => {
             <Route path="app-updates" element={<AppUpdateSettings />} />
             <Route path="app-version-history" element={<AppVersionHistory />} />
             <Route path="notifications" element={
-              (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER || hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) || hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE))
+              (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER ||
+                hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||
+                hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE) ||
+                hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE))
                 ? <NotificationPage />
                 : <Navigate to="/" replace />
             } />

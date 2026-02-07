@@ -9,6 +9,9 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useCache } from '../../contexts/CacheContext';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
+import { UserRole } from '../../types/user-role';
 import clientsApi from './api/clients.api';
 import ordersApi from '../orders/api/orders.api';
 import { toast } from '../../utils/toast';
@@ -21,6 +24,7 @@ const ClientList = () => {
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const { getCache, setCache } = useCache();
+    const { hasPermission, user } = useAuth();
     const [clients, setClients] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -169,6 +173,10 @@ const ClientList = () => {
     };
 
     const viewOrderDetailInPage = async (orderId: string) => {
+        if (!hasPermission(Permissions.ORDERS_VIEW) && !hasPermission(Permissions.USERS_VIEW)) {
+            toast.error(t('common:noPermission'));
+            return;
+        }
         try {
             setLoadingOrderDetail(true);
             setViewMode('detail');
@@ -642,7 +650,7 @@ const ClientList = () => {
                                 </div>
                             </div>
                         )}
-                        {viewMode === 'detail' && selectedOrder && (
+                        {viewMode === 'detail' && selectedOrder && (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW)) && user?.role !== UserRole.EMPLOYEE && (
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                 <button
                                     onClick={() => navigate(`/orders/${selectedOrder.id}`)}
