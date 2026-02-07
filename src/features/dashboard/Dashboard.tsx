@@ -233,7 +233,7 @@ const Dashboard: React.FC = () => {
                     />
                 )}
 
-                {(hasPermission('orders.view') || hasPermission('orders.update')) && (
+                {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
                     <StatCard
                         title={t('totalOrders')}
                         value={stats.totalOrders || 0}

@@ -49,10 +49,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
         // Employees check their role permissions
         if (user.role === UserRole.EMPLOYEE) {
-            // Default permissions for ALL employees
-            const defaultPermissions = [Permissions.STORE_VIEW];
-            if (defaultPermissions.includes(permission as any)) return true;
-
             const permissions = user.employeeRole?.permissions || [];
             if (permissions.includes(permission)) return true;
 
