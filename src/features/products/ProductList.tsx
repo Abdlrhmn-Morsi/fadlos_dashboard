@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, Star } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, Star, Eye } from 'lucide-react';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import productsApi from './api/products.api';
@@ -334,7 +334,10 @@ const ProductList = () => {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <h3 className="font-semibold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                                                        <h3
+                                                            onClick={() => navigate(`/products/${product.id}`)}
+                                                            className="font-semibold text-slate-800 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors"
+                                                        >
                                                             {isRTL ? product.nameAr || product.name : product.name}
                                                         </h3>
                                                     </div>
@@ -401,6 +404,13 @@ const ProductList = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={clsx("flex items-center gap-2 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
+                                                <button
+                                                    onClick={() => navigate(`/products/${product.id}`)}
+                                                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                    title={t('common:view')}
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
                                                 {hasPermission(Permissions.PRODUCTS_UPDATE) && (
                                                     <button
                                                         onClick={() => navigate(`/products/edit/${product.id}`)}

@@ -410,7 +410,7 @@ const Dashboard: React.FC = () => {
                                 <div
                                     key={product.id}
                                     className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative"
-                                    onClick={() => navigate(`/products/edit/${product.id}`)}
+                                    onClick={() => navigate(`/products/${product.id}`)}
                                 >
                                     {hasPermission('products.update') && (
                                         <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">

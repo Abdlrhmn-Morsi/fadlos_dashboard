@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { ArrowLeft, Edit, Tag, DollarSign, Package, CheckCircle, XCircle } from 'lucide-react';
+import { ArrowLeft, Edit, Tag, DollarSign, Package, CheckCircle, XCircle, Eye } from 'lucide-react';
 import productsApi from './api/products.api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
 
 const ProductDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { language, isRTL } = useLanguage();
     const { t } = useTranslation(['products', 'common', 'addons']);
+    const { hasPermission } = useAuth();
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
 
@@ -60,13 +63,15 @@ const ProductDetail = () => {
                     </button>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('products:productDetails')}</h1>
                 </div>
-                <button
-                    onClick={() => navigate(`/products/edit/${product.id}`)}
-                    className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition-colors"
-                >
-                    <Edit size={18} />
-                    <span>{t('products:editProduct')}</span>
-                </button>
+                {hasPermission(Permissions.PRODUCTS_UPDATE) && (
+                    <button
+                        onClick={() => navigate(`/products/edit/${product.id}`)}
+                        className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition-colors"
+                    >
+                        <Edit size={18} />
+                        <span>{t('products:editProduct')}</span>
+                    </button>
+                )}
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
