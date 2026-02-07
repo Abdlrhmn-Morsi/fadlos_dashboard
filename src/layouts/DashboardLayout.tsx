@@ -198,7 +198,7 @@ const DashboardLayout: React.FC = () => {
               {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
                 <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
               )}
-              {hasPermission(Permissions.STORE_VIEW) && ( // Assuming feedback is store view? Or we need feedback perm
+              {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && (
                 <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
               )}
               {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && (

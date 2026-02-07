@@ -36,6 +36,9 @@ import { getTowns } from '../towns/api/towns.api';
 import { getBusinessCategories } from '../store-categories/api/business-categories.api';
 import { toast } from '../../utils/toast';
 import toolsApi from '../../services/tools.api';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
+import { useNavigate } from 'react-router-dom';
 
 
 const SOCIAL_PLATFORMS = [
@@ -60,6 +63,10 @@ const StoreSettings = () => {
     const [cities, setCities] = useState<any[]>([]);
     const [towns, setTowns] = useState<any[]>([]);
     const [availableCategories, setAvailableCategories] = useState<any[]>([]);
+    const { hasPermission } = useAuth();
+    const navigate = useNavigate();
+    const canViewStore = hasPermission(Permissions.STORE_VIEW);
+    const canUpdateStore = hasPermission(Permissions.STORE_UPDATE);
     const [loadingCategories, setLoadingCategories] = useState(false);
 
     // Form states
@@ -98,8 +105,8 @@ const StoreSettings = () => {
             const [store, bTypes, allCities, allTowns, allCategories] = await Promise.all([
                 getMyStore(),
                 getBusinessTypes(),
-                getCities({ limit: 1000 }),
-                getTowns({ limit: 1000 }),
+                getCities({}),
+                getTowns({ limit: 0 }),
                 getMyStore().then(store => store.businessType?.id ? getBusinessCategories(store.businessType.id) : [])
             ]);
 
@@ -368,6 +375,28 @@ const StoreSettings = () => {
         );
     }
 
+    if (!canViewStore) {
+        return (
+            <div className="flex flex-col items-center justify-center py-32 gap-6">
+                <div className="p-6 bg-rose-50 dark:bg-rose-900/10 rounded-full text-rose-500">
+                    <XCircle size={64} strokeWidth={1.5} />
+                </div>
+                <div className="text-center px-4">
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">{t('common:accessDenied')}</h2>
+                    <p className="text-slate-500 font-medium mt-2">{t('common:noPermissionViewStore')}</p>
+                </div>
+                <button
+                    onClick={() => navigate(-1)}
+                    className="px-8 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded font-bold uppercase tracking-widest text-[10px]"
+                >
+                    {t('common:goBack')}
+                </button>
+            </div>
+        );
+    }
+
+    const isReadOnly = !canUpdateStore;
+
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50" dir={isRTL ? 'rtl' : 'ltr'}>
             <form onSubmit={handleSubmit} className="relative">
@@ -388,14 +417,16 @@ const StoreSettings = () => {
                         </div>
 
                         <div className="flex items-center gap-3 w-full sm:w-auto">
-                            <button
-                                type="submit"
-                                disabled={saving}
-                                className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-10 py-3.5 bg-primary text-white font-black uppercase tracking-widest text-[11px] rounded shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none group"
-                            >
-                                {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} className="group-hover:rotate-12 transition-transform" />}
-                                {t('common:save')}
-                            </button>
+                            {canUpdateStore && (
+                                <button
+                                    type="submit"
+                                    disabled={saving}
+                                    className="flex-1 sm:flex-none flex items-center justify-center gap-3 px-10 py-3.5 bg-primary text-white font-black uppercase tracking-widest text-[11px] rounded shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all disabled:opacity-50 disabled:pointer-events-none group"
+                                >
+                                    {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} className="group-hover:rotate-12 transition-transform" />}
+                                    {t('common:save')}
+                                </button>
+                            )}
                         </div>
                     </div>
                 </header>
@@ -415,8 +446,11 @@ const StoreSettings = () => {
                             <div className="relative group">
                                 <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ps-1">{t('banner')}</label>
                                 <div
-                                    className="w-full h-64 bg-slate-100 dark:bg-slate-800 rounded overflow-hidden relative cursor-pointer group shadow-inner"
-                                    onClick={() => bannerInputRef.current?.click()}
+                                    className={clsx(
+                                        "w-full h-64 bg-slate-100 dark:bg-slate-800 rounded overflow-hidden relative shadow-inner",
+                                        !isReadOnly ? "cursor-pointer group" : "cursor-default"
+                                    )}
+                                    onClick={() => !isReadOnly && bannerInputRef.current?.click()}
                                 >
                                     {bannerPreview ? (
                                         <img src={bannerPreview} alt="Banner" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
@@ -425,9 +459,11 @@ const StoreSettings = () => {
                                             <ImageIcon size={48} strokeWidth={1} />
                                         </div>
                                     )}
-                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <Camera size={32} className="text-white" />
-                                    </div>
+                                    {!isReadOnly && (
+                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                            <Camera size={32} className="text-white" />
+                                        </div>
+                                    )}
                                 </div>
                                 <input
                                     type="file"
@@ -441,8 +477,11 @@ const StoreSettings = () => {
                             {/* Logo */}
                             <div className="relative -mt-24 inline-block group ms-8">
                                 <div
-                                    className="w-40 h-40 rounded-full bg-white dark:bg-slate-900 p-3 shadow-2xl border-4 border-white dark:border-slate-800 relative cursor-pointer group-hover:scale-105 transition-transform"
-                                    onClick={() => logoInputRef.current?.click()}
+                                    className={clsx(
+                                        "w-40 h-40 rounded-full bg-white dark:bg-slate-900 p-3 shadow-2xl border-4 border-white dark:border-slate-800 relative transition-transform",
+                                        !isReadOnly ? "cursor-pointer group group-hover:scale-105" : "cursor-default"
+                                    )}
+                                    onClick={() => !isReadOnly && logoInputRef.current?.click()}
                                 >
                                     <div className="w-full h-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden relative flex items-center justify-center">
                                         {logoPreview ? (
@@ -450,9 +489,11 @@ const StoreSettings = () => {
                                         ) : (
                                             <Store size={40} className="text-slate-400" />
                                         )}
-                                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                            <Camera size={24} className="text-white" />
-                                        </div>
+                                        {!isReadOnly && (
+                                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <Camera size={24} className="text-white" />
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                                 <input
@@ -487,7 +528,8 @@ const StoreSettings = () => {
                                     onChange={handleChange}
                                     onBlur={(e) => handleTranslate(e.target.value, 'name')}
                                     required
-                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
 
@@ -501,7 +543,8 @@ const StoreSettings = () => {
                                     value={formData.name}
                                     onChange={handleChange}
                                     required
-                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
 
@@ -532,8 +575,10 @@ const StoreSettings = () => {
                                                 "flex flex-col items-center justify-center p-6 border transition-all group relative overflow-hidden",
                                                 formData.businessTypeId === type.id
                                                     ? "bg-primary/5 border-primary text-primary shadow-sm rounded"
-                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50 rounded"
+                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50 rounded",
+                                                isReadOnly && "cursor-default opacity-80"
                                             )}
+                                            disabled={isReadOnly}
                                         >
                                             <div className={clsx(
                                                 "mb-3 p-4 rounded transition-all",
@@ -570,12 +615,13 @@ const StoreSettings = () => {
                                             <button
                                                 key={category.id}
                                                 type="button"
-                                                onClick={() => handleCategoryChange(category.id)}
+                                                onClick={() => !isReadOnly && handleCategoryChange(category.id)}
                                                 className={clsx(
                                                     "flex items-center justify-between p-5 border rounded transition-all font-bold text-sm",
                                                     formData.businessCategoryIds.includes(category.id)
                                                         ? "bg-primary/5 border-primary text-primary shadow-sm"
-                                                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50"
+                                                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50",
+                                                    isReadOnly && "cursor-default opacity-80"
                                                 )}
                                             >
                                                 <span className="truncate pr-2">
@@ -622,7 +668,8 @@ const StoreSettings = () => {
                                     onChange={handleChange}
                                     onBlur={(e) => handleTranslate(e.target.value, 'description')}
                                     rows={3}
-                                    className="w-full px-6 py-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 text-right resize-none"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 text-right resize-none disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
 
@@ -635,7 +682,8 @@ const StoreSettings = () => {
                                     value={formData.description}
                                     onChange={handleChange}
                                     rows={3}
-                                    className="w-full px-6 py-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 resize-none"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 resize-none disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -660,7 +708,8 @@ const StoreSettings = () => {
                                     name="phone"
                                     value={formData.phone}
                                     onChange={handleChange}
-                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
 
@@ -673,7 +722,8 @@ const StoreSettings = () => {
                                     name="email"
                                     value={formData.email}
                                     onChange={handleChange}
-                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
 
@@ -687,7 +737,8 @@ const StoreSettings = () => {
                                     value={formData.whatsapp}
                                     onChange={handleChange}
                                     placeholder="+1234567890"
-                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                    disabled={isReadOnly}
+                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                 />
                             </div>
                         </div>
@@ -708,7 +759,7 @@ const StoreSettings = () => {
                                     <Globe size={14} /> {t('platforms')}
                                 </label>
 
-                                <div className="relative group">
+                                <div className={clsx("relative group", isReadOnly && "hidden")}>
                                     <select
                                         className="appearance-none bg-primary/5 text-primary text-xs font-bold py-2 rounded cursor-pointer focus:outline-none hover:bg-primary/10 transition-colors ps-4 pe-8"
                                         onChange={(e) => {
@@ -717,6 +768,7 @@ const StoreSettings = () => {
                                                 e.target.value = ''; // Reset
                                             }
                                         }}
+                                        disabled={isReadOnly}
                                     >
                                         <option value="">{t('addPlatform')}</option>
                                         {SOCIAL_PLATFORMS.map(p => (
@@ -742,17 +794,20 @@ const StoreSettings = () => {
                                                     value={item.url}
                                                     onChange={(e) => updateSocialMedia(index, 'url', e.target.value)}
                                                     placeholder={`https://${item.platform.toLowerCase()}.com/...`}
-                                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                                    disabled={isReadOnly}
+                                                    className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                                 />
                                             </div>
-                                            <button
-                                                type="button"
-                                                onClick={() => removeSocialMedia(index)}
-                                                className="p-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded transition-colors"
-                                                title={t('common:delete')}
-                                            >
-                                                <Trash2 size={18} />
-                                            </button>
+                                            {!isReadOnly && (
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeSocialMedia(index)}
+                                                    className="p-3 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded transition-colors"
+                                                    title={t('common:delete')}
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            )}
                                         </div>
                                     );
                                 })}
@@ -782,12 +837,13 @@ const StoreSettings = () => {
                                         <button
                                             key={city.id}
                                             type="button"
-                                            onClick={() => handleLocationChange('townIds', city.id)}
+                                            onClick={() => !isReadOnly && handleLocationChange('townIds', city.id)}
                                             className={clsx(
                                                 "flex items-center justify-between p-5 border rounded transition-all font-bold text-sm",
                                                 formData.townIds.includes(city.id)
                                                     ? "bg-primary/5 border-primary text-primary shadow-sm"
-                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50"
+                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50",
+                                                isReadOnly && "cursor-default opacity-80"
                                             )}
                                         >
                                             {currentLng.startsWith('ar') ? city.arName : city.enName}
@@ -808,12 +864,13 @@ const StoreSettings = () => {
                                         <button
                                             key={town.id}
                                             type="button"
-                                            onClick={() => handleLocationChange('placeIds', town.id)}
+                                            onClick={() => !isReadOnly && handleLocationChange('placeIds', town.id)}
                                             className={clsx(
                                                 "flex items-center justify-between p-5 border rounded transition-all font-bold text-sm",
                                                 formData.placeIds.includes(town.id)
                                                     ? "bg-primary/5 border-primary text-primary shadow-sm"
-                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50"
+                                                    : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50",
+                                                isReadOnly && "cursor-default opacity-80"
                                             )}
                                         >
                                             {currentLng.startsWith('ar') ? town.arName : town.enName}
@@ -849,15 +906,16 @@ const StoreSettings = () => {
                                     <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('enableStoreReviews')}</h4>
                                     <p className="text-slate-500 text-xs">{t('enableStoreReviewsDesc')}</p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
+                                <label className={clsx("relative inline-flex items-center", !isReadOnly ? "cursor-pointer" : "cursor-default")}>
                                     <input
                                         type="checkbox"
                                         name="enableStoreReviews"
                                         className="sr-only peer"
                                         checked={formData.enableStoreReviews}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                     />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 disabled:opacity-50"></div>
                                 </label>
                             </div>
 
@@ -866,15 +924,16 @@ const StoreSettings = () => {
                                     <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('enableProductReviews')}</h4>
                                     <p className="text-slate-500 text-xs">{t('enableProductReviewsDesc')}</p>
                                 </div>
-                                <label className="relative inline-flex items-center cursor-pointer">
+                                <label className={clsx("relative inline-flex items-center", !isReadOnly ? "cursor-pointer" : "cursor-default")}>
                                     <input
                                         type="checkbox"
                                         name="enableProductReviews"
                                         className="sr-only peer"
                                         checked={formData.enableProductReviews}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                     />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 disabled:opacity-50"></div>
                                 </label>
                             </div>
                         </div>
@@ -898,9 +957,10 @@ const StoreSettings = () => {
                                     name="is24Hours"
                                     checked={formData.is24Hours}
                                     onChange={handleChange}
-                                    className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500"
+                                    disabled={isReadOnly}
+                                    className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500 disabled:opacity-50"
                                 />
-                                <label htmlFor="is24Hours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                <label htmlFor="is24Hours" className={clsx("text-sm font-bold text-slate-700 dark:text-slate-300 select-none", !isReadOnly ? "cursor-pointer" : "cursor-default")}>
                                     {t('open24Hours')}
                                 </label>
                             </div>
@@ -917,7 +977,8 @@ const StoreSettings = () => {
                                             name="openingTime"
                                             value={formData.openingTime}
                                             onChange={handleChange}
-                                            className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                            disabled={isReadOnly}
+                                            className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                         />
                                     </div>
                                     <div className="space-y-2">
@@ -929,7 +990,8 @@ const StoreSettings = () => {
                                             name="closingTime"
                                             value={formData.closingTime}
                                             onChange={handleChange}
-                                            className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100"
+                                            disabled={isReadOnly}
+                                            className="w-full px-5 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
                                         />
                                     </div>
                                 </div>
@@ -947,12 +1009,13 @@ const StoreSettings = () => {
                                         <button
                                             key={day}
                                             type="button"
-                                            onClick={() => toggleWorkingDay(index)}
+                                            onClick={() => !isReadOnly && toggleWorkingDay(index)}
                                             className={clsx(
                                                 "w-12 h-12 rounded-full font-bold text-sm transition-all flex items-center justify-center border",
                                                 formData.workingDays.includes(index)
                                                     ? "bg-primary text-white border-primary shadow-lg shadow-primary/30"
-                                                    : "bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-primary/50"
+                                                    : "bg-white dark:bg-slate-800 text-slate-500 border-slate-200 dark:border-slate-700 hover:border-primary/50",
+                                                isReadOnly && "cursor-default opacity-80"
                                             )}
                                         >
                                             {t(`days.${day}`)}
@@ -980,7 +1043,7 @@ const StoreSettings = () => {
                                 )}>
                                     {formData.isAcceptingOrders ? t('acceptingOrders') : t('notAcceptingOrders')}
                                 </span>
-                                <label className="relative inline-flex items-center cursor-pointer">
+                                <label className={clsx("relative inline-flex items-center", !isReadOnly ? "cursor-pointer" : "cursor-default")}>
                                     <input
                                         type="checkbox"
                                         name="isAcceptingOrders"
@@ -988,8 +1051,9 @@ const StoreSettings = () => {
                                         className="sr-only peer"
                                         checked={formData.isAcceptingOrders}
                                         onChange={handleChange}
+                                        disabled={isReadOnly}
                                     />
-                                    <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 shadow-sm"></div>
+                                    <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 shadow-sm disabled:opacity-50"></div>
                                 </label>
                             </div>
                         </div>
@@ -1003,9 +1067,10 @@ const StoreSettings = () => {
                                         name="acceptOrdersIfOffDay"
                                         checked={formData.acceptOrdersIfOffDay}
                                         onChange={handleChange}
-                                        className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500"
+                                        disabled={isReadOnly}
+                                        className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500 disabled:opacity-50"
                                     />
-                                    <label htmlFor="acceptOrdersIfOffDay" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                    <label htmlFor="acceptOrdersIfOffDay" className={clsx("text-sm font-bold text-slate-700 dark:text-slate-300 select-none", !isReadOnly ? "cursor-pointer" : "cursor-default")}>
                                         {t('acceptOffDay')}
                                     </label>
                                 </div>
@@ -1016,9 +1081,10 @@ const StoreSettings = () => {
                                         name="acceptOrdersInClosedHours"
                                         checked={formData.acceptOrdersInClosedHours}
                                         onChange={handleChange}
-                                        className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-500"
+                                        disabled={isReadOnly}
+                                        className="w-5 h-5 text-emerald-600 dark:text-emerald-500 border-slate-300 rounded focus:ring-emerald-300 disabled:opacity-50"
                                     />
-                                    <label htmlFor="acceptOrdersInClosedHours" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">
+                                    <label htmlFor="acceptOrdersInClosedHours" className={clsx("text-sm font-bold text-slate-700 dark:text-slate-300 select-none", !isReadOnly ? "cursor-pointer" : "cursor-default")}>
                                         {t('acceptClosedHours')}
                                     </label>
                                 </div>

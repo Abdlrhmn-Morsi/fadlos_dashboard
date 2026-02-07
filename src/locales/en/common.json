@@ -195,7 +195,7 @@
         "users": {
             "view": {
                 "name": "View Users",
-                "description": "• Browse customer directory\n• View customer profiles and history\n• See follower list and statistics"
+                "description": "• Browse customer directory\n• View customer profiles and history\n• See follower list and statistics\n• Access and manage customer feedback"
             },
             "create": {
                 "name": "Invite Users",
@@ -373,5 +373,8 @@
     "copied": "Link copied to clipboard!",
     "noDataAvailable": "No data available",
     "addFirstProduct": "Add your first product",
-    "addFirstCategory": "Add your first category"
+    "addFirstCategory": "Add your first category",
+    "accessDenied": "Access Denied",
+    "noPermissionViewStore": "You do not have permission to view store settings. Please contact your administrator.",
+    "goBack": "Go Back"
 }
