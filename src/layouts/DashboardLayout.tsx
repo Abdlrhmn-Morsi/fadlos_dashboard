@@ -236,7 +236,9 @@ const DashboardLayout: React.FC = () => {
 
 
 
-          <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
+          {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER || hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) || hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE)) && (
+            <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
+          )}
           {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
             <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
           )}
@@ -319,10 +321,12 @@ const DashboardLayout: React.FC = () => {
                 )}
               </div>
             </div>
-            <div className="relative">
-              <NotificationBadge />
-              <NotificationList />
-            </div>
+            {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER || hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) || hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE)) && (
+              <div className="relative">
+                <NotificationBadge />
+                <NotificationList />
+              </div>
+            )}
           </div>
         </header>
 

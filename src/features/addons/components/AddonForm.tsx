@@ -8,6 +8,8 @@ import { toast } from '../../../utils/toast';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { Permissions } from '../../../types/permissions';
 import { CreateAddonDto, Addon } from '../models/addon.model';
 
 const AddonForm = () => {
@@ -16,6 +18,14 @@ const AddonForm = () => {
     const { t } = useTranslation(['addons', 'common']);
     const { isRTL } = useLanguage();
     const { invalidateCache } = useCache();
+    const { hasPermission } = useAuth();
+
+    // Permission checks
+    const canCreate = hasPermission(Permissions.ADDONS_CREATE);
+    const canUpdate = hasPermission(Permissions.ADDONS_UPDATE);
+    const canView = hasPermission(Permissions.ADDONS_VIEW);
+
+    const isReadOnly = id ? !canUpdate : !canCreate;
 
     const [loading, setLoading] = useState(false);
     const [fetching, setFetching] = useState(!!id);
@@ -33,6 +43,12 @@ const AddonForm = () => {
     const [imagePreview, setImagePreview] = useState<string | null>(null);
 
     useEffect(() => {
+        if (!canView && !(id ? canUpdate : canCreate)) {
+            toast.error(t('common:noPermission'));
+            navigate('/addons');
+            return;
+        }
+
         if (id) {
             fetchAddon();
         }
@@ -157,7 +173,7 @@ const AddonForm = () => {
                 </button>
                 <div>
                     <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                        {id ? t('editAddon') : t('addAddon')}
+                        {id ? (isReadOnly ? t('viewAddon', { defaultValue: 'View Addon' }) : t('editAddon')) : t('addAddon')}
                     </h1>
                 </div>
             </div>
@@ -179,14 +195,16 @@ const AddonForm = () => {
                                 type="text"
                                 required
                                 maxLength={100}
+                                disabled={isReadOnly}
                                 className={clsx(
                                     "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border",
-                                    "text-right"
+                                    "text-right",
+                                    isReadOnly && "opacity-70 cursor-not-allowed"
                                 )}
                                 placeholder={t('nameArPlaceholder')}
                                 value={formData.nameAr}
                                 onChange={(e) => setFormData({ ...formData, nameAr: e.target.value })}
-                                onBlur={() => handleTranslate(formData.nameAr || '')}
+                                onBlur={() => !isReadOnly && handleTranslate(formData.nameAr || '')}
                             />
                         </div>
 
@@ -204,9 +222,11 @@ const AddonForm = () => {
                                 type="text"
                                 required
                                 maxLength={100}
+                                disabled={isReadOnly}
                                 className={clsx(
                                     "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border",
-                                    isRTL && "text-right"
+                                    isRTL && "text-right",
+                                    isReadOnly && "opacity-70 cursor-not-allowed"
                                 )}
                                 placeholder={t('namePlaceholder')}
                                 value={formData.name}
@@ -224,9 +244,11 @@ const AddonForm = () => {
                                     type="number"
                                     step="0.01"
                                     required
+                                    disabled={isReadOnly}
                                     className={clsx(
                                         "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border",
-                                        isRTL ? "pr-12" : "pl-12"
+                                        isRTL ? "pr-12" : "pl-12",
+                                        isReadOnly && "opacity-70 cursor-not-allowed"
                                     )}
                                     placeholder={t('pricePlaceholder')}
                                     value={formData.price}
@@ -248,10 +270,11 @@ const AddonForm = () => {
                             </label>
                             <input
                                 type="number"
-                                disabled={!formData.trackInventory}
+                                disabled={isReadOnly || !formData.trackInventory}
                                 className={clsx(
-                                    "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border disabled:opacity-50",
-                                    isRTL && "text-right"
+                                    "w-full px-4 py-2.5 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all border",
+                                    isRTL && "text-right",
+                                    (isReadOnly || !formData.trackInventory) && "opacity-50 cursor-not-allowed"
                                 )}
                                 placeholder={t('inventoryPlaceholder')}
                                 value={formData.inventory}
@@ -262,12 +285,13 @@ const AddonForm = () => {
                         {/* Toggles Group */}
                         <div className="md:col-span-2 grid grid-cols-1 sm:grid-cols-3 gap-4 py-2">
 
-                            <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                            <label className={clsx("flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors", !isReadOnly ? "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50" : "cursor-not-allowed")}>
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('trackInventory')}</span>
                                 <div className="relative inline-flex items-center">
                                     <input
                                         type="checkbox"
                                         className="sr-only peer"
+                                        disabled={isReadOnly}
                                         checked={formData.trackInventory}
                                         onChange={(e) => setFormData({ ...formData, trackInventory: e.target.checked })}
                                     />
@@ -275,12 +299,13 @@ const AddonForm = () => {
                                 </div>
                             </label>
 
-                            <label className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                            <label className={clsx("flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl transition-colors", !isReadOnly ? "cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700/50" : "cursor-not-allowed")}>
                                 <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isActive')}</span>
                                 <div className="relative inline-flex items-center">
                                     <input
                                         type="checkbox"
                                         className="sr-only peer"
+                                        disabled={isReadOnly}
                                         checked={formData.isActive}
                                         onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
                                     />
@@ -298,19 +323,21 @@ const AddonForm = () => {
                                 {imagePreview ? (
                                     <div className="relative group w-32 h-32 rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800">
                                         <img src={imagePreview} alt="Preview" className="w-full h-full object-cover" />
-                                        <button
-                                            type="button"
-                                            onClick={removeImage}
-                                            className="absolute top-2 right-2 p-1 bg-rose-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
-                                        >
-                                            <X size={16} />
-                                        </button>
+                                        {!isReadOnly && (
+                                            <button
+                                                type="button"
+                                                onClick={removeImage}
+                                                className="absolute top-2 right-2 p-1 bg-rose-500 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg"
+                                            >
+                                                <X size={16} />
+                                            </button>
+                                        )}
                                     </div>
                                 ) : (
-                                    <label className="w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl cursor-pointer hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all group">
+                                    <label className={clsx("w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl transition-all group", !isReadOnly ? "cursor-pointer hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800" : "cursor-not-allowed opacity-50")}>
                                         <Upload className="w-8 h-8 text-slate-300 group-hover:text-indigo-500 mb-2" />
                                         <span className="text-xs font-medium text-slate-400 group-hover:text-indigo-500">Upload</span>
-                                        <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />
+                                        {!isReadOnly && <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />}
                                     </label>
                                 )}
                             </div>
@@ -318,16 +345,18 @@ const AddonForm = () => {
                     </div>
                 </div>
 
-                <div className="flex justify-end pt-4">
-                    <button
-                        type="submit"
-                        disabled={loading}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/25 transition-all duration-200 font-bold"
-                    >
-                        {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
-                        <span>{id ? t('common:updateChanges') : t('common:save')}</span>
-                    </button>
-                </div>
+                {!isReadOnly && (
+                    <div className="flex justify-end pt-4">
+                        <button
+                            type="submit"
+                            disabled={loading}
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-8 py-3 rounded-xl shadow-lg hover:shadow-indigo-500/25 transition-all duration-200 font-bold"
+                        >
+                            {loading ? <Loader2 className="animate-spin" size={20} /> : <Save size={20} />}
+                            <span>{id ? t('common:updateChanges') : t('common:save')}</span>
+                        </button>
+                    </div>
+                )}
             </form>
         </div>
     );

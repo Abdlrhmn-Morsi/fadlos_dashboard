@@ -1,10 +1,12 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useMemo } from 'react';
 import { useNotification } from '../context/NotificationContext';
 import { Check, X, FileText, ShoppingBag, UserPlus, Info } from 'lucide-react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { UserRole } from '../../../types/user-role';
 
 // Icons mapping based on type
 const getIcon = (type: string) => {
@@ -24,11 +26,15 @@ export const NotificationList = () => {
         showNotificationList,
         setShowNotificationList,
         markAsRead,
-        fetchNotifications
+        fetchNotifications,
+        activeFilters
     } = useNotification();
+    const { user } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation('common');
     const { isRTL } = useLanguage();
+
+    const displayNotifications = notifications;
 
     const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -54,37 +60,37 @@ export const NotificationList = () => {
     useEffect(() => {
         if (showNotificationList) {
             // When list opens, fetch and mark all as read
-            fetchNotifications(1, true);
+            fetchNotifications(1, true, activeFilters);
         }
-    }, [showNotificationList, fetchNotifications]);
+    }, [showNotificationList, fetchNotifications, activeFilters]);
 
     if (!showNotificationList) return null;
 
     return (
         <div ref={wrapperRef} className={clsx(
-            "absolute mt-2 w-80 md:w-96 bg-white rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 z-50 overflow-hidden",
+            "absolute mt-2 w-80 md:w-96 bg-white dark:bg-slate-900 rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 dark:ring-white dark:ring-opacity-10 z-50 overflow-hidden",
             isRTL ? "left-0" : "right-0"
         )}>
-            <div className="p-4 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                <h3 className="text-sm font-semibold text-gray-900">{t('notifications')}</h3>
+            <div className="p-4 border-b border-gray-100 dark:border-slate-800 flex justify-between items-center bg-gray-50 dark:bg-slate-800/50">
+                <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{t('notifications')}</h3>
             </div>
 
             <div className="max-h-96 overflow-y-auto">
-                {isLoading && notifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 text-sm">Loading...</div>
-                ) : notifications.length === 0 ? (
-                    <div className="p-8 text-center text-gray-500 text-sm flex flex-col items-center">
+                {isLoading && displayNotifications.length === 0 ? (
+                    <div className="p-4 text-center text-gray-500 dark:text-slate-400 text-sm">Loading...</div>
+                ) : displayNotifications.length === 0 ? (
+                    <div className="p-8 text-center text-gray-500 dark:text-slate-400 text-sm flex flex-col items-center">
                         <BellOffIcon />
-                        <span className="mt-2">{t('noNotifications')}</span>
+                        <span className="mt-2 text-slate-400 dark:text-slate-500">{t('noNotifications')}</span>
                     </div>
                 ) : (
                     <ul>
-                        {notifications.map((notification) => (
+                        {displayNotifications.map((notification) => (
                             <li
                                 key={notification.id}
                                 className={clsx(
-                                    "p-4 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors cursor-pointer relative group",
-                                    !notification.isRead ? "bg-blue-50/50" : ""
+                                    "p-4 border-b border-gray-100 dark:border-slate-800 last:border-0 hover:bg-gray-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer relative group",
+                                    !notification.isRead ? "bg-blue-50/50 dark:bg-blue-900/10" : ""
                                 )}
                                 onClick={() => markAsRead(notification.id)}
                             >
@@ -97,13 +103,13 @@ export const NotificationList = () => {
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <p className={clsx("text-sm font-medium text-gray-900", !notification.isRead && "font-semibold")}>
+                                        <p className={clsx("text-sm font-medium text-gray-900 dark:text-white", !notification.isRead && "font-semibold")}>
                                             {notification.title}
                                         </p>
-                                        <p className="text-sm text-gray-500 line-clamp-2">
+                                        <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2">
                                             {notification.message}
                                         </p>
-                                        <p className="text-xs text-gray-400 mt-1">
+                                        <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
                                             {new Date(notification.createdAt).toLocaleDateString()} {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </p>
                                     </div>
@@ -117,23 +123,22 @@ export const NotificationList = () => {
                         ))}
                         <li className="p-2 text-center">
                             <button
-                                className="text-xs text-gray-500 hover:text-gray-700"
-                                onClick={() => fetchNotifications(Math.ceil(notifications.length / 10) + 1)}
+                                className="text-xs text-gray-500 dark:text-slate-400 hover:text-gray-700 dark:hover:text-slate-200"
+                                onClick={() => fetchNotifications(Math.ceil(notifications.length / 10) + 1, false, activeFilters)}
                             >
                                 {t('loadMore')}
                             </button>
-
                         </li>
                     </ul>
                 )}
             </div>
-            <div className="p-3 border-t border-gray-100 bg-gray-50 text-center">
+            <div className="p-3 border-t border-gray-100 dark:border-slate-800 bg-gray-50 dark:bg-slate-800/50 text-center">
                 <button
                     onClick={() => {
                         setShowNotificationList(false);
                         navigate('/notifications');
                     }}
-                    className="text-sm font-medium text-indigo-600 hover:text-indigo-800"
+                    className="text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300"
                 >
                     {t('viewAllNotifications')}
                 </button>

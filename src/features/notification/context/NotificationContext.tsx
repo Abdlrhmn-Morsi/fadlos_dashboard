@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useEffect, useState, useCallback, useRef } from 'react';
 import OneSignal from 'react-onesignal';
+import React, { createContext, useContext, useEffect, useState, useCallback, useRef, useMemo } from 'react';
 import api from '../../../services/api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { UserRole } from '../../../types/user-role';
+import { Permissions } from '../../../types/permissions';
 import { useCache } from '../../../contexts/CacheContext';
 import { toast } from '../../../utils/toast';
 import { useTranslation } from 'react-i18next';
@@ -23,11 +25,13 @@ interface NotificationContextType {
     isLoading: boolean;
     markAsRead: (id: string) => Promise<void>;
     markAllAsRead: () => Promise<void>;
-    fetchNotifications: (page?: number, markSeen?: boolean) => Promise<void>;
+    fetchNotifications: (page?: number, markSeen?: boolean, filters?: any) => Promise<void>;
+    fetchUnreadCount: (filters?: any) => Promise<void>;
     showNotificationList: boolean;
     setShowNotificationList: (show: boolean) => void;
     loginOneSignal: (userId: string) => Promise<void>;
     isAudioBlocked: boolean;
+    activeFilters: any;
 }
 
 const NotificationContext = createContext<NotificationContextType | undefined>(undefined);
@@ -40,13 +44,28 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
     const [isAudioBlocked, setIsAudioBlocked] = useState(false);
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const initialized = useRef(false);
-    const { user: authUser } = useAuth(); // Get user from AuthContext
+    const { user: authUser, hasPermission } = useAuth(); // Get user and hasPermission from AuthContext
     const { t } = useTranslation(['dashboard', 'common']);
     const { getCache, setCache, invalidateCache } = useCache();
 
-    const fetchUnreadCount = useCallback(async () => {
+    const memoizedFilters = useMemo(() => {
+        if (authUser?.role !== UserRole.EMPLOYEE) return {};
+
+        const types = [];
+        if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) {
+            types.push('order');
+        }
+        if (hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE)) {
+            types.push('review');
+        }
+
+        return types.length > 0 ? { type: types.join(',') } : { type: 'none' };
+    }, [authUser?.role, hasPermission]);
+
+    const fetchUnreadCount = useCallback(async (filters?: any) => {
         try {
-            const response = await api.get('/notifications/unread-count');
+            const params = { ...filters };
+            const response = await api.get('/notifications/unread-count', { params });
             const count = response.data.data?.data?.unreadCount ?? response.data.data?.unreadCount ?? 0;
             setUnreadCount(count);
         } catch (error) {
@@ -54,9 +73,9 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
     }, []);
 
-    const fetchNotifications = useCallback(async (page = 1, markAll = false) => {
+    const fetchNotifications = useCallback(async (page = 1, markAll = false, filters?: any) => {
         setIsLoading(true);
-        const params: any = { page, limit: 10 };
+        const params: any = { page, limit: 10, ...filters };
 
         try {
             // Check cache for first page
@@ -102,7 +121,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             } else {
                 setNotifications(prev => [...prev, ...(Array.isArray(newNotifications) ? newNotifications : [])]);
             }
-            fetchUnreadCount();
+            fetchUnreadCount(filters);
         } catch (error) {
             // Silently handle
         } finally {
@@ -195,7 +214,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         window.addEventListener('keydown', unlockAudio);
         window.addEventListener('touchstart', unlockAudio);
 
-        fetchUnreadCount();
+        fetchUnreadCount(memoizedFilters);
+        fetchNotifications(1, false, memoizedFilters);
 
         const initOneSignal = async () => {
             try {
@@ -229,8 +249,8 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     playNotificationSound(soundToPlay);
                     // Invalidate cache when new notification arrives
                     invalidateCache('notifications');
-                    fetchUnreadCount();
-                    fetchNotifications(1);
+                    fetchUnreadCount(memoizedFilters);
+                    fetchNotifications(1, false, memoizedFilters);
                 });
 
             } catch (error) {
@@ -254,11 +274,13 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
             isLoading,
             markAsRead,
             markAllAsRead,
+            fetchUnreadCount,
             fetchNotifications,
             showNotificationList,
             setShowNotificationList,
             loginOneSignal,
-            isAudioBlocked
+            isAudioBlocked,
+            activeFilters: memoizedFilters
         }}>
             {children}
 

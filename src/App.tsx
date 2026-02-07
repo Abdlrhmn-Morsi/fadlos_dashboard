@@ -44,6 +44,7 @@ import { NotificationProvider } from './features/notification/context/Notificati
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CacheProvider } from './contexts/CacheContext';
 import { Permissions } from './types/permissions';
+import { UserRole } from './types/user-role';
 
 const ProtectedRoute = () => {
   const { isAuthenticated, isLoading } = useAuth();
@@ -74,6 +75,7 @@ const PermissionGate = ({ permission, children }: { permission: string, children
 
 const AppContent = () => {
   const { isDark } = useTheme();
+  const { user, hasPermission } = useAuth();
 
   return (
     <div className={isDark ? 'dark' : ''}>
@@ -95,7 +97,7 @@ const AppContent = () => {
 
             <Route path="addons" element={<AddonsList />} />
             <Route path="addons/new" element={<PermissionGate permission={Permissions.ADDONS_CREATE}><AddonForm /></PermissionGate>} />
-            <Route path="addons/edit/:id" element={<PermissionGate permission={Permissions.ADDONS_UPDATE}><AddonForm /></PermissionGate>} />
+            <Route path="addons/edit/:id" element={<AddonForm />} />
 
             <Route path="categories" element={<CategoryList />} />
 
@@ -127,7 +129,11 @@ const AppContent = () => {
             <Route path="settings" element={<Settings />} />
             <Route path="app-updates" element={<AppUpdateSettings />} />
             <Route path="app-version-history" element={<AppVersionHistory />} />
-            <Route path="notifications" element={<NotificationPage />} />
+            <Route path="notifications" element={
+              (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER || hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) || hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE))
+                ? <NotificationPage />
+                : <Navigate to="/" replace />
+            } />
 
             {/* Team Management Routes */}
             <Route path="roles" element={<PermissionGate permission={Permissions.ROLES_MANAGE}><RolesList /></PermissionGate>} />

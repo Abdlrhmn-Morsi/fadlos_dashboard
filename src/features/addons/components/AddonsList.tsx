@@ -105,13 +105,15 @@ const AddonsList = () => {
                         {t('subtitle')}
                     </p>
                 </div>
-                <button
-                    onClick={() => navigate('/addons/new')}
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                >
-                    <Plus size={20} />
-                    <span>{t('addAddon')}</span>
-                </button>
+                {hasPermission(Permissions.ADDONS_CREATE) && (
+                    <button
+                        onClick={() => navigate('/addons/new')}
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                    >
+                        <Plus size={20} />
+                        <span>{t('addAddon')}</span>
+                    </button>
+                )}
             </div>
 
             {/* Search Bar */}
@@ -141,7 +143,11 @@ const AddonsList = () => {
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('price')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('inventory')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('isActive')}</th>
-                                <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>{t('common:actions')}</th>
+                                {(hasPermission(Permissions.ADDONS_UPDATE) || hasPermission(Permissions.ADDONS_DELETE) || hasPermission(Permissions.ADDONS_VIEW)) && (
+                                    <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>
+                                        {t('common:actions')}
+                                    </th>
+                                )}
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -213,18 +219,32 @@ const AddonsList = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={clsx("flex items-center gap-2", isRTL ? "justify-start" : "justify-end")}>
-                                                <button
-                                                    onClick={() => navigate(`/addons/edit/${addon.id}`)}
-                                                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                <button
-                                                    onClick={() => handleDelete(addon.id)}
-                                                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                {hasPermission(Permissions.ADDONS_UPDATE) ? (
+                                                    <button
+                                                        onClick={() => navigate(`/addons/edit/${addon.id}`)}
+                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                        title={t('common:edit')}
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                ) : hasPermission(Permissions.ADDONS_VIEW) && (
+                                                    <button
+                                                        onClick={() => navigate(`/addons/edit/${addon.id}`)}
+                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                        title={t('common:view')}
+                                                    >
+                                                        <Search size={18} />
+                                                    </button>
+                                                )}
+                                                {hasPermission(Permissions.ADDONS_DELETE) && (
+                                                    <button
+                                                        onClick={() => handleDelete(addon.id)}
+                                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                        title={t('common:delete')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>

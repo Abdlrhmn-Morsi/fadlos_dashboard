@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from '../../../utils/toast';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Save, User, Key, Mail, Phone, Shield } from 'lucide-react';
+import { ArrowLeft, Save, User, Key, Mail, Phone, Shield, Eye, EyeOff } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
@@ -20,6 +20,7 @@ const EmployeeForm = () => {
 
     const [loading, setLoading] = useState(isEditMode);
     const [submitting, setSubmitting] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
     const [roles, setRoles] = useState<Role[]>([]);
 
     const [formData, setFormData] = useState({
@@ -195,13 +196,16 @@ const EmployeeForm = () => {
                                 {t('email', { defaultValue: 'Email Address' })} <span className="text-rose-500">*</span>
                             </label>
                             <div className="relative">
-                                <Mail size={18} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400" />
+                                <Mail size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
                                 <input
                                     type="email"
                                     required
                                     value={formData.email}
                                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                    className={clsx(
+                                        "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                        isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                    )}
                                 />
                             </div>
                         </div>
@@ -210,12 +214,15 @@ const EmployeeForm = () => {
                                 {t('phone', { defaultValue: 'Phone Number' })}
                             </label>
                             <div className="relative">
-                                <Phone size={18} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400" />
+                                <Phone size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
                                 <input
                                     type="text"
                                     value={formData.phone}
                                     onChange={e => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                    className={clsx(
+                                        "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                        isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                    )}
                                 />
                             </div>
                         </div>
@@ -253,16 +260,29 @@ const EmployeeForm = () => {
                                 {t('password', { defaultValue: 'Password' })} {isEditMode ? '' : <span className="text-rose-500">*</span>}
                             </label>
                             <div className="relative">
-                                <Key size={18} className="absolute top-1/2 -translate-y-1/2 left-3 text-slate-400" />
+                                <Key size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
                                 <input
-                                    type="password"
+                                    type={showPassword ? 'text' : 'password'}
                                     required={!isEditMode}
                                     minLength={6}
                                     value={formData.password}
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                    className={clsx(
+                                        "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
+                                        isRTL ? "pr-10 pl-4" : "pl-10 pr-10"
+                                    )}
                                     placeholder={isEditMode ? t('leaveBlankToKeepCurrent', { defaultValue: 'Leave blank to keep current' }) : ''}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword(!showPassword)}
+                                    className={clsx(
+                                        "absolute top-1/2 -translate-y-1/2 text-slate-400 hover:text-indigo-500 transition-colors",
+                                        isRTL ? "left-3" : "right-3"
+                                    )}
+                                >
+                                    {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                                </button>
                             </div>
                         </div>
                     </div>
