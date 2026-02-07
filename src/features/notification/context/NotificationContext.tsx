@@ -239,13 +239,10 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         initialized.current = true;
 
         const unlockAudio = () => {
-            if (!audioRef.current) {
-                audioRef.current = new Audio('/notification_sound.mp3');
-            }
-            audioRef.current.volume = 0;
-            audioRef.current.play()
+            // Create a temporary silent audio to unlock the browser's audio policy
+            const silentAudio = new Audio('data:audio/wav;base64,UklGRigAAABXQVZFRm10IBAAAAABAAEARKwAAIhYAQACABAAZGF0YQQAAAAAAA==');
+            silentAudio.play()
                 .then(() => {
-                    if (audioRef.current) audioRef.current.volume = 1;
                     setIsAudioBlocked(false);
                 })
                 .catch((err) => {
