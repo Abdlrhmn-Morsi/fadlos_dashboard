@@ -32,5 +32,8 @@
     "failedToDeactivateReview": "Failed to deactivate review",
     "reviewDeletedSuccessfully": "Review deleted successfully",
     "failedToDeleteReview": "Failed to delete review",
-    "confirmDeleteReview": "Are you sure you want to delete this review? This action cannot be undone."
+    "confirmDeleteReview": "Are you sure you want to delete this review? This action cannot be undone.",
+    "unreport": "Unreport",
+    "reviewUnreportedSuccessfully": "Review unreported successfully",
+    "failedToUnreportReview": "Failed to unreport review"
 }

@@ -291,7 +291,7 @@ const Dashboard: React.FC = () => {
                                 color="rose"
                             />
                         )}
-                        {hasPermission('store.view') && (
+                        {(hasPermission('store.view') || hasPermission('users.view')) && (
                             <StatCard
                                 title={t('totalReviews')}
                                 value={stats.totalReviews || 0}

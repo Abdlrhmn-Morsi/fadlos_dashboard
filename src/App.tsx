@@ -112,7 +112,11 @@ const AppContent = () => {
             <Route path="promocodes/new" element={<PermissionGate permission={Permissions.PROMO_CODES_CREATE}><PromoCodeForm /></PermissionGate>} />
             <Route path="promocodes/edit/:id" element={<PermissionGate permission={Permissions.PROMO_CODES_UPDATE}><PromoCodeForm /></PermissionGate>} />
 
-            <Route path="reviews" element={<PermissionGate permission={Permissions.STORE_VIEW}><ReviewList /></PermissionGate>} />
+            <Route path="reviews" element={
+              (hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.USERS_VIEW))
+                ? <ReviewList />
+                : <Navigate to="/" replace />
+            } />
 
             <Route path="clients" element={<PermissionGate permission={Permissions.USERS_VIEW}><ClientList /></PermissionGate>} />
             <Route path="followers" element={<PermissionGate permission={Permissions.USERS_VIEW}><FollowerList /></PermissionGate>} />

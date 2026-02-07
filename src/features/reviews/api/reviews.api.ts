@@ -30,6 +30,13 @@ export const reviewsApi = {
      */
     async deleteReview(reviewId: string) {
         return apiService.delete(`/reviews/${reviewId}`);
+    },
+
+    /**
+     * Unreport a review
+     */
+    async unreportReview(reviewId: string) {
+        return apiService.patch(`/reviews/${reviewId}/unreport`);
     }
 };
 

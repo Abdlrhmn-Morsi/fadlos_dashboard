@@ -115,11 +115,14 @@ const ReviewList = () => {
 
         try {
             setIsSubmittingReport(true);
-            await reviewsApi.reportReview(reviewId, reportReason);
+            const updatedReview = await reviewsApi.reportReview(reviewId, reportReason);
             toast.success(t('reviewReportedSuccessfully'));
+
+            // Update local state
+            setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updatedReview } : r));
+
             setReportingId(null);
             setReportReason('');
-            fetchReviews();
         } catch (error) {
             console.error('Failed to report review', error);
             toast.error(t('failedToReportReview'));
@@ -128,12 +131,30 @@ const ReviewList = () => {
         }
     };
 
+    const handleUnreport = async (reviewId: string) => {
+        try {
+            setActionLoading(reviewId);
+            const updatedReview = await reviewsApi.unreportReview(reviewId);
+            toast.success(t('reviewUnreportedSuccessfully'));
+
+            // Update local state
+            setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updatedReview } : r));
+        } catch (error) {
+            console.error('Failed to unreport review', error);
+            toast.error(t('failedToUnreportReview'));
+        } finally {
+            setActionLoading(null);
+        }
+    };
+
     const handleDeactivate = async (reviewId: string) => {
         try {
             setActionLoading(reviewId);
-            await reviewsApi.updateReview(reviewId, { isActive: false });
+            const updatedReview = await reviewsApi.updateReview(reviewId, { isActive: false });
             toast.success(t('reviewDeactivatedSuccessfully'));
-            fetchReviews();
+
+            // Update local state
+            setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updatedReview } : r));
         } catch (error) {
             console.error('Failed to deactivate review', error);
             toast.error(t('failedToDeactivateReview'));
@@ -354,6 +375,15 @@ const ReviewList = () => {
                                                         <ShieldAlert size={12} />
                                                         {t('reported')}
                                                     </div>
+
+                                                    <button
+                                                        disabled={actionLoading === review.id}
+                                                        onClick={() => handleUnreport(review.id)}
+                                                        className="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-all border border-emerald-200 dark:border-emerald-900/30 disabled:opacity-50"
+                                                    >
+                                                        {actionLoading === review.id ? <Loader2 size={14} className="animate-spin" /> : <BadgeCheck size={14} />}
+                                                        {t('unreport')}
+                                                    </button>
 
                                                     {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
                                                         <>

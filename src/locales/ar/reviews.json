@@ -32,5 +32,8 @@
     "failedToDeactivateReview": "فشل إلغاء تنشيط التقييم",
     "reviewDeletedSuccessfully": "تم حذف التقييم بنجاح",
     "failedToDeleteReview": "فشل حذف التقييم",
-    "confirmDeleteReview": "هل أنت متأكد من رغبتك في حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء."
+    "confirmDeleteReview": "هل أنت متأكد من رغبتك في حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء.",
+    "unreport": "إلغاء الإبلاغ",
+    "reviewUnreportedSuccessfully": "تم إلغاء الإبلاغ عن التقييم بنجاح",
+    "failedToUnreportReview": "فشل إلغاء الإبلاغ عن التقييم"
 }

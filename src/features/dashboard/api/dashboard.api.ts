@@ -72,8 +72,8 @@ export const fetchDashboardStats = async (user: any) => {
                 promises.push(apiService.get('/store/clients?limit=1').then(res => ({ key: 'clients', val: res.meta?.total || 0 })).catch(() => ({ key: 'clients', val: 0 })));
             }
 
-            // Reviews count (store.view)
-            if (hasPerm('store.view')) {
+            // Reviews count (store.view or users.view)
+            if (hasPerm('store.view') || hasPerm('users.view')) {
                 promises.push(apiService.get('/reviews/store-management?limit=1').then(res => ({ key: 'reviews', val: res.meta?.total || 0 })).catch(() => ({ key: 'reviews', val: 0 })));
             }
 
