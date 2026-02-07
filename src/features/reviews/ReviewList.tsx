@@ -17,7 +17,7 @@ const ReviewList = () => {
     const { isRTL, language } = useLanguage();
     const { user } = useAuth();
     const navigate = useNavigate();
-    const { getCache, setCache } = useCache();
+    const { getCache, setCache, updateCacheItem, invalidateCache } = useCache();
     const [reviews, setReviews] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [type, setType] = useState('STORE'); // STORE or PRODUCT
@@ -121,6 +121,9 @@ const ReviewList = () => {
             // Update local state
             setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updatedReview } : r));
 
+            // Update global cache to maintain consistency across filters/toggles
+            updateCacheItem('reviews', reviewId, (old) => ({ ...old, ...updatedReview }));
+
             setReportingId(null);
             setReportReason('');
         } catch (error) {
@@ -139,6 +142,9 @@ const ReviewList = () => {
 
             // Update local state
             setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updatedReview } : r));
+
+            // Update global cache to maintain consistency across filters/toggles
+            updateCacheItem('reviews', reviewId, (old) => ({ ...old, ...updatedReview }));
         } catch (error) {
             console.error('Failed to unreport review', error);
             toast.error(t('failedToUnreportReview'));
@@ -155,6 +161,9 @@ const ReviewList = () => {
 
             // Update local state
             setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, ...updatedReview } : r));
+
+            // Update global cache to maintain consistency across filters/toggles
+            updateCacheItem('reviews', reviewId, (old) => ({ ...old, ...updatedReview }));
         } catch (error) {
             console.error('Failed to deactivate review', error);
             toast.error(t('failedToDeactivateReview'));
@@ -170,6 +179,9 @@ const ReviewList = () => {
             setActionLoading(reviewId);
             await reviewsApi.deleteReview(reviewId);
             toast.success(t('reviewDeletedSuccessfully'));
+
+            // Invalidate cache to force fresh fetch and handle page shifts
+            invalidateCache('reviews');
             fetchReviews();
         } catch (error) {
             console.error('Failed to delete review', error);
