@@ -32,8 +32,18 @@
     "failedToDeactivateReview": "فشل إلغاء تنشيط التقييم",
     "reviewDeletedSuccessfully": "تم حذف التقييم بنجاح",
     "failedToDeleteReview": "فشل حذف التقييم",
-    "confirmDeleteReview": "هل أنت متأكد من رغبتك في حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء.",
+    "confirmDeleteReview": "حذف التقييم",
+    "deleteReviewConfirmation": "هل أنت متأكد من رغبتك في حذف هذا التقييم؟ لا يمكن التراجع عن هذا الإجراء.",
     "unreport": "إلغاء الإبلاغ",
     "reviewUnreportedSuccessfully": "تم إلغاء الإبلاغ عن التقييم بنجاح",
-    "failedToUnreportReview": "فشل إلغاء الإبلاغ عن التقييم"
+    "failedToUnreportReview": "فشل إلغاء الإبلاغ عن التقييم",
+    "confirmUnreportReview": "إلغاء الإبلاغ عن التقييم",
+    "unreportReviewConfirmation": "هل أنت متأكد من رغبتك في إلغاء الإبلاغ عن هذا التقييم؟",
+    "reportedReviews": "التقييمات المُبلغ عنها",
+    "reportedReviewsSubtitle": "الإشراف على المحتوى المُبلغ عنه على مستوى المنصة",
+    "noReportedReviews": "لا توجد تقييمات مُبلغ عنها للإشراف عليها",
+    "inactive": "غير نشط",
+    "activate": "تنشيط",
+    "reviewActivatedSuccessfully": "تم تنشيط التقييم بنجاح",
+    "failedToActivateReview": "فشل تنشيط التقييم"
 }

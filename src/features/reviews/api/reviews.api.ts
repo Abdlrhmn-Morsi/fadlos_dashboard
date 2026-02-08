@@ -12,6 +12,13 @@ export const reviewsApi = {
     },
 
     /**
+     * Fetch all reviews (for platform admin)
+     */
+    async getAllReviews(params: any = {}) {
+        return apiService.get('/reviews', { params });
+    },
+
+    /**
      * Report a review
      */
     async reportReview(reviewId: string, reason: string) {
@@ -23,6 +30,20 @@ export const reviewsApi = {
      */
     async updateReview(reviewId: string, data: any) {
         return apiService.patch(`/reviews/${reviewId}`, data);
+    },
+
+    /**
+     * Deactivate review
+     */
+    async deactivateReview(reviewId: string) {
+        return apiService.patch(`/reviews/${reviewId}/deactivate`);
+    },
+
+    /**
+     * Activate review
+     */
+    async activateReview(reviewId: string) {
+        return apiService.patch(`/reviews/${reviewId}/activate`);
     },
 
     /**

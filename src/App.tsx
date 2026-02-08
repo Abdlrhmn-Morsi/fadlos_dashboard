@@ -21,6 +21,7 @@ import OrderDetail from './features/orders/OrderDetail';
 import PromoCodeList from './features/promocodes/PromoCodeList';
 import PromoCodeForm from './features/promocodes/PromoCodeForm';
 import ReviewList from './features/reviews/ReviewList';
+import ReportedReviewList from './features/reviews/ReportedReviewList';
 import ClientList from './features/clients/ClientList';
 import FollowerList from './features/followers/FollowerList';
 import CategoryList from './features/categories/CategoryList';
@@ -134,6 +135,7 @@ const AppContent = () => {
             <Route path="towns" element={<Towns />} />
             <Route path="business-types" element={<BusinessTypes />} />
             <Route path="business-categories" element={<BusinessCategories />} />
+            <Route path="reported-reviews" element={<ReportedReviewList />} />
 
 
             <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
