@@ -9,6 +9,14 @@
     "commercialStats": "Commercial Stats",
     "orders": "Orders",
     "revenue": "REV",
+    "products": "Products",
+    "categories": "Categories",
+    "description": "Description",
+    "slug": "Slug",
+    "plan": "Plan",
+    "openingHours": "Opening Hours",
+    "createdAt": "Created At",
+    "lastOrder": "Last Order",
     "notSet": "Not Set",
     "noStoresFound": "No store records found in system",
     "syncing": "Syncing store records...",
@@ -48,7 +56,8 @@
     "openingTime": "Opening Time",
     "closingTime": "Closing Time",
     "workingDays": "Working Days",
-    "orderAcceptance": "Order Acceptance Rules",
+    "acceptOrdersIfOffDay": "Accept if off day",
+    "acceptOrdersInClosedHours": "Accept if closed",
     "orderAcceptanceRules": "Order Acceptance Rules",
     "acceptingOrders": "Accepting Orders",
     "acceptOffDay": "Accept orders even on off days",
@@ -70,5 +79,6 @@
     "enableStoreReviews": "Enable Store Reviews",
     "enableStoreReviewsDesc": "Allow customers to leave overall reviews and ratings for your store.",
     "enableProductReviews": "Enable Product Reviews",
-    "enableProductReviewsDesc": "Allow customers to leave specific reviews and ratings for individual products."
+    "enableProductReviewsDesc": "Allow customers to leave specific reviews and ratings for individual products.",
+    "businessCategories": "Business Categories"
 }

@@ -11,7 +11,8 @@ import {
     ShoppingBag
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { getUsers } from '../api/users.api';
+import { getUsers, toggleUserStatus } from '../api/users.api';
+import { toast } from '../../../utils/toast';
 import { UserRole } from '../../../types/user-role';
 import {
     usersState,
@@ -29,6 +30,8 @@ const UsersList: React.FC = () => {
     const [loading, setLoading] = useRecoilState(usersLoadingState);
     const [filters, setFilters] = useRecoilState(usersFiltersState);
     const [pagination, setPagination] = useRecoilState(usersPaginationState);
+    const [searchTerm, setSearchTerm] = React.useState(filters.search);
+    const [debouncedSearch, setDebouncedSearch] = React.useState(filters.search);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -36,7 +39,7 @@ const UsersList: React.FC = () => {
             const params: any = {
                 page: pagination.page,
                 limit: pagination.limit,
-                search: filters.search,
+                search: debouncedSearch,
             };
 
             if (filters.role && filters.role !== 'all') {
@@ -57,14 +60,38 @@ const UsersList: React.FC = () => {
         }
     };
 
+    const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
+        try {
+            await toggleUserStatus(userId, !currentStatus);
+            setUsers(prev => prev.map((u: any) => u.id === userId ? { ...u, isActive: !currentStatus } : u));
+            toast.success(t('common:statusUpdated'));
+        } catch (error) {
+            console.error('Failed to toggle user status:', error);
+            toast.error(t('common:errorUpdatingStatus'));
+        }
+    };
+
+    // Debounce effect
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+            setFilters(prev => ({ ...prev, search: searchTerm }));
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm, setFilters]);
+
+    // Reset page when search changes
+    useEffect(() => {
+        setPagination(prev => ({ ...prev, page: 1 }));
+    }, [debouncedSearch, setPagination]);
+
+    // Fetch on page, role, or debounced search change
     useEffect(() => {
         fetchUsers();
-    }, [pagination.page, filters.role]);
+    }, [pagination.page, filters.role, debouncedSearch]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        setPagination((prev: any) => ({ ...prev, page: 1 }));
-        fetchUsers();
     };
 
     const getRoleBadge = (role: string) => {
@@ -96,13 +123,13 @@ const UsersList: React.FC = () => {
                         <Search size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors", isRTL ? "right-4" : "left-4")} />
                         <input
                             type="text"
-                            placeholder={t('searchPlaceholder')}
+                            placeholder={t('searchUsersPlaceholder')}
                             className={clsx(
                                 "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md",
                                 isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
                             )}
-                            value={filters.search}
-                            onChange={(e) => setFilters((prev: any) => ({ ...prev, search: e.target.value }))}
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </form>
 
@@ -168,12 +195,25 @@ const UsersList: React.FC = () => {
                                                 <div className="text-xs text-slate-400 font-medium mt-0.5">{user.phone || t('noPhoneSet', { defaultValue: 'No phone set' })}</div>
                                             </td>
                                             <td className="table-cell">
-                                                <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
-                                                    <div className={`w-3 h-3 rounded-none ${user.isActive ? 'bg-emerald-500 shadow-[0_0_12px_rgba(16,185,129,0.6)]' : 'bg-slate-300'}`} />
-                                                    <span className={`text-xs font-black uppercase tracking-wider ${user.isActive ? 'text-emerald-600' : 'text-slate-400'}`}>
+                                                <button
+                                                    onClick={() => handleToggleStatus(user.id, user.isActive)}
+                                                    className={clsx(
+                                                        "flex items-center gap-3 px-3 py-1.5 rounded-none border transition-all active:scale-95 group/status",
+                                                        user.isActive
+                                                            ? "bg-emerald-50 border-emerald-100 text-emerald-600 hover:bg-emerald-100 dark:bg-emerald-900/10 dark:border-emerald-900/30 dark:text-emerald-400"
+                                                            : "bg-slate-50 border-slate-100 text-slate-400 hover:bg-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-500"
+                                                    )}
+                                                >
+                                                    <div className={clsx(
+                                                        "w-2.5 h-2.5 rounded-none transition-all",
+                                                        user.isActive
+                                                            ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] group-hover/status:scale-125"
+                                                            : "bg-slate-300 group-hover/status:bg-slate-400"
+                                                    )} />
+                                                    <span className="text-[10px] font-black uppercase tracking-widest">
                                                         {user.isActive ? t('common:active') : t('common:inactive')}
                                                     </span>
-                                                </div>
+                                                </button>
                                             </td>
                                             <td className="table-cell text-sm text-slate-500 font-bold">
                                                 {new Date(user.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}

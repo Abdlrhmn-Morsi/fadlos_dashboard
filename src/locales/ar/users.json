@@ -1,6 +1,7 @@
 {
     "title": "مستخدمي النظام",
     "searchPlaceholder": "تصفية الدليل...",
+    "searchUsersPlaceholder": "البحث بالاسم، البريد الإلكتروني، أو الهاتف...",
     "roleFilter": "تصفية حسب الدور",
     "allRoles": "جميع الأدوار الأمنية",
     "admin": "مسؤول",

@@ -9,6 +9,14 @@
     "commercialStats": "الإحصائيات التجارية",
     "orders": "الطلبات",
     "revenue": "الإيرادات",
+    "products": "المنتجات",
+    "categories": "الأقسام",
+    "description": "الوصف",
+    "slug": "المعرف",
+    "plan": "الباقة",
+    "openingHours": "ساعات العمل",
+    "createdAt": "تاريخ الإنشاء",
+    "lastOrder": "آخر طلب",
     "notSet": "غير محدد",
     "noStoresFound": "لا توجد سجلات متاجر في النظام",
     "syncing": "جاري مزامنة سجلات المتجر...",
@@ -48,7 +56,8 @@
     "openingTime": "وقت الافتتاح",
     "closingTime": "وقت الإغلاق",
     "workingDays": "أيام العمل",
-    "orderAcceptance": "قواعد قبول الطلبات",
+    "acceptOrdersIfOffDay": "قبول الطلبات في العطلة",
+    "acceptOrdersInClosedHours": "قبول الطلبات خارج الساعات",
     "orderAcceptanceRules": "قواعد قبول الطلبات",
     "acceptingOrders": "قبول الطلبات",
     "acceptOffDay": "قبول الطلبات حتى في أيام العطلة",
@@ -70,5 +79,6 @@
     "enableStoreReviews": "تفعيل تقييمات المتجر",
     "enableStoreReviewsDesc": "السماح للعملاء بترك تقييمات وآراء عامة لمتجرك.",
     "enableProductReviews": "تفعيل تقييمات المنتجات",
-    "enableProductReviewsDesc": "السماح للعملاء بترك تقييمات وآراء محددة للمنتجات الفردية."
+    "enableProductReviewsDesc": "السماح للعملاء بترك تقييمات وآراء محددة للمنتجات الفردية.",
+    "businessCategories": "أنشطة المتجر"
 }

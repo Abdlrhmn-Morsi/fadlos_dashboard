@@ -8,6 +8,7 @@ import ForgotPassword from './features/auth/ForgotPassword';
 import Dashboard from './features/dashboard/Dashboard';
 import Users from './features/users/Users';
 import Stores from './features/stores/Stores';
+import StoreDetail from './features/stores/StoreDetail';
 import Cities from './features/cities/Cities';
 import Towns from './features/towns/Towns';
 import BusinessTypes from './features/business-types/BusinessTypes';
@@ -128,6 +129,7 @@ const AppContent = () => {
             {/* Admin Routes */}
             <Route path="users" element={<Users />} />
             <Route path="stores" element={<Stores />} />
+            <Route path="stores/:id" element={<StoreDetail />} />
             <Route path="cities" element={<Cities />} />
             <Route path="towns" element={<Towns />} />
             <Route path="business-types" element={<BusinessTypes />} />

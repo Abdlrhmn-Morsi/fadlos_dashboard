@@ -152,7 +152,7 @@ const DashboardLayout: React.FC = () => {
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
 
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
-          {hasPermission(Permissions.ANALYTICS_VIEW) && (
+          {hasPermission(Permissions.ANALYTICS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && (
             <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
           )}
 

@@ -41,3 +41,11 @@ export const updatePassword = async (data: any) => {
         throw error;
     }
 };
+
+export const toggleUserStatus = async (userId: string, isActive: boolean) => {
+    try {
+        return await apiService.patch(`/users/${userId}`, { isActive });
+    } catch (error) {
+        throw error;
+    }
+};

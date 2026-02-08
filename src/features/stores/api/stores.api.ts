@@ -67,3 +67,11 @@ export const updateStore = async (formData: FormData) => {
         throw error;
     }
 };
+export const getStoreById = async (id: string) => {
+    try {
+        const response = await apiService.get(`/stores/${id}`);
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};

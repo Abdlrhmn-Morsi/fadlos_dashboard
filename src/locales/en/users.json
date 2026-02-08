@@ -1,6 +1,7 @@
 {
     "title": "System Users",
     "searchPlaceholder": "Filter directory...",
+    "searchUsersPlaceholder": "Search by name, email, or phone...",
     "roleFilter": "Filter by role",
     "allRoles": "All Security Roles",
     "admin": "Admin",
