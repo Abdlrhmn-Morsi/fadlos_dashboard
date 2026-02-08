@@ -6,6 +6,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import clsx from 'clsx';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 enum PlatformType {
     ANDROID = 'android',
@@ -122,7 +123,9 @@ const AppUpdateSettings: React.FC = () => {
         }
     };
 
-    if (!config && loading) return <div>Loading...</div>;
+    if (!config && loading) {
+        return <LoadingSpinner />;
+    }
 
     return (
         <div className="p-6" dir={isRTL ? 'rtl' : 'ltr'}>

@@ -8,6 +8,7 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
 import { RolesService } from '../api/roles.api';
 import { PermissionGroup } from '../../../types/permission';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 const RoleForm = () => {
     const { t } = useTranslation(['common']);
@@ -151,11 +152,7 @@ const RoleForm = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     return (

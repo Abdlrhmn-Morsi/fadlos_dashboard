@@ -32,6 +32,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchOrderStats, fetchProductMerchantStats, fetchCustomerAnalytics } from './api/analytics.api';
 import clsx from 'clsx';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 interface StatCardProps {
     title: string;
@@ -122,14 +123,7 @@ const Analytics: React.FC = () => {
     const textColor = isDark ? '#64748b' : '#94a3b8';
 
     if (loading && !orderStats) {
-        return (
-            <div className="p-8 flex items-center justify-center min-h-[60vh]">
-                <div className="flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-primary border-t-transparent animate-spin" />
-                    <p className="text-slate-500 font-bold uppercase tracking-widest text-xs">{t('loading')}</p>
-                </div>
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     return (

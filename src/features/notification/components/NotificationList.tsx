@@ -7,6 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 // Icons mapping based on type
 const getIcon = (type: string) => {
@@ -77,7 +78,9 @@ export const NotificationList = () => {
 
             <div className="max-h-96 overflow-y-auto">
                 {isLoading && displayNotifications.length === 0 ? (
-                    <div className="p-4 text-center text-gray-500 dark:text-slate-400 text-sm">Loading...</div>
+                    <div className="p-4">
+                        <LoadingSpinner fullHeight={false} size="sm" />
+                    </div>
                 ) : displayNotifications.length === 0 ? (
                     <div className="p-8 text-center text-gray-500 dark:text-slate-400 text-sm flex flex-col items-center">
                         <BellOffIcon />

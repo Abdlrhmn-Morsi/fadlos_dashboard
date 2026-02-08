@@ -11,6 +11,7 @@ import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 import { toast } from '../../utils/toast';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const ReviewList = () => {
     const { t } = useTranslation(['reviews', 'common']);
@@ -30,6 +31,7 @@ const ReviewList = () => {
     // Search State
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
+    const [totalItems, setTotalItems] = useState(0);
 
     // Reporting & Moderation State
     const [reportingId, setReportingId] = useState<string | null>(null);
@@ -72,10 +74,12 @@ const ReviewList = () => {
                     setReviews(cachedData.data);
                     if (cachedData.meta) {
                         setTotalPages(cachedData.meta.totalPages || 1);
+                        setTotalItems(cachedData.meta.total || 0);
                     }
                 } else if (Array.isArray(cachedData)) {
                     setReviews(cachedData);
                     setTotalPages(1);
+                    setTotalItems(cachedData.length);
                 }
                 setLoading(false);
                 return;
@@ -87,17 +91,20 @@ const ReviewList = () => {
                 setReviews(response.data);
                 if (response.meta) {
                     setTotalPages(response.meta.totalPages || 1);
+                    setTotalItems(response.meta.total || 0);
                 }
                 // Cache the response
                 setCache(cacheKey, response, params);
             } else if (Array.isArray(response)) {
                 setReviews(response);
                 setTotalPages(1);
+                setTotalItems(response.length);
                 // Cache the response
                 setCache(cacheKey, response, params);
             } else {
                 setReviews([]);
                 setTotalPages(1);
+                setTotalItems(0);
             }
         } catch (error) {
             console.error('Failed to fetch reviews', error);
@@ -213,7 +220,14 @@ const ReviewList = () => {
             {/* Header section with high-contrast tab switcher */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1">
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
+                        {!loading && totalItems > 0 && (
+                            <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded-full border border-primary/20 animate-in zoom-in-50">
+                                {totalItems}
+                            </span>
+                        )}
+                    </div>
                     <p className="text-slate-400 font-medium text-xs mt-0.5">{t('subtitle')}</p>
                 </div>
 
@@ -260,9 +274,8 @@ const ReviewList = () => {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {loading ? (
-                    <div className="flex flex-col items-center justify-center py-20 gap-4">
-                        <Loader2 size={40} className="text-primary animate-spin" />
-                        <span className="text-xs font-black text-slate-400 uppercase tracking-[0.3em]">{t('loadingImpressions')}</span>
+                    <div className="col-span-full py-20">
+                        <LoadingSpinner fullHeight={false} />
                     </div>
                 ) : reviews.length === 0 ? (
                     <div className="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">

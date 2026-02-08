@@ -7,6 +7,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../contexts/AuthContext';
 import { Permissions } from '../../types/permissions';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 const ProductDetail = () => {
     const { id } = useParams();
@@ -36,11 +37,7 @@ const ProductDetail = () => {
     };
 
     if (loading) {
-        return (
-            <div className="p-6">
-                <div className="text-center py-12 text-slate-500">{t('common:loading')}</div>
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     if (!product) {

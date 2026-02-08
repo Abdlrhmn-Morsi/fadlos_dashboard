@@ -9,6 +9,7 @@ import clsx from 'clsx';
 import { EmployeesService } from '../api/employees.api';
 import { RolesService } from '../../roles/api/roles.api';
 import { Role } from '../../roles/models/role.model';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 const EmployeeForm = () => {
     const { t } = useTranslation(['common']);
@@ -117,11 +118,7 @@ const EmployeeForm = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-screen">
-                <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     return (

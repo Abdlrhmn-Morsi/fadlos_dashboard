@@ -27,6 +27,7 @@ import {
 } from '../../towns/api/towns.api';
 import { toast } from '../../../utils/toast';
 import StatusModal from '../../../components/common/StatusModal';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 const DeliveryAreas = () => {
     const { t, i18n } = useTranslation(['stores', 'common']);
@@ -151,12 +152,7 @@ const DeliveryAreas = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center py-12 gap-4">
-                <Loader2 size={32} className="text-primary animate-spin" />
-                <div className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('common:loading')}</div>
-            </div>
-        );
+        return <LoadingSpinner fullHeight={false} />;
     }
 
     const currentLng = i18n.language;

@@ -18,8 +18,6 @@ export const fetchDashboardStats = async (user: any) => {
             totalProducts: 0,
             avgOrderValue: 0,
             totalClients: 0,
-            totalFollowers: 0,
-            totalReviews: 0,
             totalCategories: 0,
             topRatedProducts: [],
             topCategories: [],
@@ -83,17 +81,12 @@ export const fetchDashboardStats = async (user: any) => {
                 promises.push(apiService.get('/store/clients?limit=1').then(res => ({ key: 'clients', val: res.meta?.total || 0 })).catch(() => ({ key: 'clients', val: 0 })));
             }
 
-            // Reviews count (store.view or users.view)
-            if (hasPerm('store.view') || hasPerm('users.view')) {
-                promises.push(apiService.get('/reviews/store-management?limit=1').then(res => ({ key: 'reviews', val: res.meta?.total || 0 })).catch(() => ({ key: 'reviews', val: 0 })));
-            }
 
             // Categories count (Default for all employees)
             promises.push(apiService.get('/categories/seller-categories?limit=1').then(res => ({ key: 'categories', val: res.meta?.total || 0 })).catch(() => ({ key: 'categories', val: 0 })));
 
             // Followers (store.view) - Assuming store view allows seeing followers
             if (storeId && hasPerm('store.view')) {
-                promises.push(apiService.get(`/follows/stats/store/${storeId}`).then(res => ({ key: 'followers', val: res.followersCount || 0 })).catch(() => ({ key: 'followers', val: 0 })));
                 promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0 })).catch(() => ({ key: 'rating', val: 0 })));
             }
 
@@ -108,9 +101,7 @@ export const fetchDashboardStats = async (user: any) => {
             results.forEach((res: any) => {
                 if (res.key === 'products') stats.totalProducts = res.val;
                 if (res.key === 'clients') stats.totalClients = res.val;
-                if (res.key === 'reviews') stats.totalReviews = res.val;
                 if (res.key === 'categories') stats.totalCategories = res.val;
-                if (res.key === 'followers') stats.totalFollowers = res.val;
                 if (res.key === 'rating') stats.averageRating = res.val;
                 if (res.key === 'topProducts') stats.topRatedProducts = res.val;
                 if (res.key === 'topCategories') stats.topCategories = res.val;

@@ -11,9 +11,10 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight } from 'lucide-react';
+import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { UserRole } from '../../types/user-role';
 import {
     dashboardStatsState,
@@ -151,11 +152,9 @@ const Dashboard: React.FC = () => {
     const textColor = isDark ? '#94a3b8' : '#94a3b8'; // slate-400
     const cursorFill = isDark ? '#334155' : '#f8fafc'; // slate-700 : slate-50
 
-    if (loading || !user) return (
-        <div className="flex items-center justify-center min-h-[50vh] p-6 animate-pulse">
-            <div className="text-slate-500 font-medium">{t('common:loading')}</div>
-        </div>
-    );
+    if (loading || !user) {
+        return <LoadingSpinner />;
+    }
 
     if (error) return (
         <div className="p-6 bg-rose-50 border border-rose-200 rounded-none text-rose-600 font-medium m-6">
@@ -229,8 +228,8 @@ const Dashboard: React.FC = () => {
                     <StatCard
                         title={t('todayRevenue')}
                         value={`${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        icon={DollarSign}
-                        color="primary"
+                        icon={Zap}
+                        color="emerald"
                     />
                 )}
 
@@ -239,8 +238,8 @@ const Dashboard: React.FC = () => {
                     <StatCard
                         title={t('todayOrders')}
                         value={stats.todayOrders || 0}
-                        icon={ShoppingBag}
-                        color="primary"
+                        icon={Activity}
+                        color="blue"
                     />
                 )}
 
@@ -302,22 +301,6 @@ const Dashboard: React.FC = () => {
                                 value={stats.totalClients || 0}
                                 icon={Users}
                                 color="blue"
-                            />
-                        )}
-                        {hasPermission('users.view') && (
-                            <StatCard
-                                title={t('totalFollowers')}
-                                value={stats.totalFollowers || 0}
-                                icon={Heart}
-                                color="rose"
-                            />
-                        )}
-                        {(hasPermission('store.view') || hasPermission('users.view')) && (
-                            <StatCard
-                                title={t('totalReviews')}
-                                value={stats.totalReviews || 0}
-                                icon={Star}
-                                color="yellow"
                             />
                         )}
                         {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (

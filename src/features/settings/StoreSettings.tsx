@@ -39,6 +39,7 @@ import toolsApi from '../../services/tools.api';
 import { useAuth } from '../../contexts/AuthContext';
 import { Permissions } from '../../types/permissions';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 
 const SOCIAL_PLATFORMS = [
@@ -367,12 +368,7 @@ const StoreSettings = () => {
     };
 
     if (loading) {
-        return (
-            <div className="flex flex-col items-center justify-center py-32 gap-6">
-                <Loader2 size={48} className="text-primary animate-spin" />
-                <div className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('common:loading')}</div>
-            </div>
-        );
+        return <LoadingSpinner />;
     }
 
     if (!canViewStore) {
