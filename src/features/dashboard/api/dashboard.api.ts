@@ -1,14 +1,17 @@
 import apiService from '../../../services/api.service';
 import { UserRole } from '../../../types/user-role';
 import { OrderStatus } from '../../../types/order-status';
+import { DashboardStats } from '../models/dashboard.model';
 
 export const fetchDashboardStats = async (user: any) => {
     try {
         const userRole = user.role;
         // Default empty stats
-        const stats = {
+        const stats: DashboardStats = {
             totalRevenue: 0,
             totalOrders: 0,
+            todayRevenue: 0,
+            todayOrders: 0,
             pendingOrders: 0,
             totalUsers: 0,
             totalStores: 0,
@@ -49,13 +52,21 @@ export const fetchDashboardStats = async (user: any) => {
             // We'll require orders.view for now as it's the safest bet for "reading" order data.
             if (hasPerm('orders.view') || hasPerm('analytics.view')) {
                 try {
-                    const responseBody = await apiService.get('/orders/stats/summary?period=30d');
-                    const data = responseBody.data || responseBody;
+                    const [thirtyDays, today] = await Promise.all([
+                        apiService.get('/orders/stats/summary?period=30d'),
+                        apiService.get('/orders/stats/summary?period=today')
+                    ]);
+
+                    const data = thirtyDays.data || thirtyDays;
                     stats.totalRevenue = data.totalRevenue || 0;
                     stats.totalOrders = data.totalOrders || 0;
                     stats.avgOrderValue = data.averageOrderValue || 0;
                     stats.pendingOrders = data.statusCounts?.pending || 0;
                     stats.chartData = data.chartData || [];
+
+                    const todayData = today.data || today;
+                    stats.todayRevenue = todayData.totalRevenue || 0;
+                    stats.todayOrders = todayData.totalOrders || 0;
                 } catch (e) {
                     console.warn('Failed to fetch order stats', e);
                 }

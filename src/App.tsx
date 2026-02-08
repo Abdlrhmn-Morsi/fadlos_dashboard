@@ -37,6 +37,7 @@ import EmployeesList from './features/employees/components/EmployeesList';
 import EmployeeForm from './features/employees/components/EmployeeForm';
 import AddonsList from './features/addons/components/AddonsList';
 import AddonForm from './features/addons/components/AddonForm';
+import Analytics from './features/analytics/Analytics';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
@@ -88,6 +89,7 @@ const AppContent = () => {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardLayout />}>
             <Route index element={<Dashboard />} />
+            <Route path="analytics" element={<PermissionGate permission={Permissions.ANALYTICS_VIEW}><Analytics /></PermissionGate>} />
 
             {/* Store Owner & Employee Routes */}
             <Route path="products" element={<ProductList />} />

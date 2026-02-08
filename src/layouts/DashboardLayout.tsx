@@ -17,7 +17,8 @@ import {
   LucideIcon,
   Bell,
   Shield,
-  Layers
+  Layers,
+  TrendingUp
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -151,6 +152,9 @@ const DashboardLayout: React.FC = () => {
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
 
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
+          {hasPermission(Permissions.ANALYTICS_VIEW) && (
+            <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
+          )}
 
           {/* Admin Links */}
           {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (

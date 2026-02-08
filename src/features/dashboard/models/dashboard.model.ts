@@ -5,6 +5,8 @@ export interface DashboardStats {
     totalStores: number;
     totalProducts: number;
     avgOrderValue: number;
+    todayRevenue?: number;
+    todayOrders?: number;
     pendingOrders?: number;
     // Seller specific (Optional as they might not be present for Admin)
     totalClients?: number;
@@ -18,6 +20,6 @@ export interface DashboardStats {
 }
 
 export interface ChartDataItem {
-    date: string;
+    label: string;
     revenue: number;
 }

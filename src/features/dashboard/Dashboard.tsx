@@ -8,7 +8,8 @@ import {
     YAxis,
     CartesianGrid,
     Tooltip,
-    ResponsiveContainer
+    ResponsiveContainer,
+    Cell
 } from 'recharts';
 import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
@@ -71,7 +72,7 @@ const Dashboard: React.FC = () => {
             setLoading(true);
             try {
                 // Create cache key based on user role for better cache management
-                const dashboardCacheKey = `dashboard-stats-${user.role}`;
+                const dashboardCacheKey = `dashboard-stats-v3-${user.role}`;
                 const storeCacheKey = 'store-details';
 
                 // Check cache for dashboard stats
@@ -86,7 +87,7 @@ const Dashboard: React.FC = () => {
                         for (let i = 6; i >= 0; i--) {
                             const d = new Date();
                             d.setDate(d.getDate() - i);
-                            skeletonData.push({ date: d.toISOString().split('T')[0], revenue: 0 });
+                            skeletonData.push({ label: d.toLocaleDateString('sv-SE'), revenue: 0 });
                         }
                         setChartData(skeletonData);
                     } else {
@@ -105,7 +106,7 @@ const Dashboard: React.FC = () => {
                         for (let i = 6; i >= 0; i--) {
                             const d = new Date();
                             d.setDate(d.getDate() - i);
-                            skeletonData.push({ date: d.toISOString().split('T')[0], revenue: 0 });
+                            skeletonData.push({ label: d.toLocaleDateString('sv-SE'), revenue: 0 });
                         }
                         setChartData(skeletonData);
                     } else {
@@ -223,6 +224,26 @@ const Dashboard: React.FC = () => {
         <div className="p-6 space-y-8 animate-in animate-fade">
             {renderStatusBanner()}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {/* Today's Revenue */}
+                {hasPermission('analytics.view') && (
+                    <StatCard
+                        title={t('todayRevenue')}
+                        value={`${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                        icon={DollarSign}
+                        color="primary"
+                    />
+                )}
+
+                {/* Today's Orders */}
+                {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
+                    <StatCard
+                        title={t('todayOrders')}
+                        value={stats.todayOrders || 0}
+                        icon={ShoppingBag}
+                        color="primary"
+                    />
+                )}
+
                 {/* Revenue - Common for all, but check permission for analytics */}
                 {hasPermission('analytics.view') && (
                     <StatCard
@@ -510,24 +531,30 @@ const Dashboard: React.FC = () => {
 
             {/* Revenue Performance section */}
             {hasPermission('analytics.view') && (
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors text-right">
-                    <div className="flex items-center justify-between mb-8">
+                <div className={clsx("bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors", isRTL ? "text-right" : "text-left")}>
+                    <div className="flex flex-col mb-8">
                         <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
+                        <p className="text-xs text-slate-400 font-medium">{t('last30Days')}</p>
                     </div>
                     <div className="h-[300px]">
                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                            <BarChart
+                                key={`chart-${isRTL}`}
+                                data={chartData}
+                                margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                            >
                                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
                                 <XAxis
-                                    dataKey="date"
+                                    dataKey="label"
                                     axisLine={false}
                                     tickLine={false}
                                     tick={{ fill: textColor, fontSize: 10 }}
                                     dy={10}
                                     reversed={isRTL}
                                     tickFormatter={(str) => {
-                                        const date = new Date(str);
-                                        return date.getDate().toString(); // Just show day numbers for bars to avoid overlap
+                                        const parts = str.split('-');
+                                        if (parts.length === 3) return parseInt(parts[2], 10).toString();
+                                        return str;
                                     }}
                                 />
                                 <YAxis
@@ -551,18 +578,31 @@ const Dashboard: React.FC = () => {
                                     }}
                                     formatter={(val: any) => [`${val.toLocaleString()} ${t('common:currencySymbol')}`, t('totalRevenue')]}
                                     labelFormatter={(label) => {
-                                        const date = new Date(label);
-                                        return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                                        const parts = label.split('-');
+                                        if (parts.length === 3) {
+                                            const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                                            return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                                        }
+                                        return label;
                                     }}
                                 />
                                 <Bar
                                     dataKey="revenue"
-                                    fill="#FF5C00"
                                     radius={[2, 2, 0, 0]}
                                     barSize={20}
                                     minPointSize={4}
                                     animationDuration={1500}
-                                />
+                                >
+                                    {(() => {
+                                        const todayStr = new Date().toLocaleDateString('sv-SE');
+                                        return chartData.map((entry, index) => (
+                                            <Cell
+                                                key={`cell-${index}`}
+                                                fill={entry.label === todayStr ? '#4F46E5' : '#FF5C00'}
+                                            />
+                                        ));
+                                    })()}
+                                </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

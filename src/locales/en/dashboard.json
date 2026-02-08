@@ -11,6 +11,8 @@
     "platformUsers": "Platform Users",
     "avgOrderValue": "Avg. Order Value",
     "vsLastPeriod": "vs last period",
+    "todayRevenue": "Today's Revenue",
+    "todayOrders": "Today's Orders",
     "revenuePerformance": "Revenue Performance",
     "recentActivity": "Recent Activity",
     "topStores": "Top Performing Stores",
