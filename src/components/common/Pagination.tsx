@@ -46,7 +46,7 @@ export const Pagination: React.FC<PaginationProps> = ({
 
     const pages = getPageNumbers();
 
-    const buttonClass = "flex items-center justify-center w-10 h-10 rounded-lg border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
+    const buttonClass = "flex items-center justify-center w-10 h-10 rounded-[4px] border transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed";
     const activeClass = "bg-primary border-primary text-white shadow-sm";
     const inactiveClass = "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-primary hover:text-primary";
 

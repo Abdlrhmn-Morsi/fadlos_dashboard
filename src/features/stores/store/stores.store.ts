@@ -15,7 +15,8 @@ export const storesFiltersState = atom<StoresFilters>({
     key: 'storesFiltersState',
     default: {
         search: '',
-        status: ''
+        status: '',
+        cityId: ''
     }
 });
 

@@ -33,6 +33,7 @@ export interface Store {
 export interface StoresFilters {
     search: string;
     status: string;
+    cityId: string;
 }
 
 export interface StoresPagination {

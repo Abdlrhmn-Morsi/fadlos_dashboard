@@ -47,7 +47,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
       to={to}
       replace={replace}
       className={({ isActive }) => clsx(
-        'flex items-center gap-3 px-4 py-3 rounded-none-none transition-all duration-200 group relative',
+        'flex items-center gap-3 px-4 py-3 rounded-[4px] transition-all duration-200 group relative',
         isActive
           ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
           : 'text-slate-500 hover:bg-primary-light hover:text-primary'
@@ -56,15 +56,14 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
       <Icon size={20} className={clsx('shrink-0', collapsed ? 'mx-auto' : '')} />
       {!collapsed && (
         <span className={clsx(
-          "font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300 flex-1",
-          isRTL ? "text-right" : "text-left"
+          "font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300 flex-1"
         )}>
           {label}
         </span>
       )}
       {collapsed && (
         <div className={clsx(
-          "absolute px-2 py-1 bg-slate-900 text-white text-xs rounded-none opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50",
+          "absolute px-2 py-1 bg-slate-900 text-white text-xs rounded-[4px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50",
           isRTL ? "right-full mr-2" : "left-full ml-2"
         )}>
           {label}
@@ -111,7 +110,10 @@ const DashboardLayout: React.FC = () => {
   };
 
   return (
-    <div className={clsx('flex h-screen overflow-hidden bg-slate-50 font-inter', isRTL ? 'text-right' : 'text-left')}>
+    <div
+      dir={isRTL ? 'rtl' : 'ltr'}
+      className={clsx('flex h-screen overflow-hidden bg-slate-50 font-inter')}
+    >
       {/* Mobile Overlay */}
       {mobileOpen && (
         <div
@@ -142,7 +144,7 @@ const DashboardLayout: React.FC = () => {
             </div>
           )}
           <button
-            className="hidden lg:flex p-1.5 rounded-none text-slate-400 hover:bg-slate-50 hover:text-primary transition-colors dark:hover:bg-slate-800"
+            className="hidden lg:flex p-1.5 rounded-[4px] text-slate-400 hover:bg-slate-50 hover:text-primary transition-colors dark:hover:bg-slate-800"
             onClick={() => setCollapsed(!collapsed)}
           >
             {collapsed ? <Menu size={18} /> : <X size={18} />}
@@ -164,8 +166,7 @@ const DashboardLayout: React.FC = () => {
 
               {!collapsed && (
                 <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]",
-                  isRTL ? "text-right" : "text-left"
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
                 )}>
                   {t('geoAndOrg')}
                 </div>
@@ -184,8 +185,7 @@ const DashboardLayout: React.FC = () => {
             <>
               {!collapsed && (
                 <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]",
-                  isRTL ? "text-right" : "text-left"
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
                 )}>
                   {t('management')}
                 </div>
@@ -223,8 +223,7 @@ const DashboardLayout: React.FC = () => {
 
               {!collapsed && (
                 <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]",
-                  isRTL ? "text-right" : "text-left"
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
                 )}>
                   {t('team')}
                 </div>
@@ -254,7 +253,7 @@ const DashboardLayout: React.FC = () => {
         <div className="p-4 border-t border-slate-100 dark:border-slate-800">
           <button
             className={clsx(
-              'flex items-center gap-3 w-full px-4 py-3 rounded-none-none transition-all duration-200 group text-rose-500 hover:bg-rose-50',
+              'flex items-center gap-3 w-full px-4 py-3 rounded-[4px] transition-all duration-200 group text-rose-500 hover:bg-rose-50',
               collapsed && 'justify-center'
             )}
             onClick={handleLogout}
@@ -262,8 +261,7 @@ const DashboardLayout: React.FC = () => {
             <LogOut size={20} className={isRTL ? 'rotate-180' : ''} />
             {!collapsed && (
               <span className={clsx(
-                "font-bold text-sm flex-1",
-                isRTL ? "text-right" : "text-left"
+                "font-bold text-sm flex-1"
               )}>
                 {t('logout')}
               </span>
@@ -312,7 +310,7 @@ const DashboardLayout: React.FC = () => {
                 }
               }}
             >
-              <div className={clsx("flex flex-col", isRTL ? "ml-3 text-left items-start" : "mr-3 text-right items-end")}>
+              <div className={clsx("flex flex-col mx-3")}>
                 <span className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none mb-1">
                   {user?.name}
                 </span>

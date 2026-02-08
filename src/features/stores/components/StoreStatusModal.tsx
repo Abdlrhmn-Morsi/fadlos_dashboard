@@ -49,10 +49,10 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-sm animate-in fade-in duration-200" dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-none shadow-2xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
+            <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[4px] shadow-2xl border border-slate-200 dark:border-slate-800 animate-in zoom-in-95 duration-200">
                 <div className="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className="p-2 bg-primary/10 rounded-none">
+                        <div className="p-2 bg-primary/10 rounded-[4px]">
                             <Clock className="text-primary" size={20} />
                         </div>
                         <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('common:updateStatus')}</h3>
@@ -71,7 +71,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                                     key={s.id}
                                     type="button"
                                     onClick={() => setFormData({ ...formData, status: s.id })}
-                                    className={`flex items-center gap-3 p-3 border transition-all ${formData.status === s.id
+                                    className={`flex items-center gap-3 p-3 border transition-all rounded-[4px] ${formData.status === s.id
                                         ? `border-primary ring-4 ring-primary/5 ${s.bg}`
                                         : 'border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50 hover:border-slate-200 dark:hover:border-slate-700'
                                         }`}
@@ -91,12 +91,12 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                             <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{t('common:optional')}</span>
                         </div>
                         <textarea
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-slate-900 dark:text-white text-sm min-h-[120px] resize-none placeholder:text-slate-400"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-slate-900 dark:text-white text-sm min-h-[120px] resize-none placeholder:text-slate-400"
                             placeholder={t('common:statusReasonPlaceholder')}
                             value={formData.reason}
                             onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
                         />
-                        <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-none">
+                        <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-[4px]">
                             <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
                             <p className="text-[11px] text-amber-700 dark:text-amber-400/80 font-medium leading-relaxed">
                                 {t('common:storeOwnerVisibilityNote')}
@@ -108,17 +108,17 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                         <button
                             type="button"
                             onClick={onClose}
-                            className="flex-1 py-3 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                            className="flex-1 py-3 text-sm font-bold text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors rounded-[4px]"
                         >
                             {t('common:cancel')}
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-[2] py-3 bg-primary text-white text-sm font-black uppercase tracking-widest hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                            className="flex-[2] py-3 bg-primary text-white text-sm font-black uppercase tracking-widest hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 rounded-[4px]"
                         >
                             {loading ? (
-                                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-none animate-spin" />
+                                <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-[4px] animate-spin" />
                             ) : (
                                 t('common:updateStatus')
                             )}

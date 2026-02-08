@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getStores, getStoreStatsSummary } from '../api/stores.api';
+import { getCities } from '../../cities/api/cities.api';
 import {
     storesState,
     storesLoadingState,
@@ -36,6 +37,8 @@ const StoresList = () => {
     const [selectedStore, setSelectedStore] = useState<any>(null);
     const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
     const [statsSummary, setStatsSummary] = useState<any>(null);
+    const [cities, setCities] = useState<any[]>([]);
+    const [searchTerm, setSearchTerm] = useState(filters.search);
 
     const fetchStatsSummary = async () => {
         try {
@@ -46,6 +49,15 @@ const StoresList = () => {
         }
     };
 
+    const fetchCities = async () => {
+        try {
+            const data = await getCities();
+            setCities(data);
+        } catch (error) {
+            console.error('Failed to fetch cities:', error);
+        }
+    };
+
     const fetchStores = async () => {
         setLoading(true);
         try {
@@ -53,7 +65,8 @@ const StoresList = () => {
                 page: pagination.page,
                 limit: pagination.limit,
                 search: filters.search,
-                status: filters.status
+                status: filters.status,
+                cityId: filters.cityId
             };
 
             const { stores, meta } = await getStores(params);
@@ -72,11 +85,24 @@ const StoresList = () => {
 
     useEffect(() => {
         fetchStores();
-    }, [pagination.page, filters.status]);
+    }, [pagination.page, filters.status, filters.cityId, filters.search]);
 
     useEffect(() => {
         fetchStatsSummary();
+        fetchCities();
     }, []);
+
+    // Debounce search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (searchTerm !== filters.search) {
+                setFilters(prev => ({ ...prev, search: searchTerm }));
+                setPagination(prev => ({ ...prev, page: 1 }));
+            }
+        }, 500);
+
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -85,19 +111,19 @@ const StoresList = () => {
     };
 
     const getStatusBadge = (status: string) => {
-        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-none text-xs font-semibold";
+        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-[4px] text-xs font-semibold";
         const s = status?.toUpperCase();
         switch (s) {
             case 'ACTIVE':
-                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400`}><CheckCircle size={12} /> {t('common:active')}</span>;
+                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 rounded-[4px]`}><CheckCircle size={12} /> {t('common:active')}</span>;
             case 'INACTIVE':
-                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><XCircle size={12} /> {t('common:inactive')}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 rounded-[4px]`}><XCircle size={12} /> {t('common:inactive')}</span>;
             case 'PENDING':
-                return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400`}><Clock size={12} /> {t('common:pending')}</span>;
+                return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 rounded-[4px]`}><Clock size={12} /> {t('common:pending')}</span>;
             case 'SUSPENDED':
-                return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400`}><ShieldAlert size={12} /> {t('common:suspended')}</span>;
+                return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400 rounded-[4px]`}><ShieldAlert size={12} /> {t('common:suspended')}</span>;
             default:
-                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}>{status}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 rounded-[4px]`}>{status}</span>;
         }
     };
 
@@ -110,7 +136,7 @@ const StoresList = () => {
         <div className="list-page-container p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex items-center gap-3">
-                    <div className="p-3 bg-primary-light rounded-none animate-float">
+                    <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Store size={24} className="text-primary" />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
@@ -118,7 +144,23 @@ const StoresList = () => {
 
                 <div className="flex flex-wrap gap-3">
                     <select
-                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
+                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
+                        value={filters.cityId}
+                        onChange={(e) => {
+                            setFilters((prev: any) => ({ ...prev, cityId: e.target.value }));
+                            setPagination((prev: any) => ({ ...prev, page: 1 }));
+                        }}
+                    >
+                        <option value="">{t('common:allCities', { defaultValue: 'All Cities' })}</option>
+                        {cities.map((city) => (
+                            <option key={city.id} value={city.id}>
+                                {isRTL ? city.arName : city.enName}
+                            </option>
+                        ))}
+                    </select>
+
+                    <select
+                        className="px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm"
                         value={filters.status}
                         onChange={(e) => {
                             setFilters((prev: any) => ({ ...prev, status: e.target.value }));
@@ -132,24 +174,24 @@ const StoresList = () => {
                         <option value="inactive">{t('common:inactive')}</option>
                     </select>
 
-                    <form onSubmit={handleSubmit} className="relative group">
+                    <div className="relative group">
                         <Search size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors start-4" />
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
-                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100 ps-11 pe-4"
-                            value={filters.search}
-                            onChange={(e) => setFilters((prev: any) => ({ ...prev, search: e.target.value }))}
+                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100 ps-11 pe-4"
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
                         />
-                    </form>
+                    </div>
                 </div>
             </div>
 
             {/* Stats Summary Section */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-[4px] border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-none">
+                        <div className="p-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 rounded-[4px]">
                             <CheckCircle size={20} />
                         </div>
                         <div>
@@ -159,9 +201,9 @@ const StoresList = () => {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-[4px] border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-none">
+                        <div className="p-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-[4px]">
                             <Clock size={20} />
                         </div>
                         <div>
@@ -171,9 +213,9 @@ const StoresList = () => {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-[4px] border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-none">
+                        <div className="p-3 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 rounded-[4px]">
                             <ShieldAlert size={20} />
                         </div>
                         <div>
@@ -183,9 +225,9 @@ const StoresList = () => {
                     </div>
                 </div>
 
-                <div className="bg-white dark:bg-slate-900 p-5 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm">
+                <div className="bg-white dark:bg-slate-900 p-5 rounded-[4px] border border-slate-200 dark:border-slate-700 shadow-sm">
                     <div className="flex items-center gap-4">
-                        <div className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-none">
+                        <div className="p-3 bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-[4px]">
                             <XCircle size={20} />
                         </div>
                         <div>
@@ -199,7 +241,7 @@ const StoresList = () => {
             <div className="table-container">
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-6">
-                        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-none animate-spin" />
+                        <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-[4px] animate-spin" />
                         <div className="text-slate-400 font-bold uppercase tracking-widest text-xs">{t('syncing')}</div>
                     </div>
                 ) : (
@@ -222,9 +264,9 @@ const StoresList = () => {
                                             <td className="table-cell">
                                                 <div className="flex items-center gap-4">
                                                     {store.logo ? (
-                                                        <img src={store.logo} alt="" className="w-11 h-11 rounded-none object-cover shadow-lg shadow-slate-200 dark:shadow-slate-900/50 border border-white dark:border-slate-700" />
+                                                        <img src={store.logo} alt="" className="w-11 h-11 rounded-[4px] object-cover shadow-lg shadow-slate-200 dark:shadow-slate-900/50 border border-white dark:border-slate-700" />
                                                     ) : (
-                                                        <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
+                                                        <div className="w-11 h-11 rounded-[4px] bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
                                                             {store.name.charAt(0).toUpperCase()}
                                                         </div>
                                                     )}
@@ -257,14 +299,14 @@ const StoresList = () => {
                                                 <div className="flex items-center gap-1 justify-end">
                                                     <button
                                                         onClick={() => navigate(`/stores/${store.id}`)}
-                                                        className="p-3 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-none transition-all active:scale-90"
+                                                        className="p-3 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded-[4px] transition-all active:scale-90"
                                                         title={t('common:view')}
                                                     >
                                                         <Eye size={20} />
                                                     </button>
                                                     <button
                                                         onClick={() => handleOpenStatusModal(store)}
-                                                        className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none transition-all active:scale-90"
+                                                        className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-[4px] transition-all active:scale-90"
                                                     >
                                                         <MoreVertical size={20} />
                                                     </button>

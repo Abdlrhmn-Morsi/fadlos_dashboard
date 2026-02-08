@@ -117,22 +117,22 @@ const BusinessCategoriesList = () => {
 
     return (
         <div className="list-page-container p-6">
-            <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "flex-row-reverse")}>
-                <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
-                    <div className="p-3 bg-primary-light rounded-none animate-float">
+            <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4")}>
+                <div className={clsx("flex items-center gap-3")}>
+                    <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Tags size={24} className="text-primary" />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
-                <div className={clsx("flex flex-wrap gap-3", isRTL && "flex-row-reverse")}>
+                <div className={clsx("flex flex-wrap gap-3")}>
                     <div className="relative group">
                         <Search size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors", isRTL ? "right-4" : "left-4")} />
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
                             className={clsx(
-                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
-                                isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
+                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -144,8 +144,8 @@ const BusinessCategoriesList = () => {
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                             className={clsx(
-                                "py-3 w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
-                                isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
+                                "py-3 w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                         >
                             <option value="">{t('allBusinessTypes')}</option>
@@ -187,7 +187,7 @@ const BusinessCategoriesList = () => {
                     </div>
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
+                        <table className={clsx("w-full border-collapse")}>
                             <thead>
                                 <tr className="bg-slate-50/80 dark:bg-slate-800/80">
                                     <th className="table-header-cell">{t('nameEn')}</th>
@@ -195,7 +195,7 @@ const BusinessCategoriesList = () => {
                                     <th className="table-header-cell">{t('businessType')}</th>
                                     <th className="table-header-cell">{t('code')}</th>
                                     <th className="table-header-cell">{t('status')}</th>
-                                    <th className={clsx("table-header-cell", isRTL ? "text-left" : "text-right")}>{t('actions')}</th>
+                                    <th className={clsx("table-header-cell text-end")}>{t('actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -214,7 +214,7 @@ const BusinessCategoriesList = () => {
                                                 </div>
                                             </td>
                                             <td className="table-cell">
-                                                <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-none text-[10px] font-black tracking-widest uppercase">
+                                                <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-[4px] text-[10px] font-black tracking-widest uppercase">
                                                     {category.code}
                                                 </code>
                                             </td>
@@ -222,20 +222,19 @@ const BusinessCategoriesList = () => {
                                                 <button
                                                     onClick={() => handleToggleStatus(category)}
                                                     className={clsx(
-                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-none text-[10px] font-black uppercase tracking-widest transition-all",
-                                                        isRTL && "flex-row-reverse",
+                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
                                                         category.isActive
                                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-900'
                                                             : 'bg-slate-50 text-slate-400 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700'
                                                     )}
                                                 >
-                                                    <div className={`w-1.5 h-1.5 rounded-none ${category.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${category.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
                                                     {category.isActive ? t('active') : t('inactive')}
                                                 </button>
                                             </td>
-                                            <td className={clsx("table-cell", isRTL ? "text-left" : "text-right")}>
+                                            <td className={clsx("table-cell text-end")}>
                                                 <button
-                                                    className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none transition-all active:scale-90"
+                                                    className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-[4px] transition-all active:scale-90"
                                                     onClick={() => {
                                                         setModal({
                                                             isOpen: true,
@@ -273,7 +272,7 @@ const BusinessCategoriesList = () => {
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('nameEn')}
                             </label>
                             <input
@@ -283,13 +282,12 @@ const BusinessCategoriesList = () => {
                                 required
                                 placeholder={t('nameEnPlaceholder')}
                                 className={clsx(
-                                    "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
-                                    isRTL && "text-right"
+                                    "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                                 )}
                             />
                         </div>
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('nameAr')}
                             </label>
                             <input
@@ -299,14 +297,13 @@ const BusinessCategoriesList = () => {
                                 required
                                 placeholder={t('nameArPlaceholder')}
                                 className={clsx(
-                                    "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
-                                    isRTL && "text-right"
+                                    "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                                 )}
                             />
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('businessType')}
                         </label>
                         <select
@@ -314,8 +311,7 @@ const BusinessCategoriesList = () => {
                             onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, businessTypeId: e.target.value } })}
                             required
                             className={clsx(
-                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
-                                isRTL && "text-right"
+                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                             )}
                         >
                             <option value="">{t('selectBusinessType')}</option>
@@ -327,7 +323,7 @@ const BusinessCategoriesList = () => {
                         </select>
                     </div>
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('sortOrder')}
                         </label>
                         <input
@@ -335,26 +331,24 @@ const BusinessCategoriesList = () => {
                             value={modal.currentCategory.sort || 0}
                             onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, sort: parseInt(e.target.value) || 0 } })}
                             className={clsx(
-                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
-                                isRTL && "text-right"
+                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100"
                             )}
                             placeholder={t('sortOrderPlaceholder')}
                         />
                     </div>
                     <div className={clsx(
-                        "flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/50 p-5 rounded-none border border-slate-100 dark:border-slate-700 transition-all hover:bg-slate-50 dark:hover:bg-slate-800",
-                        isRTL && "flex-row-reverse"
+                        "flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/50 p-5 rounded-[4px] border border-slate-100 dark:border-slate-700 transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
                     )}>
                         <input
                             type="checkbox"
                             checked={modal.currentCategory.isActive ?? true}
                             onChange={(e) => setModal({ ...modal, currentCategory: { ...modal.currentCategory, isActive: e.target.checked } })}
                             id="category-active"
-                            className="w-6 h-6 rounded-none border-slate-300 dark:border-slate-600 text-primary shadow-sm"
+                            className="w-6 h-6 rounded-[4px] border-slate-300 dark:border-slate-600 text-primary shadow-sm"
                         />
                         <label htmlFor="category-active" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">{t('activeStatus')}</label>
                     </div>
-                    <div className={clsx("flex items-center gap-3 pt-4", isRTL ? "justify-start flex-row-reverse" : "justify-end")}>
+                    <div className={clsx("flex items-center gap-3 pt-4 justify-end")}>
                         <button
                             type="button"
                             className="btn btn-secondary"

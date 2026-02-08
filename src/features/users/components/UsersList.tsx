@@ -110,36 +110,30 @@ const UsersList: React.FC = () => {
 
     return (
         <div className="list-page-container p-6">
-            <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "flex-row-reverse")}>
-                <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="flex items-center gap-3">
                     <div className="p-3 bg-primary-light rounded-none animate-float">
                         <Users size={24} className="text-primary" />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
 
-                <div className={clsx("flex flex-wrap gap-3", isRTL && "flex-row-reverse")}>
+                <div className="flex flex-wrap gap-3">
                     <form onSubmit={handleSearch} className="relative group">
-                        <Search size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors", isRTL ? "right-4" : "left-4")} />
+                        <Search size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors start-4" />
                         <input
                             type="text"
                             placeholder={t('searchUsersPlaceholder')}
-                            className={clsx(
-                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md",
-                                isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
-                            )}
+                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md ps-11 pe-4"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </form>
 
                     <div className="relative group">
-                        <Filter size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none", isRTL ? "right-4" : "left-4")} />
+                        <Filter size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none start-4" />
                         <select
-                            className={clsx(
-                                "appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group-hover:shadow-md",
-                                isRTL ? "pr-11 pl-12 text-right" : "pl-11 pr-12"
-                            )}
+                            className="appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group-hover:shadow-md ps-11 pe-12"
                             value={filters.role}
                             onChange={(e) => {
                                 setFilters((prev: any) => ({ ...prev, role: e.target.value }));
@@ -163,15 +157,15 @@ const UsersList: React.FC = () => {
                     </div>
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
-                        <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
+                        <table className="w-full border-collapse">
                             <thead>
                                 <tr className="bg-slate-50/80 dark:bg-slate-800/80">
-                                    <th className="table-header-cell">{t('userProfile')}</th>
-                                    <th className="table-header-cell">{t('permissions')}</th>
-                                    <th className="table-header-cell">{t('communication')}</th>
-                                    <th className="table-header-cell">{t('common:status')}</th>
-                                    <th className="table-header-cell">{t('registration')}</th>
-                                    <th className={clsx("table-header-cell", isRTL ? "text-left" : "text-right")}>{t('common:actions')}</th>
+                                    <th className="table-header-cell text-start">{t('userProfile')}</th>
+                                    <th className="table-header-cell text-start">{t('permissions')}</th>
+                                    <th className="table-header-cell text-start">{t('communication')}</th>
+                                    <th className="table-header-cell text-start">{t('common:status')}</th>
+                                    <th className="table-header-cell text-start">{t('registration')}</th>
+                                    <th className="table-header-cell text-end">{t('common:actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -179,11 +173,11 @@ const UsersList: React.FC = () => {
                                     users.map((user: any) => (
                                         <tr key={user.id} className="table-row group">
                                             <td className="table-cell">
-                                                <div className={clsx("flex items-center gap-4", isRTL && "flex-row-reverse")}>
+                                                <div className="flex items-center gap-4">
                                                     <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
                                                         {user.name.charAt(0).toUpperCase()}
                                                     </div>
-                                                    <div className={isRTL ? "text-right" : "text-left"}>
+                                                    <div className="text-start">
                                                         <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{user.name}</div>
                                                         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">@{user.username}</div>
                                                     </div>
@@ -218,7 +212,7 @@ const UsersList: React.FC = () => {
                                             <td className="table-cell text-sm text-slate-500 font-bold">
                                                 {new Date(user.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                                             </td>
-                                            <td className={clsx("table-cell", isRTL ? "text-left" : "text-right")}>
+                                            <td className="table-cell text-end">
                                                 <button className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none transition-all active:scale-90">
                                                     <MoreVertical size={20} />
                                                 </button>
@@ -243,15 +237,15 @@ const UsersList: React.FC = () => {
 
             {
                 pagination.totalPages > 1 && (
-                    <div className={clsx("flex items-center justify-between py-6", isRTL && "flex-row-reverse")}>
+                    <div className="flex items-center justify-between py-6">
                         <button
                             disabled={pagination.page === 1}
                             onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page - 1 }))}
                             className="btn btn-secondary border-none shadow-sm h-11"
                         >
-                            {isRTL ? t('common:next') : t('common:previous')}
+                            {t('common:previous')}
                         </button>
-                        <div className={clsx("flex items-center gap-2", isRTL && "flex-row-reverse")}>
+                        <div className="flex items-center gap-2">
                             <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('common:page')}</span>
                             <div className="w-10 h-10 rounded-none bg-slate-900 dark:bg-slate-700 flex items-center justify-center text-white text-sm font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50">
                                 {pagination.page}
@@ -263,7 +257,7 @@ const UsersList: React.FC = () => {
                             onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page + 1 }))}
                             className="btn btn-secondary border-none shadow-sm h-11"
                         >
-                            {isRTL ? t('common:previous') : t('common:next')}
+                            {t('common:next')}
                         </button>
                     </div>
                 )

@@ -131,22 +131,22 @@ const CitiesList = () => {
 
     return (
         <div className="list-page-container p-6">
-            <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4", isRTL && "flex-row-reverse")}>
-                <div className={clsx("flex items-center gap-3", isRTL && "flex-row-reverse")}>
-                    <div className="p-3 bg-primary-light rounded-none animate-float">
+            <div className={clsx("flex flex-col md:flex-row md:items-center justify-between gap-4")}>
+                <div className={clsx("flex items-center gap-3")}>
+                    <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Map size={24} className="text-primary" />
                     </div>
                     <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
-                <div className={clsx("flex flex-wrap gap-3", isRTL && "flex-row-reverse")}>
+                <div className={clsx("flex flex-wrap gap-3")}>
                     <div className="relative group">
                         <Search size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors", isRTL ? "right-4" : "left-4")} />
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
                             className={clsx(
-                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
-                                isRTL ? "pr-11 pl-4 text-right" : "pl-11 pr-4"
+                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                             value={search}
                             onChange={(e) => setSearch(e.target.value)}
@@ -176,15 +176,14 @@ const CitiesList = () => {
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
                         <table
-                            dir={isRTL ? 'rtl' : 'ltr'}
-                            className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}
+                            className={clsx("w-full border-collapse")}
                         >
                             <thead>
                                 <tr className="bg-slate-50/80 dark:bg-slate-800/80">
                                     <th className="table-header-cell">{t('domainEn')}</th>
                                     <th className="table-header-cell">{t('domainAr')}</th>
                                     <th className="table-header-cell">{t('presence')}</th>
-                                    <th className={clsx("table-header-cell", isRTL ? "text-left" : "text-right")}>{t('governance')}</th>
+                                    <th className={clsx("table-header-cell text-end")}>{t('governance')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -201,21 +200,20 @@ const CitiesList = () => {
                                                 <button
                                                     onClick={() => handleToggleStatus(city)}
                                                     className={clsx(
-                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-none text-[10px] font-black uppercase tracking-widest transition-all",
-                                                        isRTL && "flex-row-reverse",
+                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
                                                         city.isActive
                                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-900'
                                                             : 'bg-slate-50 text-slate-400 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700'
                                                     )}
                                                 >
-                                                    <div className={`w-1.5 h-1.5 rounded-none ${city.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
+                                                    <div className={`w-1.5 h-1.5 rounded-full ${city.isActive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-300'}`} />
                                                     {city.isActive ? t('deployed') : t('offline')}
                                                 </button>
                                             </td>
-                                            <td className={clsx("table-cell", isRTL ? "text-left" : "text-right")}>
-                                                <div className={clsx("flex gap-2", isRTL ? "justify-start" : "justify-end")}>
+                                            <td className={clsx("table-cell text-end")}>
+                                                <div className={clsx("flex gap-2 justify-end")}>
                                                     <button
-                                                        className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none transition-all active:scale-90"
+                                                        className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-[4px] transition-all active:scale-90"
                                                         onClick={() => {
                                                             setModal({
                                                                 isOpen: true,
@@ -227,7 +225,7 @@ const CitiesList = () => {
                                                         <Edit2 size={18} />
                                                     </button>
                                                     <button
-                                                        className="p-3 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-none transition-all active:scale-90"
+                                                        className="p-3 text-slate-300 hover:text-rose-600 hover:bg-rose-50 rounded-[4px] transition-all active:scale-90"
                                                         onClick={() => handleDelete(city.id)}
                                                     >
                                                         <Trash2 size={18} />
@@ -259,7 +257,7 @@ const CitiesList = () => {
             >
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('universalDesignationEn')}
                         </label>
                         <input
@@ -269,13 +267,12 @@ const CitiesList = () => {
                             required
                             placeholder={t('placeholderEn')}
                             className={clsx(
-                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
-                                isRTL && "text-right"
+                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-[4px]"
                             )}
                         />
                     </div>
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em]", isRTL ? "mr-1 block text-right" : "ml-1")}>
+                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('nativeDesignationAr')}
                         </label>
                         <input
@@ -285,25 +282,23 @@ const CitiesList = () => {
                             required
                             placeholder={t('placeholderAr')}
                             className={clsx(
-                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100",
-                                isRTL && "text-right"
+                                "bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-[4px]"
                             )}
                         />
                     </div>
                     <div className={clsx(
-                        "flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/50 p-5 rounded-none border border-slate-100 dark:border-slate-700 transition-all hover:bg-slate-50 dark:hover:bg-slate-800",
-                        isRTL && "flex-row-reverse"
+                        "flex items-center gap-4 bg-slate-50/50 dark:bg-slate-800/50 p-5 rounded-[4px] border border-slate-100 dark:border-slate-700 transition-all hover:bg-slate-50 dark:hover:bg-slate-800"
                     )}>
                         <input
                             type="checkbox"
                             checked={modal.currentCity.isActive}
                             onChange={(e) => setModal({ ...modal, currentCity: { ...modal.currentCity, isActive: e.target.checked } })}
                             id="city-active"
-                            className="w-6 h-6 rounded-none border-slate-300 dark:border-slate-600 text-primary shadow-sm"
+                            className="w-6 h-6 rounded-[4px] border-slate-300 dark:border-slate-600 text-primary shadow-sm"
                         />
                         <label htmlFor="city-active" className="text-sm font-bold text-slate-700 dark:text-slate-300 cursor-pointer select-none">{t('activeDeployment')}</label>
                     </div>
-                    <div className={clsx("flex items-center gap-3 pt-4", isRTL ? "justify-start flex-row-reverse" : "justify-end")}>
+                    <div className={clsx("flex items-center gap-3 pt-4 justify-end")}>
                         <button
                             type="button"
                             className="btn btn-secondary"
