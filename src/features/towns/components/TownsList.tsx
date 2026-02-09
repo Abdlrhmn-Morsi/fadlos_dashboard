@@ -124,8 +124,8 @@ const TownsList = () => {
                     setPagination(prev => ({
                         ...prev,
                         page: pageToFetch,
-                        total: cachedTowns.total,
-                        totalPages: cachedTowns.totalPages
+                        total: cachedTowns.meta?.total || cachedTowns.total || 0,
+                        totalPages: cachedTowns.meta?.totalPages || cachedTowns.totalPages || 0
                     }));
                 } else if (Array.isArray(cachedTowns)) {
                     setTowns(cachedTowns);
@@ -142,8 +142,8 @@ const TownsList = () => {
                 setPagination(prev => ({
                     ...prev,
                     page: pageToFetch,
-                    total: townsResponse.total,
-                    totalPages: townsResponse.totalPages
+                    total: townsResponse.meta?.total || townsResponse.total || 0,
+                    totalPages: townsResponse.meta?.totalPages || townsResponse.totalPages || 0
                 }));
                 // Set Cache
                 setCache(townsCacheKey, townsResponse, cacheParams);
