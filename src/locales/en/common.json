@@ -102,10 +102,8 @@
     "phoneAlreadyExists": "This phone number is already in use by another user.",
     "email": "Email Address",
     "phone": "Phone Number",
-    "actions": {
-        "edit": "Edit",
-        "remove": "Remove"
-    },
+    "actions": "Actions",
+    "remove": "Remove",
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
