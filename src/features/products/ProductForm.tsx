@@ -1243,7 +1243,9 @@ const ProductForm = () => {
                                         >
                                             <option value="">{t('selectCategory')}</option>
                                             {categories.map((cat: any) => (
-                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                                <option key={cat.id} value={cat.id}>
+                                                    {isRTL ? (cat.nameAr || cat.name) : cat.name}
+                                                </option>
                                             ))}
                                         </select>
                                     )}
