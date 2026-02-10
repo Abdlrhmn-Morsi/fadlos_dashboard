@@ -1,4 +1,14 @@
 {
+    "common": {
+        "no_results": "No results found",
+        "click_to_upload": "Click to upload",
+        "leave_blank_to_keep": "Leave blank to keep unchanged",
+        "error_fetching_data": "Failed to load data",
+        "not_found": "Data not found",
+        "update_success": "Updated successfully",
+        "delete_success": "Deleted successfully",
+        "create_success": "Created successfully"
+    },
     "dashboard": "Dashboard",
     "revenue": "Revenue",
     "orders": "Orders",
@@ -59,6 +69,9 @@
     "reportedReviews": "Reported Reviews",
     "categories": "Categories",
     "addons": "Add-ons",
+    "deliveryDrivers": "Delivery Drivers",
+    "driverVerification": "Driver Verification",
+    "deliveryDashboard": "Driver Dashboard",
     "analytics": "Analytics",
     "logout": "Logout",
     "search": "Search",
@@ -89,16 +102,23 @@
     "phoneAlreadyExists": "This phone number is already in use by another user.",
     "email": "Email Address",
     "phone": "Phone Number",
-    "actions": "Actions",
+    "actions": {
+        "edit": "Edit",
+        "remove": "Remove"
+    },
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
+    "accepted": "Accepted",
     "pending": "Pending",
     "confirmed": "Confirmed",
-    "preparing": "Preparing",
+    "prepared": "Prepared",
     "ready": "Ready",
     "delivered": "Delivered",
     "cancelled": "Cancelled",
+    "rejected": "Rejected",
+    "unverified": "Unverified",
+    "preparing": "Preparing",
     "sortOrder": "Sort Order",
     "total": "Total",
     "page": "Page",
@@ -109,6 +129,26 @@
     "noData": "No data available for the selected period",
     "noResults": "No results found",
     "adjustSearch": "Try adjusting your search terms",
+    "reason": "Reason",
+    "optional": "Optional",
+    "provideReason": "Provide a reason (optional)",
+    "verificationSuccess": "Driver verification updated successfully",
+    "verificationError": "Failed to update verification status",
+    "approve_confirm_msg": "Are you sure you want to verify this driver? They will be able to start accepting orders immediately.",
+    "reject_confirm_msg": "Please provide a reason for rejecting this driver's application.",
+    "approve": "Approve",
+    "reject": "Reject",
+    "type": "Type",
+    "documents": "Verification Documents",
+    "verificationStatuses": {
+        "VERIFIED": "Verified",
+        "REJECTED": "Rejected",
+        "PENDING": "Pending"
+    },
+    "driverTypes": {
+        "STORE_DRIVER": "Store Driver",
+        "FREELANCER": "Freelancer"
+    },
     "language": "Language",
     "theme": "Theme",
     "lightMode": "Light Mode",
@@ -438,5 +478,50 @@
     "addFirstCategory": "Add your first category",
     "accessDenied": "Access Denied",
     "noPermissionViewStore": "You do not have permission to view store settings. Please contact your administrator.",
-    "goBack": "Go Back"
+    "goBack": "Go Back",
+    "delivery": {
+        "status": {
+            "online": "Online",
+            "offline": "Offline"
+        },
+        "drivers": {
+            "title": "Delivery Drivers",
+            "my_drivers": "My Drivers",
+            "marketplace": "Marketplace",
+            "list_title": "Store Drivers",
+            "manage_desc": "Manage your delivery staff and their availability",
+            "search_placeholder": "Search by name, email or phone...",
+            "add_new": "Add New Driver",
+            "find_freelancers": "Find Freelancers",
+            "marketplace_desc": "Connect with available delivery drivers in your area",
+            "available_only": "Available Only",
+            "hire": "Hire Driver",
+            "hire_success": "Freelancer hired successfully",
+            "create_title": "Create New Driver",
+            "personal_info": "Personal Information",
+            "identity_verification": "Identity Verification",
+            "id_front": "ID Card (Front)",
+            "id_back": "ID Card (Back)",
+            "selfie": "Selfie",
+            "remove_title": "Remove Driver",
+            "remove_confirm_message": "Are you sure you want to remove this driver from your store? This action cannot be undone.",
+            "total": "Total",
+            "no_pending": "No drivers awaiting verification",
+            "verification": {
+                "title": "Driver Verification",
+                "desc": "Review and approve driver identity documents."
+            }
+        }
+    },
+    "fields": {
+        "name": "Full Name",
+        "contact": "Contact",
+        "status": "Status",
+        "availability": "Availability",
+        "joined_at": "Joined At",
+        "username": "Username",
+        "email": "Email Address",
+        "phone": "Phone Number",
+        "password": "Password"
+    }
 }

@@ -40,6 +40,10 @@ import EmployeeForm from './features/employees/components/EmployeeForm';
 import AddonsList from './features/addons/components/AddonsList';
 import AddonForm from './features/addons/components/AddonForm';
 import Analytics from './features/analytics/Analytics';
+import DeliveryDriversPage from './features/delivery/pages/DeliveryDriversPage';
+import DeliveryDriverForm from './features/delivery/components/DeliveryDriverForm';
+import DriverDashboard from './features/delivery/pages/DriverDashboard';
+import DriverVerificationPage from './features/delivery/pages/DriverVerificationPage';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
@@ -136,6 +140,7 @@ const AppContent = () => {
             <Route path="business-types" element={<BusinessTypes />} />
             <Route path="business-categories" element={<BusinessCategories />} />
             <Route path="reported-reviews" element={<ReportedReviewList />} />
+            <Route path="drivers/verification" element={<DriverVerificationPage />} />
 
 
             <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
@@ -160,6 +165,12 @@ const AppContent = () => {
             <Route path="employees" element={<PermissionGate permission={Permissions.EMPLOYEES_VIEW}><EmployeesList /></PermissionGate>} />
             <Route path="employees/new" element={<PermissionGate permission={Permissions.EMPLOYEES_CREATE}><EmployeeForm /></PermissionGate>} />
             <Route path="employees/edit/:id" element={<PermissionGate permission={Permissions.EMPLOYEES_UPDATE}><EmployeeForm /></PermissionGate>} />
+
+            {/* Delivery Drivers */}
+            <Route path="delivery-drivers" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_VIEW}><DeliveryDriversPage /></PermissionGate>} />
+            <Route path="delivery-drivers/new" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_CREATE}><DeliveryDriverForm /></PermissionGate>} />
+            <Route path="delivery-drivers/edit/:id" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DeliveryDriverForm /></PermissionGate>} />
+            <Route path="delivery-dashboard" element={<DriverDashboard />} />
 
             {/* Redirect unknown to dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />

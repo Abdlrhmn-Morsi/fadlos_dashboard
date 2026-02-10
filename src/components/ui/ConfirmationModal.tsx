@@ -11,6 +11,7 @@ interface ConfirmationModalProps {
     cancelLabel?: string;
     isLoading?: boolean;
     type?: 'danger' | 'warning' | 'info';
+    children?: React.ReactNode;
 }
 
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -25,7 +26,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
     confirmLabel,
     cancelLabel,
     isLoading = false,
-    type = 'info'
+    type = 'info',
+    children
 }) => {
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
@@ -58,6 +60,8 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                     <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">{title}</h3>
                     <p className="text-slate-500 dark:text-slate-400 mb-6">{message}</p>
 
+                    {children}
+
                     <div className="flex gap-3 justify-center">
                         <button
                             onClick={onCancel}
@@ -66,19 +70,21 @@ const ConfirmationModal: React.FC<ConfirmationModalProps> = ({
                         >
                             {finalCancelLabel}
                         </button>
-                        <button
-                            onClick={onConfirm}
-                            disabled={isLoading}
-                            className={`px-5 py-2.5 text-white rounded-lg font-medium transition-all shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 disabled:opacity-50 flex items-center gap-2 ${type === 'danger'
-                                ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20 hover:shadow-rose-500/30'
-                                : type === 'warning'
-                                    ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20 hover:shadow-amber-500/30'
-                                    : 'bg-indigo-600 hover:bg-indigo-700'
-                                }`}
-                        >
-                            {isLoading && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>}
-                            {finalConfirmLabel}
-                        </button>
+                        {confirmLabel !== "" && (
+                            <button
+                                onClick={onConfirm}
+                                disabled={isLoading}
+                                className={`px-5 py-2.5 text-white rounded-lg font-medium transition-all shadow-lg shadow-indigo-500/20 hover:shadow-xl hover:shadow-indigo-500/30 disabled:opacity-50 flex items-center gap-2 ${type === 'danger'
+                                    ? 'bg-rose-600 hover:bg-rose-700 shadow-rose-500/20 hover:shadow-rose-500/30'
+                                    : type === 'warning'
+                                        ? 'bg-amber-600 hover:bg-amber-700 shadow-amber-500/20 hover:shadow-amber-500/30'
+                                        : 'bg-indigo-600 hover:bg-indigo-700'
+                                    }`}
+                            >
+                                {isLoading && <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/30 border-t-white"></div>}
+                                {finalConfirmLabel}
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

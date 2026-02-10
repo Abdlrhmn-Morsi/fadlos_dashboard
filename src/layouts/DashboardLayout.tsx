@@ -154,6 +154,9 @@ const DashboardLayout: React.FC = () => {
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
 
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
+          {user?.role === UserRole.DELIVERY && (
+            <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
+          )}
           {hasPermission(Permissions.ANALYTICS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && (
             <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
           )}
@@ -177,6 +180,7 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />
               <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />
               <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />
+              <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />
               <SidebarItem to="/reported-reviews" icon={Shield} label={t('reportedReviews')} collapsed={collapsed} />
             </>
           )}
@@ -234,6 +238,9 @@ const DashboardLayout: React.FC = () => {
               )}
               {hasPermission(Permissions.ROLES_MANAGE) && (
                 <SidebarItem to="/roles" icon={Shield} label={t('roles')} collapsed={collapsed} />
+              )}
+              {hasPermission(Permissions.DELIVERY_DRIVERS_VIEW) && (
+                <SidebarItem to="/delivery-drivers" icon={Truck} label={t('deliveryDrivers')} collapsed={collapsed} />
               )}
             </>
           )}

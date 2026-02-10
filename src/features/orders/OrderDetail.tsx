@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Clock, MapPin, User, Phone, Save,
-    Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe
+    Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe, Truck, Camera
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
 import { OrderStatus } from '../../types/order-status';
@@ -17,6 +17,7 @@ import { Permissions } from '../../types/permissions';
 import { UserRole } from '../../types/user-role';
 import clsx from 'clsx';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
+import { toast } from '../../utils/toast';
 
 const OrderDetail = () => {
     const { id } = useParams();
@@ -34,9 +35,15 @@ const OrderDetail = () => {
     // Modal States
     const [statusModal, setStatusModal] = useState<{ isOpen: boolean; status: string }>({ isOpen: false, status: '' });
     const [cancelModal, setCancelModal] = useState(false);
+    const [assignDriverModal, setAssignDriverModal] = useState(false);
+    const [confirmDeliveryModal, setConfirmDeliveryModal] = useState(false);
+    const [deliveryPin, setDeliveryPin] = useState('');
+    const [proofImage, setProofImage] = useState<File | null>(null);
+    const [availableDrivers, setAvailableDrivers] = useState<any[]>([]);
 
     useEffect(() => {
         fetchOrder();
+        fetchAvailableDrivers();
     }, [id]);
 
     const fetchOrder = async () => {
@@ -50,6 +57,79 @@ const OrderDetail = () => {
             console.error('Failed to fetch order', error);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const fetchAvailableDrivers = async () => {
+        try {
+            // Import dynamically or ensure it's available
+            const { getStoreDrivers } = await import('../delivery/api/delivery-drivers.api');
+            const drivers = await getStoreDrivers();
+            setAvailableDrivers(drivers);
+        } catch (error) {
+            console.error('Failed to fetch available drivers', error);
+        }
+    };
+
+    const handleAssignDriver = async (driverId: string) => {
+        try {
+            setUpdating(true);
+            const method = order.driverId ? ordersApi.reassignDriver : ordersApi.assignDriver;
+            await method(id!, driverId);
+            setAssignDriverModal(false);
+            fetchOrder(); // Refresh order data
+        } catch (error) {
+            console.error('Failed to assign driver', error);
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleConfirmDelivery = async () => {
+        if (!deliveryPin) return;
+        try {
+            setUpdating(true);
+            await ordersApi.confirmDelivery(id!, deliveryPin, proofImage || undefined);
+            setConfirmDeliveryModal(false);
+            setDeliveryPin('');
+            setProofImage(null);
+            fetchOrder();
+            toast.success(t('orderDelivered', 'Order marked as delivered'));
+        } catch (error: any) {
+            console.error('Failed to confirm delivery', error);
+            toast.error(error.response?.data?.message || t('common.error', 'Invalid PIN or error confirming delivery'));
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleUpdateStatus = async (status: string) => {
+        try {
+            setUpdating(true);
+            await ordersApi.updateOrderStatus(id!, status);
+
+            // Update local state and cache
+            const oldStatus = order.status;
+            setOrder({ ...order, status: status });
+
+            updateCacheItem('orders', id!, (o: any) => ({ ...o, status }));
+
+            // Optional: Update status counts
+            const cachedCounts = getCache<Record<string, number>>('order-status-counts');
+            if (cachedCounts) {
+                const updatedCounts = { ...cachedCounts };
+                if (updatedCounts[oldStatus]) updatedCounts[oldStatus] = Math.max(0, updatedCounts[oldStatus] - 1);
+                updatedCounts[status] = (updatedCounts[status] || 0) + 1;
+                setCache('order-status-counts', updatedCounts);
+            }
+
+            fetchOrder(); // Full refresh to be safe
+            toast.success(t('orderUpdated', 'Order status updated successfully'));
+        } catch (error) {
+            console.error('Failed to update status', error);
+            toast.error(t('common.error', 'Failed to update order status'));
+        } finally {
+            setUpdating(false);
         }
     };
 
@@ -517,6 +597,110 @@ const OrderDetail = () => {
                             </div>
                         </div>
 
+                        {/* Logistics Section */}
+                        {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <Truck className="text-indigo-500" size={20} />
+                                    {t('logistics', 'Logistics')}
+                                </h3>
+
+                                {order.driver ? (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+                                                    {order.driver.name.charAt(0)}
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-sm text-slate-900 dark:text-white">{order.driver.name}</p>
+                                                    <p className="text-xs text-slate-500">{order.driver.phone}</p>
+                                                </div>
+                                            </div>
+                                            <button
+                                                onClick={() => setAssignDriverModal(true)}
+                                                className="text-xs font-bold text-indigo-600 hover:underline"
+                                            >
+                                                {t('changeDriver', 'Change')}
+                                            </button>
+                                        </div>
+
+                                        {order.deliveryPin && (
+                                            <div className="p-3 border border-dashed border-indigo-200 dark:border-indigo-800 rounded-lg flex items-center justify-between">
+                                                <span className="text-sm text-slate-500">{t('deliveryPin', 'Delivery PIN')}</span>
+                                                <span className="text-lg font-black tracking-widest text-indigo-600">{order.deliveryPin}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <p className="text-sm text-slate-500">{t('noDriverAssigned', 'No driver assigned to this order yet.')}</p>
+                                        <button
+                                            onClick={() => setAssignDriverModal(true)}
+                                            className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            <Truck size={18} />
+                                            {t('assignDriver', 'Assign Driver')}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Driver Actions Section */}
+                        {user?.role === UserRole.DELIVERY && order.driverId === user.id && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6 overflow-hidden relative">
+                                <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16" />
+
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2 relative z-10">
+                                    <Truck className="text-indigo-500" size={20} />
+                                    {t('driverActions', 'Delivery Actions')}
+                                </h3>
+
+                                {order.status === OrderStatus.DRIVER_ASSIGNED && (
+                                    <div className="space-y-4 relative z-10">
+                                        <p className="text-sm text-slate-500">{t('pickupPrompt', 'Have you picked up the order from the store?')}</p>
+                                        <button
+                                            onClick={() => handleUpdateStatus(OrderStatus.OUT_FOR_DELIVERY)}
+                                            disabled={updating}
+                                            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 flex items-center justify-center gap-2"
+                                        >
+                                            {updating ? <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Package size={20} />}
+                                            {t('pickupOrder', 'Start Delivery')}
+                                        </button>
+                                    </div>
+                                )}
+
+                                {order.status === OrderStatus.OUT_FOR_DELIVERY && (
+                                    <div className="space-y-4 relative z-10">
+                                        <div className="p-4 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-800/50 rounded-xl">
+                                            <p className="text-sm text-amber-700 dark:text-amber-400 font-medium">
+                                                {t('deliveryInProgress', 'Delivery In Progress')}
+                                            </p>
+                                            <p className="text-xs text-amber-600/80 mt-1">
+                                                {t('deliveryInstructions', 'Navigate to the customer and collect the PIN to confirm delivery.')}
+                                            </p>
+                                        </div>
+
+                                        <button
+                                            onClick={() => setConfirmDeliveryModal(true)}
+                                            className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-emerald-200 flex items-center justify-center gap-2"
+                                        >
+                                            <CheckCircle size={20} />
+                                            {t('confirmDelivery', 'Confirm Delivery')}
+                                        </button>
+                                    </div>
+                                )}
+
+                                {order.status === OrderStatus.DELIVERED && (
+                                    <div className="text-center py-4 bg-emerald-50 dark:bg-emerald-900/10 rounded-xl">
+                                        <CheckCircle size={40} className="text-emerald-500 mx-auto mb-2" />
+                                        <p className="font-bold text-emerald-700 dark:text-emerald-400">{t('orderDelivered', 'Delivered Successfully')}</p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Cancel Order Section */}
                         {hasPermission(Permissions.ORDERS_CANCEL) &&
                             order.status !== OrderStatus.DELIVERED &&
@@ -565,6 +749,96 @@ const OrderDetail = () => {
                 onCancel={() => setCancelModal(false)}
                 isLoading={updating}
             />
+
+            <ConfirmationModal
+                isOpen={assignDriverModal}
+                title={order.driverId ? t('reassignDriver', 'Reassign Driver') : t('assignDriver', 'Assign Driver')}
+                message={t('selectDriverMessage', 'Select a driver to handle this delivery:')}
+                onConfirm={() => { }} // Not used for this type of modal
+                onCancel={() => setAssignDriverModal(false)}
+                confirmLabel="" // Hidden
+            >
+                <div className="space-y-3 mt-4 max-h-[400px] overflow-y-auto custom-scrollbar p-1">
+                    {availableDrivers.length > 0 ? (
+                        availableDrivers.map((driver) => (
+                            <button
+                                key={driver.id}
+                                onClick={() => handleAssignDriver(driver.id)}
+                                disabled={updating}
+                                className={clsx(
+                                    "w-full flex items-center justify-between p-4 rounded-xl border transition-all text-start group",
+                                    order.driverId === driver.id
+                                        ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
+                                        : "bg-white border-slate-200 hover:border-indigo-300 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-700"
+                                )}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 font-bold">
+                                        {driver.name.charAt(0)}
+                                    </div>
+                                    <div>
+                                        <p className="font-bold text-slate-900 dark:text-white">{driver.name}</p>
+                                        <div className="flex items-center gap-2 mt-0.5">
+                                            <span className={clsx(
+                                                "w-2 h-2 rounded-full",
+                                                driver.deliveryProfile?.isBusy ? "bg-amber-500" : "bg-emerald-500"
+                                            )} />
+                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                                                {driver.deliveryProfile?.isBusy ? t('status.busy', 'Busy') : t('status.available', 'Available')}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                {order.driverId === driver.id && (
+                                    <CheckCircle size={20} className="text-indigo-600" />
+                                )}
+                            </button>
+                        ))
+                    ) : (
+                        <div className="text-center py-8 text-slate-500 italic">
+                            {t('noDriversFound', 'No drivers available. Add drivers in the Delivery section first.')}
+                        </div>
+                    )}
+                </div>
+            </ConfirmationModal>
+
+            <ConfirmationModal
+                isOpen={confirmDeliveryModal}
+                title={t('confirmDelivery', 'Confirm Delivery')}
+                message={t('deliveryPinMessage', 'Please enter the delivery PIN provided by the customer.')}
+                onConfirm={handleConfirmDelivery}
+                onCancel={() => setConfirmDeliveryModal(false)}
+                confirmLabel={t('confirm', 'Confirm')}
+                isLoading={updating}
+            >
+                <div className="space-y-4 mt-4">
+                    <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                            {t('deliveryPin', 'Delivery PIN')}
+                        </label>
+                        <input
+                            type="text"
+                            maxLength={4}
+                            value={deliveryPin}
+                            onChange={(e) => setDeliveryPin(e.target.value.replace(/\D/g, ''))}
+                            placeholder="0000"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center text-2xl font-black tracking-[0.5em]"
+                        />
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                            {t('proofImage', 'Proof of Delivery (Optional)')}
+                        </label>
+                        <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => setProofImage(e.target.files?.[0] || null)}
+                            className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                        />
+                    </div>
+                </div>
+            </ConfirmationModal>
         </div>
     );
 };

@@ -1,4 +1,14 @@
 {
+    "common": {
+        "no_results": "لم يتم العثور على نتائج",
+        "click_to_upload": "انقر للتحميل",
+        "leave_blank_to_keep": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
+        "error_fetching_data": "خطأ في جلب البيانات",
+        "not_found": "البيانات غير موجودة",
+        "update_success": "تم التحديث بنجاح",
+        "delete_success": "تم الحذف بنجاح",
+        "create_success": "تم الإنشاء بنجاح"
+    },
     "dashboard": "لوحة التحكم",
     "revenue": "الإيرادات",
     "orders": "الطلبات",
@@ -57,7 +67,11 @@
     "businessTypes": "أنواع الأعمال",
     "businessCategories": "فئات الأعمال",
     "reportedReviews": "التقييمات المُبلغ عنها",
+    "categories": "الأقسام",
     "addons": "الإضافات",
+    "deliveryDrivers": "سائقي التوصيل",
+    "driverVerification": "توثيق السائقين",
+    "deliveryDashboard": "لوحة تحكم السائق",
     "analytics": "الإحصائيات",
     "logout": "تسجيل الخروج",
     "search": "بحث",
@@ -88,16 +102,23 @@
     "phoneAlreadyExists": "رقم الهاتف هذا مستخدم بالفعل من قبل مستخدم آخر.",
     "email": "البريد الإلكتروني",
     "phone": "رقم الهاتف",
-    "actions": "الإجراءات",
+    "actions": {
+        "edit": "تعديل",
+        "remove": "إزالة"
+    },
     "status": "الحالة",
     "active": "نشط",
     "inactive": "غير نشط",
+    "accepted": "مقبول",
     "pending": "قيد الانتظار",
     "confirmed": "تم التأكيد",
-    "preparing": "جاري التجهيز",
+    "prepared": "تم التجهيز",
     "ready": "جاهز",
     "delivered": "تم التوصيل",
     "cancelled": "ملغى",
+    "rejected": "مرفوض",
+    "unverified": "غير موثق",
+    "preparing": "جاري التجهيز",
     "sortOrder": "ترتيب العرض",
     "total": "المجموع",
     "page": "صفحة",
@@ -108,6 +129,26 @@
     "noData": "لا توجد بيانات متاحة للفترة المختارة",
     "noResults": "لم يتم العثور على نتائج",
     "adjustSearch": "حاول تعديل شروط البحث الخاصة بك",
+    "reason": "السبب",
+    "optional": "اختياري",
+    "provideReason": "أدخل السبب (اختياري)",
+    "verificationSuccess": "تم تحديث توثيق السائق بنجاح",
+    "verificationError": "فشل تحديث حالة التوثيق",
+    "approve_confirm_msg": "هل أنت متأكد أنك تريد توثيق هذا السائق؟ سيتمكن من البدء في قبول الطلبات على الفور.",
+    "reject_confirm_msg": "يرجى تقديم سبب لرفض طلب هذا السائق.",
+    "approve": "قبول",
+    "reject": "رفض",
+    "type": "النوع",
+    "documents": "مستندات الهوية",
+    "verificationStatuses": {
+        "VERIFIED": "موثق",
+        "REJECTED": "مرفوض",
+        "PENDING": "قيد الانتظار"
+    },
+    "driverTypes": {
+        "STORE_DRIVER": "سائق متجر",
+        "FREELANCER": "مستقل"
+    },
     "language": "اللغة",
     "theme": "المظهر",
     "lightMode": "الوضع الفاتح",
@@ -130,7 +171,6 @@
     "confirmLogout": "تأكيد الخروج",
     "management": "الإدارة",
     "products": "المنتجات",
-    "categories": "الأقسام",
     "feedback": "الآراء والملاحظات",
     "promoCodes": "أكواد الخصم",
     "clients": "عملاء المتجر",
@@ -439,5 +479,50 @@
     "addFirstCategory": "أضف تصنيفك الأول",
     "accessDenied": "تم رفض الوصول",
     "noPermissionViewStore": "ليس لديك الإذن لتبديل إعدادات المتجر. يرجى الاتصال بمسؤول النظام.",
-    "goBack": "العودة للخلف"
+    "goBack": "العودة للخلف",
+    "delivery": {
+        "status": {
+            "online": "متصل",
+            "offline": "غير متصل"
+        },
+        "drivers": {
+            "title": "سائقي التوصيل",
+            "my_drivers": "سائقيّ",
+            "marketplace": "سوق السائقين",
+            "list_title": "سائقو المتجر",
+            "manage_desc": "إدارة فريق التوصيل الخاص بك وتوافرهم",
+            "search_placeholder": "البحث بالاسم أو البريد الإلكتروني أو الهاتف...",
+            "add_new": "إضافة سائق جديد",
+            "find_freelancers": "البحث عن مستقلين",
+            "marketplace_desc": "تواصل مع سائقي التوصيل المتاحين في منطقتك",
+            "available_only": "المتاحون فقط",
+            "hire": "توظيف السائق",
+            "hire_success": "تم توظيف السائق المستقل بنجاح",
+            "create_title": "إنشاء سائق جديد",
+            "personal_info": "المعلومات الشخصية",
+            "identity_verification": "التحقق من الهوية",
+            "id_front": "صورة الهوية (أمام)",
+            "id_back": "صورة الهوية (خلف)",
+            "selfie": "صورة سيلفي",
+            "remove_title": "إزالة السائق",
+            "remove_confirm_message": "هل أنت متأكد أنك تريد إزالة هذا السائق من متجرك؟ لا يمكن التراجع عن هذا الإجراء.",
+            "total": "إجمالي",
+            "no_pending": "لا يوجد سائقون في انتظار التوثيق",
+            "verification": {
+                "title": "توثيق السائق",
+                "desc": "مراجعة واعتماد مستندات هوية السائق."
+            }
+        }
+    },
+    "fields": {
+        "name": "الاسم الكامل",
+        "contact": "جهات الاتصال",
+        "status": "الحالة",
+        "availability": "التوفر",
+        "joined_at": "تاريخ الانضمام",
+        "username": "اسم المستخدم",
+        "email": "البريد الإلكتروني",
+        "phone": "رقم الهاتف",
+        "password": "كلمة المرور"
+    }
 }

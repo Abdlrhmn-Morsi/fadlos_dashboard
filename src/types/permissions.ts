@@ -58,4 +58,10 @@ export enum Permissions {
     ADDONS_CREATE = 'addons.create',
     ADDONS_UPDATE = 'addons.update',
     ADDONS_DELETE = 'addons.delete',
+
+    // Delivery Drivers
+    DELIVERY_DRIVERS_VIEW = 'delivery_drivers.view',
+    DELIVERY_DRIVERS_CREATE = 'delivery_drivers.create',
+    DELIVERY_DRIVERS_UPDATE = 'delivery_drivers.update',
+    DELIVERY_DRIVERS_DELETE = 'delivery_drivers.delete',
 }
