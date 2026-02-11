@@ -44,6 +44,7 @@ import DeliveryDriversPage from './features/delivery/pages/DeliveryDriversPage';
 import DeliveryDriverForm from './features/delivery/components/DeliveryDriverForm';
 import DriverDashboard from './features/delivery/pages/DriverDashboard';
 import DriverVerificationPage from './features/delivery/pages/DriverVerificationPage';
+import DriverDetail from './features/delivery/pages/DriverDetail';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
@@ -169,6 +170,7 @@ const AppContent = () => {
             {/* Delivery Drivers */}
             <Route path="delivery-drivers" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_VIEW}><DeliveryDriversPage /></PermissionGate>} />
             <Route path="delivery-drivers/new" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_CREATE}><DeliveryDriverForm /></PermissionGate>} />
+            <Route path="delivery-drivers/:id" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_VIEW}><DriverDetail /></PermissionGate>} />
             <Route path="delivery-drivers/edit/:id" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DeliveryDriverForm /></PermissionGate>} />
             <Route path="delivery-dashboard" element={<DriverDashboard />} />
 

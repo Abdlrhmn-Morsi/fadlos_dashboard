@@ -65,6 +65,7 @@
     "cities": "Cities",
     "allCities": "All Cities",
     "towns": "Towns",
+    "places": "Places",
     "businessTypes": "Business Types",
     "businessCategories": "Business Categories",
     "reportedReviews": "Reported Reviews",
@@ -97,7 +98,24 @@
     "errorFetchingData": "Error fetching data",
     "success": "Success",
     "statusUpdated": "Status updated successfully",
+    "set_available": "Set Available",
+    "set_busy": "Set Busy",
     "errorUpdatingStatus": "Failed to update status",
+    "deliverySettings": "Delivery Settings",
+    "maxOrdersPerDriver": "Max Active Orders Per Driver",
+    "maxOrdersPerDriverDesc": "Automatically mark drivers as \"Busy\" when they reach this limit.",
+    "acceptingOrders": "Accepting Orders",
+    "notAcceptingOrders": "Not Accepting Orders",
+    "notAcceptingOrdersMsg": "The store is currently not accepting new orders. Customers will be notified.",
+    "acceptOffDay": "Accept orders on off days",
+    "acceptClosedHours": "Accept orders during closed hours",
+    "operatingHours": "Operating Hours",
+    "open24Hours": "Open 24 Hours",
+    "workingDays": "Working Days",
+    "openingTime": "Opening Time",
+    "closingTime": "Closing Time",
+    "serviceCoverage": "Service Coverage",
+    "selectCitiesFirst": "Please select cities first to see available towns",
     "emailAlreadyExists": "This email is already in use by another user.",
     "phoneAlreadyExists": "This phone number is already in use by another user.",
     "email": "Email Address",
@@ -126,6 +144,9 @@
     "noData": "No data available for the selected period",
     "noResults": "No results found",
     "adjustSearch": "Try adjusting your search terms",
+    "failedToLoad": "Failed to load data",
+    "notSet": "Not Set",
+    "back": "Back",
     "reason": "Reason",
     "optional": "Optional",
     "provideReason": "Provide a reason (optional)",
@@ -482,7 +503,15 @@
     "delivery": {
         "status": {
             "online": "Online",
-            "offline": "Offline"
+            "offline": "Offline",
+            "busy": "Busy",
+            "available": "Available",
+            "busy_on": "You are now busy",
+            "available_on": "You are now available",
+            "online_desc": "Driver is active and on-duty.",
+            "offline_desc": "Driver is currently off-duty and cannot receive orders.",
+            "busy_desc": "Driver has reached maximum order capacity or manually paused new assignments.",
+            "available_desc": "Driver is ready to accept new delivery requests."
         },
         "drivers": {
             "title": "Delivery Drivers",
@@ -519,11 +548,31 @@
             "rejected_instruction": "Please correct the issues with your identity documents and resubmit.",
             "verification": {
                 "title": "Driver Verification",
-                "desc": "Review and approve driver identity documents."
+                "desc": "Review and approve driver identity documents.",
+                "verified": "Verified",
+                "under_review": "Under Review",
+                "rejected": "Rejected"
+            },
+            "vehicle_details": "Vehicle Details",
+            "vehicle_type": "Vehicle Type",
+            "plate_number": "Plate Number",
+            "operating_regions": "Operating Regions",
+            "rejection_reason": "Rejection Reason",
+            "status": {
+                "available": "Available",
+                "busy": "Busy"
+            },
+            "stats": {
+                "active_orders": "Active Orders",
+                "on_the_way_orders": "On The Way",
+                "delivered_orders": "Delivered",
+                "cancelled_orders": "Cancelled",
+                "total_orders": "Total"
             }
         }
     },
     "fields": {
+        "type": "Type",
         "name": "Full Name",
         "contact": "Contact",
         "status": "Status",
@@ -535,7 +584,9 @@
         "password": "Password",
         "vehicle_type": "Vehicle Type",
         "vehicle": "Vehicle",
-        "avatar": "Profile Photo"
+        "avatar": "Profile Photo",
+        "active_orders": "Active Orders",
+        "total_orders": "Total Orders"
     },
     "vehicle_types": {
         "bicycle": "Bicycle",

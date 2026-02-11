@@ -10,7 +10,6 @@
     "totalProducts": "Total Products",
     "platformUsers": "Platform Users",
     "totalDrivers": "Store Drivers",
-    "avgOrderValue": "Avg. Order Value",
     "vsLastPeriod": "vs last period",
     "todayRevenue": "Today's Revenue",
     "todayOrders": "Today's Orders",
@@ -43,6 +42,8 @@
         "confirmed": "Confirmed",
         "preparing": "Preparing",
         "ready": "Ready",
+        "driver_assigned": "Driver Assigned",
+        "out_for_delivery": "On The Way",
         "delivered": "Delivered",
         "cancelled": "Cancelled"
     },

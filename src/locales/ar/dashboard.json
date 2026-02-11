@@ -10,7 +10,6 @@
     "totalProducts": "إجمالي المنتجات",
     "platformUsers": "مستخدمو المنصة",
     "totalDrivers": "سائقو المتجر",
-    "avgOrderValue": "متوسط قيمة الطلب",
     "vsLastPeriod": "مقارنة بالفترة السابقة",
     "todayRevenue": "إيرادات اليوم",
     "todayOrders": "طلبات اليوم",
@@ -43,6 +42,8 @@
         "confirmed": "تم التأكيد",
         "preparing": "جاري التحضير",
         "ready": "جاهز للاستلام",
+        "driver_assigned": "تم تعيين سائق",
+        "out_for_delivery": "جاري التوصيل",
         "delivered": "تم التوصيل",
         "cancelled": "ملغي"
     },

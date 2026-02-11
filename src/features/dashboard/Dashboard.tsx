@@ -11,7 +11,7 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck } from 'lucide-react';
+import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -322,15 +322,7 @@ const Dashboard: React.FC = () => {
                     </>
                 )}
 
-                {/* Avg Order Value - Common */}
-                {hasPermission('analytics.view') && (
-                    <StatCard
-                        title={t('avgOrderValue')}
-                        value={`${(stats.avgOrderValue || 0).toFixed(2)} ${t('common:currencySymbol')}`}
-                        icon={TrendingUp}
-                        color="amber"
-                    />
-                )}
+
             </div>
 
             {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}

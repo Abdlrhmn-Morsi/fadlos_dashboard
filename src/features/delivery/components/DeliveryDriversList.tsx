@@ -1,4 +1,4 @@
-import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit, Bike, Footprints } from 'lucide-react';
+import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit, Bike, Footprints, Package, ShieldCheck, Mail, Phone, X, Eye } from 'lucide-react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -10,13 +10,14 @@ import clsx from 'clsx';
 import { useCache } from '../../../contexts/CacheContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
+import { Permissions } from '../../../types/permissions';
 
 const DeliveryDriversList = () => {
     const { getCache, setCache, updateCacheItem, invalidateCache } = useCache();
-    const { user } = useAuth();
+    const { user, hasPermission } = useAuth();
     const isSystemAdmin = user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN;
     const CACHE_KEY = 'delivery_drivers';
-    // ... (existing state)
+
     const { t } = useTranslation('common');
     const navigate = useNavigate();
     const [drivers, setDrivers] = useState<any[]>([]);
@@ -28,10 +29,11 @@ const DeliveryDriversList = () => {
         total: 0,
         page: 1,
         limit: 10,
-        totalPages: 0
+        totalPages: 0,
+        maxOrdersPerDriver: 5
     });
 
-    // ... (existing useEffects)
+
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(searchTerm);
@@ -292,13 +294,18 @@ const DeliveryDriversList = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    <button
-                        onClick={() => navigate('/delivery-drivers/new')}
-                        className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2 justify-center"
-                    >
-                        <Plus size={18} />
-                        {t('delivery.drivers.add_new')}
-                    </button>
+                    {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
+                        <button
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                navigate('/delivery-drivers/new');
+                            }}
+                            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2 justify-center"
+                        >
+                            <Plus size={18} />
+                            {t('delivery.drivers.add_new')}
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -308,19 +315,19 @@ const DeliveryDriversList = () => {
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.name')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.type')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.availability', 'Availability')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.contact')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.vehicle', 'Vehicle')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.status')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('active', 'Active')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.availability')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.joined_at')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-center">{t('fields.active_orders', 'Active')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-center">{t('fields.total_orders', 'Total')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-right">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-12 text-center">
+                                    <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="w-8 h-8 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
                                             <span className="text-slate-400 text-sm">{t('loading')}...</span>
@@ -329,23 +336,69 @@ const DeliveryDriversList = () => {
                                 </tr>
                             ) : drivers.length > 0 ? (
                                 drivers.map((driver) => (
-                                    <tr key={driver.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                    <tr
+                                        key={driver.id}
+                                        className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+                                        onClick={() => navigate(`/delivery-drivers/${driver.id}`)}
+                                    >
                                         {/* ... (keep existing columns) */}
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex-shrink-0">
-                                                    {driver.deliveryProfile?.avatarUrl ? (
-                                                        <img src={driver.deliveryProfile.avatarUrl} alt={driver.name} className="w-full h-full object-cover" />
-                                                    ) : (
-                                                        <div className="w-full h-full flex items-center justify-center text-slate-400">
-                                                            <User size={20} />
-                                                        </div>
-                                                    )}
+                                                <div className="relative flex-shrink-0">
+                                                    <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800">
+                                                        {driver.deliveryProfile?.avatarUrl ? (
+                                                            <img src={driver.deliveryProfile.avatarUrl} alt={driver.name} className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                                                <User size={20} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    {/* Status Dot */}
+                                                    <div className={clsx(
+                                                        "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm",
+                                                        !driver.deliveryProfile?.isAvailableForWork ? "bg-slate-400" :
+                                                            driver.deliveryProfile?.isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
+                                                    )} />
                                                 </div>
                                                 <div className="flex flex-col">
-                                                    <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{driver.name}</span>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{driver.name}</span>
+                                                    </div>
                                                     <span className="text-[10px] text-slate-500 lowercase font-medium">@{driver.username}</span>
                                                 </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                                            <span className={clsx(
+                                                "px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest border",
+                                                driver.deliveryProfile?.driverType === 'FREELANCER'
+                                                    ? "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800"
+                                                    : "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
+                                            )}>
+                                                {t(`driverTypes.${driver.deliveryProfile?.driverType || 'STORE_DRIVER'}`, driver.deliveryProfile?.driverType || 'Store Driver') as string}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                                            <div className="flex flex-col gap-1.5">
+                                                {/* Online/Offline Status */}
+                                                <span className={clsx(
+                                                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest border",
+                                                    driver.deliveryProfile?.isAvailableForWork
+                                                        ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800"
+                                                        : "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
+                                                )}>
+                                                    <span className={clsx("w-1.5 h-1.5 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-400")} />
+                                                    {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online', 'Online') : t('delivery.status.offline', 'Offline')}
+                                                </span>
+
+                                                {/* Busy Status */}
+                                                {driver.deliveryProfile?.isBusy && (
+                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 animate-pulse">
+                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                                                        {t('delivery.status.busy', 'Busy')}
+                                                    </span>
+                                                )}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
@@ -355,60 +408,70 @@ const DeliveryDriversList = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                                            {getVehicleBadge(driver.deliveryProfile?.vehicleType || 'bicycle')}
+                                            <div className="flex flex-col gap-1.5 items-start">
+                                                {getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus, driver.id)}
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                                            {getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus, driver.id)}
-                                        </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                                            <label className="relative inline-flex items-center cursor-pointer">
-                                                <input
-                                                    type="checkbox"
-                                                    className="sr-only peer"
-                                                    checked={driver.storeDriverIsActive || false}
-                                                    onChange={() => handleActiveToggle(driver.id)}
-                                                />
-                                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 dark:peer-checked:bg-emerald-600 shadow-sm"></div>
-                                            </label>
-                                        </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-sm lowercase">
-                                            <span className={clsx(
-                                                "inline-flex items-center gap-1.5 text-xs font-bold",
-                                                driver.deliveryProfile?.isAvailableForWork ? "text-emerald-600" : "text-slate-400"
-                                            )}>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
+                                            <div className="flex flex-col items-center gap-1">
                                                 <span className={clsx(
-                                                    "w-2 h-2 rounded-full",
-                                                    driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500" : "bg-slate-300"
-                                                )} />
-                                                {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
-                                            </span>
+                                                    "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
+                                                    (driver.activeDeliveriesCount || 0) >= (meta?.maxOrdersPerDriver || 5)
+                                                        ? "bg-amber-50 text-amber-600 border-amber-200 animate-pulse"
+                                                        : "bg-emerald-50 text-emerald-600 border-emerald-200"
+                                                )}>
+                                                    {driver.activeDeliveriesCount || 0} / {meta?.maxOrdersPerDriver || 5}
+                                                </span>
+                                            </div>
                                         </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-sm text-slate-500">
-                                            {driver.joinedAt ? new Date(driver.joinedAt).toLocaleDateString() : '-'}
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
+                                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-xs border border-slate-200 dark:border-slate-700">
+                                                {driver.totalOrdersCount || 0}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-right">
                                             <div className="flex items-center justify-end gap-2">
                                                 <button
-                                                    onClick={() => navigate(`/delivery-drivers/edit/${driver.id}`)}
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/delivery-drivers/${driver.id}`);
+                                                    }}
                                                     className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                                                    title={t('actions.edit', 'Edit')}
+                                                    title={t('actions.view', 'View')}
                                                 >
-                                                    <Edit size={18} />
+                                                    <Eye size={18} />
                                                 </button>
-                                                <button
-                                                    onClick={() => handleDeleteClick(driver.id)}
-                                                    className="p-2 text-slate-400 hover:text-red-600 rounded transition-colors"
-                                                    title={t('actions.remove', 'Remove')}
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                                                {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/delivery-drivers/edit/${driver.id}`);
+                                                        }}
+                                                        className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                                                        title={t('actions.edit', 'Edit')}
+                                                    >
+                                                        <Edit size={18} />
+                                                    </button>
+                                                )}
+                                                {hasPermission(Permissions.DELIVERY_DRIVERS_DELETE) && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteClick(driver.id);
+                                                        }}
+                                                        className="p-2 text-slate-400 hover:text-red-600 rounded transition-colors"
+                                                        title={t('actions.remove', 'Remove')}
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                )}
                                             </div>
                                         </td>
                                     </tr>
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={8} className="px-6 py-12 text-center text-slate-400 text-sm">
+                                    <td colSpan={7} className="px-6 py-12 text-center text-slate-400 text-sm">
                                         {t('common.no_results')}
                                     </td>
                                 </tr>
@@ -435,6 +498,7 @@ const DeliveryDriversList = () => {
                 title={t('delivery.drivers.remove_title', 'Remove Driver')}
                 message={t('delivery.drivers.remove_confirm_message', 'Are you sure you want to remove this driver from your store? This action cannot be undone.')}
             />
+
         </div>
     );
 };

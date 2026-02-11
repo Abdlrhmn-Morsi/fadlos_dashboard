@@ -11,6 +11,9 @@
         "save": "حفظ"
     },
     "dashboard": "لوحة التحكم",
+    "status": "الحالة",
+    "active": "نشط",
+    "inactive": "غير نشط",
     "revenue": "الإيرادات",
     "orders": "الطلبات",
     "averageOrderValue": "متوسط قيمة الطلب",
@@ -65,6 +68,7 @@
     "cities": "المدن",
     "allCities": "كل المدن",
     "towns": "البلدات",
+    "places": "المناطق",
     "businessTypes": "أنواع الأعمال",
     "businessCategories": "فئات الأعمال",
     "reportedReviews": "التقييمات المُبلغ عنها",
@@ -97,23 +101,33 @@
     "errorFetchingData": "خطأ في جلب البيانات",
     "success": "نجاح",
     "statusUpdated": "تم تحديث الحالة بنجاح",
+    "set_available": "تعيين كمتاح",
+    "set_busy": "تعيين كمشغول",
     "errorUpdatingStatus": "فشل تحديث الحالة",
+    "deliverySettings": "إعدادات التوصيل",
+    "maxOrdersPerDriver": "أقصى عدد طلبات نشطة للسائق",
+    "maxOrdersPerDriverDesc": "تغيير حالة السائق تلقائياً إلى \"مشغول\" عند الوصول لهذا الحد.",
+    "acceptingOrders": "نستقبل طلبات الآن",
+    "notAcceptingOrders": "لا نستقبل طلبات الآن",
+    "notAcceptingOrdersMsg": "المتجر لا يستقبل طلبات جديدة حالياً. سيتم إخطار العملاء.",
+    "acceptOffDay": "استقبال الطلبات في أيام العطلة",
+    "acceptClosedHours": "استقبال الطلبات خارج ساعات العمل",
+    "operatingHours": "ساعات العمل",
+    "open24Hours": "مفتوح ٢٤ ساعة",
+    "workingDays": "أيام العمل",
+    "openingTime": "وقت الفتح",
+    "closingTime": "وقت الإغلاق",
+    "serviceCoverage": "نطاق الخدمة",
+    "selectCitiesFirst": "يرجى اختيار المدن أولاً لرؤية المناطق المتاحة",
     "emailAlreadyExists": "هذا البريد الإلكتروني مستخدم بالفعل من قبل مستخدم آخر.",
     "phoneAlreadyExists": "رقم الهاتف هذا مستخدم بالفعل من قبل مستخدم آخر.",
     "email": "البريد الإلكتروني",
     "phone": "رقم الهاتف",
     "actions": "الإجراءات",
     "remove": "إزالة",
-    "status": "الحالة",
-    "active": "نشط",
-    "inactive": "غير نشط",
-    "under_review": "قيد المراجعة",
     "confirmed": "موثق",
     "prepared": "تم التجهيز",
     "ready": "جاهز",
-    "delivered": "تم التوصيل",
-    "cancelled": "ملغى",
-    "rejected": "مرفوض",
     "unverified": "غير موثق",
     "preparing": "جاري التجهيز",
     "sortOrder": "ترتيب العرض",
@@ -126,6 +140,9 @@
     "noData": "لا توجد بيانات متاحة للفترة المختارة",
     "noResults": "لم يتم العثور على نتائج",
     "adjustSearch": "حاول تعديل شروط البحث الخاصة بك",
+    "failedToLoad": "فشل جلب البيانات",
+    "notSet": "غير محدد",
+    "back": "رجوع",
     "reason": "السبب",
     "optional": "اختياري",
     "provideReason": "أدخل السبب (اختياري)",
@@ -196,7 +213,6 @@
     "manageProfileDesc": "تحديث معلومات ملفك الشخصي",
     "changeProfilePicture": "تغيير صورة الملف الشخصي",
     "fullName": "الاسم الكامل",
-    "username": "اسم المستخدم",
     "changePassword": "الأمان وكلمة المرور",
     "updatePassword": "تحديث كلمة المرور",
     "oldPassword": "كلمة المرور الحالية",
@@ -245,7 +261,6 @@
     "contact": "جهات الاتصال",
     "role": "الدور",
     "selectRole": "اختر الدور",
-    "password": "كلمة المرور",
     "accountAccess": "الوصول للحساب",
     "activeStatus": "حالة النشاط",
     "createEmployee": "إضافة موظف جديد",
@@ -280,9 +295,9 @@
     "Addons": "الإضافات",
     "Addon Management": "إدارة الإضافات",
     "searchEmployeePlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
+    "searchPlaceholder": "بحث...",
     "activate": "تفعيل",
     "leaveBlankToKeepCurrent": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
-    "searchPlaceholder": "بحث...",
     "personalInfo": "المعلومات الشخصية",
     "permissions": {
         "store": {
@@ -483,7 +498,15 @@
     "delivery": {
         "status": {
             "online": "متصل",
-            "offline": "غير متصل"
+            "offline": "غير متصل",
+            "busy": "مشغول",
+            "available": "متاح",
+            "busy_on": "أنت الآن مشغول",
+            "available_on": "أنت الآن متاح",
+            "online_desc": "السائق نشط وفي الخدمة.",
+            "offline_desc": "السائق حالياً خارج الخدمة ولا يمكنه استلام طلبات.",
+            "busy_desc": "وصل السائق إلى الحد الأقصى من الطلبات أو أوقف استقبال الطلبات الجديدة يدوياً.",
+            "available_desc": "السائق جاهز لقبول طلبات توصيل جديدة."
         },
         "drivers": {
             "title": "سائقي التوصيل",
@@ -520,11 +543,31 @@
             "rejected_instruction": "يرجى تصحيح المشاكل في مستندات الهوية وإعادة الإرسال.",
             "verification": {
                 "title": "توثيق السائق",
-                "desc": "مراجعة واعتماد مستندات هوية السائق."
+                "desc": "مراجعة واعتماد مستندات هوية السائق.",
+                "verified": "موثق",
+                "under_review": "قيد المراجعة",
+                "rejected": "مرفوض"
+            },
+            "vehicle_details": "تفاصيل المركبة",
+            "vehicle_type": "نوع المركبة",
+            "plate_number": "رقم اللوحة",
+            "operating_regions": "مناطق العمل",
+            "rejection_reason": "سبب الرفض",
+            "status": {
+                "available": "متاح",
+                "busy": "مشغول"
+            },
+            "stats": {
+                "active_orders": "طلبات نشطة",
+                "on_the_way_orders": "في الطريق",
+                "delivered_orders": "تم التوصيل",
+                "cancelled_orders": "ملغاة",
+                "total_orders": "إجمالي"
             }
         }
     },
     "fields": {
+        "type": "النوع",
         "name": "الاسم الكامل",
         "contact": "جهات الاتصال",
         "status": "الحالة",
@@ -536,12 +579,26 @@
         "password": "كلمة المرور",
         "vehicle_type": "نوع المركبة",
         "vehicle": "المركبة",
-        "avatar": "صورة الملف الشخصي"
+        "avatar": "الصورة الشخصية",
+        "active_orders": "الطلبات النشطة",
+        "total_orders": "إجمالي الطلبات",
+        "maxOrdersPerDriver": "الحد الأقصى للطلبات لكل سائق"
     },
     "vehicle_types": {
         "bicycle": "دراجة هوائية",
         "motorcycle": "موتوسيكل",
         "walking": "سيراً على الأقدام",
         "tricycle": "تروسيكل"
-    }
+    },
+    "pending": "معلق",
+    "approved": "موافق عليه",
+    "rejected": "مرفوض",
+    "in_review": "قيد المراجعة",
+    "online": "متصل",
+    "offline": "غير متصل",
+    "busy": "مشغول",
+    "available": "متاح",
+    "on_the_way": "في الطريق",
+    "delivered": "تم التوصيل",
+    "cancelled": "ملغاة"
 }

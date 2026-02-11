@@ -122,8 +122,20 @@ const FreelancerMarketplace = () => {
                         <div key={profile.id} className="border border-slate-200 dark:border-slate-700 rounded-xl p-5 hover:shadow-md transition-shadow bg-white dark:bg-slate-900">
                             <div className="flex items-start justify-between mb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
-                                        {profile.user.name.charAt(0)}
+                                    <div className="relative flex-shrink-0">
+                                        <div className="w-12 h-12 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg overflow-hidden">
+                                            {profile.avatarUrl ? (
+                                                <img src={profile.avatarUrl} alt={profile.user.name} className="w-full h-full object-cover" />
+                                            ) : (
+                                                profile.user.name.charAt(0)
+                                            )}
+                                        </div>
+                                        {/* Status Dot */}
+                                        <div className={clsx(
+                                            "absolute -bottom-0.5 -right-0.5 w-4 h-4 rounded-full border-2 border-white dark:border-slate-900 shadow-sm",
+                                            (profile.isBusy || profile.activeDeliveriesCount > 0) ? "bg-amber-500 animate-pulse" :
+                                                profile.isAvailableForWork ? "bg-emerald-500" : "bg-slate-400"
+                                        )} />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-slate-900 dark:text-white">{profile.user.name}</h3>
@@ -136,9 +148,11 @@ const FreelancerMarketplace = () => {
                                 <div className="flex flex-col items-end">
                                     <span className={clsx(
                                         "px-2 py-0.5 rounded text-xs font-bold mb-1",
-                                        profile.isAvailableForWork ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
+                                        (profile.isBusy || profile.activeDeliveriesCount > 0) ? "bg-amber-100 text-amber-700" :
+                                            profile.isAvailableForWork ? "bg-emerald-100 text-emerald-700" : "bg-slate-100 text-slate-500"
                                     )}>
-                                        {profile.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
+                                        {(profile.isBusy || profile.activeDeliveriesCount > 0) ? t('delivery.status.busy') :
+                                            profile.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
                                     </span>
                                 </div>
                             </div>

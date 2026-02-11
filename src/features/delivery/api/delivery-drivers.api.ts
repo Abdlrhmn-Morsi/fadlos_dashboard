@@ -72,6 +72,15 @@ export const toggleDriverAvailability = async () => {
     }
 };
 
+export const toggleDriverBusy = async () => {
+    try {
+        const response = await apiService.patch('/delivery-drivers/toggle-busy');
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getAllDrivers = async () => {
     try {
         const response = await apiService.get('/delivery-drivers');
@@ -93,6 +102,15 @@ export const verifyDriver = async (driverId: string, status: string, notes?: str
 export const toggleStoreDriverStatus = async (driverId: string) => {
     try {
         const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-status`);
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const adminToggleDriverBusy = async (driverId: string) => {
+    try {
+        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-busy`);
         return response.data || response;
     } catch (error) {
         throw error;

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Clock, MapPin, User, Phone, Save,
-    Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe, Truck, Camera
+    Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe, Truck, Camera,
+    Search, X, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, BadgeCheck
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
 import { OrderStatus } from '../../types/order-status';
@@ -40,11 +41,36 @@ const OrderDetail = () => {
     const [deliveryPin, setDeliveryPin] = useState('');
     const [proofImage, setProofImage] = useState<File | null>(null);
     const [availableDrivers, setAvailableDrivers] = useState<any[]>([]);
+    const [driverSearch, setDriverSearch] = useState('');
+    const [driverPage, setDriverPage] = useState(1);
+    const [driverTotal, setDriverTotal] = useState(0);
+    const [driverLoading, setDriverLoading] = useState(false);
 
     useEffect(() => {
         fetchOrder();
-        fetchAvailableDrivers();
     }, [id]);
+
+    // Fetch drivers when modal opens
+    useEffect(() => {
+        if (assignDriverModal) {
+            setDriverPage(1);
+            setDriverSearch('');
+            fetchAvailableDrivers(1, '');
+        }
+    }, [assignDriverModal]);
+
+    // Debounced search
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            if (assignDriverModal) fetchAvailableDrivers(1, driverSearch);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [driverSearch]);
+
+    // Pagination
+    useEffect(() => {
+        if (assignDriverModal && driverPage > 1) fetchAvailableDrivers(driverPage, driverSearch);
+    }, [driverPage]);
 
     const fetchOrder = async () => {
         try {
@@ -60,14 +86,20 @@ const OrderDetail = () => {
         }
     };
 
-    const fetchAvailableDrivers = async () => {
+    const fetchAvailableDrivers = async (page = 1, search = '') => {
         try {
+            setDriverLoading(true);
             // Import dynamically or ensure it's available
             const { getStoreDrivers } = await import('../delivery/api/delivery-drivers.api');
-            const drivers = await getStoreDrivers();
+            const response: any = await getStoreDrivers({ page, limit: 5, search });
+            const drivers = Array.isArray(response) ? response : (response.data || []);
+            const meta = response.meta || {};
             setAvailableDrivers(drivers);
+            setDriverTotal(meta.total || drivers.length);
         } catch (error) {
             console.error('Failed to fetch available drivers', error);
+        } finally {
+            setDriverLoading(false);
         }
     };
 
@@ -234,6 +266,7 @@ const OrderDetail = () => {
         OrderStatus.CONFIRMED,
         OrderStatus.PREPARING,
         OrderStatus.READY,
+        OrderStatus.OUT_FOR_DELIVERY,
         OrderStatus.DELIVERED
     ];
 
@@ -243,6 +276,7 @@ const OrderDetail = () => {
             case OrderStatus.CONFIRMED: return 'text-blue-600 bg-blue-50 border-blue-200';
             case OrderStatus.PREPARING: return 'text-indigo-600 bg-indigo-50 border-indigo-200';
             case OrderStatus.READY: return 'text-purple-600 bg-purple-50 border-purple-200';
+            case OrderStatus.OUT_FOR_DELIVERY: return 'text-orange-600 bg-orange-50 border-orange-200';
             case OrderStatus.DELIVERED: return 'text-green-600 bg-green-50 border-green-200';
             case OrderStatus.CANCELLED: return 'text-rose-600 bg-rose-50 border-rose-200';
             default: return 'text-slate-600 bg-slate-50 border-slate-200';
@@ -607,22 +641,64 @@ const OrderDetail = () => {
 
                                 {order.driver ? (
                                     <div className="space-y-4">
-                                        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 font-bold">
-                                                    {order.driver.name.charAt(0)}
+                                        <div className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg gap-4">
+                                            <div className="flex items-center gap-3 min-w-0 flex-1">
+                                                <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full overflow-hidden flex items-center justify-center text-indigo-600 font-bold">
+                                                    {order.driver.deliveryProfile?.avatarUrl ? (
+                                                        <ImageWithFallback
+                                                            src={order.driver.deliveryProfile.avatarUrl}
+                                                            alt={order.driver.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        order.driver.name.charAt(0)
+                                                    )}
                                                 </div>
-                                                <div>
-                                                    <p className="font-bold text-sm text-slate-900 dark:text-white">{order.driver.name}</p>
-                                                    <p className="text-xs text-slate-500">{order.driver.phone}</p>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-1.5 flex-wrap">
+                                                        <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{order.driver.name}</p>
+                                                        {order.driver.verificationStatus === 'VERIFIED' && (
+                                                            <div className="flex items-center gap-0.5 text-[9px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded-full">
+                                                                <BadgeCheck size={10} />
+                                                                {t('verified', 'Verified')}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-1">
+                                                        <div className="flex items-center gap-1.5 shrink-0">
+                                                            <span className={clsx(
+                                                                "w-1.5 h-1.5 rounded-full",
+                                                                order.driver.deliveryProfile?.isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
+                                                            )} />
+                                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                                                                {order.driver.deliveryProfile?.isBusy
+                                                                    ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
+                                                                    : (t('common:delivery.drivers.status.available', 'Available') as string)}
+                                                            </span>
+                                                        </div>
+                                                        <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+                                                        <p className="text-xs text-slate-500 shrink-0">{order.driver.phone}</p>
+                                                        {order.driver.deliveryProfile?.vehicleType && (
+                                                            <>
+                                                                <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
+                                                                <span className="text-[9px] text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded font-black uppercase tracking-wider shrink-0">
+                                                                    {t(`common:vehicle_types.${order.driver.deliveryProfile.vehicleType}`, order.driver.deliveryProfile.vehicleType) as string}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
                                                 </div>
                                             </div>
-                                            <button
-                                                onClick={() => setAssignDriverModal(true)}
-                                                className="text-xs font-bold text-indigo-600 hover:underline"
-                                            >
-                                                {t('changeDriver', 'Change')}
-                                            </button>
+                                            {order.status !== OrderStatus.OUT_FOR_DELIVERY &&
+                                                order.status !== OrderStatus.DELIVERED &&
+                                                order.status !== OrderStatus.CANCELLED && (
+                                                    <button
+                                                        onClick={() => setAssignDriverModal(true)}
+                                                        className="text-xs font-bold text-indigo-600 hover:underline"
+                                                    >
+                                                        {t('reassignDriver', 'Reassign Driver')}
+                                                    </button>
+                                                )}
                                         </div>
 
                                         {order.deliveryPin && (
@@ -750,57 +826,190 @@ const OrderDetail = () => {
                 isLoading={updating}
             />
 
-            <ConfirmationModal
-                isOpen={assignDriverModal}
-                title={order.driverId ? t('reassignDriver', 'Reassign Driver') : t('assignDriver', 'Assign Driver')}
-                message={t('selectDriverMessage', 'Select a driver to handle this delivery:')}
-                onConfirm={() => { }} // Not used for this type of modal
-                onCancel={() => setAssignDriverModal(false)}
-                confirmLabel="" // Hidden
-            >
-                <div className="space-y-3 mt-4 max-h-[400px] overflow-y-auto custom-scrollbar p-1">
-                    {availableDrivers.length > 0 ? (
-                        availableDrivers.map((driver) => (
+            {/* Custom Assign Driver Modal */}
+            {assignDriverModal && (
+                <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200" dir={isRTL ? 'rtl' : 'ltr'}>
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
+                        {/* Header */}
+                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
+                            <div>
+                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
+                                    {order.driverId ? t('reassignDriver', 'Reassign Driver') : t('assignDriver', 'Assign Driver')}
+                                </h3>
+                                <p className="text-sm text-slate-500 mt-1">{t('selectDriverMessage', 'Select a driver to handle this delivery:')}</p>
+                            </div>
                             <button
-                                key={driver.id}
-                                onClick={() => handleAssignDriver(driver.id)}
-                                disabled={updating}
-                                className={clsx(
-                                    "w-full flex items-center justify-between p-4 rounded-xl border transition-all text-start group",
-                                    order.driverId === driver.id
-                                        ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
-                                        : "bg-white border-slate-200 hover:border-indigo-300 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-700"
-                                )}
+                                onClick={() => setAssignDriverModal(false)}
+                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
                             >
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 font-bold">
-                                        {driver.name.charAt(0)}
-                                    </div>
-                                    <div>
-                                        <p className="font-bold text-slate-900 dark:text-white">{driver.name}</p>
-                                        <div className="flex items-center gap-2 mt-0.5">
-                                            <span className={clsx(
-                                                "w-2 h-2 rounded-full",
-                                                driver.deliveryProfile?.isBusy ? "bg-amber-500" : "bg-emerald-500"
-                                            )} />
-                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-                                                {driver.deliveryProfile?.isBusy ? t('status.busy', 'Busy') : t('status.available', 'Available')}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                {order.driverId === driver.id && (
-                                    <CheckCircle size={20} className="text-indigo-600" />
-                                )}
+                                <X size={24} />
                             </button>
-                        ))
-                    ) : (
-                        <div className="text-center py-8 text-slate-500 italic">
-                            {t('noDriversFound', 'No drivers available. Add drivers in the Delivery section first.')}
                         </div>
-                    )}
+
+                        {/* Search Bar */}
+                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
+                            <div className="relative">
+                                <Search className={clsx("absolute top-3 text-slate-400", isRTL ? "right-4" : "left-4")} size={20} />
+                                <input
+                                    type="text"
+                                    placeholder={t('delivery.drivers.search_placeholder', 'Search by name, email or phone...')}
+                                    value={driverSearch}
+                                    onChange={(e) => setDriverSearch(e.target.value)}
+                                    className={clsx(
+                                        "w-full py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm",
+                                        isRTL ? "pr-12 pl-4" : "pl-12 pr-4"
+                                    )}
+                                />
+                            </div>
+                        </div>
+
+                        {/* Driver List */}
+                        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                            {driverLoading ? (
+                                <div className="flex flex-col items-center justify-center py-12 space-y-3 opacity-60">
+                                    <div className="w-8 h-8 border-4 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
+                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{t('loading', 'Loading...')}</p>
+                                </div>
+                            ) : availableDrivers.length > 0 ? (
+                                availableDrivers.map((driver) => {
+                                    const isVerified = ['VERIFIED', 'Verified', 'verified'].includes(driver.deliveryProfile?.verificationStatus);
+                                    const isSelected = order.driverId === driver.id;
+                                    const isBusy = driver.deliveryProfile?.isBusy; // REQ: Rely on profile isBusy flag only
+
+                                    return (
+                                        <div
+                                            key={driver.id}
+                                            onClick={() => isVerified && !isBusy && handleAssignDriver(driver.id)}
+                                            className={clsx(
+                                                "relative w-full flex items-center justify-between p-4 rounded-xl border transition-all text-start group",
+                                                (!isVerified || isBusy)
+                                                    ? "opacity-60 bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800 cursor-not-allowed grayscale-[0.5]"
+                                                    : isSelected
+                                                        ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-1 ring-indigo-500/30 cursor-default"
+                                                        : "bg-white border-slate-200 hover:border-indigo-300 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-700 hover:shadow-md cursor-pointer"
+                                            )}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <div className={clsx(
+                                                    "w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg shadow-inner",
+                                                    isVerified ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" : "bg-slate-200 dark:bg-slate-800 text-slate-500"
+                                                )}>
+                                                    {driver.deliveryProfile?.avatarUrl ? (
+                                                        <ImageWithFallback
+                                                            src={driver.deliveryProfile.avatarUrl}
+                                                            alt={driver.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        driver.name ? driver.name.charAt(0) : '?'
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <h4 className="font-bold text-slate-900 dark:text-white">{driver.name}</h4>
+                                                        {isVerified ? (
+                                                            <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded">
+                                                                <BadgeCheck size={12} />
+                                                                {t('verified', 'Verified')}
+                                                            </div>
+                                                        ) : (
+                                                            <div className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-500 dark:bg-slate-700">
+                                                                {driver.deliveryProfile?.verificationStatus || 'Unknown'}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="flex items-center gap-3 mt-1">
+                                                        <div className="flex items-center gap-1.5">
+                                                            <span className={clsx(
+                                                                "w-2 h-2 rounded-full",
+                                                                isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
+                                                            )} />
+                                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                                                                {isBusy
+                                                                    ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
+                                                                    : (t('common:delivery.drivers.status.available', 'Available') as string)}
+                                                            </span>
+                                                        </div>
+                                                        {(driver.activeDeliveriesCount > 0) && (
+                                                            <>
+                                                                <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                                <div className="flex items-center gap-1 text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                                                                    <Package size={12} />
+                                                                    <span>{driver.activeDeliveriesCount} {t('activeTasks', 'Active')}</span>
+                                                                </div>
+                                                            </>
+                                                        )}
+                                                        <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                        <span className="text-xs text-slate-500">{driver.phone}</span>
+                                                        {driver.deliveryProfile?.vehicleType && (
+                                                            <>
+                                                                <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                                <span className="text-[10px] text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
+                                                                    {t(`common:vehicle_types.${driver.deliveryProfile.vehicleType}`, driver.deliveryProfile.vehicleType) as string}
+                                                                </span>
+                                                            </>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            {isSelected ? (
+                                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
+                                                    <CheckCircle size={14} />
+                                                    {t('selected', 'Selected')}
+                                                </div>
+                                            ) : isVerified ? (
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-indigo-200 dark:shadow-none">
+                                                    {t('assign', 'Assign')}
+                                                </div>
+                                            ) : (
+                                                <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                                                    <ShieldAlert size={12} />
+                                                    {t('unverified', 'Unverified')}
+                                                </div>
+                                            )}
+                                        </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-16 text-center">
+                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
+                                        <Truck size={32} className="text-slate-300" />
+                                    </div>
+                                    <p className="text-slate-500 font-medium">{t('noDriversFound', 'No drivers found')}</p>
+                                    <p className="text-xs text-slate-400 mt-1">{t('adjustSearch', 'Try adjusting your search')}</p>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Pagination Footer */}
+                        {driverTotal > 5 && (
+                            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
+                                <span className="text-xs text-slate-500 font-medium">
+                                    {t('showingResults', { start: (driverPage - 1) * 5 + 1, end: Math.min(driverPage * 5, driverTotal), total: driverTotal })}
+                                </span>
+                                <div className="flex gap-2">
+                                    <button
+                                        onClick={() => setDriverPage(p => Math.max(1, p - 1))}
+                                        disabled={driverPage === 1}
+                                        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <ChevronLeft size={16} />
+                                    </button>
+                                    <button
+                                        onClick={() => setDriverPage(p => p + 1)}
+                                        disabled={driverPage * 5 >= driverTotal}
+                                        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                    >
+                                        <ChevronRight size={16} className={isRTL ? "rotate-180" : ""} />
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 </div>
-            </ConfirmationModal>
+            )}
+
 
             <ConfirmationModal
                 isOpen={confirmDeliveryModal}

@@ -160,13 +160,18 @@ const OrderList = () => {
             case OrderStatus.CONFIRMED: return 'text-blue-600 bg-blue-100 dark:bg-blue-900/30 dark:text-blue-400';
             case OrderStatus.PREPARING: return 'text-indigo-600 bg-indigo-100 dark:bg-indigo-900/30 dark:text-indigo-400';
             case OrderStatus.READY: return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400';
+            case OrderStatus.OUT_FOR_DELIVERY: return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400';
             case OrderStatus.DELIVERED: return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
             case OrderStatus.CANCELLED: return 'text-rose-600 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400';
+            case OrderStatus.DRIVER_ASSIGNED: return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400'; // Match Ready
             default: return 'text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400';
         }
     };
 
     const getLocalizedStatus = (status: string) => {
+        if (status === OrderStatus.DRIVER_ASSIGNED) {
+            return t('dashboard:status.ready');
+        }
         // Assume keys like "pending", "confirmed" exist in common or dashboard
         return t(`dashboard:status.${status.toLowerCase()}`, { defaultValue: status.replace(/_/g, ' ') });
     };
@@ -174,7 +179,7 @@ const OrderList = () => {
     return (
         <div className="p-6">
             {/* Status Counts Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3 mb-8">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 mb-8">
                 <div
                     onClick={() => setStatusFilter('')}
                     className={clsx(
@@ -194,6 +199,7 @@ const OrderList = () => {
                     OrderStatus.CONFIRMED,
                     OrderStatus.PREPARING,
                     OrderStatus.READY,
+                    OrderStatus.OUT_FOR_DELIVERY,
                     OrderStatus.DELIVERED,
                     OrderStatus.CANCELLED
                 ].map(status => (
@@ -270,6 +276,7 @@ const OrderList = () => {
                         <option value={OrderStatus.CONFIRMED}>{getLocalizedStatus(OrderStatus.CONFIRMED)}</option>
                         <option value={OrderStatus.PREPARING}>{getLocalizedStatus(OrderStatus.PREPARING)}</option>
                         <option value={OrderStatus.READY}>{getLocalizedStatus(OrderStatus.READY)}</option>
+                        <option value={OrderStatus.OUT_FOR_DELIVERY}>{getLocalizedStatus(OrderStatus.OUT_FOR_DELIVERY)}</option>
                         <option value={OrderStatus.DELIVERED}>{getLocalizedStatus(OrderStatus.DELIVERED)}</option>
                         <option value={OrderStatus.CANCELLED}>{getLocalizedStatus(OrderStatus.CANCELLED)}</option>
                     </select>

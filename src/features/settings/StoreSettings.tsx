@@ -92,7 +92,8 @@ const StoreSettings = () => {
         acceptOrdersInClosedHours: false,
         isAcceptingOrders: true,
         enableStoreReviews: true,
-        enableProductReviews: true
+        enableProductReviews: true,
+        maxOrdersPerDriver: 5
     });
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -142,7 +143,8 @@ const StoreSettings = () => {
                 acceptOrdersInClosedHours: store.acceptOrdersInClosedHours || false,
                 isAcceptingOrders: store.isAcceptingOrders === false ? false : true,
                 enableStoreReviews: store.enableStoreReviews === false ? false : true,
-                enableProductReviews: store.enableProductReviews === false ? false : true
+                enableProductReviews: store.enableProductReviews === false ? false : true,
+                maxOrdersPerDriver: store.maxOrdersPerDriver || 5
             });
 
             setLogoPreview(store.logo);
@@ -341,6 +343,7 @@ const StoreSettings = () => {
             data.append('isAcceptingOrders', String(formData.isAcceptingOrders));
             data.append('enableStoreReviews', String(formData.enableStoreReviews));
             data.append('enableProductReviews', String(formData.enableProductReviews));
+            data.append('maxOrdersPerDriver', String(formData.maxOrdersPerDriver));
 
             if (formData.workingDays.length > 0) {
                 data.append('workingDays', JSON.stringify(formData.workingDays));
@@ -1097,6 +1100,39 @@ const StoreSettings = () => {
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    </section>
+
+                    {/* Delivery Settings */}
+                    <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
+                        <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
+                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                <Truck size={24} className="text-primary" />
+                            </div>
+                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('deliverySettings', 'Delivery Settings')}</h3>
+                        </div>
+
+                        <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                    <Truck size={14} /> {t('maxOrdersPerDriver', 'Max Active Orders Per Driver')}
+                                </label>
+                                <div className="relative">
+                                    <input
+                                        type="number"
+                                        name="maxOrdersPerDriver"
+                                        value={formData.maxOrdersPerDriver}
+                                        onChange={handleChange}
+                                        min={1}
+                                        max={50}
+                                        disabled={isReadOnly}
+                                        className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed"
+                                    />
+                                    <p className="mt-2 text-slate-500 text-[10px] font-medium italic">
+                                        {t('maxOrdersPerDriverDesc', 'Automatically mark drivers as "Busy" when they reach this limit.')}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </section>
                 </div>
