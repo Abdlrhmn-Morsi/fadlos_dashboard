@@ -1,13 +1,22 @@
-import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit } from 'lucide-react';
+import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit, Bike, Footprints } from 'lucide-react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getStoreDrivers, updateDriverStatus, removeDriver } from '../api/delivery-drivers.api';
+import { getStoreDrivers, updateDriverStatus, removeDriver, toggleStoreDriverStatus } from '../api/delivery-drivers.api';
 import { Pagination } from '../../../components/common/Pagination';
+import { toast } from '../../../utils/toast';
 import clsx from 'clsx';
+import { useCache } from '../../../contexts/CacheContext';
+import { useAuth } from '../../../contexts/AuthContext';
+import { UserRole } from '../../../types/user-role';
 
 const DeliveryDriversList = () => {
+    const { getCache, setCache, updateCacheItem, invalidateCache } = useCache();
+    const { user } = useAuth();
+    const isSystemAdmin = user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN;
+    const CACHE_KEY = 'delivery_drivers';
+    // ... (existing state)
     const { t } = useTranslation('common');
     const navigate = useNavigate();
     const [drivers, setDrivers] = useState<any[]>([]);
@@ -22,31 +31,46 @@ const DeliveryDriversList = () => {
         totalPages: 0
     });
 
-    // Debounce search term
+    // ... (existing useEffects)
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(searchTerm);
-            setPage(1); // Reset to first page on search
+            setPage(1);
         }, 500);
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
     const fetchDrivers = async () => {
+        const params = {
+            search: debouncedSearch,
+            page,
+            limit: meta.limit
+        };
+
+        // Check cache first
+        const cachedResponse = getCache(CACHE_KEY, params);
+        if (cachedResponse) {
+            setDrivers(cachedResponse.data);
+            setMeta(cachedResponse.meta);
+            setLoading(false);
+            return;
+        }
+
         setLoading(true);
         try {
-            const response = await getStoreDrivers({
-                search: debouncedSearch,
-                page,
-                limit: meta.limit
-            });
+            const response = await getStoreDrivers(params);
             if (response) {
-                // More robust check: handle {data, meta} or just flat array
                 const driversList = response.data && Array.isArray(response.data)
                     ? response.data
                     : (Array.isArray(response) ? response : []);
 
+                const formattedMeta = response.meta || { total: driversList.length, page: 1, limit: 10, totalPages: 1 };
+
                 setDrivers(driversList);
-                setMeta(response.meta || { total: driversList.length, page: 1, limit: 10, totalPages: 1 });
+                setMeta(formattedMeta);
+
+                // Set cache
+                setCache(CACHE_KEY, { data: driversList, meta: formattedMeta }, params);
             } else {
                 setDrivers([]);
             }
@@ -62,15 +86,95 @@ const DeliveryDriversList = () => {
     }, [debouncedSearch, page]);
 
     const handleStatusToggle = async (driverId: string, currentStatus: string) => {
-        if (currentStatus !== 'ACCEPTED' && currentStatus !== 'PENDING') return;
+        if (currentStatus !== 'VERIFIED' && currentStatus !== 'UNDER_REVIEW') return;
 
-        const newStatus = currentStatus === 'ACCEPTED' ? 'PENDING' : 'ACCEPTED';
+        const newStatus = currentStatus === 'VERIFIED' ? 'UNDER_REVIEW' : 'VERIFIED';
+        const updater = (d: any) => ({ ...d, deliveryProfile: { ...d.deliveryProfile, verificationStatus: newStatus } });
+
         try {
-            await updateDriverStatus(driverId, newStatus);
-            // Refresh list
-            fetchDrivers();
+            // Optimistic update local state
+            setDrivers(prevDrivers => prevDrivers.map(d =>
+                d.id === driverId ? updater(d) : d
+            ));
+
+            // Update cache
+            updateCacheItem(CACHE_KEY, driverId, updater);
+
+            const response = await updateDriverStatus(driverId, newStatus);
+
+            // If response contains the updated status, sync it just in case
+            if (response && response.status) {
+                const finalUpdater = (d: any) => ({ ...d, deliveryProfile: { ...d.deliveryProfile, verificationStatus: response.status } });
+                setDrivers(prevDrivers => prevDrivers.map(d =>
+                    d.id === driverId ? finalUpdater(d) : d
+                ));
+                updateCacheItem(CACHE_KEY, driverId, finalUpdater);
+            }
+
+            toast.success(t('delivery.drivers.status_updated', 'Driver status updated successfully'));
         } catch (error) {
             console.error('Failed to update status:', error);
+            const revertUpdater = (d: any) => ({ ...d, deliveryProfile: { ...d.deliveryProfile, verificationStatus: currentStatus } });
+
+            // Revert local state
+            setDrivers(prevDrivers => prevDrivers.map(d =>
+                d.id === driverId ? revertUpdater(d) : d
+            ));
+
+            // Revert cache
+            updateCacheItem(CACHE_KEY, driverId, revertUpdater);
+
+            toast.error(t('common.error', 'Failed to update status'));
+        }
+    };
+
+    const handleActiveToggle = async (driverId: string) => {
+        const updater = (d: any) => ({ ...d, storeDriverIsActive: !d.storeDriverIsActive });
+
+        try {
+            // Optimistic update local state
+            setDrivers(prevDrivers => prevDrivers.map(d =>
+                d.id === driverId ? updater(d) : d
+            ));
+
+            // Update cache
+            updateCacheItem(CACHE_KEY, driverId, updater);
+
+            const response: any = await toggleStoreDriverStatus(driverId);
+
+            // If response contains updated driver data, use it.
+            // The backend returns the updated `StoreDeliveryDriver` entity.
+            // But our local state is a mix of User properties and storeDriverIsActive.
+            // Let's assume the API returns the saved entity which has `isActive`.
+
+            // If the API call fails, we should revert.
+            // However, the prompt says "get the data from the response and update the ui".
+
+            // Re-read backend:
+            // storeDriver.isActive = !storeDriver.isActive;
+            // return this.storeDeliveryDriverRepository.save(storeDriver);
+
+            // So response is the StoreDeliveryDriver object: { id, isActive: boolean, ... }
+
+            if (response && typeof response.isActive !== 'undefined') {
+                const finalUpdater = (d: any) => ({ ...d, storeDriverIsActive: response.isActive });
+                setDrivers(prevDrivers => prevDrivers.map(d =>
+                    d.id === driverId ? finalUpdater(d) : d
+                ));
+                updateCacheItem(CACHE_KEY, driverId, finalUpdater);
+            }
+
+            toast.success(t('delivery.drivers.status_updated', 'Driver status updated successfully'));
+        } catch (error) {
+            console.error('Failed to toggle driver status:', error);
+            // Revert local state
+            setDrivers(prevDrivers => prevDrivers.map(d =>
+                d.id === driverId ? updater(d) : d // toggle back
+            ));
+            // Revert cache
+            updateCacheItem(CACHE_KEY, driverId, updater);
+
+            toast.error(t('common.error', 'Failed to update driver status'));
         }
     };
 
@@ -93,8 +197,6 @@ const DeliveryDriversList = () => {
         driverId: null as string | null
     });
 
-    // ... (keep fetchDrivers and handleStatusToggle)
-
     const handleDeleteClick = (driverId: string) => {
         setDeleteModal({ isOpen: true, driverId });
     };
@@ -104,42 +206,71 @@ const DeliveryDriversList = () => {
 
         try {
             await removeDriver(deleteModal.driverId);
-            fetchDrivers();
+
+            // Invalidate the cache entirely for this key because removal affects multiple pages/counts
+            // and CacheContext doesn't have a simple "removeItem" with pattern matching yet (only update).
+            // Actually, I can use invalidateCache.
+            invalidateCache(CACHE_KEY);
+
+            setDrivers(prevDrivers => prevDrivers.filter(d => d.id !== deleteModal.driverId));
+            setMeta(prev => ({
+                ...prev,
+                total: prev.total - 1,
+                totalPages: Math.ceil((prev.total - 1) / prev.limit)
+            }));
+            toast.success(t('delivery.drivers.remove_success', 'Driver removed successfully'));
         } catch (error) {
             console.error('Failed to remove driver:', error);
+            toast.error(t('common.error', 'Failed to remove driver'));
         } finally {
             setDeleteModal({ isOpen: false, driverId: null });
         }
     };
 
     const getStatusBadge = (status: string, driverId?: string) => {
-        // ... (keep existing implementation)
         const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold cursor-pointer select-none";
 
-        // Only allow toggling for ACCEPTED/PENDING
-        const canToggle = status === 'ACCEPTED' || status === 'PENDING';
+        const canToggle = isSystemAdmin && (status === 'VERIFIED' || status === 'UNDER_REVIEW');
         const toggleProps = canToggle && driverId ? { onClick: () => handleStatusToggle(driverId, status) } : {};
 
         switch (status) {
             case 'VERIFIED':
-                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('confirmed')}</span>;
-            case 'ACCEPTED':
-                return <span {...toggleProps} className={`${baseClass} bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-900/50 transition-colors`}><CheckCircle size={12} /> {t('accepted', 'Accepted')}</span>;
+                return <span {...toggleProps} className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors`}><CheckCircle size={12} /> {t('verificationStatuses.VERIFIED', 'Verified')}</span>;
+            case 'ACTIVE':
+                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('verificationStatuses.ACTIVE', 'Active')}</span>;
+            case 'UNDER_REVIEW':
+                return <span {...toggleProps} className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors`}><Clock size={12} /> {t('verificationStatuses.UNDER_REVIEW', 'Under Review')}</span>;
             case 'PENDING':
-                return <span {...toggleProps} className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors`}><Clock size={12} /> {t('pending')}</span>;
+                return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('verificationStatuses.PENDING', 'Pending')}</span>;
             case 'REJECTED':
-                return <span className={`${baseClass} bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300`}><XCircle size={12} /> {t('cancelled')}</span>;
+                return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('verificationStatuses.REJECTED', 'Rejected')}</span>;
             case 'UNVERIFIED':
-                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t('unverified', 'Unverified')}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t('verificationStatuses.UNVERIFIED', 'Unverified')}</span>;
             default:
-                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {status}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t(`verificationStatuses.${status}`, status)}</span>;
+        }
+    };
+
+    const getVehicleBadge = (type: string) => {
+        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-xs font-semibold select-none bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300";
+
+        switch (type) {
+            case 'walking':
+                return <span className={baseClass}><Footprints size={12} /> {t('vehicle_types.walking', 'Walking')}</span>;
+            case 'bicycle':
+                return <span className={baseClass}><Bike size={12} /> {t('vehicle_types.bicycle', 'Bicycle')}</span>;
+            case 'tricycle':
+                return <span className={baseClass}><Truck size={12} /> {t('vehicle_types.tricycle', 'Tricycle')}</span>;
+            case 'motorcycle':
+                return <span className={baseClass}><Bike size={12} /> {t('vehicle_types.motorcycle', 'Motorcycle')}</span>;
+            default:
+                return <span className={baseClass}>{type}</span>;
         }
     };
 
     return (
         <div className="space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                {/* ... (keep header) */}
                 <div className="flex items-center gap-3">
                     <div className="p-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
                         <Truck size={24} className="text-indigo-600 dark:text-indigo-400" />
@@ -174,12 +305,13 @@ const DeliveryDriversList = () => {
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
-                        {/* ... (keep table header) */}
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.name')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.contact')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.vehicle', 'Vehicle')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.status')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('active', 'Active')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.availability')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.joined_at')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-right">{t('actions')}</th>
@@ -188,7 +320,7 @@ const DeliveryDriversList = () => {
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center">
+                                    <td colSpan={8} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center gap-3">
                                             <div className="w-8 h-8 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
                                             <span className="text-slate-400 text-sm">{t('loading')}...</span>
@@ -200,9 +332,20 @@ const DeliveryDriversList = () => {
                                     <tr key={driver.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                                         {/* ... (keep existing columns) */}
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                                            <div className="flex flex-col">
-                                                <span className="font-medium text-slate-900 dark:text-white uppercase">{driver.name}</span>
-                                                <span className="text-xs text-slate-500 lowercase">@{driver.username}</span>
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 flex-shrink-0">
+                                                    {driver.deliveryProfile?.avatarUrl ? (
+                                                        <img src={driver.deliveryProfile.avatarUrl} alt={driver.name} className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-slate-400">
+                                                            <User size={20} />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col">
+                                                    <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{driver.name}</span>
+                                                    <span className="text-[10px] text-slate-500 lowercase font-medium">@{driver.username}</span>
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
@@ -212,7 +355,21 @@ const DeliveryDriversList = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                                            {getVehicleBadge(driver.deliveryProfile?.vehicleType || 'bicycle')}
+                                        </td>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
                                             {getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus, driver.id)}
+                                        </td>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                                            <label className="relative inline-flex items-center cursor-pointer">
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={driver.storeDriverIsActive || false}
+                                                    onChange={() => handleActiveToggle(driver.id)}
+                                                />
+                                                <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600 dark:peer-checked:bg-emerald-600 shadow-sm"></div>
+                                            </label>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-sm lowercase">
                                             <span className={clsx(
@@ -251,7 +408,7 @@ const DeliveryDriversList = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-12 text-center text-slate-400 text-sm">
+                                    <td colSpan={8} className="px-6 py-12 text-center text-slate-400 text-sm">
                                         {t('common.no_results')}
                                     </td>
                                 </tr>

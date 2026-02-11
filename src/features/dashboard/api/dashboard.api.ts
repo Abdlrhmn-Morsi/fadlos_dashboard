@@ -19,6 +19,7 @@ export const fetchDashboardStats = async (user: any) => {
             avgOrderValue: 0,
             totalClients: 0,
             totalCategories: 0,
+            totalDrivers: 0,
             topRatedProducts: [],
             topCategories: [],
             averageRating: 0,
@@ -85,6 +86,11 @@ export const fetchDashboardStats = async (user: any) => {
             // Categories count (Default for all employees)
             promises.push(apiService.get('/categories/seller-categories?limit=1').then(res => ({ key: 'categories', val: res.meta?.total || 0 })).catch(() => ({ key: 'categories', val: 0 })));
 
+            // Drivers count (delivery_drivers.view)
+            if (hasPerm('delivery_drivers.view')) {
+                promises.push(apiService.get('/delivery-drivers/store-drivers?limit=1').then(res => ({ key: 'drivers', val: res.meta?.total || 0 })).catch(() => ({ key: 'drivers', val: 0 })));
+            }
+
             // Followers (store.view) - Assuming store view allows seeing followers
             if (storeId && hasPerm('store.view')) {
                 promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0 })).catch(() => ({ key: 'rating', val: 0 })));
@@ -102,6 +108,7 @@ export const fetchDashboardStats = async (user: any) => {
                 if (res.key === 'products') stats.totalProducts = res.val;
                 if (res.key === 'clients') stats.totalClients = res.val;
                 if (res.key === 'categories') stats.totalCategories = res.val;
+                if (res.key === 'drivers') stats.totalDrivers = res.val;
                 if (res.key === 'rating') stats.averageRating = res.val;
                 if (res.key === 'topProducts') stats.topRatedProducts = res.val;
                 if (res.key === 'topCategories') stats.topCategories = res.val;

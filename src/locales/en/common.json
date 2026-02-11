@@ -7,7 +7,8 @@
         "not_found": "Data not found",
         "update_success": "Updated successfully",
         "delete_success": "Deleted successfully",
-        "create_success": "Created successfully"
+        "create_success": "Created successfully",
+        "save": "Save"
     },
     "dashboard": "Dashboard",
     "revenue": "Revenue",
@@ -82,7 +83,6 @@
     "update": "Update",
     "viewAll": "View All",
     "delete": "Delete",
-    "save": "Save",
     "updateChanges": "Update Changes",
     "cancel": "Cancel",
     "confirm": "Confirm",
@@ -107,9 +107,8 @@
     "status": "Status",
     "active": "Active",
     "inactive": "Inactive",
-    "accepted": "Accepted",
-    "pending": "Pending",
-    "confirmed": "Confirmed",
+    "under_review": "Under Review",
+    "confirmed": "Verified",
     "prepared": "Prepared",
     "ready": "Ready",
     "delivered": "Delivered",
@@ -141,7 +140,10 @@
     "verificationStatuses": {
         "VERIFIED": "Verified",
         "REJECTED": "Rejected",
-        "PENDING": "Pending"
+        "UNDER_REVIEW": "Under Review",
+        "UNVERIFIED": "Unverified",
+        "PENDING": "Pending",
+        "ACTIVE": "Active"
     },
     "driverTypes": {
         "STORE_DRIVER": "Store Driver",
@@ -496,15 +498,25 @@
             "hire": "Hire Driver",
             "hire_success": "Freelancer hired successfully",
             "create_title": "Create New Driver",
+            "edit_title": "Edit Driver Profile",
+            "confirm_update_title": "Sensitive Profile Change",
+            "confirm_update_message": "Updating your profile information will set your verification status back to UNDER REVIEW. Do you want to continue?",
+            "status_updated": "Driver status updated successfully",
+            "remove_success": "Driver removed successfully",
             "personal_info": "Personal Information",
             "identity_verification": "Identity Verification",
             "id_front": "ID Card (Front)",
             "id_back": "ID Card (Back)",
-            "selfie": "Selfie",
+            "selfie": "Selfie with ID Card",
+            "selfie_desc": "Take a selfie while holding your national ID card",
             "remove_title": "Remove Driver",
             "remove_confirm_message": "Are you sure you want to remove this driver from your store? This action cannot be undone.",
             "total": "Total",
-            "no_pending": "No drivers awaiting verification",
+            "no_pending": "No drivers currently under review",
+            "under_review": "Profile data is currently under review",
+            "locked_verification": "Locked for Security",
+            "rejected_title": "Verification Rejected",
+            "rejected_instruction": "Please correct the issues with your identity documents and resubmit.",
             "verification": {
                 "title": "Driver Verification",
                 "desc": "Review and approve driver identity documents."
@@ -520,6 +532,15 @@
         "username": "Username",
         "email": "Email Address",
         "phone": "Phone Number",
-        "password": "Password"
+        "password": "Password",
+        "vehicle_type": "Vehicle Type",
+        "vehicle": "Vehicle",
+        "avatar": "Profile Photo"
+    },
+    "vehicle_types": {
+        "bicycle": "Bicycle",
+        "motorcycle": "Motorcycle",
+        "walking": "Walking",
+        "tricycle": "Tricycle"
     }
 }

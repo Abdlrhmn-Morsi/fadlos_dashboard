@@ -13,6 +13,7 @@ export interface DashboardStats {
     totalFollowers?: number;
     totalReviews?: number;
     totalCategories?: number;
+    totalDrivers?: number;
     topRatedProducts?: any[];
     topCategories?: any[];
     averageRating?: number;

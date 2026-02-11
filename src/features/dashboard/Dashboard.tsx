@@ -11,7 +11,7 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
-import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity } from 'lucide-react';
+import { LucideIcon, TrendingUp, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -308,6 +308,14 @@ const Dashboard: React.FC = () => {
                                 title={t('totalProducts')}
                                 value={stats.totalProducts || 0}
                                 icon={Layers}
+                                color="indigo"
+                            />
+                        )}
+                        {hasPermission('delivery_drivers.view') && (
+                            <StatCard
+                                title={t('totalDrivers')}
+                                value={stats.totalDrivers || 0}
+                                icon={Truck}
                                 color="indigo"
                             />
                         )}

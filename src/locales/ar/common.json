@@ -7,7 +7,8 @@
         "not_found": "البيانات غير موجودة",
         "update_success": "تم التحديث بنجاح",
         "delete_success": "تم الحذف بنجاح",
-        "create_success": "تم الإنشاء بنجاح"
+        "create_success": "تم الإنشاء بنجاح",
+        "save": "حفظ"
     },
     "dashboard": "لوحة التحكم",
     "revenue": "الإيرادات",
@@ -69,7 +70,7 @@
     "reportedReviews": "التقييمات المُبلغ عنها",
     "categories": "الأقسام",
     "addons": "الإضافات",
-    "deliveryDrivers": "سائقي التوصيل",
+    "deliveryDrivers": "سائقي المتاجر",
     "driverVerification": "توثيق السائقين",
     "deliveryDashboard": "لوحة تحكم السائق",
     "analytics": "الإحصائيات",
@@ -82,7 +83,6 @@
     "update": "تحديث",
     "viewAll": "عرض الكل",
     "delete": "حذف",
-    "save": "حفظ",
     "updateChanges": "تحديث التغييرات",
     "cancel": "إلغاء",
     "confirm": "تأكيد",
@@ -107,9 +107,8 @@
     "status": "الحالة",
     "active": "نشط",
     "inactive": "غير نشط",
-    "accepted": "مقبول",
-    "pending": "قيد الانتظار",
-    "confirmed": "تم التأكيد",
+    "under_review": "قيد المراجعة",
+    "confirmed": "موثق",
     "prepared": "تم التجهيز",
     "ready": "جاهز",
     "delivered": "تم التوصيل",
@@ -141,7 +140,10 @@
     "verificationStatuses": {
         "VERIFIED": "موثق",
         "REJECTED": "مرفوض",
-        "PENDING": "قيد الانتظار"
+        "UNDER_REVIEW": "قيد المراجعة",
+        "UNVERIFIED": "غير موثق",
+        "PENDING": "معلق",
+        "ACTIVE": "نشط"
     },
     "driverTypes": {
         "STORE_DRIVER": "سائق متجر",
@@ -487,7 +489,7 @@
             "title": "سائقي التوصيل",
             "my_drivers": "سائقيّ",
             "marketplace": "سوق السائقين",
-            "list_title": "سائقو المتجر",
+            "list_title": "سائقي المتاجر",
             "manage_desc": "إدارة فريق التوصيل الخاص بك وتوافرهم",
             "search_placeholder": "البحث بالاسم أو البريد الإلكتروني أو الهاتف...",
             "add_new": "إضافة سائق جديد",
@@ -497,15 +499,25 @@
             "hire": "توظيف السائق",
             "hire_success": "تم توظيف السائق المستقل بنجاح",
             "create_title": "إنشاء سائق جديد",
+            "edit_title": "تعديل ملف السائق",
+            "confirm_update_title": "تغيير بيانات حساسة",
+            "confirm_update_message": "سيؤدي تحديث بياناتك الشخصية إلى إعادة حالة التوثيق إلى 'قيد المراجعة'. هل تريد الاستمرار؟",
+            "status_updated": "تم تحديث حالة السائق بنجاح",
+            "remove_success": "تم إزالة السائق بنجاح",
             "personal_info": "المعلومات الشخصية",
             "identity_verification": "التحقق من الهوية",
             "id_front": "صورة الهوية (أمام)",
             "id_back": "صورة الهوية (خلف)",
-            "selfie": "صورة سيلفي",
+            "selfie": "سيلفي مع بطاقة الهوية",
+            "selfie_desc": "التقط صورة لنفسك وأنت تمسك بطاقة الهوية الوطنية الخاصة بك",
             "remove_title": "إزالة السائق",
             "remove_confirm_message": "هل أنت متأكد أنك تريد إزالة هذا السائق من متجرك؟ لا يمكن التراجع عن هذا الإجراء.",
             "total": "إجمالي",
-            "no_pending": "لا يوجد سائقون في انتظار التوثيق",
+            "no_pending": "لا يوجد سائقون قيد المراجعة حالياً",
+            "under_review": "بيانات الملف الشخصي قيد المراجعة حالياً",
+            "locked_verification": "مؤمن للدواعي الأمنية",
+            "rejected_title": "تم رفض التوثيق",
+            "rejected_instruction": "يرجى تصحيح المشاكل في مستندات الهوية وإعادة الإرسال.",
             "verification": {
                 "title": "توثيق السائق",
                 "desc": "مراجعة واعتماد مستندات هوية السائق."
@@ -521,6 +533,15 @@
         "username": "اسم المستخدم",
         "email": "البريد الإلكتروني",
         "phone": "رقم الهاتف",
-        "password": "كلمة المرور"
+        "password": "كلمة المرور",
+        "vehicle_type": "نوع المركبة",
+        "vehicle": "المركبة",
+        "avatar": "صورة الملف الشخصي"
+    },
+    "vehicle_types": {
+        "bicycle": "دراجة هوائية",
+        "motorcycle": "موتوسيكل",
+        "walking": "سيراً على الأقدام",
+        "tricycle": "تروسيكل"
     }
 }

@@ -14,12 +14,14 @@ export const createStoreDriver = async (data: any) => {
     try {
         const formData = new FormData();
         Object.keys(data).forEach(key => {
-            if (key === 'identityImageFront' || key === 'identityImageBack' || key === 'identityImageSelfie') {
-                if (data[key]) {
+            if (['avatar', 'identityImageFront', 'identityImageBack', 'identityImageSelfie'].includes(key)) {
+                if (data[key] instanceof File) {
                     formData.append(key, data[key]);
                 }
             } else {
-                formData.append(key, data[key]);
+                if (data[key] !== undefined && data[key] !== null) {
+                    formData.append(key, data[key]);
+                }
             }
         });
 
@@ -79,16 +81,25 @@ export const getAllDrivers = async () => {
     }
 };
 
-export const verifyDriver = async (driverId: string, status: string, notes?: string) => {
+export const verifyDriver = async (driverId: string, status: string, notes?: string, rejectionReason?: string) => {
     try {
-        const response = await apiService.patch(`/delivery-drivers/${driverId}/verify`, { status, notes });
+        const response = await apiService.patch(`/delivery-drivers/${driverId}/verify`, { status, notes, rejectionReason });
         return response.data || response;
     } catch (error) {
         throw error;
     }
 };
 
-export const updateDriverStatus = async (driverId: string, status: 'ACCEPTED' | 'PENDING') => {
+export const toggleStoreDriverStatus = async (driverId: string) => {
+    try {
+        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-status`);
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const updateDriverStatus = async (driverId: string, status: 'VERIFIED' | 'UNDER_REVIEW') => {
     try {
         const response = await apiService.patch(`/delivery-drivers/${driverId}/status`, { status });
         return response.data;
@@ -119,7 +130,7 @@ export const updateStoreDriver = async (driverId: string, data: any) => {
     try {
         const formData = new FormData();
         Object.keys(data).forEach(key => {
-            if (key === 'identityImageFront' || key === 'identityImageBack' || key === 'identityImageSelfie') {
+            if (['avatar', 'identityImageFront', 'identityImageBack', 'identityImageSelfie'].includes(key)) {
                 if (data[key] instanceof File) {
                     formData.append(key, data[key]);
                 }

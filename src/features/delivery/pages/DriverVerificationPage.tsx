@@ -15,7 +15,8 @@ const DriverVerificationPage = () => {
         driverId: '',
         status: '',
         driverName: '',
-        notes: ''
+        notes: '',
+        rejectionReason: ''
     });
 
     useEffect(() => {
@@ -41,13 +42,16 @@ const DriverVerificationPage = () => {
             driverId,
             status,
             driverName: name,
-            notes: ''
+            notes: '',
+            rejectionReason: ''
         });
     };
 
     const confirmVerification = async () => {
         try {
-            await verifyDriver(modal.driverId, modal.status, modal.notes);
+            // Include rejectionReason if status is REJECTED
+            const reason = modal.status === 'REJECTED' ? modal.rejectionReason : undefined;
+            await verifyDriver(modal.driverId, modal.status, modal.notes, reason);
             toast.success(t('verificationSuccess', 'Driver verification updated successfully'));
             setModal({ ...modal, isOpen: false });
             fetchDrivers();
@@ -89,7 +93,7 @@ const DriverVerificationPage = () => {
                             "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-center border-b",
                             profile.verificationStatus === 'VERIFIED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
                                 profile.verificationStatus === 'REJECTED' ? "bg-rose-50 text-rose-600 border-rose-100" :
-                                    profile.verificationStatus === 'PENDING' ? "bg-amber-50 text-amber-600 border-amber-100" :
+                                    profile.verificationStatus === 'UNDER_REVIEW' ? "bg-amber-50 text-amber-600 border-amber-100" :
                                         "bg-slate-50 text-slate-600 border-slate-100"
                         )}>
                             {t(`verificationStatuses.${profile.verificationStatus}`, profile.verificationStatus) as string}
@@ -121,14 +125,19 @@ const DriverVerificationPage = () => {
                                 </div>
                             </div>
 
-                            {/* Verification Notes */}
-                            {profile.verificationNotes && (
+                            {/* Verification Notes / Rejection Reason */}
+                            {(profile.rejectionReason || profile.verificationNotes) && (
                                 <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800/50">
                                     <div className="flex items-center gap-1.5 text-slate-400 mb-1">
                                         <Info size={12} />
                                         <span className="text-[10px] font-black uppercase tracking-widest">{t('reason', 'Reason')}</span>
                                     </div>
-                                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">"{profile.verificationNotes}"</p>
+                                    {profile.rejectionReason && (
+                                        <p className="text-xs text-rose-600 dark:text-rose-400 leading-relaxed font-bold mb-1">{profile.rejectionReason}</p>
+                                    )}
+                                    {profile.verificationNotes && (
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">"{profile.verificationNotes}"</p>
+                                    )}
                                 </div>
                             )}
 
@@ -208,11 +217,23 @@ const DriverVerificationPage = () => {
                                 </p>
                             </div>
 
+                            {modal.status === 'REJECTED' && (
+                                <div className="space-y-2">
+                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('rejection_reason', 'Rejection Reason')}</label>
+                                    <textarea
+                                        className="w-full h-32 p-4 bg-rose-50 dark:bg-rose-900/10 border-2 border-rose-100 dark:border-rose-800 rounded-2xl text-slate-900 dark:text-white placeholder:text-rose-300 focus:border-rose-500 focus:ring-0 transition-all outline-none resize-none text-sm"
+                                        placeholder={t('provide_rejection_reason', 'Provide a reason for rejection (required)')}
+                                        value={modal.rejectionReason}
+                                        onChange={(e) => setModal({ ...modal, rejectionReason: e.target.value })}
+                                    />
+                                </div>
+                            )}
+
                             <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('reason', 'Reason')} ({t('optional', 'Optional')})</label>
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('admin_notes', 'Admin Notes')} ({t('optional', 'Optional')})</label>
                                 <textarea
-                                    className="w-full h-32 p-4 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 transition-all outline-none resize-none text-sm"
-                                    placeholder={t('provideReason', 'Provide a reason (optional)')}
+                                    className="w-full h-20 p-4 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 transition-all outline-none resize-none text-sm"
+                                    placeholder={t('provide_notes', 'Internal notes (optional)')}
                                     value={modal.notes}
                                     onChange={(e) => setModal({ ...modal, notes: e.target.value })}
                                 />

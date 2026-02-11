@@ -14,8 +14,11 @@ import {
 import clsx from 'clsx';
 import { getTowns } from '../../towns/api/towns.api';
 
+import { useCache } from '../../../contexts/CacheContext';
+
 const FreelancerMarketplace = () => {
     const { t } = useTranslation(['common']);
+    const { invalidateCache } = useCache();
     const [freelancers, setFreelancers] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [hiringId, setHiringId] = useState<string | null>(null);
@@ -55,13 +58,17 @@ const FreelancerMarketplace = () => {
         }
     };
 
-    const handleHire = async (driverId: string) => {
-        setHiringId(driverId);
+    const handleHire = async (userId: string) => {
+        setHiringId(userId);
         try {
-            await hireFreelancer(driverId);
+            await hireFreelancer(userId);
             toast.success(t('delivery.drivers.hire_success', 'Freelancer hired successfully'));
-            // Optionally remove from list or update status
-            fetchFreelancers();
+
+            // Invalidate My Drivers cache
+            invalidateCache('delivery_drivers');
+
+            // Remove from list locally
+            setFreelancers(prev => prev.filter(f => f.user.id !== userId));
         } catch (error: any) {
             console.error('Failed to hire freelancer', error);
             toast.error(error.response?.data?.message || t('common.error', 'Failed to hire freelancer'));
