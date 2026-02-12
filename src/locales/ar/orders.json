@@ -65,5 +65,7 @@
     "unverified": "غير موثق",
     "verified": "موثق",
     "onTheWay": "في الطريق",
-    "activeTasks": "طلبات نشطة"
+    "activeTasks": "طلبات نشطة",
+    "statusHistory": "سجل الحالات",
+    "cancellationReason": "سبب الإلغاء"
 }

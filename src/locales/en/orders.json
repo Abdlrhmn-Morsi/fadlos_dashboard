@@ -65,5 +65,7 @@
     "verified": "Verified",
     "onTheWay": "On The Way",
     "activeTasks": "Active",
-    "reassignDriver": "Reassign Driver"
+    "reassignDriver": "Reassign Driver",
+    "statusHistory": "Status History",
+    "cancellationReason": "Cancellation Reason"
 }

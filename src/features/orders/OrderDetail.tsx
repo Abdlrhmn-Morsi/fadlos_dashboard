@@ -460,15 +460,68 @@ const OrderDetail = () => {
                             </div>
                         </div>
 
-                        {/* Customer Note */}
                         {order.notes && (
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                                 <h3 className="font-bold text-slate-900 dark:text-white mb-3 flex items-center gap-2">
                                     <FileText className="text-amber-500" size={20} />
                                     {t('orderNotes')}
                                 </h3>
-                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 rounded-lg text-sm leading-relaxed border border-amber-100 dark:border-amber-900/30">
+                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 rounded-lg text-sm leading-relaxed border border-amber-100 dark:border-amber-900/30 break-words overflow-wrap-anywhere">
                                     {order.notes}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Cancellation Note */}
+                        {order.status === OrderStatus.CANCELLED && order.statusNote && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-rose-200 dark:border-rose-800 p-6">
+                                <h3 className="font-bold text-rose-900 dark:text-rose-200 mb-3 flex items-center gap-2">
+                                    <AlertCircle className="text-rose-500" size={20} />
+                                    {t('cancellationReason', 'Cancellation Reason')}
+                                </h3>
+                                <div className="p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-900 dark:text-rose-200 rounded-lg text-sm leading-relaxed border border-rose-100 dark:border-rose-900/30 break-words overflow-wrap-anywhere">
+                                    {order.statusNote}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Status History */}
+                        {order.statusHistory && order.statusHistory.length > 0 && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <Clock className="text-indigo-500" size={20} />
+                                    {t('statusHistory', 'Status History')}
+                                </h3>
+                                <div className="space-y-3">
+                                    {order.statusHistory.map((entry: any, index: number) => (
+                                        <div key={index} className="flex gap-3 pb-3 last:pb-0 border-b last:border-b-0 border-slate-100 dark:border-slate-800">
+                                            <div className="shrink-0">
+                                                <div className={`w-8 h-8 rounded-full flex items-center justify-center ${getStatusColor(entry.status)}`}>
+                                                    <CheckCircle size={14} />
+                                                </div>
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center justify-between gap-2 mb-1">
+                                                    <h4 className="font-bold text-sm text-slate-900 dark:text-white">
+                                                        {getStatusLabel(entry.status)}
+                                                    </h4>
+                                                    <span className="text-xs text-slate-500 whitespace-nowrap">
+                                                        {new Date(entry.timestamp).toLocaleString(isRTL ? 'ar-EG' : 'en-US', {
+                                                            month: 'short',
+                                                            day: 'numeric',
+                                                            hour: '2-digit',
+                                                            minute: '2-digit'
+                                                        })}
+                                                    </span>
+                                                </div>
+                                                {entry.notes && (
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 break-words">
+                                                        {entry.notes}
+                                                    </p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
                         )}
