@@ -22,6 +22,7 @@ import {
 } from '../store/users.store';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import clsx from 'clsx';
+import ConfirmationModal from '../../../components/ui/ConfirmationModal';
 
 const UsersList: React.FC = () => {
     const { t } = useTranslation(['users', 'common']);
@@ -32,6 +33,9 @@ const UsersList: React.FC = () => {
     const [pagination, setPagination] = useRecoilState(usersPaginationState);
     const [searchTerm, setSearchTerm] = React.useState(filters.search);
     const [debouncedSearch, setDebouncedSearch] = React.useState(filters.search);
+    const [isConfirmingStatus, setIsConfirmingStatus] = React.useState(false);
+    const [userToToggle, setUserToToggle] = React.useState<any>(null);
+    const [isUpdatingStatus, setIsUpdatingStatus] = React.useState(false);
 
     const fetchUsers = async () => {
         setLoading(true);
@@ -60,14 +64,26 @@ const UsersList: React.FC = () => {
         }
     };
 
-    const handleToggleStatus = async (userId: string, currentStatus: boolean) => {
+    const handleToggleStatus = (user: any) => {
+        setUserToToggle(user);
+        setIsConfirmingStatus(true);
+    };
+
+    const confirmToggleStatus = async () => {
+        if (!userToToggle) return;
+
+        setIsUpdatingStatus(true);
         try {
-            await toggleUserStatus(userId, !currentStatus);
-            setUsers(prev => prev.map((u: any) => u.id === userId ? { ...u, isActive: !currentStatus } : u));
+            await toggleUserStatus(userToToggle.id, !userToToggle.isActive);
+            setUsers(prev => prev.map((u: any) => u.id === userToToggle.id ? { ...u, isActive: !userToToggle.isActive } : u));
             toast.success(t('common:statusUpdated'));
         } catch (error) {
             console.error('Failed to toggle user status:', error);
             toast.error(t('common:errorUpdatingStatus'));
+        } finally {
+            setIsUpdatingStatus(false);
+            setIsConfirmingStatus(false);
+            setUserToToggle(null);
         }
     };
 
@@ -103,6 +119,10 @@ const UsersList: React.FC = () => {
                 return <span className={`${baseClass} bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300`}><Shield size={12} /> {t('employee')}</span>;
             case UserRole.CUSTOMER:
                 return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><ShoppingBag size={12} /> {t('customer')}</span>;
+            case UserRole.DELIVERY:
+                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><UserIcon size={12} /> {t('delivery')}</span>;
+            case UserRole.ADMIN:
+                return <span className={`${baseClass} bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300`}><Shield size={12} /> {t('admin')}</span>;
             default:
                 return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><UserIcon size={12} /> {role}</span>;
         }
@@ -144,6 +164,8 @@ const UsersList: React.FC = () => {
                             <option value={UserRole.CUSTOMER}>{t('customer')}</option>
                             <option value={UserRole.STORE_OWNER}>{t('storeOwner')}</option>
                             <option value={UserRole.EMPLOYEE}>{t('employee')}</option>
+                            <option value={UserRole.DELIVERY}>{t('delivery')}</option>
+                            <option value={UserRole.ADMIN}>{t('admin')}</option>
                         </select>
                     </div>
                 </div>
@@ -165,7 +187,6 @@ const UsersList: React.FC = () => {
                                     <th className="table-header-cell text-start">{t('communication')}</th>
                                     <th className="table-header-cell text-start">{t('common:status')}</th>
                                     <th className="table-header-cell text-start">{t('registration')}</th>
-                                    <th className="table-header-cell text-end">{t('common:actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -174,8 +195,19 @@ const UsersList: React.FC = () => {
                                         <tr key={user.id} className="table-row group">
                                             <td className="table-cell">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
-                                                        {user.name.charAt(0).toUpperCase()}
+                                                    <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform overflow-hidden">
+                                                        {(user.profileImage || (user.deliveryProfile && user.deliveryProfile.avatarUrl)) ? (
+                                                            <img
+                                                                src={user.profileImage || user.deliveryProfile.avatarUrl}
+                                                                alt=""
+                                                                className="w-full h-full object-cover"
+                                                                onError={(e) => {
+                                                                    (e.target as HTMLImageElement).style.display = 'none';
+                                                                }}
+                                                            />
+                                                        ) : (
+                                                            user.name.charAt(0).toUpperCase()
+                                                        )}
                                                     </div>
                                                     <div className="text-start">
                                                         <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{user.name}</div>
@@ -190,7 +222,7 @@ const UsersList: React.FC = () => {
                                             </td>
                                             <td className="table-cell">
                                                 <button
-                                                    onClick={() => handleToggleStatus(user.id, user.isActive)}
+                                                    onClick={() => handleToggleStatus(user)}
                                                     className={clsx(
                                                         "flex items-center gap-3 px-3 py-1.5 rounded-none border transition-all active:scale-95 group/status",
                                                         user.isActive
@@ -211,11 +243,6 @@ const UsersList: React.FC = () => {
                                             </td>
                                             <td className="table-cell text-sm text-slate-500 font-bold">
                                                 {new Date(user.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                            </td>
-                                            <td className="table-cell text-end">
-                                                <button className="p-3 text-slate-300 hover:text-primary hover:bg-primary-light rounded-none transition-all active:scale-90">
-                                                    <MoreVertical size={20} />
-                                                </button>
                                             </td>
                                         </tr>
                                     ))
@@ -262,6 +289,37 @@ const UsersList: React.FC = () => {
                     </div>
                 )
             }
+
+            <ConfirmationModal
+                isOpen={isConfirmingStatus}
+                title={t('common:confirmStatusChange')}
+                message={t('common:confirmStatusChangeMessage', { name: userToToggle?.name })}
+                onConfirm={confirmToggleStatus}
+                onCancel={() => {
+                    setIsConfirmingStatus(false);
+                    setUserToToggle(null);
+                }}
+                confirmLabel={t('common:update')}
+                cancelLabel={t('common:cancel')}
+                isLoading={isUpdatingStatus}
+                type="warning"
+            >
+                {userToToggle && (
+                    <div className="flex justify-center my-4">
+                        <div className="w-20 h-20 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white text-2xl font-black shadow-xl overflow-hidden border-2 border-primary">
+                            {(userToToggle.profileImage || (userToToggle.deliveryProfile && userToToggle.deliveryProfile.avatarUrl)) ? (
+                                <img
+                                    src={userToToggle.profileImage || userToToggle.deliveryProfile.avatarUrl}
+                                    alt=""
+                                    className="w-full h-full object-cover"
+                                />
+                            ) : (
+                                userToToggle.name.charAt(0).toUpperCase()
+                            )}
+                        </div>
+                    </div>
+                )}
+            </ConfirmationModal>
         </div>
     );
 };

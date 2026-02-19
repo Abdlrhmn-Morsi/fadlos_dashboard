@@ -104,6 +104,8 @@
     "set_available": "تعيين كمتاح",
     "set_busy": "تعيين كمشغول",
     "errorUpdatingStatus": "فشل تحديث الحالة",
+    "confirmStatusChange": "تأكيد تغيير الحالة",
+    "confirmStatusChangeMessage": "هل أنت متأكد من تغيير حالة {{name}}؟",
     "deliverySettings": "إعدادات التوصيل",
     "maxOrdersPerDriver": "أقصى عدد طلبات نشطة للسائق",
     "maxOrdersPerDriverDesc": "تغيير حالة السائق تلقائياً إلى \"مشغول\" عند الوصول لهذا الحد.",

@@ -8,6 +8,15 @@ export interface DashboardStats {
     todayRevenue?: number;
     todayOrders?: number;
     pendingOrders?: number;
+    totalCustomers?: number;
+    pendingStores?: number;
+    activeSubscriptions?: number;
+    totalTowns?: number;
+    pendingApprovals?: {
+        stores: any[];
+        drivers: any[];
+    };
+    topStores?: any[];
     // Seller specific (Optional as they might not be present for Admin)
     totalClients?: number;
     totalFollowers?: number;

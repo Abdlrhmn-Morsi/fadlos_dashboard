@@ -11,7 +11,7 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
-import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck } from 'lucide-react';
+import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck, MapPin } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -219,6 +219,138 @@ const Dashboard: React.FC = () => {
         );
     };
 
+    const renderPendingApprovals = () => {
+        if (user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) return null;
+        if (!stats.pendingApprovals) return null;
+
+        const { stores, drivers } = stats.pendingApprovals;
+        if (stores.length === 0 && drivers.length === 0) return null;
+
+        return (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
+                <div className="flex items-center gap-2 mb-6">
+                    <ShieldAlert size={20} className="text-amber-500" />
+                    <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
+                        {t('actionCenter')}
+                    </h3>
+                </div>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Pending Stores */}
+                    <div>
+                        <h4 className={clsx("text-sm font-bold text-slate-500 uppercase tracking-wider mb-4", isRTL && "text-right")}>
+                            {t('pendingApprovals')} - {t('totalStores')}
+                        </h4>
+                        <div className="space-y-3">
+                            {stores.length === 0 ? (
+                                <p className="text-xs text-slate-400 italic">{t('common:noDataAvailable')}</p>
+                            ) : (
+                                stores.map((store: any) => (
+                                    <div key={store.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                                                {store.logo ? <img src={store.logo} alt="" className="w-full h-full object-cover" /> : <Store size={20} className="text-slate-300" />}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{isRTL ? store.nameAr || store.name : store.name}</p>
+                                                <p className="text-[10px] text-slate-400">{store.owner?.name || 'Unknown Owner'}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => navigate(`/stores/${store.id}`)}
+                                            className="px-3 py-1.5 bg-primary text-white text-[10px] font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors"
+                                        >
+                                            {t('review')}
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Pending Drivers */}
+                    <div>
+                        <h4 className={clsx("text-sm font-bold text-slate-500 uppercase tracking-wider mb-4", isRTL && "text-right")}>
+                            {t('pendingApprovals')} - {t('platformDrivers')}
+                        </h4>
+                        <div className="space-y-3">
+                            {drivers.length === 0 ? (
+                                <p className="text-xs text-slate-400 italic">{t('common:noDataAvailable')}</p>
+                            ) : (
+                                drivers.map((profile: any) => (
+                                    <div key={profile.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700">
+                                                {profile.avatarUrl ? <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" /> : <Users size={20} className="text-slate-300" />}
+                                            </div>
+                                            <div>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{profile.user?.name || 'Unknown Driver'}</p>
+                                                <p className="text-[10px] text-slate-400">{profile.driverType}</p>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => navigate(`/delivery-drivers`)}
+                                            className="px-3 py-1.5 bg-primary text-white text-[10px] font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors"
+                                        >
+                                            {t('review')}
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+    const renderTopPerformingStores = () => {
+        if (user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) return null;
+        if (!stats.topStores || stats.topStores.length === 0) return null;
+
+        return (
+            <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <Star size={20} className="text-yellow-500" />
+                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
+                            {t('topPerformingStores')}
+                        </h3>
+                    </div>
+                    <button onClick={() => navigate('/stores')} className="text-primary text-xs font-bold hover:underline">
+                        {t('common:viewAll')}
+                    </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                    {stats.topStores.map((store: any) => (
+                        <div key={store.id} className="group p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/stores/${store.id}`)}>
+                            <div className="w-16 h-16 bg-white dark:bg-slate-900 mx-auto mb-3 border border-slate-200 dark:border-slate-700 flex items-center justify-center p-1">
+                                {store.logo ? (
+                                    <img src={store.logo} alt="" className="w-full h-full object-contain" />
+                                ) : (
+                                    <Store size={24} className="text-slate-300" />
+                                )}
+                            </div>
+                            <p className="text-sm font-bold text-slate-800 dark:text-slate-200 text-center truncate mb-1">
+                                {isRTL ? store.nameAr || store.name : store.name}
+                            </p>
+                            <div className="flex flex-col items-center">
+                                <p className="text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter">
+                                    {(store.totalRevenue || 0).toLocaleString()} {t('common:currencySymbol')}
+                                </p>
+                                <p className="text-[9px] text-slate-400 font-bold uppercase tracking-widest mt-0.5">
+                                    {store.totalOrders || 0} {t('totalOrders')}
+                                </p>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
+    };
+
+
     return (
         <div className="p-6 space-y-8 animate-in animate-fade">
             {renderStatusBanner()}
@@ -281,15 +413,45 @@ const Dashboard: React.FC = () => {
                             color="blue"
                         />
                         <StatCard
+                            title={t('pendingStores')}
+                            value={stats.pendingStores || 0}
+                            icon={Store}
+                            color="amber"
+                        />
+                        <StatCard
                             title={t('platformUsers')}
                             value={stats.totalUsers || 0}
                             icon={Users}
                             color="violet"
                         />
                         <StatCard
+                            title={t('totalCustomers')}
+                            value={stats.totalCustomers || 0}
+                            icon={Users}
+                            color="emerald"
+                        />
+                        <StatCard
+                            title={t('platformDrivers')}
+                            value={stats.totalDrivers || 0}
+                            icon={Truck}
+                            color="blue"
+                        />
+                        <StatCard
                             title={t('totalProducts')}
                             value={stats.totalProducts || 0}
                             icon={Layers}
+                            color="indigo"
+                        />
+                        <StatCard
+                            title={t('activeSubscriptions')}
+                            value={stats.activeSubscriptions || 0}
+                            icon={Zap}
+                            color="emerald"
+                        />
+                        <StatCard
+                            title={t('totalTowns')}
+                            value={stats.totalTowns || 0}
+                            icon={MapPin}
                             color="indigo"
                         />
                     </>
@@ -324,6 +486,10 @@ const Dashboard: React.FC = () => {
 
 
             </div>
+
+            {/* Phase 2: Super Admin Sections */}
+            {renderPendingApprovals()}
+            {renderTopPerformingStores()}
 
             {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}
             {hasPermission('store.update') && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
@@ -513,7 +679,7 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* Revenue Performance section */}
-            {hasPermission('analytics.view') && (
+            {hasPermission('analytics.view') && user?.role !== UserRole.SUPER_ADMIN && (
                 <div className={clsx("bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors", isRTL ? "text-right" : "text-left")}>
                     <div className="flex flex-col mb-8">
                         <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>

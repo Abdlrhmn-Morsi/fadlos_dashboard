@@ -101,6 +101,8 @@
     "set_available": "Set Available",
     "set_busy": "Set Busy",
     "errorUpdatingStatus": "Failed to update status",
+    "confirmStatusChange": "Confirm Status Change",
+    "confirmStatusChangeMessage": "Are you sure you want to change the status for {{name}}?",
     "deliverySettings": "Delivery Settings",
     "maxOrdersPerDriver": "Max Active Orders Per Driver",
     "maxOrdersPerDriverDesc": "Automatically mark drivers as \"Busy\" when they reach this limit.",
