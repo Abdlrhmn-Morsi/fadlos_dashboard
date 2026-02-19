@@ -13,6 +13,11 @@ enum PlatformType {
     IOS = 'ios',
 }
 
+enum AppType {
+    CUSTOMER = 'customer',
+    DRIVER = 'driver',
+}
+
 interface AppVersionConfig {
     exact_blocked_version: string;
     store_url: string;
@@ -34,6 +39,7 @@ const AppUpdateSettings: React.FC = () => {
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const [activeTab, setActiveTab] = useState<PlatformType>(PlatformType.ANDROID);
+    const [activeApp, setActiveApp] = useState<AppType>(AppType.CUSTOMER);
     const [loading, setLoading] = useState(false);
     const [config, setConfig] = useState<AppVersionResponse | null>(null);
 
@@ -51,7 +57,9 @@ const AppUpdateSettings: React.FC = () => {
     const fetchConfig = async () => {
         try {
             setLoading(true);
-            const response = await api.get('/app-version');
+            const response = await api.get('/app-version', {
+                params: { appType: activeApp }
+            });
             // Handle wrapped response from TransformInterceptor
             const data = response.data.data || response.data;
             setConfig(data);
@@ -74,7 +82,7 @@ const AppUpdateSettings: React.FC = () => {
 
     useEffect(() => {
         fetchConfig();
-    }, []);
+    }, [activeApp]);
 
     useEffect(() => {
         // update form data when tab changes or config loads
@@ -100,6 +108,7 @@ const AppUpdateSettings: React.FC = () => {
             setLoading(true);
 
             const payload = {
+                appType: activeApp,
                 platform: activeTab,
                 storeUrl: formData.store_url,
                 latestVersion: formData.latest_version,
@@ -134,9 +143,30 @@ const AppUpdateSettings: React.FC = () => {
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
                         {t('appUpdates', { defaultValue: 'App Update Controls' })}
                     </h1>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        {t('unsavedChangesSpecific', { defaultValue: 'Unsaved changes are specific to the active tab.' })}
-                    </p>
+                    <div className="flex gap-2 mt-2">
+                        <button
+                            onClick={() => setActiveApp(AppType.CUSTOMER)}
+                            className={clsx(
+                                "px-4 py-1.5 text-sm font-bold transition-all",
+                                activeApp === AppType.CUSTOMER
+                                    ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                    : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                            )}
+                        >
+                            {t('customerApp', { defaultValue: 'Customer App' })}
+                        </button>
+                        <button
+                            onClick={() => setActiveApp(AppType.DRIVER)}
+                            className={clsx(
+                                "px-4 py-1.5 text-sm font-bold transition-all",
+                                activeApp === AppType.DRIVER
+                                    ? "bg-primary text-white shadow-lg shadow-primary/25"
+                                    : "bg-white dark:bg-slate-800 text-slate-500 border border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                            )}
+                        >
+                            {t('driverApp', { defaultValue: 'Driver App' })}
+                        </button>
+                    </div>
                 </div>
                 <button
                     onClick={() => navigate('/app-version-history')}
