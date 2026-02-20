@@ -40,6 +40,20 @@ export const ordersApi = {
     },
 
     /**
+     * Return an order (Store Owner/Employee)
+     */
+    storeReturnOrder: async (id: string, reason: string) => {
+        return apiService.patch(`/orders/${id}/return`, { reason });
+    },
+
+    /**
+     * Reset a returned order back to pending (Store Owner/Employee)
+     */
+    resetReturnedOrder: async (id: string) => {
+        return apiService.patch(`/orders/${id}/reset-return`);
+    },
+
+    /**
      * Get order status counts
      */
     getStatusCounts: async () => {

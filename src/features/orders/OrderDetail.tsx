@@ -47,6 +47,8 @@ const OrderDetail = () => {
     const [driverTotal, setDriverTotal] = useState(0);
     const [driverLoading, setDriverLoading] = useState(false);
 
+    const [storeReturnModal, setStoreReturnModal] = useState(false);
+
     useEffect(() => {
         fetchOrder();
     }, [id]);
@@ -276,6 +278,49 @@ const OrderDetail = () => {
         }
     };
 
+    const handleStoreReturnOrder = async (reason: string) => {
+        try {
+            setUpdating(true);
+            await ordersApi.storeReturnOrder(id!, reason);
+            setStoreReturnModal(false);
+
+            updateCacheItem('orders', id!, (order: any) => ({
+                ...order,
+                status: OrderStatus.RETURNED
+            }));
+
+            invalidateCache('dashboard-stats');
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to return order', error);
+            toast.error(t('common:error', 'Failed to return order'));
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleResetReturnedOrder = async () => {
+        try {
+            setUpdating(true);
+            await ordersApi.resetReturnedOrder(id!);
+
+            updateCacheItem('orders', id!, (order: any) => ({
+                ...order,
+                status: OrderStatus.PENDING,
+                driverId: null,
+                driver: null
+            }));
+
+            invalidateCache('dashboard-stats');
+            window.location.reload();
+        } catch (error) {
+            console.error('Failed to reset order', error);
+            toast.error(t('common:error', 'Failed to reset order'));
+        } finally {
+            setUpdating(false);
+        }
+    };
+
     if (loading) return (
         <div className="flex h-screen items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -290,7 +335,7 @@ const OrderDetail = () => {
         OrderStatus.PREPARING,
         OrderStatus.READY,
         OrderStatus.OUT_FOR_DELIVERY,
-        OrderStatus.DELIVERED
+        order.status === OrderStatus.RETURNED ? OrderStatus.RETURNED : OrderStatus.DELIVERED
     ];
 
     const getStatusColor = (status: string) => {
@@ -861,6 +906,28 @@ const OrderDetail = () => {
                             </div>
                         )}
 
+                        {/* Reset Returned Order Section */}
+                        {hasPermission(Permissions.ORDERS_UPDATE) &&
+                            order.status === OrderStatus.RETURNED &&
+                            (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                    <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                        <ArrowLeft className="text-indigo-500" size={20} />
+                                        {t('resetOrder', 'Reset Order')}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 mb-4">
+                                        {t('resetOrderDescription', 'Reset this returned order back to pending to process it again.')}
+                                    </p>
+                                    <button
+                                        onClick={handleResetReturnedOrder}
+                                        disabled={updating}
+                                        className="w-full py-2.5 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/40 font-medium transition-colors"
+                                    >
+                                        {t('resetOrderButton', 'Reset to Pending')}
+                                    </button>
+                                </div>
+                            )}
+
                         {/* Return Order Section (Delivery Driver) */}
                         {user?.role === UserRole.DELIVERY &&
                             order.driverId === user.id &&
@@ -882,25 +949,38 @@ const OrderDetail = () => {
                                 </div>
                             )}
 
-                        {/* Cancel Order Section */}
+                        {/* Cancel / Return Order Section (Admin/Employee) */}
                         {hasPermission(Permissions.ORDERS_CANCEL) &&
                             order.status !== OrderStatus.DELIVERED &&
                             order.status !== OrderStatus.CANCELLED &&
-                            (user?.role !== UserRole.CUSTOMER || order.status === OrderStatus.PENDING) && (
-                                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                            order.status !== OrderStatus.RETURNED &&
+                            (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE || (user?.role === UserRole.CUSTOMER && order.status === OrderStatus.PENDING)) && (
+                                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-rose-200 dark:border-slate-800 p-6">
                                     <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
                                         <AlertCircle className="text-rose-500" size={20} />
-                                        {t('cancelOrder')}
+                                        {t('cancelOrder', 'Cancel Order')}
                                     </h3>
                                     <p className="text-sm text-slate-500 mb-4">
                                         {t('cancelOrderWarning')}
                                     </p>
-                                    <button
-                                        onClick={() => setCancelModal(true)}
-                                        className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
-                                    >
-                                        {t('cancelOrder')}
-                                    </button>
+                                    <div className="space-y-3">
+                                        <button
+                                            onClick={() => setCancelModal(true)}
+                                            className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
+                                        >
+                                            {t('cancelOrder', 'Cancel Order')}
+                                        </button>
+
+                                        {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                                            <button
+                                                onClick={() => setStoreReturnModal(true)}
+                                                className="w-full py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors flex justify-center items-center gap-2"
+                                            >
+                                                <ArrowLeft size={16} />
+                                                {t('returnOrder', 'Return Order')}
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             )}
                     </div>
@@ -939,6 +1019,17 @@ const OrderDetail = () => {
                 submitLabel={t('returnOrder', 'Return Order')}
                 onSubmit={handleReturnOrder}
                 onCancel={() => setReturnModal(false)}
+                isLoading={updating}
+            />
+
+            <InputModal
+                isOpen={storeReturnModal}
+                title={t('returnOrder', 'Return Order')}
+                message={t('returnOrderWarning', 'Please provide a reason for returning the order.')}
+                placeholder={t('returnReasonPlaceholder', 'Reason for return...')}
+                submitLabel={t('returnOrder', 'Return Order')}
+                onSubmit={handleStoreReturnOrder}
+                onCancel={() => setStoreReturnModal(false)}
                 isLoading={updating}
             />
 
