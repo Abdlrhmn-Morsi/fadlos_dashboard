@@ -55,6 +55,7 @@
     "deliveryInstructions": "توجه إلى العميل واطلب رمز التسليم لتأكيد العملية.",
     "confirmDelivery": "تأكيد التسليم",
     "orderDelivered": "تم توصيل الطلب بنجاح",
+    "searchDriverPlaceholder": "البحث باسم السائق، البريد الإلكتروني أو الهاتف...",
     "reassignDriver": "إعادة تعيين السائق",
     "selectDriverMessage": "اختر سائقًا لتولي عملية التوصيل:",
     "driverStatusBusy": "مشغول",

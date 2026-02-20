@@ -55,6 +55,7 @@
     "deliveryInstructions": "Navigate to the customer and collect the PIN to confirm delivery.",
     "confirmDelivery": "Confirm Delivery",
     "orderDelivered": "Order marked as delivered",
+    "searchDriverPlaceholder": "Search by name, email or phone...",
     "selectDriverMessage": "Select a driver to handle this delivery:",
     "driverStatusBusy": "BUSY",
     "driverStatusAvailable": "AVAILABLE",

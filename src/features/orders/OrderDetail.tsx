@@ -905,7 +905,7 @@ const OrderDetail = () => {
                                 <Search className={clsx("absolute top-3 text-slate-400", isRTL ? "right-4" : "left-4")} size={20} />
                                 <input
                                     type="text"
-                                    placeholder={t('delivery.drivers.search_placeholder', 'Search by name, email or phone...')}
+                                    placeholder={t('searchDriverPlaceholder', 'Search by name, email or phone...')}
                                     value={driverSearch}
                                     onChange={(e) => setDriverSearch(e.target.value)}
                                     className={clsx(
