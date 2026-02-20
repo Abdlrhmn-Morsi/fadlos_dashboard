@@ -48,7 +48,8 @@
         "driver_assigned": "تم تعيين سائق",
         "out_for_delivery": "جاري التوصيل",
         "delivered": "تم التوصيل",
-        "cancelled": "ملغي"
+        "cancelled": "ملغي",
+        "returned": "مرتجع"
     },
     "appUpdates": "التحكم في تحديثات التطبيق",
     "customerApp": "تطبيق العملاء",

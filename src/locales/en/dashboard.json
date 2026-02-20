@@ -48,7 +48,8 @@
         "driver_assigned": "Driver Assigned",
         "out_for_delivery": "On The Way",
         "delivered": "Delivered",
-        "cancelled": "Cancelled"
+        "cancelled": "Cancelled",
+        "returned": "Returned"
     },
     "appUpdates": "App Update Controls",
     "customerApp": "Customer App",

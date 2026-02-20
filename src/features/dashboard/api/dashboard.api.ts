@@ -65,6 +65,7 @@ export const fetchDashboardStats = async (user: any) => {
                     stats.totalOrders = data.totalOrders || 0;
                     stats.avgOrderValue = data.averageOrderValue || 0;
                     stats.pendingOrders = data.statusCounts?.pending || 0;
+                    stats.statusCounts = data.statusCounts || {};
                     stats.chartData = data.chartData || [];
 
                     const todayData = today.data || today;

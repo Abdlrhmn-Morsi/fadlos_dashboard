@@ -163,6 +163,7 @@ const OrderList = () => {
             case OrderStatus.OUT_FOR_DELIVERY: return 'text-orange-600 bg-orange-100 dark:bg-orange-900/30 dark:text-orange-400';
             case OrderStatus.DELIVERED: return 'text-green-600 bg-green-100 dark:bg-green-900/30 dark:text-green-400';
             case OrderStatus.CANCELLED: return 'text-rose-600 bg-rose-100 dark:bg-rose-900/30 dark:text-rose-400';
+            case OrderStatus.RETURNED: return 'text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400';
             case OrderStatus.DRIVER_ASSIGNED: return 'text-purple-600 bg-purple-100 dark:bg-purple-900/30 dark:text-purple-400'; // Match Ready
             default: return 'text-slate-600 bg-slate-100 dark:bg-slate-800 dark:text-slate-400';
         }
@@ -179,48 +180,77 @@ const OrderList = () => {
     return (
         <div className="p-6">
             {/* Status Counts Grid */}
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 gap-3 mb-8">
-                <div
-                    onClick={() => setStatusFilter('')}
-                    className={clsx(
-                        "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
-                        statusFilter === ''
-                            ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-2 ring-indigo-500/20"
-                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
-                    )}
-                >
-                    <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{t('total')}</span>
-                    <span className="text-2xl font-black text-slate-800 dark:text-slate-100">
-                        {Object.values(OrderStatus).reduce((total, s) => total + (Number(statusCounts[s]) || 0), 0)}
-                    </span>
-                </div>
-                {[
-                    OrderStatus.PENDING,
-                    OrderStatus.CONFIRMED,
-                    OrderStatus.PREPARING,
-                    OrderStatus.READY,
-                    OrderStatus.OUT_FOR_DELIVERY,
-                    OrderStatus.DELIVERED,
-                    OrderStatus.CANCELLED
-                ].map(status => (
+            <div className="space-y-4 mb-8">
+                {/* First Row: 4 cards */}
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
                     <div
-                        key={status}
-                        onClick={() => setStatusFilter(status)}
+                        onClick={() => setStatusFilter('')}
                         className={clsx(
                             "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
-                            getStatusColor(status).replace('text-', 'border-').replace('bg-', 'bg-opacity-10 bg-') + ' border bg-opacity-5',
-                            statusFilter === status && getStatusColor(status).split(' ')[0], // Add text color class when active
-                            statusFilter === status && "ring-2 ring-offset-2 dark:ring-offset-slate-950 ring-current shadow-lg scale-[1.02]"
+                            statusFilter === ''
+                                ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-2 ring-indigo-500/20"
+                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
                         )}
                     >
-                        <span className={clsx("text-xs font-bold uppercase tracking-wider opacity-80", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
-                            {getLocalizedStatus(status)}
-                        </span>
-                        <span className={clsx("text-2xl font-black", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
-                            {statusCounts[status] || 0}
+                        <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{t('total')}</span>
+                        <span className="text-2xl font-black text-slate-800 dark:text-slate-100">
+                            {Object.values(OrderStatus).reduce((total, s) => total + (Number(statusCounts[s]) || 0), 0)}
                         </span>
                     </div>
-                ))}
+
+                    {[
+                        OrderStatus.PENDING,
+                        OrderStatus.CONFIRMED,
+                        OrderStatus.PREPARING
+                    ].map(status => (
+                        <div
+                            key={status}
+                            onClick={() => setStatusFilter(status)}
+                            className={clsx(
+                                "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                                getStatusColor(status).replace('text-', 'border-').replace('bg-', 'bg-opacity-10 bg-') + ' border bg-opacity-5',
+                                statusFilter === status && getStatusColor(status).split(' ')[0],
+                                statusFilter === status && "ring-2 ring-offset-2 dark:ring-offset-slate-950 ring-current shadow-lg scale-[1.02]"
+                            )}
+                        >
+                            <span className={clsx("text-xs font-bold uppercase tracking-wider opacity-80", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                                {getLocalizedStatus(status)}
+                            </span>
+                            <span className={clsx("text-2xl font-black", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                                {statusCounts[status] || 0}
+                            </span>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Second Row: 5 cards */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                    {[
+                        OrderStatus.READY,
+                        OrderStatus.OUT_FOR_DELIVERY,
+                        OrderStatus.DELIVERED,
+                        OrderStatus.CANCELLED,
+                        OrderStatus.RETURNED
+                    ].map(status => (
+                        <div
+                            key={status}
+                            onClick={() => setStatusFilter(status)}
+                            className={clsx(
+                                "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                                getStatusColor(status).replace('text-', 'border-').replace('bg-', 'bg-opacity-10 bg-') + ' border bg-opacity-5',
+                                statusFilter === status && getStatusColor(status).split(' ')[0],
+                                statusFilter === status && "ring-2 ring-offset-2 dark:ring-offset-slate-950 ring-current shadow-lg scale-[1.02]"
+                            )}
+                        >
+                            <span className={clsx("text-xs font-bold uppercase tracking-wider opacity-80", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                                {getLocalizedStatus(status)}
+                            </span>
+                            <span className={clsx("text-2xl font-black", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                                {statusCounts[status] || 0}
+                            </span>
+                        </div>
+                    ))}
+                </div>
             </div>
 
             <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-6 gap-4">
@@ -279,6 +309,7 @@ const OrderList = () => {
                         <option value={OrderStatus.OUT_FOR_DELIVERY}>{getLocalizedStatus(OrderStatus.OUT_FOR_DELIVERY)}</option>
                         <option value={OrderStatus.DELIVERED}>{getLocalizedStatus(OrderStatus.DELIVERED)}</option>
                         <option value={OrderStatus.CANCELLED}>{getLocalizedStatus(OrderStatus.CANCELLED)}</option>
+                        <option value={OrderStatus.RETURNED}>{getLocalizedStatus(OrderStatus.RETURNED)}</option>
                     </select>
                 </div>
             </div>

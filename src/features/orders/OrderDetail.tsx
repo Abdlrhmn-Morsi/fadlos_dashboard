@@ -36,6 +36,7 @@ const OrderDetail = () => {
     // Modal States
     const [statusModal, setStatusModal] = useState<{ isOpen: boolean; status: string }>({ isOpen: false, status: '' });
     const [cancelModal, setCancelModal] = useState(false);
+    const [returnModal, setReturnModal] = useState(false);
     const [assignDriverModal, setAssignDriverModal] = useState(false);
     const [confirmDeliveryModal, setConfirmDeliveryModal] = useState(false);
     const [deliveryPin, setDeliveryPin] = useState('');
@@ -245,9 +246,31 @@ const OrderDetail = () => {
 
             // Update local state and reload to show cancelled status
             window.location.reload();
+        } finally {
+            setUpdating(false);
+        }
+    };
+
+    const handleReturnOrder = async (reason: string) => {
+        try {
+            setUpdating(true);
+            await ordersApi.returnOrder(id!, reason);
+            setReturnModal(false);
+
+            // Update the order in cache
+            updateCacheItem('orders', id!, (order: any) => ({
+                ...order,
+                status: OrderStatus.RETURNED
+            }));
+
+            // Invalidate dashboard cache to refresh stats
+            invalidateCache('dashboard-stats');
+
+            // Update local state and reload to show returned status
+            window.location.reload();
         } catch (error) {
-            console.error('Failed to cancel order', error);
-            // Ideally toast error
+            console.error('Failed to return order', error);
+            toast.error(t('common:error', 'Failed to return order'));
         } finally {
             setUpdating(false);
         }
@@ -279,6 +302,7 @@ const OrderDetail = () => {
             case OrderStatus.OUT_FOR_DELIVERY: return 'text-orange-600 bg-orange-50 border-orange-200';
             case OrderStatus.DELIVERED: return 'text-green-600 bg-green-50 border-green-200';
             case OrderStatus.CANCELLED: return 'text-rose-600 bg-rose-50 border-rose-200';
+            case OrderStatus.RETURNED: return 'text-slate-600 bg-slate-100 border-slate-300';
             default: return 'text-slate-600 bg-slate-50 border-slate-200';
         }
     };
@@ -827,8 +851,36 @@ const OrderDetail = () => {
                                         <p className="font-bold text-emerald-700 dark:text-emerald-400">{t('orderDelivered', 'Delivered Successfully')}</p>
                                     </div>
                                 )}
+
+                                {order.status === OrderStatus.RETURNED && (
+                                    <div className="text-center py-4 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
+                                        <ArrowLeft size={40} className="text-slate-500 mx-auto mb-2" />
+                                        <p className="font-bold text-slate-700 dark:text-slate-300">{t('orderReturned', 'Order Returned')}</p>
+                                    </div>
+                                )}
                             </div>
                         )}
+
+                        {/* Return Order Section (Delivery Driver) */}
+                        {user?.role === UserRole.DELIVERY &&
+                            order.driverId === user.id &&
+                            order.status === OrderStatus.OUT_FOR_DELIVERY && (
+                                <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                    <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
+                                        <ArrowLeft className="text-amber-500" size={20} />
+                                        {t('returnOrder', 'Return Order')}
+                                    </h3>
+                                    <p className="text-sm text-slate-500 mb-4">
+                                        {t('returnOrderWarning', 'If the delivery cannot be completed, you can return the order to the store.')}
+                                    </p>
+                                    <button
+                                        onClick={() => setReturnModal(true)}
+                                        className="w-full py-2.5 bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 font-medium transition-colors"
+                                    >
+                                        {t('returnOrder', 'Return Order')}
+                                    </button>
+                                </div>
+                            )}
 
                         {/* Cancel Order Section */}
                         {hasPermission(Permissions.ORDERS_CANCEL) &&
@@ -876,6 +928,17 @@ const OrderDetail = () => {
                 submitLabel={t('cancelOrder')}
                 onSubmit={handleCancelOrder}
                 onCancel={() => setCancelModal(false)}
+                isLoading={updating}
+            />
+
+            <InputModal
+                isOpen={returnModal}
+                title={t('returnOrder', 'Return Order')}
+                message={t('returnOrderWarning', 'Please provide a reason for returning the order.')}
+                placeholder={t('returnReasonPlaceholder', 'Reason for return...')}
+                submitLabel={t('returnOrder', 'Return Order')}
+                onSubmit={handleReturnOrder}
+                onCancel={() => setReturnModal(false)}
                 isLoading={updating}
             />
 

@@ -45,7 +45,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, subValue, growth, icon: Icon, color }) => {
     const { isRTL } = useLanguage();
-    const { t } = useTranslation('common');
+    const { t } = useTranslation(['common', 'dashboard']);
 
     const colorClasses = {
         emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
@@ -84,7 +84,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subValue, growth, ico
 };
 
 const Analytics: React.FC = () => {
-    const { t } = useTranslation('common');
+    const { t } = useTranslation(['common', 'dashboard']);
     const { isDark } = useTheme();
     const { isRTL } = useLanguage();
     const [period, setPeriod] = useState('7d');
@@ -401,8 +401,11 @@ const Analytics: React.FC = () => {
                             { id: 'confirmed', color: 'bg-blue-500' },
                             { id: 'preparing', color: 'bg-indigo-500' },
                             { id: 'ready', color: 'bg-violet-500' },
+                            { id: 'driver_assigned', color: 'bg-primary' },
+                            { id: 'out_for_delivery', color: 'bg-orange-500' },
                             { id: 'delivered', color: 'bg-emerald-500' },
-                            { id: 'cancelled', color: 'bg-rose-500' }
+                            { id: 'cancelled', color: 'bg-rose-500' },
+                            { id: 'returned', color: 'bg-slate-500' }
                         ].map((statusObj) => {
                             const status = statusObj.id;
                             const count = orderStats?.statusCounts?.[status] || 0;
@@ -410,7 +413,7 @@ const Analytics: React.FC = () => {
                             return (
                                 <div key={status} className="space-y-2">
                                     <div className={clsx("flex justify-between text-[10px] font-black uppercase tracking-wider", isRTL && "flex-row-reverse")}>
-                                        <span className="text-slate-500">{t(`common:${status}`)}</span>
+                                        <span className="text-slate-500">{t(`dashboard:status.${status}`)}</span>
                                         <span className="text-slate-900 dark:text-slate-100">{count}</span>
                                     </div>
                                     <div className="h-2 bg-slate-100 dark:bg-slate-800 overflow-hidden">
@@ -547,6 +550,10 @@ const Analytics: React.FC = () => {
                                                     <span className="text-[10px] font-black text-emerald-600">{town.delivered}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                                                    <span className="text-[10px] font-black text-slate-600">{town.returned || 0}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />
                                                     <span className="text-[10px] font-black text-rose-600">{town.cancelled}</span>
                                                 </div>
@@ -585,6 +592,10 @@ const Analytics: React.FC = () => {
                                                 <div className="flex items-center gap-1">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                                                     <span className="text-[10px] font-black text-emerald-600">{place.delivered}</span>
+                                                </div>
+                                                <div className="flex items-center gap-1">
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-slate-500" />
+                                                    <span className="text-[10px] font-black text-slate-600">{place.returned || 0}</span>
                                                 </div>
                                                 <div className="flex items-center gap-1">
                                                     <div className="w-1.5 h-1.5 rounded-full bg-rose-500" />

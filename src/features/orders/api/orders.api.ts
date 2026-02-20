@@ -33,6 +33,13 @@ export const ordersApi = {
     },
 
     /**
+     * Return an order (Driver)
+     */
+    returnOrder: async (id: string, reason: string) => {
+        return apiService.patch(`/delivery/orders/${id}/return`, { reason });
+    },
+
+    /**
      * Get order status counts
      */
     getStatusCounts: async () => {

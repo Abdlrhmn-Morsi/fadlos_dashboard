@@ -8,6 +8,7 @@ export interface DashboardStats {
     todayRevenue?: number;
     todayOrders?: number;
     pendingOrders?: number;
+    statusCounts?: Record<string, number>;
     totalCustomers?: number;
     pendingStores?: number;
     activeSubscriptions?: number;
