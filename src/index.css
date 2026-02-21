@@ -3,9 +3,9 @@
 
 @theme {
   /* Brand Colors */
-  --color-primary: #FF5C00;
-  --color-primary-hover: #E65100;
-  --color-primary-light: #FFF3E0;
+  --color-primary: #0bc16a;
+  --color-primary-hover: #09a057;
+  --color-primary-light: #daf5e8;
 
   /* Slate Scale for semantic use */
   --color-slate-50: #f8fafc;
