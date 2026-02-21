@@ -17,7 +17,7 @@ const InteractiveBackground = () => {
         const particleCount = 40;
         const connectionDistance = 150;
         const mouseDistance = 200;
-        const color = '#FF5C00'; // Primary Orange
+        const color = '#0bc16a'; // Primary Green
 
         class Particle {
             constructor() {
@@ -192,7 +192,7 @@ const InteractiveBackgroundFixed = () => {
         const particleCount = 60;
         const connectionDistance = 140;
         const mouseDistance = 180;
-        const color = '#FF5C00';
+        const color = '#0bc16a';
 
         canvas.width = width;
         canvas.height = height;
