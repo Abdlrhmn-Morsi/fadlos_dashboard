@@ -1,17 +1,20 @@
 import React, { useRef, useEffect } from 'react';
 
 const InteractiveBackground = () => {
-    const canvasRef = useRef(null);
-    const containerRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
-        const ctx = canvas.getContext('2d');
-        let animationFrameId;
+        if (!canvas || !containerRef.current) return;
 
-        let width, height;
-        let particles = [];
-        let mouse = { x: null, y: null };
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        let animationFrameId: number;
+
+        let width: number, height: number;
+        let mouse: { x: number | null, y: number | null } = { x: null, y: null };
 
         // Configuration
         const particleCount = 40;
@@ -20,6 +23,13 @@ const InteractiveBackground = () => {
         const color = '#0bc16a'; // Primary Green
 
         class Particle {
+            x: number;
+            y: number;
+            vx: number;
+            vy: number;
+            size: number;
+            baseSize: number;
+
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
@@ -38,7 +48,7 @@ const InteractiveBackground = () => {
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
                 // Mouse interaction
-                if (mouse.x != null) {
+                if (mouse.x != null && mouse.y != null) {
                     let dx = mouse.x - this.x;
                     let dy = mouse.y - this.y;
                     let distance = Math.sqrt(dx * dx + dy * dy);
@@ -57,6 +67,7 @@ const InteractiveBackground = () => {
             }
 
             draw() {
+                if (!ctx) return;
                 ctx.fillStyle = color;
                 ctx.globalAlpha = 0.6;
                 ctx.beginPath();
@@ -64,6 +75,8 @@ const InteractiveBackground = () => {
                 ctx.fill();
             }
         }
+
+        let particles: Particle[] = [];
 
         const init = () => {
             resize();
@@ -74,6 +87,7 @@ const InteractiveBackground = () => {
         };
 
         const resize = () => {
+            if (!containerRef.current || !canvas) return;
             width = containerRef.current.clientWidth;
             height = containerRef.current.clientHeight;
             canvas.width = width;
@@ -81,6 +95,7 @@ const InteractiveBackground = () => {
         };
 
         const animate = () => {
+            if (!ctx) return;
             ctx.clearRect(0, 0, width, height);
 
             for (let i = 0; i < particles.length; i++) {
@@ -105,7 +120,7 @@ const InteractiveBackground = () => {
                 }
 
                 // Draw mouse connections (duplication effect simulation)
-                if (mouse.x != null) {
+                if (mouse.x != null && mouse.y != null) {
                     const dx = particles[i].x - mouse.x;
                     const dy = particles[i].y - mouse.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -125,7 +140,8 @@ const InteractiveBackground = () => {
             animationFrameId = requestAnimationFrame(animate);
         };
 
-        const handleMouseMove = (e) => {
+        const handleMouseMove = (e: MouseEvent) => {
+            if (!canvas) return;
             const rect = canvas.getBoundingClientRect();
             mouse.x = e.clientX - rect.left;
             mouse.y = e.clientY - rect.top;
@@ -146,47 +162,41 @@ const InteractiveBackground = () => {
 
         return () => {
             window.removeEventListener('resize', resize);
-            canvas.removeEventListener('mousemove', handleMouseMove);
-            canvas.removeEventListener('mouseleave', handleMouseLeave);
-            cancelAnimationFrame(animationFrameId);
+            if (canvas) {
+                canvas.removeEventListener('mousemove', handleMouseMove);
+                canvas.removeEventListener('mouseleave', handleMouseLeave);
+            }
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
         };
     }, []);
 
     return (
         <div ref={containerRef} style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', zIndex: 0, pointerEvents: 'none' }}>
-            {/* Pointer events none on container, but we might need them on canvas if we want precise mouse tracking relative to page. 
-                However, since it's a background, we want clicks to pass through to form.
-                To capture mouse for the effect, we'll attach listeners to window or handle it differently.
-                Wait, if pointer-events is none, canvas won't get mouse events. 
-                Correction: We want the background to react but not block clicks.
-                We will set pointer-events: none and attach mouse listener to window in the component, 
-                OR set pointer-events: auto on canvas but make sure it's behind everything (-1 z-index).
-            */}
             <canvas
                 ref={canvasRef}
                 style={{
                     display: 'block',
-                    pointerEvents: 'auto' // Need this to capture hover if we attach listener to canvas
+                    pointerEvents: 'auto'
                 }}
             />
         </div>
     );
 };
 
-// Adjusted strategy for mouse tracking to allow clicks to pass through:
-// We will attach the event listener to the window instead of the canvas, 
-// so we don't need pointer-events: auto on the canvas covering the form.
 const InteractiveBackgroundFixed = () => {
-    const canvasRef = useRef(null);
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     useEffect(() => {
         const canvas = canvasRef.current;
+        if (!canvas) return;
+
         const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
         let width = window.innerWidth;
         let height = window.innerHeight;
-        let particles = [];
-        let mouse = { x: null, y: null };
-        let animationFrameId;
+        let mouse: { x: number | null, y: number | null } = { x: null, y: null };
+        let animationFrameId: number;
 
         // Configuration
         const particleCount = 60;
@@ -198,6 +208,12 @@ const InteractiveBackgroundFixed = () => {
         canvas.height = height;
 
         class Particle {
+            x: number;
+            y: number;
+            vx: number;
+            vy: number;
+            size: number;
+
             constructor() {
                 this.x = Math.random() * width;
                 this.y = Math.random() * height;
@@ -214,19 +230,19 @@ const InteractiveBackgroundFixed = () => {
                 if (this.y < 0 || this.y > height) this.vy *= -1;
 
                 // Mouse Repel/Attract Effect
-                if (mouse.x != null) {
+                if (mouse.x != null && mouse.y != null) {
                     const dx = mouse.x - this.x;
                     const dy = mouse.y - this.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
 
                     if (distance < mouseDistance) {
-                        // Create a slight duplication/ghosting effect by drawing a "shadow" particle
                         // Logic handled in draw loop
                     }
                 }
             }
 
             draw() {
+                if (!ctx) return;
                 ctx.fillStyle = color;
                 ctx.globalAlpha = 0.5;
                 ctx.beginPath();
@@ -234,6 +250,8 @@ const InteractiveBackgroundFixed = () => {
                 ctx.fill();
             }
         }
+
+        let particles: Particle[] = [];
 
         const init = () => {
             particles = [];
@@ -243,6 +261,7 @@ const InteractiveBackgroundFixed = () => {
         };
 
         const animate = () => {
+            if (!ctx) return;
             ctx.clearRect(0, 0, width, height);
 
             // Draw particles and connections
@@ -268,7 +287,7 @@ const InteractiveBackgroundFixed = () => {
                 }
 
                 // Interactive "Duplication/Web" effect on hover
-                if (mouse.x != null) {
+                if (mouse.x != null && mouse.y != null) {
                     const dx = particles[i].x - mouse.x;
                     const dy = particles[i].y - mouse.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
@@ -282,7 +301,7 @@ const InteractiveBackgroundFixed = () => {
                         ctx.lineTo(mouse.x, mouse.y);
                         ctx.stroke();
 
-                        // "Duplicate" effect - draw a larger faint circle at particle position
+                        // "Duplicate" effect 
                         ctx.beginPath();
                         ctx.strokeStyle = color;
                         ctx.globalAlpha = 0.1;
@@ -296,6 +315,7 @@ const InteractiveBackgroundFixed = () => {
         };
 
         const handleResize = () => {
+            if (!canvas) return;
             width = window.innerWidth;
             height = window.innerHeight;
             canvas.width = width;
@@ -303,7 +323,7 @@ const InteractiveBackgroundFixed = () => {
             init();
         };
 
-        const handleMouseMove = (e) => {
+        const handleMouseMove = (e: MouseEvent) => {
             mouse.x = e.clientX;
             mouse.y = e.clientY;
         };
@@ -317,7 +337,7 @@ const InteractiveBackgroundFixed = () => {
         return () => {
             window.removeEventListener('resize', handleResize);
             window.removeEventListener('mousemove', handleMouseMove);
-            cancelAnimationFrame(animationFrameId);
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
         };
     }, []);
 
@@ -329,7 +349,7 @@ const InteractiveBackgroundFixed = () => {
                 top: 0,
                 left: 0,
                 zIndex: 0,
-                pointerEvents: 'none', // Allow clicks to pass through to form
+                pointerEvents: 'none',
                 background: 'transparent'
             }}
         />
@@ -337,3 +357,4 @@ const InteractiveBackgroundFixed = () => {
 };
 
 export default InteractiveBackgroundFixed;
+
