@@ -278,6 +278,7 @@ const Analytics: React.FC = () => {
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
                                     itemStyle={{ color: '#FF5C00' }}
+                                    formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:currencySymbol')}`, t('revenue')]}
                                     labelFormatter={(label) => {
                                         const parts = label.split('-');
                                         if (parts.length === 3) {
@@ -290,6 +291,7 @@ const Analytics: React.FC = () => {
                                 <Area
                                     type="monotone"
                                     dataKey="revenue"
+                                    name={t('revenue')}
                                     stroke="#FF5C00"
                                     strokeWidth={4}
                                     fillOpacity={1}
@@ -347,8 +349,9 @@ const Analytics: React.FC = () => {
                                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
+                                    formatter={(value: any) => [value, t('ordersCount')]}
                                 />
-                                <Bar dataKey="count" fill="#4f46e5" radius={[2, 2, 0, 0]} animationDuration={1500} />
+                                <Bar dataKey="count" name={t('ordersCount')} fill="#4f46e5" radius={[2, 2, 0, 0]} animationDuration={1500} />
                             </BarChart>
                         </ResponsiveContainer>
                     </div>

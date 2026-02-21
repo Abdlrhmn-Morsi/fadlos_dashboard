@@ -726,6 +726,8 @@ const Dashboard: React.FC = () => {
                                         color: isDark ? '#f1f5f9' : '#0f172a',
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
+                                    itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
+                                    labelStyle={{ color: isDark ? '#94a3b8' : '#64748b', marginBottom: '4px' }}
                                     formatter={(val: any) => [`${val.toLocaleString()} ${t('common:currencySymbol')}`, t('totalRevenue')]}
                                     labelFormatter={(label) => {
                                         const parts = label.split('-');
