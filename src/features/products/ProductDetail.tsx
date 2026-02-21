@@ -49,14 +49,14 @@ const ProductDetail = () => {
     }
 
     return (
-        <div className="p-6 max-w-5xl mx-auto">
+        <div className="p-6 max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                     <button
                         onClick={() => navigate('/products')}
                         className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                     >
-                        <ArrowLeft size={24} className="text-slate-600 dark:text-slate-400" />
+                        <ArrowLeft size={24} className={clsx("text-slate-600 dark:text-slate-400", isRTL && "rotate-180")} />
                     </button>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('products:productDetails')}</h1>
                 </div>
@@ -163,7 +163,7 @@ const ProductDetail = () => {
                         </div>
 
                         <div className="space-y-2">
-                            <div className={clsx("flex items-center gap-2 text-slate-600 dark:text-slate-400", isRTL && "flex-row-reverse text-right")}>
+                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
                                 <Package size={20} />
                                 <span className="font-semibold">{t('products:category')}:</span>
                                 <span>{(isRTL ? product.category?.nameAr || product.category?.name : product.category?.name) || t('products:uncategorized')}</span>
@@ -172,7 +172,7 @@ const ProductDetail = () => {
 
                         <div className="border-t border-slate-200 dark:border-slate-700 pt-4">
                             <h4 className="font-bold text-slate-800 dark:text-white mb-2">{t('products:description')}</h4>
-                            <p className={clsx("text-slate-600 dark:text-slate-300 leading-relaxed", language === 'ar' && "text-right")} dir={language === 'ar' ? "rtl" : "ltr"}>
+                            <p className="text-slate-600 dark:text-slate-300 leading-relaxed">
                                 {language === 'ar' && product.descriptionAr ? product.descriptionAr : (product.description || t('products:noDescription'))}
                             </p>
                         </div>

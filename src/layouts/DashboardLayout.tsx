@@ -18,7 +18,8 @@ import {
   Bell,
   Shield,
   Layers,
-  TrendingUp
+  TrendingUp,
+  DollarSign
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -38,14 +39,16 @@ interface SidebarItemProps {
   label: string;
   collapsed: boolean;
   replace?: boolean;
+  end?: boolean;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed, replace }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed, replace, end }) => {
   const { isRTL } = useLanguage();
   return (
     <NavLink
       to={to}
       replace={replace}
+      end={end}
       className={({ isActive }) => clsx(
         'flex items-center gap-3 px-4 py-3 rounded-[4px] transition-all duration-200 group relative',
         isActive
@@ -205,7 +208,10 @@ const DashboardLayout: React.FC = () => {
                 <SidebarItem to="/addons" icon={Layers} label={t('addons')} collapsed={collapsed} />
               )}
               {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
-                <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} />
+                <>
+                  <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} end={true} />
+                  <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
+                </>
               )}
               {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && (
                 <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />

@@ -3,9 +3,10 @@ import { useParams, useNavigate } from 'react-router-dom';
 import {
     ArrowLeft, Clock, MapPin, User, Phone, Save,
     Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe, Truck, Camera,
-    Search, X, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, BadgeCheck
+    Search, X, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, BadgeCheck, DollarSign
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
+import settlementsApi from './api/settlements.api';
 import { OrderStatus } from '../../types/order-status';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
 import InputModal from '../../components/ui/InputModal';
@@ -321,6 +322,20 @@ const OrderDetail = () => {
         }
     };
 
+    const handleSettleOrder = async () => {
+        try {
+            setUpdating(true);
+            await settlementsApi.createSettlement(order.driverId, [id!]);
+            toast.success(t('orderSettled', 'Order settled successfully'));
+            fetchOrder();
+        } catch (error) {
+            console.error('Failed to settle order', error);
+            toast.error(t('common:error', 'Failed to settle order'));
+        } finally {
+            setUpdating(false);
+        }
+    };
+
     if (loading) return (
         <div className="flex h-screen items-center justify-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
@@ -535,7 +550,10 @@ const OrderDetail = () => {
                                     <FileText className="text-amber-500" size={20} />
                                     {t('orderNotes')}
                                 </h3>
-                                <div className="p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 rounded-lg text-sm leading-relaxed border border-amber-100 dark:border-amber-900/30 break-words overflow-wrap-anywhere">
+                                <div className={clsx(
+                                    "p-4 bg-amber-50 dark:bg-amber-900/20 text-amber-900 dark:text-amber-200 rounded-lg text-sm leading-relaxed border border-amber-100 dark:border-amber-900/30 break-words overflow-wrap-anywhere",
+                                    isRTL && "text-right"
+                                )}>
                                     {order.notes}
                                 </div>
                             </div>
@@ -546,9 +564,12 @@ const OrderDetail = () => {
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-rose-200 dark:border-rose-800 p-6">
                                 <h3 className="font-bold text-rose-900 dark:text-rose-200 mb-3 flex items-center gap-2">
                                     <AlertCircle className="text-rose-500" size={20} />
-                                    {t('cancellationReason', 'Cancellation Reason')}
+                                    {t('cancellationReason')}
                                 </h3>
-                                <div className="p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-900 dark:text-rose-200 rounded-lg text-sm leading-relaxed border border-rose-100 dark:border-rose-900/30 break-words overflow-wrap-anywhere">
+                                <div className={clsx(
+                                    "p-4 bg-rose-50 dark:bg-rose-900/20 text-rose-900 dark:text-rose-200 rounded-lg text-sm leading-relaxed border border-rose-100 dark:border-rose-900/30 break-words overflow-wrap-anywhere",
+                                    isRTL && "text-right"
+                                )}>
                                     {order.statusNote}
                                 </div>
                             </div>
@@ -559,7 +580,7 @@ const OrderDetail = () => {
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                                 <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                     <Clock className="text-indigo-500" size={20} />
-                                    {t('statusHistory', 'Status History')}
+                                    {t('statusHistory')}
                                 </h3>
                                 <div className="space-y-3">
                                     {order.statusHistory.map((entry: any, index: number) => (
@@ -753,6 +774,49 @@ const OrderDetail = () => {
                             </div>
                         </div>
 
+                        {/* Settlement Info Section */}
+                        {order.paymentMethod === 'CASH_ON_DELIVERY' && order.status === OrderStatus.DELIVERED && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <DollarSign className="text-emerald-500" size={20} />
+                                    {t('settlementStatus')}
+                                </h3>
+
+                                {order.isSettled ? (
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 px-3 py-2 rounded-lg font-bold">
+                                            <CheckCircle size={18} />
+                                            <span>{t('isSettled')}</span>
+                                        </div>
+                                        {order.settlement && (
+                                            <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg space-y-1">
+                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('settlementReference')}</p>
+                                                <p className="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">{order.settlement.settlementNumber}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        <div className="flex items-center gap-2 text-amber-600 bg-amber-50 dark:bg-amber-900/20 px-3 py-2 rounded-lg font-bold">
+                                            <AlertCircle size={18} />
+                                            <span>{t('notSettled')}</span>
+                                        </div>
+                                        <p className="text-xs text-slate-500">
+                                            {t('settlePrompt')}
+                                        </p>
+                                        <button
+                                            onClick={handleSettleOrder}
+                                            disabled={updating || !order.driverId}
+                                            className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg transition-colors flex items-center justify-center gap-2 shadow-lg shadow-emerald-200 dark:shadow-none"
+                                        >
+                                            <CheckCircle size={18} />
+                                            {t('settleNow')}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
                         {/* Logistics Section */}
                         {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
@@ -823,7 +887,7 @@ const OrderDetail = () => {
                                                 )}
                                         </div>
 
-                                        {order.deliveryPin && (
+                                        {order.deliveryPin && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE || user?.role === UserRole.CUSTOMER) && (
                                             <div className="p-3 border border-dashed border-indigo-200 dark:border-indigo-800 rounded-lg flex items-center justify-between">
                                                 <span className="text-sm text-slate-500">{t('deliveryPin', 'Delivery PIN')}</span>
                                                 <span className="text-lg font-black tracking-widest text-indigo-600">{order.deliveryPin}</span>
@@ -899,7 +963,7 @@ const OrderDetail = () => {
 
                                 {order.status === OrderStatus.RETURNED && (
                                     <div className="text-center py-4 bg-slate-100 dark:bg-slate-800/50 rounded-xl">
-                                        <ArrowLeft size={40} className="text-slate-500 mx-auto mb-2" />
+                                        <ArrowLeft size={40} className={clsx("text-slate-500 mx-auto mb-2", isRTL && "rotate-180")} />
                                         <p className="font-bold text-slate-700 dark:text-slate-300">{t('orderReturned', 'Order Returned')}</p>
                                     </div>
                                 )}
@@ -912,7 +976,7 @@ const OrderDetail = () => {
                             (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                                 <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                                     <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                                        <ArrowLeft className="text-indigo-500" size={20} />
+                                        <ArrowLeft className={clsx("text-indigo-500", isRTL && "rotate-180")} size={20} />
                                         {t('resetOrder', 'Reset Order')}
                                     </h3>
                                     <p className="text-sm text-slate-500 mb-4">
@@ -934,8 +998,8 @@ const OrderDetail = () => {
                             order.status === OrderStatus.OUT_FOR_DELIVERY && (
                                 <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                                     <h3 className="font-bold text-slate-900 dark:text-white mb-2 flex items-center gap-2">
-                                        <ArrowLeft className="text-amber-500" size={20} />
-                                        {t('returnOrder', 'Return Order')}
+                                        <ArrowLeft className={clsx("text-amber-500", isRTL && "rotate-180")} size={20} />
+                                        {t('returnOrder')}
                                     </h3>
                                     <p className="text-sm text-slate-500 mb-4">
                                         {t('returnOrderWarning', 'If the delivery cannot be completed, you can return the order to the store.')}
@@ -944,7 +1008,7 @@ const OrderDetail = () => {
                                         onClick={() => setReturnModal(true)}
                                         className="w-full py-2.5 bg-white dark:bg-slate-800 text-amber-600 dark:text-amber-400 border border-amber-200 dark:border-amber-800 rounded-lg hover:bg-amber-50 dark:hover:bg-amber-900/20 font-medium transition-colors"
                                     >
-                                        {t('returnOrder', 'Return Order')}
+                                        {t('returnOrder')}
                                     </button>
                                 </div>
                             )}
@@ -961,14 +1025,14 @@ const OrderDetail = () => {
                                         {t('cancelOrder', 'Cancel Order')}
                                     </h3>
                                     <p className="text-sm text-slate-500 mb-4">
-                                        {t('cancelOrderWarning')}
+                                        {t('cancelOrderWarning', 'Cancelling an order will refund the customer and mark the order as cancelled.')}
                                     </p>
                                     <div className="space-y-3">
                                         <button
                                             onClick={() => setCancelModal(true)}
                                             className="w-full py-2.5 bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-800 rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 font-medium transition-colors"
                                         >
-                                            {t('cancelOrder', 'Cancel Order')}
+                                            {t('cancelOrder')}
                                         </button>
 
                                         {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
@@ -976,8 +1040,8 @@ const OrderDetail = () => {
                                                 onClick={() => setStoreReturnModal(true)}
                                                 className="w-full py-2.5 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 rounded-lg hover:bg-slate-50 dark:hover:bg-slate-800 font-medium transition-colors flex justify-center items-center gap-2"
                                             >
-                                                <ArrowLeft size={16} />
-                                                {t('returnOrder', 'Return Order')}
+                                                <ArrowLeft size={16} className={clsx(isRTL && "rotate-180")} />
+                                                {t('returnOrder')}
                                             </button>
                                         )}
                                     </div>
@@ -1013,10 +1077,10 @@ const OrderDetail = () => {
 
             <InputModal
                 isOpen={returnModal}
-                title={t('returnOrder', 'Return Order')}
-                message={t('returnOrderWarning', 'Please provide a reason for returning the order.')}
-                placeholder={t('returnReasonPlaceholder', 'Reason for return...')}
-                submitLabel={t('returnOrder', 'Return Order')}
+                title={t('returnOrder')}
+                message={t('returnOrderWarning')}
+                placeholder={t('returnReasonPlaceholder')}
+                submitLabel={t('returnOrder')}
                 onSubmit={handleReturnOrder}
                 onCancel={() => setReturnModal(false)}
                 isLoading={updating}
@@ -1024,10 +1088,10 @@ const OrderDetail = () => {
 
             <InputModal
                 isOpen={storeReturnModal}
-                title={t('returnOrder', 'Return Order')}
-                message={t('returnOrderWarning', 'Please provide a reason for returning the order.')}
-                placeholder={t('returnReasonPlaceholder', 'Reason for return...')}
-                submitLabel={t('returnOrder', 'Return Order')}
+                title={t('returnOrder')}
+                message={t('returnOrderWarning')}
+                placeholder={t('returnReasonPlaceholder')}
+                submitLabel={t('returnOrder')}
                 onSubmit={handleStoreReturnOrder}
                 onCancel={() => setStoreReturnModal(false)}
                 isLoading={updating}
