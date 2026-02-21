@@ -10,6 +10,7 @@
         "create_success": "Created successfully",
         "save": "Save"
     },
+    "save": "Save",
     "dashboard": "Dashboard",
     "revenue": "Revenue",
     "orders": "Orders",
@@ -305,6 +306,8 @@
     "Promo Codes": "Promo Codes",
     "Variants": "Variants",
     "Addons": "Add-ons",
+    "Delivery Drivers": "Delivery Drivers",
+    "Cash Settlement": "Cash Settlement",
     "searchEmployeePlaceholder": "Search by name or email...",
     "activate": "Activate",
     "leaveBlankToKeepCurrent": "Leave blank to keep current",
@@ -485,6 +488,34 @@
             "delete": {
                 "name": "Delete Addons",
                 "description": "• Delete product addons"
+            }
+        },
+        "delivery_drivers": {
+            "view": {
+                "name": "View Delivery Drivers",
+                "description": "• View list of store delivery drivers\n• See driver status and details"
+            },
+            "create": {
+                "name": "Create Delivery Drivers",
+                "description": "• Add new delivery drivers\n• Hire freelance drivers"
+            },
+            "update": {
+                "name": "Update Delivery Drivers",
+                "description": "• Edit driver profiles\n• Change driver status (active/inactive)\n• Verify driver documents"
+            },
+            "delete": {
+                "name": "Remove Delivery Drivers",
+                "description": "• Remove drivers from the store"
+            }
+        },
+        "cash_settlement": {
+            "read": {
+                "name": "View Cash Settlements",
+                "description": "• View pending cash collections\n• View past settlement batches"
+            },
+            "manage": {
+                "name": "Manage Cash Settlements",
+                "description": "• Create new settlement batches to collect cash from drivers"
             }
         }
     },

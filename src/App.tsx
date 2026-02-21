@@ -112,7 +112,7 @@ const AppContent = () => {
             <Route path="categories" element={<CategoryList />} />
 
             <Route path="orders" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderList /></PermissionGate>} />
-            <Route path="orders/settlement" element={<PermissionGate permission={Permissions.ORDERS_UPDATE}><CashSettlement /></PermissionGate>} />
+            <Route path="orders/settlement" element={<PermissionGate permission={Permissions.CASH_SETTLEMENT_READ}><CashSettlement /></PermissionGate>} />
             <Route path="orders/:id" element={
               (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW))
                 ? <OrderDetail />
@@ -143,7 +143,7 @@ const AppContent = () => {
             <Route path="business-types" element={<BusinessTypes />} />
             <Route path="business-categories" element={<BusinessCategories />} />
             <Route path="reported-reviews" element={<ReportedReviewList />} />
-            <Route path="drivers/verification" element={<DriverVerificationPage />} />
+            <Route path="drivers/verification" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DriverVerificationPage /></PermissionGate>} />
 
 
             <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
@@ -174,7 +174,7 @@ const AppContent = () => {
             <Route path="delivery-drivers/new" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_CREATE}><DeliveryDriverForm /></PermissionGate>} />
             <Route path="delivery-drivers/:id" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_VIEW}><DriverDetail /></PermissionGate>} />
             <Route path="delivery-drivers/edit/:id" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DeliveryDriverForm /></PermissionGate>} />
-            <Route path="delivery-dashboard" element={<DriverDashboard />} />
+            <Route path="delivery-dashboard" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_VIEW}><DriverDashboard /></PermissionGate>} />
 
             {/* Redirect unknown to dashboard */}
             <Route path="*" element={<Navigate to="/" replace />} />

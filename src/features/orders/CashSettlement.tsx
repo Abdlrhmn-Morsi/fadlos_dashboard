@@ -6,11 +6,15 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import clsx from 'clsx';
 import { toast } from '../../utils/toast';
+import { useAuth } from '../../contexts/AuthContext';
+import { Permissions } from '../../types/permissions';
+import Modal from '../../components/common/Modal';
 
 const CashSettlement = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['orders', 'common', 'products']);
     const { isRTL } = useLanguage();
+    const { hasPermission } = useAuth();
     const [pendingCollections, setPendingCollections] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [settling, setSettling] = useState<string | null>(null);
@@ -20,6 +24,9 @@ const CashSettlement = () => {
     const [driverOrders, setDriverOrders] = useState<any[]>([]);
     const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
     const [loadingOrders, setLoadingOrders] = useState(false);
+
+    // Modal State
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     useEffect(() => {
         fetchPendingCollections();
@@ -196,22 +203,24 @@ const CashSettlement = () => {
                                             <span className="text-xs ml-1 opacity-70">{t('common:currencySymbol')}</span>
                                         </div>
                                     </div>
-                                    <button
-                                        onClick={handleSettle}
-                                        disabled={settling === selectedDriver.driverId || selectedOrderIds.length === 0}
-                                        className={clsx(
-                                            "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2",
-                                            "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20",
-                                            "disabled:opacity-50 disabled:cursor-not-allowed"
-                                        )}
-                                    >
-                                        {settling === selectedDriver.driverId ? (
-                                            <Loader2 size={18} className="animate-spin" />
-                                        ) : (
-                                            <CheckCircle size={18} />
-                                        )}
-                                        {t('markAsSettled', 'Confirm Collection')}
-                                    </button>
+                                    {hasPermission(Permissions.CASH_SETTLEMENT_MANAGE) && (
+                                        <button
+                                            onClick={() => setShowConfirmModal(true)}
+                                            disabled={settling === selectedDriver.driverId || selectedOrderIds.length === 0}
+                                            className={clsx(
+                                                "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2",
+                                                "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20",
+                                                "disabled:opacity-50 disabled:cursor-not-allowed"
+                                            )}
+                                        >
+                                            {settling === selectedDriver.driverId ? (
+                                                <Loader2 size={18} className="animate-spin" />
+                                            ) : (
+                                                <CheckCircle size={18} />
+                                            )}
+                                            {t('markAsSettled', 'Confirm Collection')}
+                                        </button>
+                                    )}
                                 </div>
                             </div>
 
@@ -281,6 +290,37 @@ const CashSettlement = () => {
                     )}
                 </div>
             )}
+
+            {/* Confirmation Modal */}
+            <Modal
+                isOpen={showConfirmModal}
+                onClose={() => setShowConfirmModal(false)}
+                title={t('confirmCollectionTitle', 'Confirm Cash Collection')}
+            >
+                <div>
+                    <p className="text-slate-600 dark:text-slate-400 mb-6">
+                        {t('confirmCollectionDesc', 'Are you sure you want to confirm collection of this cash? This action cannot be undone.')}
+                    </p>
+                    <div className="flex justify-end gap-3 mt-8">
+                        <button
+                            onClick={() => setShowConfirmModal(false)}
+                            className="px-4 py-2 rounded-xl font-bold bg-slate-100 text-slate-700 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700 transition-colors"
+                        >
+                            {t('common:cancel')}
+                        </button>
+                        <button
+                            onClick={() => {
+                                setShowConfirmModal(false);
+                                handleSettle();
+                            }}
+                            className="px-4 py-2 rounded-xl font-bold bg-primary text-white hover:bg-primary-dark transition-colors flex items-center gap-2"
+                        >
+                            <CheckCircle size={18} />
+                            {t('common:confirm')}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
         </div>
     );
 };

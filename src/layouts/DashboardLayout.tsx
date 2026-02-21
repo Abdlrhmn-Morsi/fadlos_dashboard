@@ -208,10 +208,10 @@ const DashboardLayout: React.FC = () => {
                 <SidebarItem to="/addons" icon={Layers} label={t('addons')} collapsed={collapsed} />
               )}
               {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
-                <>
-                  <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} end={true} />
-                  <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
-                </>
+                <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} end={true} />
+              )}
+              {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
+                <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
               )}
               {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && (
                 <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />

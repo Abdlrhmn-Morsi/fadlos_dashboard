@@ -90,5 +90,7 @@
     "resetOrderButton": "Reset to Pending",
     "orderReturned": "Order Returned",
     "settlePrompt": "This COD order has been delivered but the cash has not been collected from the driver yet.",
-    "totalSelected": "Selected Total"
+    "totalSelected": "Selected Total",
+    "confirmCollectionTitle": "Confirm Cash Collection",
+    "confirmCollectionDesc": "Are you sure you want to confirm collection of this cash? This action cannot be undone."
 }

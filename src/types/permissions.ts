@@ -64,4 +64,8 @@ export enum Permissions {
     DELIVERY_DRIVERS_CREATE = 'delivery_drivers.create',
     DELIVERY_DRIVERS_UPDATE = 'delivery_drivers.update',
     DELIVERY_DRIVERS_DELETE = 'delivery_drivers.delete',
+
+    // Cash Settlement
+    CASH_SETTLEMENT_READ = 'cash_settlement.read',
+    CASH_SETTLEMENT_MANAGE = 'cash_settlement.manage',
 }
