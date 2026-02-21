@@ -80,5 +80,10 @@
     "enableStoreReviewsDesc": "Allow customers to leave overall reviews and ratings for your store.",
     "enableProductReviews": "Enable Product Reviews",
     "enableProductReviewsDesc": "Allow customers to leave specific reviews and ratings for individual products.",
-    "businessCategories": "Business Categories"
+    "businessCategories": "Business Categories",
+    "maxOrdersPerDriver": "Max active orders per driver",
+    "isHiringDrivers": "Are you hiring drivers?",
+    "isHiringDriversDesc": "Enable this to allow freelance drivers to find and apply to work with your store.",
+    "hiringSettings": "Hiring Settings",
+    "deliverySettings": "Delivery Settings"
 }

@@ -18,6 +18,8 @@
     "vsLastPeriod": "مقارنة بالفترة السابقة",
     "todayRevenue": "إيرادات اليوم",
     "todayOrders": "طلبات اليوم",
+    "pendingHiringRequests": "طلبات التوظيف قيد الانتظار",
+    "totalHiredDrivers": "إجمالي السائقين المستأجرين",
     "revenuePerformance": "أداء الإيرادات",
     "failedToLoad": "فشل تحميل بيانات لوحة التحكم.",
     "loading": "جاري تحميل الرؤى المميزة...",

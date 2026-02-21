@@ -24,6 +24,8 @@ export interface DashboardStats {
     totalReviews?: number;
     totalCategories?: number;
     totalDrivers?: number;
+    pendingHiringRequests?: number;
+    totalHiredDrivers?: number;
     topRatedProducts?: any[];
     topCategories?: any[];
     averageRating?: number;

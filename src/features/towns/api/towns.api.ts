@@ -13,6 +13,15 @@ export const getTowns = async (params: any = {}) => {
     }
 };
 
+export const getPlacesByTown = async (townId: string) => {
+    try {
+        const responseBody = await apiService.get(`/places/by-town/${townId}`);
+        return responseBody.data || responseBody;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const createTown = async (townData: any) => {
     try {
         return await apiService.post('/places', townData);

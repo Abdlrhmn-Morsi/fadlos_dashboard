@@ -8,7 +8,24 @@
         "update_success": "Updated successfully",
         "delete_success": "Deleted successfully",
         "create_success": "Created successfully",
-        "save": "Save"
+        "save": "Save",
+        "verified": "Verified",
+        "all_towns": "All Towns",
+        "all_places": "All Areas",
+        "no_location": "No working areas set",
+        "search_placeholder": "Search by name, email or phone...",
+        "hiring": "Hiring",
+        "not_hiring": "Not Hiring",
+        "hiringStats": "Hiring Statistics",
+        "pendingHiringRequests": "Pending Applications",
+        "totalHiredDrivers": "Hired Drivers",
+        "openToFreelancers": "Accepting Freelancers",
+        "isHiringDrivers": "Are you hiring drivers?",
+        "isHiringDriversDesc": "Enable this to allow freelance drivers to find and apply to work with your store.",
+        "search_freelancers": "Search Freelancers",
+        "sendRequest": "Send Request",
+        "requestSent": "Request Sent",
+        "alreadyHired": "Already Hired"
     },
     "save": "Save",
     "dashboard": "Dashboard",
@@ -150,7 +167,7 @@
     "noDataFound": "No data found",
     "noData": "No data available for the selected period",
     "noResults": "No results found",
-    "adjustSearch": "Try adjusting your search terms",
+    "adjustSearch": "Try adjusting your search criteria to find available freelancers.",
     "failedToLoad": "Failed to load data",
     "notSet": "Not Set",
     "back": "Back",
@@ -519,24 +536,6 @@
             }
         }
     },
-    "submit": "Submit",
-    "understood": "Understood",
-    "results": "results",
-    "showingResults": "Showing {{start}}-{{end}} of {{total}} results",
-    "pagination": {
-        "first": "First Page",
-        "previous": "Previous Page",
-        "next": "Next Page",
-        "last": "Last Page"
-    },
-    "copy": "Copy Link",
-    "copied": "Link copied to clipboard!",
-    "noDataAvailable": "No data available",
-    "addFirstProduct": "Add your first product",
-    "addFirstCategory": "Add your first category",
-    "accessDenied": "Access Denied",
-    "noPermissionViewStore": "You do not have permission to view store settings. Please contact your administrator.",
-    "goBack": "Go Back",
     "delivery": {
         "status": {
             "online": "Online",
@@ -627,8 +626,19 @@
     },
     "vehicle_types": {
         "bicycle": "Bicycle",
+        "ebike": "E-Bike",
+        "scooter": "Scooter",
         "motorcycle": "Motorcycle",
+        "car": "Car",
+        "van": "Van",
         "walking": "Walking",
         "tricycle": "Tricycle"
-    }
+    },
+    "hiringStats": "Hiring Statistics",
+    "pendingHiringRequests": "Pending Applications",
+    "totalHiredDrivers": "Hired Drivers",
+    "openToFreelancers": "Accepting Freelancers",
+    "isHiringDrivers": "Are you hiring drivers?",
+    "isHiringDriversDesc": "Enable this to allow freelance drivers to find and apply to work with your store.",
+    "search_freelancers": "Search Freelancers"
 }

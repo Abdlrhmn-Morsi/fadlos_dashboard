@@ -13,6 +13,8 @@ export const fetchDashboardStats = async (user: any) => {
             todayRevenue: 0,
             todayOrders: 0,
             pendingOrders: 0,
+            pendingHiringRequests: 0,
+            totalHiredDrivers: 0,
             totalUsers: 0,
             totalStores: 0,
             totalProducts: 0,
@@ -98,7 +100,13 @@ export const fetchDashboardStats = async (user: any) => {
 
             // Followers (store.view) - Assuming store view allows seeing followers
             if (storeId && hasPerm('store.view')) {
-                promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0 })).catch(() => ({ key: 'rating', val: 0 })));
+                promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0, extra: res })).catch(() => ({ key: 'rating', val: 0 })));
+            }
+
+            // Hiring Stats (delivery_drivers.create or delivery_drivers.update or delivery_drivers.view)
+            if (hasPerm('delivery_drivers.view')) {
+                promises.push(apiService.get('/delivery-drivers/hiring-requests/me').then(res => ({ key: 'hiring-requests', val: ((res as any).data?.requests || (res as any).requests || []).filter((r: any) => r.status === 'PENDING').length })).catch(() => ({ key: 'hiring-requests', val: 0 })));
+                promises.push(apiService.get('/delivery-drivers/store-drivers').then(res => ({ key: 'hired-drivers', val: (res.data || res).filter((d: any) => d.driverType === 'FREELANCER').length })).catch(() => ({ key: 'hired-drivers', val: 0 })));
             }
 
             // Top Rated Products (Default for all employees)
@@ -114,7 +122,15 @@ export const fetchDashboardStats = async (user: any) => {
                 if (res.key === 'clients') stats.totalClients = res.val;
                 if (res.key === 'categories') stats.totalCategories = res.val;
                 if (res.key === 'drivers') stats.totalDrivers = res.val;
-                if (res.key === 'rating') stats.averageRating = res.val;
+                if (res.key === 'rating') {
+                    stats.averageRating = res.val;
+                    if (res.extra) {
+                        stats.pendingHiringRequests = stats.pendingHiringRequests || 0; // Backup
+                        // The store object itself might have some indicators, but we use the specific counts
+                    }
+                }
+                if (res.key === 'hiring-requests') stats.pendingHiringRequests = res.val;
+                if (res.key === 'hired-drivers') stats.totalHiredDrivers = res.val;
                 if (res.key === 'topProducts') stats.topRatedProducts = res.val;
                 if (res.key === 'topCategories') stats.topCategories = res.val;
             });

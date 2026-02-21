@@ -246,6 +246,8 @@ const DeliveryDriversList = () => {
                 return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('verificationStatuses.PENDING', 'Pending')}</span>;
             case 'REJECTED':
                 return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('verificationStatuses.REJECTED', 'Rejected')}</span>;
+            case 'CANCELLED':
+                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><XCircle size={12} /> {t('verificationStatuses.CANCELLED', 'Cancelled')}</span>;
             case 'UNVERIFIED':
                 return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t('verificationStatuses.UNVERIFIED', 'Unverified')}</span>;
             default:
@@ -380,26 +382,31 @@ const DeliveryDriversList = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                                            <div className="flex flex-col gap-1.5">
-                                                {/* Online/Offline Status */}
-                                                <span className={clsx(
-                                                    "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest border",
-                                                    driver.deliveryProfile?.isAvailableForWork
-                                                        ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800"
-                                                        : "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
-                                                )}>
-                                                    <span className={clsx("w-1.5 h-1.5 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-400")} />
-                                                    {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online', 'Online') : t('delivery.status.offline', 'Offline')}
-                                                </span>
-
-                                                {/* Busy Status */}
-                                                {driver.deliveryProfile?.isBusy && (
-                                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 animate-pulse">
-                                                        <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                                                        {t('delivery.status.busy', 'Busy')}
+                                            {/* Only show online/busy status if the driver is fully hired by the store (or is a direct store driver) */}
+                                            {driver.storeDriverStatus === 'ACTIVE' ? (
+                                                <div className="flex flex-col gap-1.5">
+                                                    {/* Online/Offline Status */}
+                                                    <span className={clsx(
+                                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest border",
+                                                        driver.deliveryProfile?.isAvailableForWork
+                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800"
+                                                            : "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
+                                                    )}>
+                                                        <span className={clsx("w-1.5 h-1.5 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-400")} />
+                                                        {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online', 'Online') : t('delivery.status.offline', 'Offline')}
                                                     </span>
-                                                )}
-                                            </div>
+
+                                                    {/* Busy Status */}
+                                                    {driver.deliveryProfile?.isBusy && (
+                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 animate-pulse">
+                                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
+                                                            {t('delivery.status.busy', 'Busy')}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-400 text-xs italic">{t('delivery.drivers.pending_connection', 'Pending Connection')}</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
                                             <div className="flex flex-col text-sm">
@@ -409,39 +416,52 @@ const DeliveryDriversList = () => {
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
                                             <div className="flex flex-col gap-1.5 items-start">
-                                                {getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus, driver.id)}
+                                                {/* If it's a freelancer and the store-driver relationship is not ACTIVE, prioritize showing that request status */}
+                                                {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus !== 'ACTIVE'
+                                                    ? getStatusBadge(driver.storeDriverStatus)
+                                                    : getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus, driver.id)}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
-                                            <div className="flex flex-col items-center gap-1">
-                                                <span className={clsx(
-                                                    "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
-                                                    (driver.activeDeliveriesCount || 0) >= (meta?.maxOrdersPerDriver || 5)
-                                                        ? "bg-amber-50 text-amber-600 border-amber-200 animate-pulse"
-                                                        : "bg-emerald-50 text-emerald-600 border-emerald-200"
-                                                )}>
-                                                    {driver.activeDeliveriesCount || 0} / {meta?.maxOrdersPerDriver || 5}
+                                            {driver.storeDriverStatus === 'ACTIVE' ? (
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <span className={clsx(
+                                                        "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
+                                                        (driver.activeDeliveriesCount || 0) >= (meta?.maxOrdersPerDriver || 5)
+                                                            ? "bg-amber-50 text-amber-600 border-amber-200 animate-pulse"
+                                                            : "bg-emerald-50 text-emerald-600 border-emerald-200"
+                                                    )}>
+                                                        {driver.activeDeliveriesCount || 0} / {meta?.maxOrdersPerDriver || 5}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-300 dark:text-slate-600">-</span>
+                                            )}
+                                        </td>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
+                                            {driver.storeDriverStatus === 'ACTIVE' ? (
+                                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-xs border border-slate-200 dark:border-slate-700">
+                                                    {driver.totalOrdersCount || 0}
                                                 </span>
-                                            </div>
-                                        </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
-                                            <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-xs border border-slate-200 dark:border-slate-700">
-                                                {driver.totalOrdersCount || 0}
-                                            </span>
+                                            ) : (
+                                                <span className="text-slate-300 dark:text-slate-600">-</span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-right">
                                             <div className="flex items-center justify-end gap-2">
-                                                <button
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        navigate(`/delivery-drivers/${driver.id}`);
-                                                    }}
-                                                    className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                                                    title={t('actions.view', 'View')}
-                                                >
-                                                    <Eye size={18} />
-                                                </button>
-                                                {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) && (
+                                                {driver.storeDriverStatus === 'ACTIVE' && (
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            navigate(`/delivery-drivers/${driver.id}`);
+                                                        }}
+                                                        className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                                                        title={t('actions.view', 'View')}
+                                                    >
+                                                        <Eye size={18} />
+                                                    </button>
+                                                )}
+                                                {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) && driver.storeDriverStatus === 'ACTIVE' && (
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();

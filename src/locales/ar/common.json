@@ -8,7 +8,24 @@
         "update_success": "تم التحديث بنجاح",
         "delete_success": "تم الحذف بنجاح",
         "create_success": "تم الإنشاء بنجاح",
-        "save": "حفظ"
+        "save": "حفظ",
+        "verified": "موثق",
+        "all_towns": "كل المدن",
+        "all_places": "كل المناطق",
+        "no_location": "لم يتم تحديد مناطق عمل",
+        "search_placeholder": "البحث بالاسم، البريد أو الهاتف...",
+        "hiring": "متاح للتوظيف",
+        "not_hiring": "غير متاح",
+        "hiringStats": "إحصائيات التوظيف",
+        "pendingHiringRequests": "الطلبات المعلقة",
+        "totalHiredDrivers": "السائقين الموظفين",
+        "openToFreelancers": "مفتوح للمستقلين",
+        "isHiringDrivers": "هل تقوم بتوظيف سائقين؟",
+        "isHiringDriversDesc": "قم بتفعيل هذا الخيار للسماح للسائقين المستقلين بالعثور على متجرك والتقديم للعمل معك.",
+        "search_freelancers": "البحث عن مستقلين",
+        "sendRequest": "إرسال طلب",
+        "requestSent": "تم إرسال الطلب",
+        "alreadyHired": "تم التوظيف مسبقاً"
     },
     "save": "حفظ",
     "dashboard": "لوحة التحكم",
@@ -147,7 +164,7 @@
     "noDataFound": "لا توجد بيانات",
     "noData": "لا توجد بيانات متاحة للفترة المختارة",
     "noResults": "لم يتم العثور على نتائج",
-    "adjustSearch": "حاول تعديل شروط البحث الخاصة بك",
+    "adjustSearch": "حاول تعديل شروط البحث الخاصة بك للعثور على مستقلين متاحين.",
     "failedToLoad": "فشل جلب البيانات",
     "notSet": "غير محدد",
     "back": "رجوع",
@@ -515,24 +532,6 @@
             }
         }
     },
-    "submit": "إرسال",
-    "understood": "فهمت",
-    "results": "نتائج",
-    "showingResults": "عرض {{start}}-{{end}} من أصل {{total}} نتيجة",
-    "pagination": {
-        "first": "الصفحة الأولى",
-        "previous": "الصفحة السابقة",
-        "next": "الصفحة التالية",
-        "last": "الصفحة الأخيرة"
-    },
-    "copy": "نسخ الرابط",
-    "copied": "تم نسخ الرابط إلى الحافظة!",
-    "noDataAvailable": "لا توجد بيانات متاحة",
-    "addFirstProduct": "أضف منتجك الأول",
-    "addFirstCategory": "أضف تصنيفك الأول",
-    "accessDenied": "تم رفض الوصول",
-    "noPermissionViewStore": "ليس لديك الإذن لتبديل إعدادات المتجر. يرجى الاتصال بمسؤول النظام.",
-    "goBack": "العودة للخلف",
     "delivery": {
         "status": {
             "online": "متصل",
@@ -624,9 +623,12 @@
     },
     "vehicle_types": {
         "bicycle": "دراجة هوائية",
-        "motorcycle": "موتوسيكل",
+        "ebike": "دراجة كهربائية",
+        "scooter": "سكوتر",
+        "motorcycle": "دراجة نارية",
+        "car": "سيارة",
+        "van": "فان",
         "walking": "سيراً على الأقدام",
         "tricycle": "تروسيكل"
-    },
-    "cancelled": "ملغاة"
+    }
 }

@@ -25,7 +25,8 @@ import {
     Calendar,
     AlertTriangle,
     Languages,
-    MessageSquare
+    MessageSquare,
+    Users
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -93,7 +94,8 @@ const StoreSettings = () => {
         isAcceptingOrders: true,
         enableStoreReviews: true,
         enableProductReviews: true,
-        maxOrdersPerDriver: 5
+        maxOrdersPerDriver: 5,
+        isHiringDrivers: false
     });
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -115,7 +117,7 @@ const StoreSettings = () => {
             setStoreData(store);
             setBusinessTypes(bTypes);
             setCities(allCities);
-            setTowns(allTowns);
+            setTowns(Array.isArray(allTowns) ? allTowns : allTowns?.data || []);
             setAvailableCategories(allCategories);
 
             setFormData({
@@ -144,7 +146,8 @@ const StoreSettings = () => {
                 isAcceptingOrders: store.isAcceptingOrders === false ? false : true,
                 enableStoreReviews: store.enableStoreReviews === false ? false : true,
                 enableProductReviews: store.enableProductReviews === false ? false : true,
-                maxOrdersPerDriver: store.maxOrdersPerDriver || 5
+                maxOrdersPerDriver: store.maxOrdersPerDriver || 5,
+                isHiringDrivers: store.isHiringDrivers || false
             });
 
             setLogoPreview(store.logo);
@@ -344,6 +347,7 @@ const StoreSettings = () => {
             data.append('enableStoreReviews', String(formData.enableStoreReviews));
             data.append('enableProductReviews', String(formData.enableProductReviews));
             data.append('maxOrdersPerDriver', String(formData.maxOrdersPerDriver));
+            data.append('isHiringDrivers', String(formData.isHiringDrivers));
 
             if (formData.workingDays.length > 0) {
                 data.append('workingDays', JSON.stringify(formData.workingDays));
@@ -887,6 +891,31 @@ const StoreSettings = () => {
                                     )}
                                 </div>
                             </div>
+
+                            <div className="space-y-4">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                    <Users size={14} /> {t('hiringSettings', 'Hiring Settings')}
+                                </label>
+                                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-between transition-all">
+                                    <div className="space-y-1">
+                                        <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('isHiringDrivers', 'Are you hiring drivers?')}</h4>
+                                        <p className="text-slate-500 text-[10px] italic leading-relaxed pr-8">
+                                            {t('isHiringDriversDesc', 'Enable this to allow freelance drivers to find and apply to work with your store.')}
+                                        </p>
+                                    </div>
+                                    <label className={"relative inline-flex items-center cursor-pointer"}>
+                                        <input
+                                            type="checkbox"
+                                            name="isHiringDrivers"
+                                            className="sr-only peer"
+                                            checked={formData.isHiringDrivers}
+                                            onChange={handleChange}
+                                            disabled={isReadOnly}
+                                        />
+                                        <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary dark:peer-checked:bg-primary shadow-sm disabled:opacity-50"></div>
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     </section>
 
@@ -1131,6 +1160,28 @@ const StoreSettings = () => {
                                     <p className="mt-2 text-slate-500 text-[10px] font-medium italic">
                                         {t('maxOrdersPerDriverDesc', 'Automatically mark drivers as "Busy" when they reach this limit.')}
                                     </p>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="p-6 h-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-between transition-all">
+                                    <div className="space-y-1">
+                                        <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('isHiringDrivers', 'Are you hiring drivers?')}</h4>
+                                        <p className="text-slate-500 text-[10px] italic leading-relaxed pr-8">
+                                            {t('isHiringDriversDesc', 'Enable this to allow freelance drivers to find and apply to work with your store.')}
+                                        </p>
+                                    </div>
+                                    <label className={"relative inline-flex items-center cursor-pointer"}>
+                                        <input
+                                            type="checkbox"
+                                            name="isHiringDrivers"
+                                            className="sr-only peer"
+                                            checked={formData.isHiringDrivers}
+                                            onChange={handleChange}
+                                            disabled={isReadOnly}
+                                        />
+                                        <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary dark:peer-checked:bg-primary shadow-sm disabled:opacity-50"></div>
+                                    </label>
                                 </div>
                             </div>
                         </div>

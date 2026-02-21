@@ -18,6 +18,8 @@
     "vsLastPeriod": "vs last period",
     "todayRevenue": "Today's Revenue",
     "todayOrders": "Today's Orders",
+    "pendingHiringRequests": "Pending Hiring Requests",
+    "totalHiredDrivers": "Total Hired Drivers",
     "revenuePerformance": "Revenue Performance",
     "failedToLoad": "Failed to load dashboard data.",
     "loading": "Loading premium insights...",

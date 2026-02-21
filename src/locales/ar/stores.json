@@ -80,5 +80,10 @@
     "enableStoreReviewsDesc": "السماح للعملاء بترك تقييمات وآراء عامة لمتجرك.",
     "enableProductReviews": "تفعيل تقييمات المنتجات",
     "enableProductReviewsDesc": "السماح للعملاء بترك تقييمات وآراء محددة للمنتجات الفردية.",
-    "businessCategories": "أنشطة المتجر"
+    "businessCategories": "أنشطة المتجر",
+    "maxOrdersPerDriver": "أقصى عدد طلبات نشطة للسائق",
+    "isHiringDrivers": "هل تقوم بتوظيف سائقين؟",
+    "isHiringDriversDesc": "قم بتفعيل هذا الخيار للسماح للسائقين المستقلين بالعثور على متجرك والتقديم للعمل معك.",
+    "hiringSettings": "إعدادات التوظيف",
+    "deliverySettings": "إعدادات التوصيل"
 }

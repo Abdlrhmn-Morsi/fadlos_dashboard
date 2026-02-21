@@ -11,7 +11,7 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
-import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck, MapPin } from 'lucide-react';
+import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, CheckCircle, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck, MapPin } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -475,12 +475,26 @@ const Dashboard: React.FC = () => {
                             />
                         )}
                         {hasPermission('delivery_drivers.view') && (
-                            <StatCard
-                                title={t('totalDrivers')}
-                                value={stats.totalDrivers || 0}
-                                icon={Truck}
-                                color="indigo"
-                            />
+                            <>
+                                <StatCard
+                                    title={t('totalDrivers')}
+                                    value={stats.totalDrivers || 0}
+                                    icon={Truck}
+                                    color="indigo"
+                                />
+                                <StatCard
+                                    title={t('pendingHiringRequests')}
+                                    value={stats.pendingHiringRequests || 0}
+                                    icon={Users}
+                                    color="amber"
+                                />
+                                <StatCard
+                                    title={t('totalHiredDrivers')}
+                                    value={stats.totalHiredDrivers || 0}
+                                    icon={CheckCircle}
+                                    color="emerald"
+                                />
+                            </>
                         )}
                     </>
                 )}
@@ -511,7 +525,7 @@ const Dashboard: React.FC = () => {
                     <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-black/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
 
                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 grow">
-                        {/* 1. Icon (Start) */}
+                        {/* 1. Icon (Star) */}
                         <div className="shrink-0">
                             <div className="w-20 h-20 bg-white/10 backdrop-blur-xl border border-white/30 rounded-none flex items-center justify-center text-white shadow-xl transform group-hover:rotate-6 transition-transform duration-500">
                                 <Store size={44} strokeWidth={1} />
