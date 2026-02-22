@@ -311,19 +311,35 @@ const DeliveryDriversList = () => {
                 </div>
             </div>
 
+            {/* Summary Cards */}
+            <div className="flex justify-start">
+                <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm w-full md:w-1/3">
+                    <div className="flex items-center gap-3">
+                        <div className="p-2 bg-emerald-50 dark:bg-emerald-900/20 rounded-lg text-emerald-600">
+                            <Package size={20} />
+                        </div>
+                        <div>
+                            <p className="text-xs text-slate-500 font-medium">{t('fields.active_orders', 'Active Orders')}</p>
+                            <p className="text-lg font-bold text-slate-900 dark:text-white">
+                                {drivers.reduce((acc, d) => acc + (d.activeDeliveriesCount || 0), 0)}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-start border-collapse">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider">
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.name')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.type')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.availability', 'Availability')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.contact')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.status')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-center">{t('fields.active_orders', 'Active')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-center">{t('fields.total_orders', 'Total')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-right">{t('actions')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('delivery.drivers.verification.title', 'Verification')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">{t('fields.hiring_status', 'Hiring Status')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-center">{t('fields.active_orders', 'Active Orders')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-end">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
@@ -358,7 +374,7 @@ const DeliveryDriversList = () => {
                                                     </div>
                                                     {/* Status Dot */}
                                                     <div className={clsx(
-                                                        "absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm",
+                                                        "absolute -bottom-0.5 -inset-inline-end-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm",
                                                         !driver.deliveryProfile?.isAvailableForWork ? "bg-slate-400" :
                                                             driver.deliveryProfile?.isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
                                                     )} />
@@ -382,33 +398,6 @@ const DeliveryDriversList = () => {
                                             </span>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
-                                            {/* Only show online/busy status if the driver is fully hired by the store (or is a direct store driver) */}
-                                            {driver.storeDriverStatus === 'ACTIVE' ? (
-                                                <div className="flex flex-col gap-1.5">
-                                                    {/* Online/Offline Status */}
-                                                    <span className={clsx(
-                                                        "inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest border",
-                                                        driver.deliveryProfile?.isAvailableForWork
-                                                            ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800"
-                                                            : "bg-slate-50 text-slate-500 border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700"
-                                                    )}>
-                                                        <span className={clsx("w-1.5 h-1.5 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" : "bg-slate-400")} />
-                                                        {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online', 'Online') : t('delivery.status.offline', 'Offline')}
-                                                    </span>
-
-                                                    {/* Busy Status */}
-                                                    {driver.deliveryProfile?.isBusy && (
-                                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded text-[8px] font-black uppercase tracking-widest bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800 animate-pulse">
-                                                            <span className="w-1.5 h-1.5 rounded-full bg-amber-500 shadow-[0_0_8px_rgba(245,158,11,0.5)]" />
-                                                            {t('delivery.status.busy', 'Busy')}
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            ) : (
-                                                <span className="text-slate-400 text-xs italic">{t('delivery.drivers.pending_connection', 'Pending Connection')}</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
                                             <div className="flex flex-col text-sm">
                                                 <span>{driver.email}</span>
                                                 <span className="text-slate-500">{driver.phone}</span>
@@ -416,14 +405,16 @@ const DeliveryDriversList = () => {
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
                                             <div className="flex flex-col gap-1.5 items-start">
-                                                {/* If it's a freelancer and the store-driver relationship is not ACTIVE, prioritize showing that request status */}
-                                                {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus !== 'ACTIVE'
-                                                    ? getStatusBadge(driver.storeDriverStatus)
-                                                    : getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus, driver.id)}
+                                                {getStatusBadge(driver.deliveryProfile?.verificationStatus || 'UNVERIFIED', driver.id)}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50">
+                                            <div className="flex flex-col gap-1.5 items-start">
+                                                {getStatusBadge(driver.deliveryProfile?.driverType === 'STORE_DRIVER' ? 'ACTIVE' : driver.storeDriverStatus)}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
-                                            {driver.storeDriverStatus === 'ACTIVE' ? (
+                                            {(driver.storeDriverStatus === 'ACTIVE' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') ? (
                                                 <div className="flex flex-col items-center gap-1">
                                                     <span className={clsx(
                                                         "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
@@ -438,18 +429,9 @@ const DeliveryDriversList = () => {
                                                 <span className="text-slate-300 dark:text-slate-600">-</span>
                                             )}
                                         </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-center">
-                                            {driver.storeDriverStatus === 'ACTIVE' ? (
-                                                <span className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-bold text-xs border border-slate-200 dark:border-slate-700">
-                                                    {driver.totalOrdersCount || 0}
-                                                </span>
-                                            ) : (
-                                                <span className="text-slate-300 dark:text-slate-600">-</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-right">
+                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-end">
                                             <div className="flex items-center justify-end gap-2">
-                                                {driver.storeDriverStatus === 'ACTIVE' && (
+                                                {(driver.storeDriverStatus === 'ACTIVE' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') && (
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -461,18 +443,20 @@ const DeliveryDriversList = () => {
                                                         <Eye size={18} />
                                                     </button>
                                                 )}
-                                                {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) && driver.storeDriverStatus === 'ACTIVE' && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate(`/delivery-drivers/edit/${driver.id}`);
-                                                        }}
-                                                        className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                                                        title={t('actions.edit', 'Edit')}
-                                                    >
-                                                        <Edit size={18} />
-                                                    </button>
-                                                )}
+                                                {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
+                                                    driver.storeDriverStatus === 'ACTIVE' &&
+                                                    driver.deliveryProfile?.driverType !== 'FREELANCER' && (
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                navigate(`/delivery-drivers/edit/${driver.id}`);
+                                                            }}
+                                                            className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                                                            title={t('actions.edit', 'Edit')}
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                    )}
                                                 {hasPermission(Permissions.DELIVERY_DRIVERS_DELETE) && (
                                                     <button
                                                         onClick={(e) => {
@@ -491,7 +475,7 @@ const DeliveryDriversList = () => {
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-12 text-center text-slate-400 text-sm">
+                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-400 text-sm">
                                         {t('common.no_results')}
                                     </td>
                                 </tr>

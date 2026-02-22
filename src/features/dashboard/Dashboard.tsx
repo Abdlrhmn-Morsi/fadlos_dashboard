@@ -482,18 +482,6 @@ const Dashboard: React.FC = () => {
                                     icon={Truck}
                                     color="indigo"
                                 />
-                                <StatCard
-                                    title={t('pendingHiringRequests')}
-                                    value={stats.pendingHiringRequests || 0}
-                                    icon={Users}
-                                    color="amber"
-                                />
-                                <StatCard
-                                    title={t('totalHiredDrivers')}
-                                    value={stats.totalHiredDrivers || 0}
-                                    icon={CheckCircle}
-                                    color="emerald"
-                                />
                             </>
                         )}
                     </>

@@ -92,7 +92,7 @@
     "reportedReviews": "التقييمات المُبلغ عنها",
     "categories": "الأقسام",
     "addons": "الإضافات",
-    "deliveryDrivers": "سائقي المتاجر",
+    "deliveryDrivers": "سائقي المتجر",
     "driverVerification": "توثيق السائقين",
     "deliveryDashboard": "لوحة تحكم السائق",
     "analytics": "الإحصائيات",
@@ -184,8 +184,9 @@
         "REJECTED": "مرفوض",
         "UNDER_REVIEW": "قيد المراجعة",
         "UNVERIFIED": "غير موثق",
-        "PENDING": "معلق",
-        "ACTIVE": "نشط"
+        "PENDING": "قيد الانتظار",
+        "ACTIVE": "نشط",
+        "CANCELLED": "ملغى"
     },
     "driverTypes": {
         "STORE_DRIVER": "سائق متجر",
@@ -318,7 +319,7 @@
     "Promo Codes": "أكواد الخصم",
     "Variants": "المتغيرات",
     "Addons": "الإضافات",
-    "Delivery Drivers": "سائقي التوصيل",
+    "Delivery Drivers": "سائقي المتجر",
     "Cash Settlement": "تحصيل المبالغ النقدية",
     "Addon Management": "إدارة الإضافات",
     "searchEmployeePlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
@@ -546,10 +547,10 @@
             "available_desc": "السائق جاهز لقبول طلبات توصيل جديدة."
         },
         "drivers": {
-            "title": "سائقي التوصيل",
+            "title": "سائقي المتجر",
             "my_drivers": "سائقيّ",
             "marketplace": "سوق السائقين",
-            "list_title": "سائقي المتاجر",
+            "list_title": "سائقي المتجر",
             "manage_desc": "إدارة فريق التوصيل الخاص بك وتوافرهم",
             "search_placeholder": "البحث بالاسم أو البريد الإلكتروني أو الهاتف...",
             "add_new": "إضافة سائق جديد",
@@ -590,6 +591,21 @@
             "plate_number": "رقم اللوحة",
             "operating_regions": "مناطق العمل",
             "rejection_reason": "سبب الرفض",
+            "drivers": {
+                "cancel_hiring": "إلغاء الطلب",
+                "cancel_hiring_title": "إلغاء طلب التوظيف",
+                "confirm_cancel_hiring": "هل أنت متأكد من رغبتك في إلغاء طلب التوظيف هذا؟",
+                "cancel_hiring_success": "تم إلغاء طلب التوظيف بنجاح",
+                "cancel_hiring_failed": "فشل إلغاء طلب التوظيف",
+                "pending_freelancer_docs_msg": "ستكون مستندات الهوية مرئية بمجرد أن تصبح حالة طلب التوظيف نشطة."
+            },
+            "hiring_status": {
+                "pending": "قيد الانتظار",
+                "active": "نشط",
+                "rejected": "مرفوض",
+                "cancelled": "ملغى",
+                "expired": "منتهي الصلاحية"
+            },
             "status": {
                 "available": "متاح",
                 "busy": "مشغول"
@@ -599,6 +615,7 @@
                 "on_the_way_orders": "في الطريق",
                 "delivered_orders": "تم التوصيل",
                 "cancelled_orders": "ملغاة",
+                "returned_orders": "مرجعة",
                 "total_orders": "إجمالي"
             }
         }
@@ -608,6 +625,7 @@
         "name": "الاسم الكامل",
         "contact": "جهات الاتصال",
         "status": "الحالة",
+        "hiring_status": "حالة التوظيف",
         "availability": "التوفر",
         "joined_at": "تاريخ الانضمام",
         "username": "اسم المستخدم",
@@ -630,5 +648,12 @@
         "van": "فان",
         "walking": "سيراً على الأقدام",
         "tricycle": "تروسيكل"
-    }
+    },
+    "hiringStats": "إحصائيات التوظيف",
+    "pendingHiringRequests": "الطلبات المعلقة",
+    "totalHiredDrivers": "إجمالي السائقين المعينين",
+    "openToFreelancers": "قبول السائقين المستقلين",
+    "isHiringDrivers": "هل تقوم بتعيين سائقين؟",
+    "isHiringDriversDesc": "قم بتمكين هذا للسماح للسائقين المستقلين بالعثور على متجرك والتقديم للعمل معه.",
+    "search_freelancers": "البحث عن السائقين المستقلين"
 }

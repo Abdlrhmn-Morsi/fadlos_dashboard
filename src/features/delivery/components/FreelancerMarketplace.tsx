@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { searchFreelancers, hireFreelancer } from '../api/delivery-drivers.api';
+import { searchFreelancers, hireFreelancer, cancelHiringRequest } from '../api/delivery-drivers.api';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 import { toast } from '../../../utils/toast';
 import {
     MapPin,
@@ -9,7 +10,8 @@ import {
     User,
     CheckCircle,
     Shield,
-    Filter
+    Filter,
+    XCircle
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getCities } from '../../cities/api/cities.api';
@@ -27,6 +29,8 @@ const FreelancerMarketplace = () => {
     const [hiringId, setHiringId] = useState<string | null>(null);
     const [towns, setTowns] = useState<any[]>([]);
     const [places, setPlaces] = useState<any[]>([]);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [cancelData, setCancelData] = useState<{ requestId: string, userId: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearch = useDebounce(searchQuery, 500);
 
@@ -83,6 +87,34 @@ const FreelancerMarketplace = () => {
     const handleTownChange = (townId: string) => {
         setFilters(prev => ({ ...prev, townId, placeId: '' }));
         fetchPlaces(townId);
+    };
+
+    const handleCancelRequest = (requestId: string, userId: string) => {
+        setCancelData({ requestId, userId });
+        setIsCancelModalOpen(true);
+    };
+
+    const confirmCancelRequest = async () => {
+        if (!cancelData) return;
+        const { requestId, userId } = cancelData;
+        setIsCancelModalOpen(false);
+        setHiringId(userId);
+        try {
+            await cancelHiringRequest(requestId);
+            toast.success(t('delivery.drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
+
+            // Invalidate My Drivers cache
+            invalidateCache('delivery_drivers');
+
+            // Update status locally
+            setFreelancers(prev => prev.map(f => f.user.id === userId ? { ...f, hiringStatus: null, hiringRequestId: null } : f));
+        } catch (error: any) {
+            console.error('Failed to cancel hiring request', error);
+            toast.error(error.response?.data?.message || t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request'));
+        } finally {
+            setHiringId(null);
+            setCancelData(null);
+        }
     };
 
     const handleHire = async (userId: string) => {
@@ -180,7 +212,7 @@ const FreelancerMarketplace = () => {
                                             )}
                                         </div>
                                         <div className={clsx(
-                                            "absolute -bottom-1 -right-1 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 shadow-sm",
+                                            "absolute -bottom-1 -inset-inline-end-1 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 shadow-sm",
                                             (profile.isBusy || profile.activeDeliveriesCount > 0) ? "bg-amber-500" :
                                                 profile.isAvailableForWork ? "bg-emerald-500" : "bg-slate-400"
                                         )} />
@@ -239,13 +271,27 @@ const FreelancerMarketplace = () => {
                                     {t('common.alreadyHired', 'Already Hired')}
                                 </button>
                             ) : profile.hiringStatus === 'PENDING' ? (
-                                <button
-                                    disabled
-                                    className="w-full py-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed"
-                                >
-                                    <CheckCircle size={20} />
-                                    {t('common.requestSent', 'Request Sent')}
-                                </button>
+                                <div className="flex gap-2">
+                                    <button
+                                        disabled
+                                        className="flex-1 py-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed"
+                                    >
+                                        <CheckCircle size={20} />
+                                        {t('common.requestSent', 'Request Sent')}
+                                    </button>
+                                    <button
+                                        onClick={() => handleCancelRequest(profile.hiringRequestId, profile.user.id)}
+                                        disabled={hiringId === profile.user.id}
+                                        className="px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 font-bold rounded-xl transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
+                                        title={t('delivery.drivers.cancel_hiring', 'Cancel Application')}
+                                    >
+                                        {hiringId === profile.user.id ? (
+                                            <div className="w-5 h-5 border-2 border-rose-600/30 border-t-rose-600 rounded-full animate-spin" />
+                                        ) : (
+                                            <XCircle size={20} />
+                                        )}
+                                    </button>
+                                </div>
                             ) : (
                                 <button
                                     onClick={() => handleHire(profile.user.id)}
@@ -271,6 +317,18 @@ const FreelancerMarketplace = () => {
                     <p className="text-lg font-medium text-slate-500 dark:text-slate-400 mb-2">{t('common.no_results')}</p>
                     <p className="text-sm max-w-xs text-center">{t('adjustSearch', 'Try adjusting your search criteria to find available freelancers.')}</p>
                 </div>
+            )}
+            {isCancelModalOpen && (
+                <ConfirmModal
+                    isOpen={isCancelModalOpen}
+                    title={t('delivery.drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
+                    message={t('delivery.drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                    onConfirm={confirmCancelRequest}
+                    onCancel={() => {
+                        setIsCancelModalOpen(false);
+                        setCancelData(null);
+                    }}
+                />
             )}
         </div>
     );

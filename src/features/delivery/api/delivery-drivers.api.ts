@@ -170,3 +170,20 @@ export const updateStoreDriver = async (driverId: string, data: any) => {
     }
 };
 
+export const respondToHiringRequest = async (requestId: string, status: 'ACTIVE' | 'REJECTED') => {
+    try {
+        const response = await apiService.patch(`/delivery-drivers/hiring-requests/${requestId}/respond`, { status });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const cancelHiringRequest = async (requestId: string) => {
+    try {
+        const response = await apiService.delete(`/delivery-drivers/hiring-requests/${requestId}/cancel`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,7 +19,7 @@ import {
     ExternalLink,
     Map
 } from 'lucide-react';
-import { getDriverById, adminToggleDriverBusy } from '../api/delivery-drivers.api';
+import { getDriverById, adminToggleDriverBusy, cancelHiringRequest } from '../api/delivery-drivers.api';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
@@ -87,7 +88,12 @@ const DriverDetail: React.FC = () => {
     const [toggling, setToggling] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const canEdit = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE);
+    const isSystemAdmin = authUser?.role === UserRole.ADMIN || authUser?.role === UserRole.SUPER_ADMIN;
+
+    // Store levels can only edit store drivers. System admins can edit both.
+    const canEdit = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
+        (isSystemAdmin || driver?.deliveryProfile?.driverType === 'STORE_DRIVER');
+
     const canToggleBusy = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
         driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
 
@@ -104,6 +110,31 @@ const DriverDetail: React.FC = () => {
             toast.error(t('errorUpdatingStatus', 'Failed to update status'));
         } finally {
             setToggling(false);
+        }
+    };
+
+    const [cancelling, setCancelling] = useState(false);
+    const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
+    const handleCancelHiringRequest = async () => {
+        if (!driver?.storeDriverRequestId) return;
+
+        setIsCancelModalOpen(true);
+    };
+
+    const confirmCancelHiring = async () => {
+        if (!driver?.storeDriverRequestId) return;
+        setIsCancelModalOpen(false);
+        setCancelling(true);
+        try {
+            await cancelHiringRequest(driver.storeDriverRequestId);
+            toast.success(t('delivery.drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
+            navigate('/delivery-drivers');
+        } catch (err) {
+            console.error("Failed to cancel hiring request:", err);
+            toast.error(t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request'));
+        } finally {
+            setCancelling(false);
         }
     };
 
@@ -135,6 +166,10 @@ const DriverDetail: React.FC = () => {
                 return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.verification.under_review')}</span>;
             case 'REJECTED':
                 return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery.drivers.verification.rejected')}</span>;
+            case 'PENDING':
+                return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.pending', 'Pending')}</span>;
+            case 'CANCELLED':
+                return <span className={`${baseClass} bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.cancelled', 'Cancelled')}</span>;
             default:
                 return <span className={`${baseClass} bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}>{status}</span>;
         }
@@ -204,7 +239,7 @@ const DriverDetail: React.FC = () => {
                                 )}
                             </div>
                             <div className={clsx(
-                                "absolute -bottom-2 -right-2 w-8 h-8 rounded-[4px] border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center",
+                                "absolute -bottom-2 -inset-inline-end-2 w-8 h-8 rounded-[4px] border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center",
                                 driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500" : "bg-slate-400"
                             )} title={driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}>
                                 {driver.deliveryProfile?.isAvailableForWork ? <CheckCircle size={16} className="text-white" /> : <XCircle size={16} className="text-white" />}
@@ -222,6 +257,19 @@ const DriverDetail: React.FC = () => {
                                 <span className="text-xs uppercase tracking-widest font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                                     {driver.deliveryProfile?.driverType === 'FREELANCER' ? t('driverTypes.FREELANCER') : t('driverTypes.STORE_DRIVER')}
                                 </span>
+                                {driver.storeDriverStatus && (
+                                    <>
+                                        <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
+                                        <span className={clsx(
+                                            "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border transition-all",
+                                            driver.storeDriverStatus === 'ACTIVE'
+                                                ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50"
+                                                : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50"
+                                        )}>
+                                            {t(`delivery.drivers.hiring_status.${driver.storeDriverStatus.toLowerCase()}`, driver.storeDriverStatus) as string}
+                                        </span>
+                                    </>
+                                )}
                             </p>
 
                             <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-6">
@@ -241,6 +289,16 @@ const DriverDetail: React.FC = () => {
                                         <div className="text-xs text-slate-700 dark:text-slate-200 mt-0.5 font-bold">{driver.phone}</div>
                                     </div>
                                 </div>
+                                {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus === 'PENDING' && (
+                                    <button
+                                        onClick={handleCancelHiringRequest}
+                                        disabled={cancelling}
+                                        className="flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 rounded-[4px] border border-rose-100 dark:border-rose-900/30 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                                    >
+                                        {cancelling ? <LoadingSpinner size="sm" /> : <XCircle size={14} />}
+                                        {t('delivery.drivers.drivers.cancel_hiring', 'Cancel Application')}
+                                    </button>
+                                )}
                             </div>
                         </div>
                     </div>
@@ -248,7 +306,7 @@ const DriverDetail: React.FC = () => {
             </div>
 
             {/* Performance Metrics Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <StatCard
                     title={t('delivery.drivers.stats.on_the_way_orders')}
                     value={driver.onTheWayOrdersCount || 0}
@@ -262,6 +320,12 @@ const DriverDetail: React.FC = () => {
                     color="emerald"
                 />
                 <StatCard
+                    title={t('delivery.drivers.stats.returned_orders', 'Returned Orders')}
+                    value={driver.returnedOrdersCount || 0}
+                    icon={MapPin}
+                    color="blue"
+                />
+                <StatCard
                     title={t('delivery.drivers.stats.cancelled_orders')}
                     value={driver.cancelledOrdersCount || 0}
                     icon={XCircle}
@@ -271,7 +335,7 @@ const DriverDetail: React.FC = () => {
                     title={t('delivery.drivers.stats.total_orders')}
                     value={driver.totalOrdersCount || 0}
                     icon={Truck}
-                    color="blue"
+                    color="indigo"
                 />
             </div>
 
@@ -392,57 +456,87 @@ const DriverDetail: React.FC = () => {
                     {/* Identity Verification */}
                     <DetailCard title={t('delivery.drivers.identity_verification')} icon={ShieldCheck}>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            <div className="space-y-3 group/doc">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery.drivers.id_front')}</p>
-                                    <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
+                            {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus !== 'ACTIVE' ? (
+                                <div className="col-span-full py-12 px-6 bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 rounded-[4px] text-center space-y-3">
+                                    <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-sm">
+                                        <ShieldCheck size={24} strokeWidth={2} />
+                                    </div>
+                                    <div>
+                                        <p className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
+                                            {t('delivery.drivers.identity_verification')}
+                                        </p>
+                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto leading-relaxed">
+                                            {t('delivery.drivers.drivers.pending_freelancer_docs_msg', 'Identity documents will be visible once the hiring request status is ACTIVE.')}
+                                        </p>
+                                    </div>
                                 </div>
-                                <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
-                                    {driver.deliveryProfile?.identityImageFrontUrl ? (
-                                        <img src={driver.deliveryProfile.identityImageFrontUrl} alt="Identity Front" className="w-full h-full object-cover transition-transform duration-700 group-hover/doc:scale-110" />
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-2 text-slate-300">
-                                            <ShieldCheck size={32} strokeWidth={1.5} />
-                                            <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">No Document</span>
+                            ) : (
+                                <>
+                                    <div className="space-y-3 group/doc">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery.drivers.id_front')}</p>
+                                            <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="space-y-3 group/doc">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery.drivers.id_back')}</p>
-                                    <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
-                                </div>
-                                <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
-                                    {driver.deliveryProfile?.identityImageBackUrl ? (
-                                        <img src={driver.deliveryProfile.identityImageBackUrl} alt="Identity Back" className="w-full h-full object-cover transition-transform duration-700 group-hover/doc:scale-110" />
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-2 text-slate-300">
-                                            <ShieldCheck size={32} strokeWidth={1.5} />
-                                            <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">No Document</span>
+                                        <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
+                                            {driver.deliveryProfile?.identityImageFrontUrl ? (
+                                                <a href={driver.deliveryProfile.identityImageFrontUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full cursor-pointer">
+                                                    <img src={driver.deliveryProfile.identityImageFrontUrl} alt="Identity Front" className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+                                                </a>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-2 text-slate-300">
+                                                    <ShieldCheck size={32} strokeWidth={1.5} />
+                                                    <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">
+                                                        {t('noDocument', 'No Document')}
+                                                    </span>
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                </div>
-                            </div>
-                            <div className="space-y-3 group/doc">
-                                <div className="flex items-center justify-between">
-                                    <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery.drivers.selfie')}</p>
-                                    <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
-                                </div>
-                                <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
-                                    {driver.deliveryProfile?.identityImageSelfieUrl ? (
-                                        <img src={driver.deliveryProfile.identityImageSelfieUrl} alt="Selfie" className="w-full h-full object-cover transition-transform duration-700 group-hover/doc:scale-110" />
-                                    ) : (
-                                        <div className="flex flex-col items-center gap-2 text-slate-300">
-                                            <ShieldCheck size={32} strokeWidth={1.5} />
-                                            <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">No Document</span>
+                                    </div>
+                                    <div className="space-y-3 group/doc">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery.drivers.id_back')}</p>
+                                            <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
                                         </div>
-                                    )}
-                                </div>
-                            </div>
+                                        <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
+                                            {driver.deliveryProfile?.identityImageBackUrl ? (
+                                                <a href={driver.deliveryProfile.identityImageBackUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full cursor-pointer">
+                                                    <img src={driver.deliveryProfile.identityImageBackUrl} alt="Identity Back" className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+                                                </a>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-2 text-slate-300">
+                                                    <ShieldCheck size={32} strokeWidth={1.5} />
+                                                    <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">
+                                                        {t('noDocument', 'No Document')}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="space-y-3 group/doc">
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery.drivers.selfie')}</p>
+                                            <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
+                                        </div>
+                                        <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
+                                            {driver.deliveryProfile?.identityImageSelfieUrl ? (
+                                                <a href={driver.deliveryProfile.identityImageSelfieUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full cursor-pointer">
+                                                    <img src={driver.deliveryProfile.identityImageSelfieUrl} alt="Selfie" className="w-full h-full object-cover transition-transform duration-700 hover:scale-110" />
+                                                </a>
+                                            ) : (
+                                                <div className="flex flex-col items-center gap-2 text-slate-300">
+                                                    <ShieldCheck size={32} strokeWidth={1.5} />
+                                                    <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">
+                                                        {t('noDocument', 'No Document')}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                </>
+                            )}
                         </div>
 
-                        {driver.deliveryProfile?.rejectionReason && (
+                        {driver.deliveryProfile?.verificationStatus === 'REJECTED' && driver.deliveryProfile?.rejectionReason && (
                             <div className="mt-8 p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-100 dark:border-rose-900/50 rounded-[4px] flex items-start gap-4">
                                 <div className="p-2 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 rounded-full shrink-0">
                                     <XCircle size={18} />
@@ -503,6 +597,15 @@ const DriverDetail: React.FC = () => {
                     </DetailCard>
                 </div>
             </div>
+            {isCancelModalOpen && (
+                <ConfirmModal
+                    isOpen={isCancelModalOpen}
+                    title={t('delivery.drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
+                    message={t('delivery.drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                    onConfirm={confirmCancelHiring}
+                    onCancel={() => setIsCancelModalOpen(false)}
+                />
+            )}
         </div>
     );
 };

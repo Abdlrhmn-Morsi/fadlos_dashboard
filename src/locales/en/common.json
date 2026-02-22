@@ -89,7 +89,7 @@
     "reportedReviews": "Reported Reviews",
     "categories": "Categories",
     "addons": "Add-ons",
-    "deliveryDrivers": "Delivery Drivers",
+    "deliveryDrivers": "Store Drivers",
     "driverVerification": "Driver Verification",
     "deliveryDashboard": "Driver Dashboard",
     "analytics": "Analytics",
@@ -188,7 +188,8 @@
         "UNDER_REVIEW": "Under Review",
         "UNVERIFIED": "Unverified",
         "PENDING": "Pending",
-        "ACTIVE": "Active"
+        "ACTIVE": "Active",
+        "CANCELLED": "Cancelled"
     },
     "driverTypes": {
         "STORE_DRIVER": "Store Driver",
@@ -323,7 +324,7 @@
     "Promo Codes": "Promo Codes",
     "Variants": "Variants",
     "Addons": "Add-ons",
-    "Delivery Drivers": "Delivery Drivers",
+    "Delivery Drivers": "Store Drivers",
     "Cash Settlement": "Cash Settlement",
     "searchEmployeePlaceholder": "Search by name or email...",
     "activate": "Activate",
@@ -420,7 +421,7 @@
             },
             "update": {
                 "name": "Update Order Status",
-                "description": "• Change order status (Preparing, Ready, etc.)\n• Assign delivery drivers\n• Update fulfillment notes"
+                "description": "• Change order status (Preparing, Ready, etc.)\n• Assign store drivers\n• Update fulfillment notes"
             },
             "cancel": {
                 "name": "Cancel Orders",
@@ -509,19 +510,19 @@
         },
         "delivery_drivers": {
             "view": {
-                "name": "View Delivery Drivers",
-                "description": "• View list of store delivery drivers\n• See driver status and details"
+                "name": "View Store Drivers",
+                "description": "• View list of store drivers\n• See driver status and details"
             },
             "create": {
-                "name": "Create Delivery Drivers",
-                "description": "• Add new delivery drivers\n• Hire freelance drivers"
+                "name": "Create Store Drivers",
+                "description": "• Add new store drivers\n• Hire freelance drivers"
             },
             "update": {
-                "name": "Update Delivery Drivers",
+                "name": "Update Store Drivers",
                 "description": "• Edit driver profiles\n• Change driver status (active/inactive)\n• Verify driver documents"
             },
             "delete": {
-                "name": "Remove Delivery Drivers",
+                "name": "Remove Store Drivers",
                 "description": "• Remove drivers from the store"
             }
         },
@@ -550,7 +551,7 @@
             "available_desc": "Driver is ready to accept new delivery requests."
         },
         "drivers": {
-            "title": "Delivery Drivers",
+            "title": "Store Drivers",
             "my_drivers": "My Drivers",
             "marketplace": "Marketplace",
             "list_title": "Store Drivers",
@@ -558,7 +559,7 @@
             "search_placeholder": "Search by name, email or phone...",
             "add_new": "Add New Driver",
             "find_freelancers": "Find Freelancers",
-            "marketplace_desc": "Connect with available delivery drivers in your area",
+            "marketplace_desc": "Connect with available store drivers in your area",
             "available_only": "Available Only",
             "hire": "Hire Driver",
             "hire_success": "Freelancer hired successfully",
@@ -603,7 +604,23 @@
                 "on_the_way_orders": "On The Way",
                 "delivered_orders": "Delivered",
                 "cancelled_orders": "Cancelled",
+                "returned_orders": "Returned",
                 "total_orders": "Total"
+            },
+            "drivers": {
+                "cancel_hiring": "Cancel Application",
+                "cancel_hiring_title": "Cancel Hiring Request",
+                "confirm_cancel_hiring": "Are you sure you want to cancel this hiring request?",
+                "cancel_hiring_success": "Hiring request cancelled successfully",
+                "cancel_hiring_failed": "Failed to cancel hiring request",
+                "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACTIVE."
+            },
+            "hiring_status": {
+                "pending": "Pending",
+                "active": "Active",
+                "rejected": "Rejected",
+                "cancelled": "Cancelled",
+                "expired": "Expired"
             }
         }
     },
@@ -612,6 +629,7 @@
         "name": "Full Name",
         "contact": "Contact",
         "status": "Status",
+        "hiring_status": "Hiring Status",
         "availability": "Availability",
         "joined_at": "Joined At",
         "username": "Username",
