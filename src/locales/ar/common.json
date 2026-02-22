@@ -25,7 +25,9 @@
         "search_freelancers": "البحث عن مستقلين",
         "sendRequest": "إرسال طلب",
         "requestSent": "تم إرسال الطلب",
-        "alreadyHired": "تم التوظيف مسبقاً"
+        "alreadyHired": "تم التوظيف مسبقاً",
+        "hiringStatus": "حالة التوظيف",
+        "driverVerification": "توثيق السائقين"
     },
     "save": "حفظ",
     "dashboard": "لوحة التحكم",
@@ -628,6 +630,7 @@
         "hiring_status": "حالة التوظيف",
         "availability": "التوفر",
         "joined_at": "تاريخ الانضمام",
+        "date": "التاريخ",
         "username": "اسم المستخدم",
         "email": "البريد الإلكتروني",
         "phone": "رقم الهاتف",

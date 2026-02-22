@@ -95,5 +95,9 @@
     "newOrderPlaces": "New order {{number}} from {{store}}",
     "approve": "Approve",
     "review": "Review",
-    "viewDetails": "View Details"
+    "viewDetails": "View Details",
+    "incomingRequests": "Incoming Requests",
+    "sentInvitations": "Sent Invitations",
+    "reviewRequest": "Review Request",
+    "cancelInvitation": "Cancel Invitation"
 }

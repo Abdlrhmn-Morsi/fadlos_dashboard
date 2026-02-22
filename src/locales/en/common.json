@@ -25,7 +25,9 @@
         "search_freelancers": "Search Freelancers",
         "sendRequest": "Send Request",
         "requestSent": "Request Sent",
-        "alreadyHired": "Already Hired"
+        "alreadyHired": "Already Hired",
+        "hiringStatus": "Hiring Status",
+        "driverVerification": "Driver Verification"
     },
     "save": "Save",
     "dashboard": "Dashboard",
@@ -632,6 +634,7 @@
         "hiring_status": "Hiring Status",
         "availability": "Availability",
         "joined_at": "Joined At",
+        "date": "Date",
         "username": "Username",
         "email": "Email Address",
         "phone": "Phone Number",

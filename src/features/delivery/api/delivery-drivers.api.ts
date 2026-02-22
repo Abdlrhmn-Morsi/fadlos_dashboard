@@ -187,3 +187,12 @@ export const cancelHiringRequest = async (requestId: string) => {
         throw error;
     }
 };
+
+export const getMyHiringRequests = async () => {
+    try {
+        const response = await apiService.get('/delivery-drivers/hiring-requests/me');
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};

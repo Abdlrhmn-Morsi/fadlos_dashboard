@@ -95,5 +95,9 @@
     "newOrderPlaces": "طلب جديد {{number}} من {{store}}",
     "approve": "موافقة",
     "review": "مراجعة",
-    "viewDetails": "عرض التفاصيل"
+    "viewDetails": "عرض التفاصيل",
+    "incomingRequests": "الطلبات الواردة",
+    "sentInvitations": "الدعوات المرسلة",
+    "reviewRequest": "مراجعة الطلب",
+    "cancelInvitation": "إلغاء الدعوة"
 }

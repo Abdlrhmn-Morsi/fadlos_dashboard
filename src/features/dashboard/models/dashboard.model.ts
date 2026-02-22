@@ -28,6 +28,8 @@ export interface DashboardStats {
     totalHiredDrivers?: number;
     topRatedProducts?: any[];
     topCategories?: any[];
+    incomingRequests?: any[];
+    sentInvitations?: any[];
     averageRating?: number;
     chartData?: ChartDataItem[];
 }

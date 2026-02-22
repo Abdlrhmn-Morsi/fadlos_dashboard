@@ -28,6 +28,8 @@ export const fetchDashboardStats = async (user: any) => {
             totalTowns: 0,
             topRatedProducts: [],
             topCategories: [],
+            incomingRequests: [],
+            sentInvitations: [],
             averageRating: 0,
             chartData: []
         };
@@ -105,7 +107,19 @@ export const fetchDashboardStats = async (user: any) => {
 
             // Hiring Stats (delivery_drivers.create or delivery_drivers.update or delivery_drivers.view)
             if (hasPerm('delivery_drivers.view')) {
-                promises.push(apiService.get('/delivery-drivers/hiring-requests/me').then(res => ({ key: 'hiring-requests', val: ((res as any).data?.requests || (res as any).requests || []).filter((r: any) => r.status === 'PENDING').length })).catch(() => ({ key: 'hiring-requests', val: 0 })));
+                promises.push(apiService.get('/delivery-drivers/hiring-requests/me').then(res => {
+                    const data = (res as any).data || {};
+                    const incomingRequests = data.incomingRequests || [];
+                    const sentInvitations = data.sentInvitations || [];
+                    return {
+                        key: 'hiring-requests-full',
+                        val: {
+                            incomingRequests,
+                            sentInvitations,
+                            pendingCount: incomingRequests.filter((r: any) => r.status === 'PENDING').length
+                        }
+                    };
+                }).catch(() => ({ key: 'hiring-requests-full', val: { incomingRequests: [], sentInvitations: [], pendingCount: 0 } })));
                 promises.push(apiService.get('/delivery-drivers/store-drivers').then(res => ({ key: 'hired-drivers', val: (res.data || res).filter((d: any) => d.driverType === 'FREELANCER').length })).catch(() => ({ key: 'hired-drivers', val: 0 })));
             }
 
@@ -128,6 +142,11 @@ export const fetchDashboardStats = async (user: any) => {
                         stats.pendingHiringRequests = stats.pendingHiringRequests || 0; // Backup
                         // The store object itself might have some indicators, but we use the specific counts
                     }
+                }
+                if (res.key === 'hiring-requests-full') {
+                    stats.incomingRequests = res.val.incomingRequests;
+                    stats.sentInvitations = res.val.sentInvitations;
+                    stats.pendingHiringRequests = res.val.pendingCount;
                 }
                 if (res.key === 'hiring-requests') stats.pendingHiringRequests = res.val;
                 if (res.key === 'hired-drivers') stats.totalHiredDrivers = res.val;

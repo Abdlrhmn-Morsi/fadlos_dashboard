@@ -14,7 +14,10 @@ import {
 import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, CheckCircle, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck, MapPin } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
+import { respondToHiringRequest, cancelHiringRequest } from '../delivery/api/delivery-drivers.api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { ConfirmModal } from '../../components/ConfirmModal';
+import { toast } from '../../utils/toast';
 import { UserRole } from '../../types/user-role';
 import {
     dashboardStatsState,
@@ -63,7 +66,11 @@ const Dashboard: React.FC = () => {
     const [error, setError] = useRecoilState(dashboardErrorState);
     const [chartData, setChartData] = useRecoilState(dashboardChartDataState);
     const [storeDetails, setStoreDetails] = useState<any>(null);
-    const { getCache, setCache } = useCache();
+    const [actionLoading, setActionLoading] = useState<string | null>(null);
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [confirmData, setConfirmData] = useState<{ id: string, type: 'CANCEL' | 'REJECT' | 'ACCEPT', name: string } | null>(null);
+    const [hiringTab, setHiringTab] = useState<'incoming' | 'sent'>('incoming');
+    const { getCache, setCache, invalidateCache } = useCache();
 
     const { user, hasPermission } = useAuth();
 
@@ -243,7 +250,7 @@ const Dashboard: React.FC = () => {
                         </h4>
                         <div className="space-y-3">
                             {stores.length === 0 ? (
-                                <p className="text-xs text-slate-400 italic">{t('common:noDataAvailable')}</p>
+                                <p className="text-xs text-slate-400 italic">{t('common.no_results')}</p>
                             ) : (
                                 stores.map((store: any) => (
                                     <div key={store.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
@@ -275,7 +282,7 @@ const Dashboard: React.FC = () => {
                         </h4>
                         <div className="space-y-3">
                             {drivers.length === 0 ? (
-                                <p className="text-xs text-slate-400 italic">{t('common:noDataAvailable')}</p>
+                                <p className="text-xs text-slate-400 italic">{t('common.no_results')}</p>
                             ) : (
                                 drivers.map((profile: any) => (
                                     <div key={profile.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
@@ -299,6 +306,211 @@ const Dashboard: React.FC = () => {
                             )}
                         </div>
                     </div>
+                </div>
+            </div>
+        );
+    };
+
+    const handleHiringAction = async () => {
+        if (!confirmData) return;
+        const { id, type } = confirmData;
+        setIsConfirmModalOpen(false);
+        setActionLoading(id);
+
+        try {
+            if (type === 'CANCEL') {
+                await cancelHiringRequest(id);
+                toast.success(t('common:success'));
+            } else {
+                await respondToHiringRequest(id, type === 'REJECT' ? 'REJECTED' : 'ACTIVE');
+                toast.success(t('common:success'));
+            }
+            // Invalidate and refresh
+            invalidateCache(`dashboard-stats-v3-${user.role}`);
+            window.location.reload(); // Quickest way to refresh everything for now
+        } catch (err: any) {
+            toast.error(err.response?.data?.message || t('common:error'));
+        } finally {
+            setActionLoading(null);
+            setConfirmData(null);
+        }
+    };
+
+    const renderStoreHiringRequests = () => {
+        if (user?.role !== UserRole.STORE_OWNER && user?.role !== UserRole.EMPLOYEE) return null;
+        if (!stats.incomingRequests && !stats.sentInvitations) return null;
+
+        const incoming = stats.incomingRequests || [];
+        const sent = stats.sentInvitations || [];
+
+        if (incoming.length === 0 && sent.length === 0) return null;
+
+        return (
+            <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
+                <div className="p-6 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2 mb-1">
+                        <Users size={20} className="text-primary" />
+                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
+                            {t('actionCenter')}
+                        </h3>
+                    </div>
+                    <p className="text-xs text-slate-500">{t('totalDrivers')}</p>
+                </div>
+
+                <div className="flex border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+                    <button
+                        onClick={() => setHiringTab('incoming')}
+                        className={clsx(
+                            "flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2",
+                            hiringTab === 'incoming'
+                                ? "border-primary text-primary bg-white dark:bg-slate-900"
+                                : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        )}
+                    >
+                        {t('incomingRequests')}
+                        {incoming.length > 0 && (
+                            <span className="ml-1 px-1.5 py-0.5 bg-primary/10 text-primary rounded-full text-[10px]">
+                                {incoming.length}
+                            </span>
+                        )}
+                    </button>
+                    <button
+                        onClick={() => setHiringTab('sent')}
+                        className={clsx(
+                            "flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-wider transition-all border-b-2",
+                            hiringTab === 'sent'
+                                ? "border-primary text-primary bg-white dark:bg-slate-900"
+                                : "border-transparent text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                        )}
+                    >
+                        {t('sentInvitations')}
+                        {sent.length > 0 && (
+                            <span className="ml-1 px-1.5 py-0.5 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded-full text-[10px]">
+                                {sent.length}
+                            </span>
+                        )}
+                    </button>
+                </div>
+
+                <div className="p-6">
+                    {hiringTab === 'incoming' ? (
+                        <div className="space-y-3">
+                            {incoming.length === 0 ? (
+                                <div className="py-12 text-center">
+                                    <p className="text-sm text-slate-400 italic">{t('common.no_results')}</p>
+                                </div>
+                            ) : (
+                                incoming.map((req: any) => (
+                                    <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-lg group hover:border-primary/30 transition-all">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-full overflow-hidden shadow-sm">
+                                                {req.driver?.deliveryProfile?.avatarUrl ?
+                                                    <img src={req.driver.deliveryProfile.avatarUrl} alt="" className="w-full h-full object-cover" /> :
+                                                    <Users size={24} className="text-slate-200" />}
+                                            </div>
+                                            <div className={isRTL ? "text-right" : "text-left"}>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{req.driver?.name || 'Unknown Driver'}</p>
+                                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.hiringStatus')}:</span>
+                                                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded">
+                                                            {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.driverVerification')}:</span>
+                                                        <span className={clsx(
+                                                            "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
+                                                            req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED'
+                                                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                                : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                                                        )}>
+                                                            {req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED' ? t('common.verified') : (req.driver?.deliveryProfile?.verificationStatus || 'Unknown')}
+                                                        </span>
+                                                    </div>
+                                                    {req.notes && <span className="text-[10px] text-slate-400 truncate max-w-[150px]">— {req.notes}</span>}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => {
+                                                    setConfirmData({ id: req.id, type: 'ACCEPT', name: req.driver?.name });
+                                                    setIsConfirmModalOpen(true);
+                                                }}
+                                                disabled={actionLoading === req.id}
+                                                className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold uppercase tracking-wider rounded shadow-lg shadow-emerald-600/20 hover:bg-emerald-700 active:scale-95 transition-all disabled:opacity-50"
+                                            >
+                                                {t('approve')}
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setConfirmData({ id: req.id, type: 'REJECT', name: req.driver?.name });
+                                                    setIsConfirmModalOpen(true);
+                                                }}
+                                                disabled={actionLoading === req.id}
+                                                className="px-4 py-2 bg-rose-600 text-white text-xs font-bold uppercase tracking-wider rounded shadow-lg shadow-rose-600/20 hover:bg-rose-700 active:scale-95 transition-all disabled:opacity-50"
+                                            >
+                                                {t('common:reject')}
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {sent.length === 0 ? (
+                                <div className="py-12 text-center">
+                                    <p className="text-sm text-slate-400 italic">{t('common.no_results')}</p>
+                                </div>
+                            ) : (
+                                sent.map((req: any) => (
+                                    <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-lg group hover:border-slate-300 dark:hover:border-slate-600 transition-all text-start">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-full overflow-hidden shadow-sm">
+                                                {req.driver?.deliveryProfile?.avatarUrl ?
+                                                    <img src={req.driver.deliveryProfile.avatarUrl} alt="" className="w-full h-full object-cover" /> :
+                                                    <Users size={24} className="text-slate-200" />}
+                                            </div>
+                                            <div className={isRTL ? "text-right" : "text-left"}>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{req.driver?.name || 'Unknown Driver'}</p>
+                                                <div className="flex flex-wrap items-center gap-2 mt-1">
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.hiringStatus')}:</span>
+                                                        <span className="px-2 py-0.5 bg-slate-200 text-slate-600 dark:bg-slate-700 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest rounded">
+                                                            {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
+                                                        </span>
+                                                    </div>
+                                                    <div className="flex items-center gap-1">
+                                                        <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.driverVerification')}:</span>
+                                                        <span className={clsx(
+                                                            "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
+                                                            req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED'
+                                                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                                : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                                                        )}>
+                                                            {req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED' ? t('common.verified') : (req.driver?.deliveryProfile?.verificationStatus || 'Unknown')}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={() => {
+                                                setConfirmData({ id: req.id, type: 'CANCEL', name: req.driver?.name });
+                                                setIsConfirmModalOpen(true);
+                                            }}
+                                            disabled={actionLoading === req.id}
+                                            className="px-4 py-2 bg-slate-200 text-slate-700 text-xs font-bold uppercase tracking-wider rounded hover:bg-slate-300 active:scale-95 transition-all dark:bg-slate-700 dark:text-slate-200 disabled:opacity-50"
+                                        >
+                                            {t('cancelInvitation')}
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         );
@@ -492,6 +704,7 @@ const Dashboard: React.FC = () => {
 
             {/* Phase 2: Super Admin Sections */}
             {renderPendingApprovals()}
+            {renderStoreHiringRequests()}
             {renderTopPerformingStores()}
 
             {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}
@@ -569,7 +782,7 @@ const Dashboard: React.FC = () => {
                     {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                             <ShoppingBag size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common:noDataAvailable')}</p>
+                            <p className="text-slate-500 text-sm font-medium">{t('common.no_results')}</p>
                             <button
                                 onClick={() => navigate('/products')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
@@ -644,7 +857,7 @@ const Dashboard: React.FC = () => {
                     {!stats.topCategories || stats.topCategories.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                             <Layers size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common:noDataAvailable')}</p>
+                            <p className="text-slate-500 text-sm font-medium">{t('common.no_results')}</p>
                             <button
                                 onClick={() => navigate('/categories')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
@@ -761,6 +974,19 @@ const Dashboard: React.FC = () => {
                         </ResponsiveContainer>
                     </div>
                 </div>
+            )}
+
+            {isConfirmModalOpen && confirmData && (
+                <ConfirmModal
+                    isOpen={isConfirmModalOpen}
+                    title={confirmData.type === 'CANCEL' ? t('cancelInvitation') : confirmData.type === 'REJECT' ? t('common:reject') : t('approve')}
+                    message={t('common:confirmAction', { action: confirmData.type, name: confirmData.name })}
+                    onConfirm={handleHiringAction}
+                    onCancel={() => {
+                        setIsConfirmModalOpen(false);
+                        setConfirmData(null);
+                    }}
+                />
             )}
         </div>
     );
