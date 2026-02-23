@@ -5,37 +5,52 @@ import { useTranslation } from 'react-i18next';
 import { Truck, Globe, Clock } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { getMyHiringRequests, respondToHiringRequest, cancelHiringRequest } from '../api/delivery-drivers.api';
+import { getSentHiringRequests, getReceivedHiringRequests, respondToHiringRequest, cancelHiringRequest } from '../api/delivery-drivers.api';
 
 const DeliveryDriversPage = () => {
     const { t } = useTranslation(['common', 'dashboard']);
     const { isRTL } = useLanguage();
     const [activeTab, setActiveTab] = useState<'my-drivers' | 'incoming' | 'sent' | 'marketplace'>('my-drivers');
-    const [hiringData, setHiringData] = useState<{ incomingRequests: any[], sentInvitations: any[] }>({
-        incomingRequests: [],
-        sentInvitations: []
+    const [incomingRequestsData, setIncomingRequestsData] = useState<{ requests: any[], totalPages: number, page: number }>({
+        requests: [], totalPages: 1, page: 1
+    });
+    const [sentRequestsData, setSentRequestsData] = useState<{ requests: any[], totalPages: number, page: number }>({
+        requests: [], totalPages: 1, page: 1
     });
     const [loading, setLoading] = useState(false);
     const [cancellingRequestId, setCancellingRequestId] = useState<string | null>(null);
 
-    const fetchHiringRequests = async () => {
+    const fetchIncomingRequests = async (page: number = incomingRequestsData.page) => {
         setLoading(true);
         try {
-            const response = await getMyHiringRequests();
+            const response = await getReceivedHiringRequests({ page, limit: 10 });
             if (response) {
-                setHiringData(response);
+                setIncomingRequestsData({ requests: response.data || [], totalPages: response.meta?.totalPages || 1, page });
             }
         } catch (error) {
-            console.error('Failed to fetch hiring requests:', error);
+            console.error('Failed to fetch incoming requests:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchSentRequests = async (page: number = sentRequestsData.page) => {
+        setLoading(true);
+        try {
+            const response = await getSentHiringRequests({ page, limit: 10 });
+            if (response) {
+                setSentRequestsData({ requests: response.data || [], totalPages: response.meta?.totalPages || 1, page });
+            }
+        } catch (error) {
+            console.error('Failed to fetch sent requests:', error);
         } finally {
             setLoading(false);
         }
     };
 
     React.useEffect(() => {
-        if (activeTab === 'incoming' || activeTab === 'sent') {
-            fetchHiringRequests();
-        }
+        if (activeTab === 'incoming') fetchIncomingRequests(1);
+        else if (activeTab === 'sent') fetchSentRequests(1);
     }, [activeTab]);
 
     const handleHiringAction = async (requestId: string, action: 'ACCEPT' | 'REJECT' | 'CANCEL') => {
@@ -47,7 +62,8 @@ const DeliveryDriversPage = () => {
         setLoading(true);
         try {
             await respondToHiringRequest(requestId, action === 'ACCEPT' ? 'ACTIVE' : 'REJECTED');
-            fetchHiringRequests();
+            fetchIncomingRequests();
+            fetchSentRequests();
         } catch (error) {
             console.error(`Failed to ${action} hiring request:`, error);
         } finally {
@@ -60,7 +76,8 @@ const DeliveryDriversPage = () => {
         setLoading(true);
         try {
             await cancelHiringRequest(cancellingRequestId);
-            fetchHiringRequests();
+            fetchIncomingRequests();
+            fetchSentRequests();
         } catch (error) {
             console.error(`Failed to cancel hiring request:`, error);
         } finally {
@@ -126,20 +143,66 @@ const DeliveryDriversPage = () => {
 
             {activeTab === 'my-drivers' && <DeliveryDriversList />}
             {activeTab === 'incoming' && (
-                <HiringRequestsList
-                    requests={hiringData.incomingRequests}
-                    type="incoming"
-                    loading={loading}
-                    onAction={handleHiringAction}
-                />
+                <>
+                    <HiringRequestsList
+                        requests={incomingRequestsData.requests}
+                        type="incoming"
+                        loading={loading}
+                        onAction={handleHiringAction}
+                    />
+                    {!loading && incomingRequestsData.totalPages > 1 && (
+                        <div className="flex justify-center mt-8 gap-2">
+                            <button
+                                onClick={() => fetchIncomingRequests(Math.max(1, incomingRequestsData.page - 1))}
+                                disabled={incomingRequestsData.page === 1}
+                                className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                            >
+                                {isRTL ? 'التالي' : 'Previous'}
+                            </button>
+                            <span className="px-4 py-2 flex items-center">
+                                {incomingRequestsData.page} / {incomingRequestsData.totalPages}
+                            </span>
+                            <button
+                                onClick={() => fetchIncomingRequests(Math.min(incomingRequestsData.totalPages, incomingRequestsData.page + 1))}
+                                disabled={incomingRequestsData.page === incomingRequestsData.totalPages}
+                                className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                            >
+                                {isRTL ? 'السابق' : 'Next'}
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
             {activeTab === 'sent' && (
-                <HiringRequestsList
-                    requests={hiringData.sentInvitations}
-                    type="sent"
-                    loading={loading}
-                    onAction={handleHiringAction}
-                />
+                <>
+                    <HiringRequestsList
+                        requests={sentRequestsData.requests}
+                        type="sent"
+                        loading={loading}
+                        onAction={handleHiringAction}
+                    />
+                    {!loading && sentRequestsData.totalPages > 1 && (
+                        <div className="flex justify-center mt-8 gap-2">
+                            <button
+                                onClick={() => fetchSentRequests(Math.max(1, sentRequestsData.page - 1))}
+                                disabled={sentRequestsData.page === 1}
+                                className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                            >
+                                {isRTL ? 'التالي' : 'Previous'}
+                            </button>
+                            <span className="px-4 py-2 flex items-center">
+                                {sentRequestsData.page} / {sentRequestsData.totalPages}
+                            </span>
+                            <button
+                                onClick={() => fetchSentRequests(Math.min(sentRequestsData.totalPages, sentRequestsData.page + 1))}
+                                disabled={sentRequestsData.page === sentRequestsData.totalPages}
+                                className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                            >
+                                {isRTL ? 'السابق' : 'Next'}
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
             {activeTab === 'marketplace' && <FreelancerMarketplace />}
 

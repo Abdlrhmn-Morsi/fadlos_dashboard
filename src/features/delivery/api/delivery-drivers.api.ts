@@ -36,10 +36,17 @@ export const createStoreDriver = async (data: any) => {
     }
 };
 
-export const searchFreelancers = async (params: any) => {
+export const searchFreelancers = async (params: {
+    page?: number;
+    limit?: number;
+    townId?: string;
+    placeId?: string;
+    available?: boolean;
+    search?: string;
+}) => {
     try {
         const response = await apiService.get('/delivery-drivers/freelancers', { params });
-        return response.data || response;
+        return response.data;
     } catch (error) {
         throw error;
     }
@@ -188,10 +195,19 @@ export const cancelHiringRequest = async (requestId: string) => {
     }
 };
 
-export const getMyHiringRequests = async () => {
+export const getSentHiringRequests = async (params?: { page?: number; limit?: number }) => {
     try {
-        const response = await apiService.get('/delivery-drivers/hiring-requests/me');
-        return response.data || response;
+        const response = await apiService.get('/delivery-drivers/hiring-requests/sent', { params });
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getReceivedHiringRequests = async (params?: { page?: number; limit?: number }) => {
+    try {
+        const response = await apiService.get('/delivery-drivers/hiring-requests/received', { params });
+        return response.data;
     } catch (error) {
         throw error;
     }

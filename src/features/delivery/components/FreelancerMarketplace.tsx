@@ -33,6 +33,8 @@ const FreelancerMarketplace = () => {
     const [cancelData, setCancelData] = useState<{ requestId: string, userId: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearch = useDebounce(searchQuery, 500);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     const [filters, setFilters] = useState({
         townId: '',
@@ -68,16 +70,25 @@ const FreelancerMarketplace = () => {
     const fetchFreelancers = useCallback(async () => {
         setLoading(true);
         try {
-            const data = await searchFreelancers({
+            const response = await searchFreelancers({
                 ...filters,
-                search: debouncedSearch
+                search: debouncedSearch,
+                page,
+                limit: 12
             });
-            setFreelancers(data || []);
+            setFreelancers(response?.data || []);
+            setTotalPages(response?.meta?.totalPages || 1);
         } catch (error) {
             console.error('Failed to fetch freelancers', error);
+            setFreelancers([]);
+            setTotalPages(1);
         } finally {
             setLoading(false);
         }
+    }, [filters, debouncedSearch, page]);
+
+    useEffect(() => {
+        setPage(1);
     }, [filters, debouncedSearch]);
 
     useEffect(() => {
@@ -318,6 +329,29 @@ const FreelancerMarketplace = () => {
                     <p className="text-sm max-w-xs text-center">{t('adjustSearch', 'Try adjusting your search criteria to find available freelancers.')}</p>
                 </div>
             )}
+
+            {!loading && totalPages > 1 && (
+                <div className="flex justify-center mt-8 gap-2">
+                    <button
+                        onClick={() => setPage(p => Math.max(1, p - 1))}
+                        disabled={page === 1}
+                        className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                    >
+                        {isRTL ? 'التالي' : 'Previous'}
+                    </button>
+                    <span className="px-4 py-2 flex items-center">
+                        {page} / {totalPages}
+                    </span>
+                    <button
+                        onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                        disabled={page === totalPages}
+                        className="px-4 py-2 border rounded-lg disabled:opacity-50"
+                    >
+                        {isRTL ? 'السابق' : 'Next'}
+                    </button>
+                </div>
+            )}
+
             {isCancelModalOpen && (
                 <ConfirmModal
                     isOpen={isCancelModalOpen}
