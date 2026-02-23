@@ -20,6 +20,7 @@ const DeliveryDriversPage = () => {
     const [loading, setLoading] = useState(false);
     const [cancellingRequestId, setCancellingRequestId] = useState<string | null>(null);
     const [rejectingRequestId, setRejectingRequestId] = useState<string | null>(null);
+    const [acceptingRequestId, setAcceptingRequestId] = useState<string | null>(null);
 
     const fetchIncomingRequests = async (page: number = incomingRequestsData.page) => {
         setLoading(true);
@@ -65,15 +66,9 @@ const DeliveryDriversPage = () => {
             return;
         }
 
-        setLoading(true);
-        try {
-            await respondToHiringRequest(requestId, action === 'ACCEPT' ? 'ACCEPTED' : 'REJECTED');
-            fetchIncomingRequests();
-            fetchSentRequests();
-        } catch (error) {
-            console.error(`Failed to ${action} hiring request:`, error);
-        } finally {
-            setLoading(false);
+        if (action === 'ACCEPT') {
+            setAcceptingRequestId(requestId);
+            return;
         }
     };
 
@@ -103,6 +98,21 @@ const DeliveryDriversPage = () => {
         } finally {
             setLoading(false);
             setRejectingRequestId(null);
+        }
+    };
+
+    const confirmAccept = async () => {
+        if (!acceptingRequestId) return;
+        setLoading(true);
+        try {
+            await respondToHiringRequest(acceptingRequestId, 'ACCEPTED');
+            fetchIncomingRequests();
+            fetchSentRequests();
+        } catch (error) {
+            console.error(`Failed to accept hiring request:`, error);
+        } finally {
+            setLoading(false);
+            setAcceptingRequestId(null);
         }
     };
 
@@ -240,6 +250,14 @@ const DeliveryDriversPage = () => {
                 message={t('delivery.drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
                 onConfirm={confirmReject}
                 onCancel={() => setRejectingRequestId(null)}
+            />
+
+            <ConfirmModal
+                isOpen={!!acceptingRequestId}
+                title={t('delivery.drivers.drivers.accept_confirm_title', 'Approve Application')}
+                message={t('delivery.drivers.drivers.accept_confirm_message', "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.")}
+                onConfirm={confirmAccept}
+                onCancel={() => setAcceptingRequestId(null)}
             />
         </div>
     );

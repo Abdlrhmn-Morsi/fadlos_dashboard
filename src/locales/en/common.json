@@ -616,7 +616,9 @@
                 "confirm_cancel_hiring": "Are you sure you want to cancel this hiring request?",
                 "cancel_hiring_success": "Hiring request cancelled successfully",
                 "cancel_hiring_failed": "Failed to cancel hiring request",
-                "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACCEPTED."
+                "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACCEPTED.",
+                "accept_confirm_title": "Approve Application",
+                "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list."
             },
             "hiring_status": {
                 "pending": "Pending",
