@@ -262,7 +262,7 @@ const DriverDetail: React.FC = () => {
                                         <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
                                         <span className={clsx(
                                             "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border transition-all",
-                                            driver.storeDriverStatus === 'ACTIVE'
+                                            driver.storeDriverStatus === 'ACCEPTED'
                                                 ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50"
                                                 : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50"
                                         )}>
@@ -456,7 +456,7 @@ const DriverDetail: React.FC = () => {
                     {/* Identity Verification */}
                     <DetailCard title={t('delivery.drivers.identity_verification')} icon={ShieldCheck}>
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus !== 'ACTIVE' ? (
+                            {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus !== 'ACCEPTED' ? (
                                 <div className="col-span-full py-12 px-6 bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 rounded-[4px] text-center space-y-3">
                                     <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-500 rounded-full flex items-center justify-center mx-auto shadow-sm">
                                         <ShieldCheck size={24} strokeWidth={2} />
@@ -466,7 +466,7 @@ const DriverDetail: React.FC = () => {
                                             {t('delivery.drivers.identity_verification')}
                                         </p>
                                         <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto leading-relaxed">
-                                            {t('delivery.drivers.drivers.pending_freelancer_docs_msg', 'Identity documents will be visible once the hiring request status is ACTIVE.')}
+                                            {t('delivery.drivers.drivers.pending_freelancer_docs_msg', 'Identity documents will be visible once the hiring request status is ACCEPTED.')}
                                         </p>
                                     </div>
                                 </div>

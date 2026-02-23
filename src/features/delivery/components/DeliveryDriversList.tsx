@@ -182,19 +182,6 @@ const DeliveryDriversList = () => {
         }
     };
 
-    const handleRemoveDriver = async (driverId: string) => {
-        if (!window.confirm(t('delivery.drivers.delete_confirm', 'Are you sure you want to remove this driver?'))) {
-            return;
-        }
-
-        try {
-            await removeDriver(driverId);
-            fetchDrivers();
-        } catch (error) {
-            console.error('Failed to remove driver:', error);
-        }
-    };
-
 
     const [deleteModal, setDeleteModal] = useState({
         isOpen: false,
@@ -240,16 +227,16 @@ const DeliveryDriversList = () => {
         switch (status) {
             case 'VERIFIED':
                 return <span {...toggleProps} className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors`}><CheckCircle size={12} /> {t('verificationStatuses.VERIFIED', 'Verified')}</span>;
-            case 'ACTIVE':
-                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('verificationStatuses.ACTIVE', 'Active')}</span>;
+            case 'ACCEPTED':
+                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('verificationStatuses.ACCEPTED', 'Accepted')}</span>;
             case 'UNDER_REVIEW':
                 return <span {...toggleProps} className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors`}><Clock size={12} /> {t('verificationStatuses.UNDER_REVIEW', 'Under Review')}</span>;
             case 'PENDING':
                 return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('verificationStatuses.PENDING', 'Pending')}</span>;
             case 'REJECTED':
                 return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('verificationStatuses.REJECTED', 'Rejected')}</span>;
-            case 'CANCELLED':
-                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><XCircle size={12} /> {t('verificationStatuses.CANCELLED', 'Cancelled')}</span>;
+            case 'REMOVED':
+                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><XCircle size={12} /> {t('verificationStatuses.REMOVED', 'Removed')}</span>;
             case 'UNVERIFIED':
                 return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t('verificationStatuses.UNVERIFIED', 'Unverified')}</span>;
             default:
@@ -411,11 +398,11 @@ const DeliveryDriversList = () => {
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             <div className="flex flex-col gap-1.5 items-start">
-                                                {getStatusBadge(driver.deliveryProfile?.driverType === 'STORE_DRIVER' ? 'ACTIVE' : driver.storeDriverStatus)}
+                                                {getStatusBadge(driver.deliveryProfile?.driverType === 'STORE_DRIVER' ? 'ACCEPTED' : driver.storeDriverStatus)}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
-                                            {(driver.storeDriverStatus === 'ACTIVE' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') ? (
+                                            {(driver.storeDriverStatus === 'ACCEPTED' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') ? (
                                                 <div className="flex flex-col items-center gap-1">
                                                     <span className={clsx(
                                                         "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
@@ -432,7 +419,7 @@ const DeliveryDriversList = () => {
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             <div className="flex items-center justify-start gap-2">
-                                                {(driver.storeDriverStatus === 'ACTIVE' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') && (
+                                                {(driver.storeDriverStatus === 'ACCEPTED' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') && (
                                                     <button
                                                         onClick={(e) => {
                                                             e.stopPropagation();
@@ -445,7 +432,7 @@ const DeliveryDriversList = () => {
                                                     </button>
                                                 )}
                                                 {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
-                                                    driver.storeDriverStatus === 'ACTIVE' &&
+                                                    driver.storeDriverStatus === 'ACCEPTED' &&
                                                     driver.deliveryProfile?.driverType !== 'FREELANCER' && (
                                                         <button
                                                             onClick={(e) => {

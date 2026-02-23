@@ -322,7 +322,7 @@ const Dashboard: React.FC = () => {
                 await cancelHiringRequest(id);
                 toast.success(t('common:success'));
             } else {
-                await respondToHiringRequest(id, type === 'REJECT' ? 'REJECTED' : 'ACTIVE');
+                await respondToHiringRequest(id, type === 'REJECT' ? 'REJECTED' : 'ACCEPTED');
                 toast.success(t('common:success'));
             }
             // Invalidate and refresh

@@ -19,6 +19,7 @@ const DeliveryDriversPage = () => {
     });
     const [loading, setLoading] = useState(false);
     const [cancellingRequestId, setCancellingRequestId] = useState<string | null>(null);
+    const [rejectingRequestId, setRejectingRequestId] = useState<string | null>(null);
 
     const fetchIncomingRequests = async (page: number = incomingRequestsData.page) => {
         setLoading(true);
@@ -59,9 +60,14 @@ const DeliveryDriversPage = () => {
             return;
         }
 
+        if (action === 'REJECT') {
+            setRejectingRequestId(requestId);
+            return;
+        }
+
         setLoading(true);
         try {
-            await respondToHiringRequest(requestId, action === 'ACCEPT' ? 'ACTIVE' : 'REJECTED');
+            await respondToHiringRequest(requestId, action === 'ACCEPT' ? 'ACCEPTED' : 'REJECTED');
             fetchIncomingRequests();
             fetchSentRequests();
         } catch (error) {
@@ -83,6 +89,20 @@ const DeliveryDriversPage = () => {
         } finally {
             setLoading(false);
             setCancellingRequestId(null);
+        }
+    };
+
+    const confirmReject = async () => {
+        if (!rejectingRequestId) return;
+        setLoading(true);
+        try {
+            await respondToHiringRequest(rejectingRequestId, 'REJECTED');
+            fetchIncomingRequests();
+        } catch (error) {
+            console.error(`Failed to reject hiring request:`, error);
+        } finally {
+            setLoading(false);
+            setRejectingRequestId(null);
         }
     };
 
@@ -157,7 +177,7 @@ const DeliveryDriversPage = () => {
                                 disabled={incomingRequestsData.page === 1}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {isRTL ? 'التالي' : 'Previous'}
+                                {t('previous')}
                             </button>
                             <span className="px-4 py-2 flex items-center">
                                 {incomingRequestsData.page} / {incomingRequestsData.totalPages}
@@ -167,7 +187,7 @@ const DeliveryDriversPage = () => {
                                 disabled={incomingRequestsData.page === incomingRequestsData.totalPages}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {isRTL ? 'السابق' : 'Next'}
+                                {t('next')}
                             </button>
                         </div>
                     )}
@@ -188,7 +208,7 @@ const DeliveryDriversPage = () => {
                                 disabled={sentRequestsData.page === 1}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {isRTL ? 'التالي' : 'Previous'}
+                                {t('previous')}
                             </button>
                             <span className="px-4 py-2 flex items-center">
                                 {sentRequestsData.page} / {sentRequestsData.totalPages}
@@ -198,7 +218,7 @@ const DeliveryDriversPage = () => {
                                 disabled={sentRequestsData.page === sentRequestsData.totalPages}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {isRTL ? 'السابق' : 'Next'}
+                                {t('next')}
                             </button>
                         </div>
                     )}
@@ -212,6 +232,14 @@ const DeliveryDriversPage = () => {
                 message={t('delivery.drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
                 onConfirm={confirmCancel}
                 onCancel={() => setCancellingRequestId(null)}
+            />
+
+            <ConfirmModal
+                isOpen={!!rejectingRequestId}
+                title={t('delivery.drivers.reject_confirm_title', 'Reject Application')}
+                message={t('delivery.drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
+                onConfirm={confirmReject}
+                onCancel={() => setRejectingRequestId(null)}
             />
         </div>
     );

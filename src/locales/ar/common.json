@@ -188,7 +188,8 @@
         "UNVERIFIED": "غير موثق",
         "PENDING": "قيد الانتظار",
         "ACTIVE": "نشط",
-        "CANCELLED": "ملغى"
+        "ACCEPTED": "مقبول",
+        "REMOVED": "تمت الإزالة"
     },
     "driverTypes": {
         "STORE_DRIVER": "سائق متجر",
@@ -599,14 +600,13 @@
                 "confirm_cancel_hiring": "هل أنت متأكد من رغبتك في إلغاء طلب التوظيف هذا؟",
                 "cancel_hiring_success": "تم إلغاء طلب التوظيف بنجاح",
                 "cancel_hiring_failed": "فشل إلغاء طلب التوظيف",
-                "pending_freelancer_docs_msg": "ستكون مستندات الهوية مرئية بمجرد أن تصبح حالة طلب التوظيف نشطة."
+                "pending_freelancer_docs_msg": "ستكون مستندات الهوية مرئية بمجرد أن تصبح حالة طلب التوظيف مقبول."
             },
             "hiring_status": {
                 "pending": "قيد الانتظار",
-                "active": "نشط",
+                "accepted": "مقبول",
                 "rejected": "مرفوض",
-                "cancelled": "ملغى",
-                "expired": "منتهي الصلاحية"
+                "removed": "تمت الإزالة"
             },
             "status": {
                 "available": "متاح",
@@ -619,7 +619,9 @@
                 "cancelled_orders": "ملغاة",
                 "returned_orders": "مرجعة",
                 "total_orders": "إجمالي"
-            }
+            },
+            "reject_confirm_title": "رفض الطلب",
+            "reject_confirm_message": "هل أنت متأكد من رفض طلب هذا السائق؟ سيتم إخطار السائق بذلك."
         }
     },
     "fields": {

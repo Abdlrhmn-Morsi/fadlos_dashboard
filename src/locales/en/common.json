@@ -191,7 +191,8 @@
         "UNVERIFIED": "Unverified",
         "PENDING": "Pending",
         "ACTIVE": "Active",
-        "CANCELLED": "Cancelled"
+        "ACCEPTED": "Accepted",
+        "REMOVED": "Removed"
     },
     "driverTypes": {
         "STORE_DRIVER": "Store Driver",
@@ -615,15 +616,16 @@
                 "confirm_cancel_hiring": "Are you sure you want to cancel this hiring request?",
                 "cancel_hiring_success": "Hiring request cancelled successfully",
                 "cancel_hiring_failed": "Failed to cancel hiring request",
-                "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACTIVE."
+                "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACCEPTED."
             },
             "hiring_status": {
                 "pending": "Pending",
-                "active": "Active",
+                "accepted": "Accepted",
                 "rejected": "Rejected",
-                "cancelled": "Cancelled",
-                "expired": "Expired"
-            }
+                "removed": "Removed"
+            },
+            "reject_confirm_title": "Reject Application",
+            "reject_confirm_message": "Are you sure you want to reject this driver's application? This action will notify the driver."
         }
     },
     "fields": {

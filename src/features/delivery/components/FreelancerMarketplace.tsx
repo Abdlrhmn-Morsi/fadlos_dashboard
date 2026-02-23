@@ -273,7 +273,7 @@ const FreelancerMarketplace = () => {
                                 </div>
                             </div>
 
-                            {profile.hiringStatus === 'ACTIVE' ? (
+                            {profile.hiringStatus === 'ACCEPTED' ? (
                                 <button
                                     disabled
                                     className="w-full py-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed"
