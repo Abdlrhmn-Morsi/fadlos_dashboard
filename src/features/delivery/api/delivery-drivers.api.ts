@@ -46,7 +46,7 @@ export const searchFreelancers = async (params: {
 }) => {
     try {
         const response = await apiService.get('/delivery-drivers/freelancers', { params });
-        return response.data;
+        return response;
     } catch (error) {
         throw error;
     }
@@ -198,7 +198,7 @@ export const cancelHiringRequest = async (requestId: string) => {
 export const getSentHiringRequests = async (params?: { page?: number; limit?: number }) => {
     try {
         const response = await apiService.get('/delivery-drivers/hiring-requests/sent', { params });
-        return response.data;
+        return response;
     } catch (error) {
         throw error;
     }
@@ -207,7 +207,7 @@ export const getSentHiringRequests = async (params?: { page?: number; limit?: nu
 export const getReceivedHiringRequests = async (params?: { page?: number; limit?: number }) => {
     try {
         const response = await apiService.get('/delivery-drivers/hiring-requests/received', { params });
-        return response.data;
+        return response;
     } catch (error) {
         throw error;
     }
