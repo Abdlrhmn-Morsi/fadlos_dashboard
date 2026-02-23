@@ -66,6 +66,8 @@ export const fetchDashboardStats = async (user: any) => {
 
                     const data = thirtyDays.data || thirtyDays;
                     stats.totalRevenue = data.totalRevenue || 0;
+                    stats.totalConfirmedRevenue = data.confirmedRevenue || 0;
+                    stats.totalPendingRevenue = data.pendingRevenue || 0;
                     stats.totalOrders = data.totalOrders || 0;
                     stats.avgOrderValue = data.averageOrderValue || 0;
                     stats.pendingOrders = data.statusCounts?.pending || 0;
@@ -74,6 +76,8 @@ export const fetchDashboardStats = async (user: any) => {
 
                     const todayData = today.data || today;
                     stats.todayRevenue = todayData.totalRevenue || 0;
+                    stats.todayConfirmedRevenue = todayData.confirmedRevenue || 0;
+                    stats.todayPendingRevenue = todayData.pendingRevenue || 0;
                     stats.todayOrders = todayData.totalOrders || 0;
                 } catch (e) {
                     console.warn('Failed to fetch order stats', e);

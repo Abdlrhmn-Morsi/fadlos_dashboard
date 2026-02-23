@@ -578,6 +578,36 @@ const Dashboard: React.FC = () => {
                     />
                 )}
 
+                {/* Today's Pending Revenue */}
+                {hasPermission('analytics.view') && (
+                    <StatCard
+                        title={t('orders:pendingRevenue')}
+                        value={`${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                        icon={Clock}
+                        color="amber"
+                    />
+                )}
+
+                {/* Total Revenue */}
+                {hasPermission('analytics.view') && (
+                    <StatCard
+                        title={t('totalRevenue')}
+                        value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                        icon={DollarSign}
+                        color="emerald"
+                    />
+                )}
+
+                {/* Total Pending Revenue */}
+                {hasPermission('analytics.view') && (
+                    <StatCard
+                        title={t('orders:pendingRevenue')}
+                        value={`${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                        icon={Clock}
+                        color="amber"
+                    />
+                )}
+
                 {/* Today's Orders */}
                 {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
                     <StatCard
@@ -588,16 +618,7 @@ const Dashboard: React.FC = () => {
                     />
                 )}
 
-                {/* Revenue - Common for all, but check permission for analytics */}
-                {hasPermission('analytics.view') && (
-                    <StatCard
-                        title={t('totalRevenue')}
-                        value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        icon={DollarSign}
-                        color="emerald"
-                    />
-                )}
-
+                {/* Total Orders */}
                 {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
                     <StatCard
                         title={t('totalOrders')}
@@ -607,6 +628,7 @@ const Dashboard: React.FC = () => {
                     />
                 )}
 
+                {/* Pending Orders */}
                 {(hasPermission('orders.view') || hasPermission('orders.update')) && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
                     <StatCard
                         title={t('pendingOrders')}
@@ -678,28 +700,8 @@ const Dashboard: React.FC = () => {
                                 color="blue"
                             />
                         )}
-                        {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                            <StatCard
-                                title={t('totalProducts')}
-                                value={stats.totalProducts || 0}
-                                icon={Layers}
-                                color="indigo"
-                            />
-                        )}
-                        {hasPermission('delivery_drivers.view') && (
-                            <>
-                                <StatCard
-                                    title={t('totalDrivers')}
-                                    value={stats.totalDrivers || 0}
-                                    icon={Truck}
-                                    color="indigo"
-                                />
-                            </>
-                        )}
                     </>
                 )}
-
-
             </div>
 
             {/* Phase 2: Super Admin Sections */}

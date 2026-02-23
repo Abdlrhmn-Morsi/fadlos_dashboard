@@ -92,5 +92,11 @@
     "settlePrompt": "This COD order has been delivered but the cash has not been collected from the driver yet.",
     "totalSelected": "Selected Total",
     "confirmCollectionTitle": "Confirm Cash Collection",
-    "confirmCollectionDesc": "Are you sure you want to confirm collection of this cash? This action cannot be undone."
+    "confirmCollectionDesc": "Are you sure you want to confirm collection of this cash? This action cannot be undone.",
+    "ordersTotal": "Orders Total",
+    "driverEarningsSubtracted": "Driver Earnings (Subtracted)",
+    "collectionSuccess": "Collection confirmed successfully",
+    "settlementFailed": "Settlement failed",
+    "pendingRevenue": "Pending Revenue",
+    "confirmedRevenue": "Confirmed Revenue"
 }

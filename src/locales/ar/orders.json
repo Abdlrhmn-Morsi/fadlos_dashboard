@@ -92,5 +92,11 @@
     "settlePrompt": "تم تسليم هذا الطلب بنظام الدفع عند الاستلام، ولكن لم يتم تحصيل المبلغ من السائق بعد.",
     "totalSelected": "الإجمالي المحدد",
     "confirmCollectionTitle": "تأكيد تحصيل المبالغ النقدية",
-    "confirmCollectionDesc": "هل أنت متأكد من رغبتك في تأكيد تحصيل هذا المبلغ النقدي؟ لا يمكن التراجع عن هذا الإجراء."
+    "confirmCollectionDesc": "هل أنت متأكد من رغبتك في تأكيد تحصيل هذا المبلغ النقدي؟ لا يمكن التراجع عن هذا الإجراء.",
+    "ordersTotal": "إجمالي الطلبات",
+    "driverEarningsSubtracted": "أرباح السائق (مخصومة)",
+    "collectionSuccess": "تم تأكيد التحصيل بنجاح",
+    "settlementFailed": "فشل عملية التحصيل",
+    "pendingRevenue": "الأرباح المعلقة",
+    "confirmedRevenue": "الأرباح المؤكدة"
 }

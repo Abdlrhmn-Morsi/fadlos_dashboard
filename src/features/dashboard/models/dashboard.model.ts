@@ -1,11 +1,15 @@
 export interface DashboardStats {
     totalRevenue: number;
+    totalConfirmedRevenue?: number;
+    totalPendingRevenue?: number;
     totalOrders: number;
     totalUsers: number;
     totalStores: number;
     totalProducts: number;
     avgOrderValue: number;
     todayRevenue?: number;
+    todayConfirmedRevenue?: number;
+    todayPendingRevenue?: number;
     todayOrders?: number;
     pendingOrders?: number;
     statusCounts?: Record<string, number>;

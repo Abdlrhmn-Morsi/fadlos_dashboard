@@ -25,7 +25,8 @@ import {
     AlertCircle,
     Calendar,
     Users2,
-    MapPin
+    MapPin,
+    Clock
 } from 'lucide-react';
 import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -195,7 +196,7 @@ const Analytics: React.FC = () => {
             </div>
 
             {/* Top Level Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title={t('revenue')}
                     value={`${(orderStats?.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
@@ -205,18 +206,24 @@ const Analytics: React.FC = () => {
                     color="emerald"
                 />
                 <StatCard
+                    title={t('orders:confirmedRevenue')}
+                    value={`${(orderStats?.confirmedRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                    icon={DollarSign}
+                    color="emerald"
+                />
+                <StatCard
+                    title={t('orders:pendingRevenue')}
+                    value={`${(orderStats?.pendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                    icon={Clock}
+                    color="amber"
+                />
+                <StatCard
                     title={t('totalOrdersCount')}
                     value={orderStats?.totalOrders || 0}
                     growth={orderStats?.comparison?.ordersGrowth}
                     subValue={t('previousPeriod')}
                     icon={ShoppingBag}
                     color="orange"
-                />
-                <StatCard
-                    title={t('averageOrderValue')}
-                    value={`${(orderStats?.averageOrderValue || 0).toFixed(2)} ${t('common:currencySymbol')}`}
-                    icon={TrendingUp}
-                    color="amber"
                 />
             </div>
 
