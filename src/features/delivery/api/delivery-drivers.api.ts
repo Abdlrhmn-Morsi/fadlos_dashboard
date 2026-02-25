@@ -20,7 +20,11 @@ export const createStoreDriver = async (data: any) => {
                 }
             } else {
                 if (data[key] !== undefined && data[key] !== null) {
-                    formData.append(key, data[key]);
+                    if (Array.isArray(data[key])) {
+                        data[key].forEach((val: any) => formData.append(key, val));
+                    } else {
+                        formData.append(key, data[key]);
+                    }
                 }
             }
         });
@@ -170,7 +174,11 @@ export const updateStoreDriver = async (driverId: string, data: any) => {
                 }
             } else {
                 if (data[key] !== undefined && data[key] !== null) {
-                    formData.append(key, data[key]);
+                    if (Array.isArray(data[key])) {
+                        data[key].forEach((val: any) => formData.append(key, val));
+                    } else {
+                        formData.append(key, data[key]);
+                    }
                 }
             }
         });

@@ -3,12 +3,13 @@ import { useNavigate, Link, useParams } from 'react-router-dom';
 import {
     ArrowLeft, Save, User, Mail, Phone, Lock, Upload,
     Image as ImageIcon, X, Bike, CreditCard, Camera, Info,
-    Footprints, Eye, EyeOff, XCircle
+    Footprints, Eye, EyeOff, XCircle, MapPin, CheckSquare, Square, Search, ChevronDown
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { toast } from '../../../utils/toast';
 import { createStoreDriver, getDriverById, updateStoreDriver } from '../api/delivery-drivers.api';
+import { getTowns, getPlacesByTown } from '../../towns/api/towns.api';
 import clsx from 'clsx';
 
 import { VehicleType } from '../../../types/vehicle-type';
@@ -32,13 +33,37 @@ const DeliveryDriverForm = () => {
         phone: '',
         password: '',
         vehicleType: 'bicycle',
+        townIds: [] as string[],
+        placeIds: [] as string[],
     });
+    const [availableTowns, setAvailableTowns] = useState<any[]>([]);
+    const [availablePlaces, setAvailablePlaces] = useState<any[]>([]);
+    const [placeSearch, setPlaceSearch] = useState('');
     const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState<string | null>(null);
     const [originalFormData, setOriginalFormData] = useState<any>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false);
 
     const [showPassword, setShowPassword] = useState(false);
+    const [townSearch, setTownSearch] = useState('');
+    const [townDropdownOpen, setTownDropdownOpen] = useState(false);
+    const [placeDropdownOpen, setPlaceDropdownOpen] = useState(false);
+    const townRef = React.useRef<HTMLDivElement>(null);
+    const placeRef = React.useRef<HTMLDivElement>(null);
+
+    // Handle clicking outside of dropdowns to close them
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (townRef.current && !townRef.current.contains(event.target as Node)) {
+                setTownDropdownOpen(false);
+            }
+            if (placeRef.current && !placeRef.current.contains(event.target as Node)) {
+                setPlaceDropdownOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
 
     const [files, setFiles] = useState<{
         avatar: File | null;
@@ -68,7 +93,48 @@ const DeliveryDriverForm = () => {
         if (isEditMode && id) {
             fetchDriverDetails();
         }
+        fetchTowns();
     }, [isEditMode, id]);
+
+    const fetchTowns = async () => {
+        try {
+            const towns = await getTowns();
+            setAvailableTowns(towns || []);
+        } catch (error) {
+            console.error('Failed to fetch towns:', error);
+        }
+    };
+
+    useEffect(() => {
+        if (formData.townIds.length > 0) {
+            fetchPlaces(formData.townIds);
+        } else {
+            setAvailablePlaces([]);
+            if (formData.placeIds.length > 0) {
+                setFormData(prev => ({ ...prev, placeIds: [] }));
+            }
+        }
+    }, [formData.townIds]);
+
+    const fetchPlaces = async (townIds: string[]) => {
+        try {
+            // Fetch places for all selected towns
+            const allPlaces = await Promise.all(
+                townIds.map(townId => getPlacesByTown(townId))
+            );
+            const flatPlaces = (allPlaces.flat() || []) as any[];
+            setAvailablePlaces(flatPlaces);
+
+            // Clean up placeIds that are no longer valid for the selected towns
+            const validPlaceIds = flatPlaces.map(p => p.id);
+            setFormData(prev => ({
+                ...prev,
+                placeIds: prev.placeIds.filter(id => validPlaceIds.includes(id))
+            }));
+        } catch (error) {
+            console.error('Failed to fetch places:', error);
+        }
+    };
 
     const fetchDriverDetails = async () => {
         if (!id) return;
@@ -83,8 +149,10 @@ const DeliveryDriverForm = () => {
                     phone: driver.phone || '',
                     password: '', // Don't populate password
                     vehicleType: driver.deliveryProfile?.vehicleType || 'bicycle',
+                    townIds: driver.deliveryProfile?.towns?.map((t: any) => t.id) || [],
+                    placeIds: driver.deliveryProfile?.places?.map((p: any) => p.id) || [],
                 };
-                setFormData(driverData);
+                setFormData(driverData as any);
                 setOriginalFormData(driverData);
                 setVerificationStatus(driver.deliveryProfile?.verificationStatus || null);
                 setRejectionReason(driver.deliveryProfile?.rejectionReason || null);
@@ -142,9 +210,9 @@ const DeliveryDriverForm = () => {
                 const hasNewIdentityImages = !!(files.identityImageFront || files.identityImageBack || files.identityImageSelfie);
                 const hasNewAvatar = !!files.avatar;
 
-                // Check if any field changed (except password and vehicleType)
+                // Check if any field changed (except password, vehicleType, and service areas)
                 const anyFieldChanged = Object.keys(formData).some(key => {
-                    if (key === 'password' || key === 'vehicleType') return false;
+                    if (['password', 'vehicleType', 'townIds', 'placeIds'].includes(key)) return false;
                     return formData[key as keyof typeof formData] !== originalFormData?.[key as keyof typeof formData];
                 });
 
@@ -441,6 +509,225 @@ const DeliveryDriverForm = () => {
                                         </button>
                                     );
                                 })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Service Areas */}
+                    <div className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-sm border border-slate-200 dark:border-slate-800 space-y-8 md:col-span-2">
+                        <div className="flex items-center gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
+                            <div className="p-2.5 bg-indigo-50 dark:bg-indigo-500/10 rounded-xl">
+                                <MapPin size={22} className="text-indigo-600 dark:text-indigo-400" />
+                            </div>
+                            <div>
+                                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                                    {t('delivery.drivers.service_areas', 'Service Areas')}
+                                </h3>
+                                <p className="text-sm text-slate-500 dark:text-slate-400">
+                                    {t('delivery.drivers.service_areas_desc', 'Select towns and specific places the driver will serve')}
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-8">
+                            {/* Towns Selection Dropdown */}
+                            <div className="space-y-4" ref={townRef}>
+                                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                    <MapPin size={16} className="text-indigo-500" />
+                                    {t('delivery.drivers.select_towns', 'Select Towns')}
+                                </label>
+
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setTownDropdownOpen(!townDropdownOpen)}
+                                        className={clsx(
+                                            "w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium transition-all text-left",
+                                            townDropdownOpen ? "ring-2 ring-indigo-500/20 border-indigo-500" : "hover:border-slate-300 dark:hover:border-slate-600"
+                                        )}
+                                    >
+                                        <div className="flex flex-wrap gap-1.5 overflow-hidden">
+                                            {formData.townIds.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {formData.townIds.map(id => {
+                                                        const town = availableTowns.find(t => t.id === id);
+                                                        return (
+                                                            <span key={id} className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded text-xs">
+                                                                {town ? (isRTL ? (town.arName || town.enName) : town.enName) : id}
+                                                                <X
+                                                                    size={12}
+                                                                    className="cursor-pointer hover:text-indigo-900 dark:hover:text-indigo-100"
+                                                                    onClick={(e: React.MouseEvent) => {
+                                                                        e.stopPropagation();
+                                                                        setFormData({ ...formData, townIds: formData.townIds.filter(tid => tid !== id) });
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-500">{t('common.select_options', 'Select options...')}</span>
+                                            )}
+                                        </div>
+                                        <ChevronDown size={18} className={clsx("text-slate-400 transition-transform", townDropdownOpen && "rotate-180")} />
+                                    </button>
+
+                                    {townDropdownOpen && (
+                                        <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                            <div className="p-3 border-b border-slate-100 dark:border-slate-800">
+                                                <div className="relative">
+                                                    <Search size={14} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
+                                                    <input
+                                                        type="text"
+                                                        autoFocus
+                                                        placeholder={t('common.search', 'Search...')}
+                                                        value={townSearch}
+                                                        onChange={(e) => setTownSearch(e.target.value)}
+                                                        className={clsx(
+                                                            "w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all",
+                                                            isRTL ? "pr-9 pl-4" : "pl-9 pr-4"
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="max-h-60 overflow-y-auto p-1 custom-scrollbar">
+                                                {availableTowns.filter(town => (isRTL ? (town.arName || town.enName) : town.enName).toLowerCase().includes(townSearch.toLowerCase())).length > 0 ? (
+                                                    availableTowns
+                                                        .filter(town => (isRTL ? (town.arName || town.enName) : town.enName).toLowerCase().includes(townSearch.toLowerCase()))
+                                                        .map((town) => (
+                                                            <button
+                                                                key={town.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newTownIds = formData.townIds.includes(town.id)
+                                                                        ? formData.townIds.filter(id => id !== town.id)
+                                                                        : [...formData.townIds, town.id];
+                                                                    setFormData({ ...formData, townIds: newTownIds });
+                                                                }}
+                                                                className={clsx(
+                                                                    "w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm transition-all text-left",
+                                                                    formData.townIds.includes(town.id)
+                                                                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold"
+                                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                                                )}
+                                                            >
+                                                                <span>{isRTL ? (town.arName || town.enName) : town.enName}</span>
+                                                                {formData.townIds.includes(town.id) && <CheckSquare size={16} className="text-indigo-600 dark:text-indigo-400" />}
+                                                            </button>
+                                                        ))
+                                                ) : (
+                                                    <div className="py-8 text-center text-slate-500 text-sm">
+                                                        {t('common.no_results', 'No results found')}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Places Selection Dropdown */}
+                            <div className="space-y-4" ref={placeRef}>
+                                <label className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
+                                    <MapPin size={16} className="text-indigo-500" />
+                                    {t('delivery.drivers.select_places', 'Select Places')}
+                                </label>
+
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        disabled={formData.townIds.length === 0}
+                                        onClick={() => setPlaceDropdownOpen(!placeDropdownOpen)}
+                                        className={clsx(
+                                            "w-full flex items-center justify-between px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-sm font-medium transition-all text-left",
+                                            placeDropdownOpen ? "ring-2 ring-indigo-500/20 border-indigo-500" : "hover:border-slate-300 dark:hover:border-slate-600",
+                                            formData.townIds.length === 0 && "opacity-50 cursor-not-allowed bg-slate-100 dark:bg-slate-900 font-normal"
+                                        )}
+                                    >
+                                        <div className="flex flex-wrap gap-1.5 overflow-hidden">
+                                            {formData.placeIds.length > 0 ? (
+                                                <div className="flex flex-wrap gap-1.5">
+                                                    {formData.placeIds.map(id => {
+                                                        const place = availablePlaces.find(p => p.id === id);
+                                                        return (
+                                                            <span key={id} className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 rounded text-xs">
+                                                                {place ? (isRTL ? (place.arName || place.enName) : place.enName) : id}
+                                                                <X
+                                                                    size={12}
+                                                                    className="cursor-pointer hover:text-indigo-900 dark:hover:text-indigo-100"
+                                                                    onClick={(e: React.MouseEvent) => {
+                                                                        e.stopPropagation();
+                                                                        setFormData({ ...formData, placeIds: formData.placeIds.filter(pid => pid !== id) });
+                                                                    }}
+                                                                />
+                                                            </span>
+                                                        );
+                                                    })}
+                                                </div>
+                                            ) : (
+                                                <span className="text-slate-500">
+                                                    {formData.townIds.length === 0
+                                                        ? t('delivery.drivers.select_town_first', 'Please select a town first')
+                                                        : t('common.select_options', 'Select options...')}
+                                                </span>
+                                            )}
+                                        </div>
+                                        <ChevronDown size={18} className={clsx("text-slate-400 transition-transform", placeDropdownOpen && "rotate-180")} />
+                                    </button>
+
+                                    {placeDropdownOpen && formData.townIds.length > 0 && (
+                                        <div className="absolute z-50 w-full mt-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                                            <div className="p-3 border-b border-slate-100 dark:border-slate-800">
+                                                <div className="relative">
+                                                    <Search size={14} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
+                                                    <input
+                                                        type="text"
+                                                        autoFocus
+                                                        placeholder={t('common.search', 'Search...')}
+                                                        value={placeSearch}
+                                                        onChange={(e) => setPlaceSearch(e.target.value)}
+                                                        className={clsx(
+                                                            "w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all",
+                                                            isRTL ? "pr-9 pl-4" : "pl-9 pr-4"
+                                                        )}
+                                                    />
+                                                </div>
+                                            </div>
+                                            <div className="max-h-60 overflow-y-auto p-1 custom-scrollbar">
+                                                {availablePlaces.filter(place => (isRTL ? (place.arName || place.enName) : place.enName).toLowerCase().includes(placeSearch.toLowerCase())).length > 0 ? (
+                                                    availablePlaces
+                                                        .filter(place => (isRTL ? (place.arName || place.enName) : place.enName).toLowerCase().includes(placeSearch.toLowerCase()))
+                                                        .map((place) => (
+                                                            <button
+                                                                key={place.id}
+                                                                type="button"
+                                                                onClick={() => {
+                                                                    const newPlaceIds = formData.placeIds.includes(place.id)
+                                                                        ? formData.placeIds.filter(id => id !== place.id)
+                                                                        : [...formData.placeIds, place.id];
+                                                                    setFormData({ ...formData, placeIds: newPlaceIds });
+                                                                }}
+                                                                className={clsx(
+                                                                    "w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-sm transition-all text-left",
+                                                                    formData.placeIds.includes(place.id)
+                                                                        ? "bg-indigo-50 dark:bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 font-bold"
+                                                                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                                                                )}
+                                                            >
+                                                                <span>{isRTL ? (place.arName || place.enName) : place.enName}</span>
+                                                                {formData.placeIds.includes(place.id) && <CheckSquare size={16} className="text-indigo-600 dark:text-indigo-400" />}
+                                                            </button>
+                                                        ))
+                                                ) : (
+                                                    <div className="py-8 text-center text-slate-500 text-sm">
+                                                        {t('delivery.drivers.no_places_found', 'No places found for selected towns')}
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>

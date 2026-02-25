@@ -27,7 +27,8 @@
         "requestSent": "Request Sent",
         "alreadyHired": "Already Hired",
         "hiringStatus": "Hiring Status",
-        "driverVerification": "Driver Verification"
+        "driverVerification": "Driver Verification",
+        "select_options": "Select options..."
     },
     "save": "Save",
     "dashboard": "Dashboard",
@@ -628,7 +629,13 @@
                 "removed": "Removed"
             },
             "reject_confirm_title": "Reject Application",
-            "reject_confirm_message": "Are you sure you want to reject this driver's application? This action will notify the driver."
+            "reject_confirm_message": "Are you sure you want to reject this driver's application? This action will notify the driver.",
+            "service_areas": "Service Areas",
+            "service_areas_desc": "Select towns and specific places the driver will serve",
+            "select_towns": "Select Towns",
+            "select_places": "Select Places",
+            "select_town_first": "Please select a town first",
+            "no_places_found": "No places found for selected towns"
         }
     },
     "fields": {

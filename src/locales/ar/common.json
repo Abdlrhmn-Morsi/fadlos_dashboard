@@ -27,7 +27,8 @@
         "requestSent": "تم إرسال الطلب",
         "alreadyHired": "تم التوظيف مسبقاً",
         "hiringStatus": "حالة التوظيف",
-        "driverVerification": "توثيق السائقين"
+        "driverVerification": "توثيق السائقين",
+        "select_options": "اختر..."
     },
     "save": "حفظ",
     "dashboard": "لوحة التحكم",
@@ -623,7 +624,13 @@
                 "total_orders": "إجمالي"
             },
             "reject_confirm_title": "رفض الطلب",
-            "reject_confirm_message": "هل أنت متأكد من رفض طلب هذا السائق؟ سيتم إخطار السائق بذلك."
+            "reject_confirm_message": "هل أنت متأكد من رفض طلب هذا السائق؟ سيتم إخطار السائق بذلك.",
+            "service_areas": "مناطق الخدمة",
+            "service_areas_desc": "اختر المدن والمناطق المحددة التي سيخدمها السائق",
+            "select_towns": "اختر المدن",
+            "select_places": "اختر المناطق",
+            "select_town_first": "يرجى اختيار مدينة أولاً",
+            "no_places_found": "لم يتم العثور على مناطق للمدن المختارة"
         }
     },
     "fields": {
