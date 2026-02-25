@@ -19,7 +19,7 @@ import {
     ExternalLink,
     Map
 } from 'lucide-react';
-import { getDriverById, adminToggleDriverBusy, cancelHiringRequest } from '../api/delivery-drivers.api';
+import { getDriverById, adminToggleDriverBusy, adminToggleDriverAvailability, cancelHiringRequest } from '../api/delivery-drivers.api';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
@@ -97,6 +97,9 @@ const DriverDetail: React.FC = () => {
     const canToggleBusy = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
         driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
 
+    const canToggleAvailability = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
+        driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
+
     const handleToggleBusy = async () => {
         if (!id) return;
         setToggling(true);
@@ -107,6 +110,22 @@ const DriverDetail: React.FC = () => {
             toast.success(t('statusUpdated', 'Status updated successfully'));
         } catch (err) {
             console.error("Failed to toggle busy status:", err);
+            toast.error(t('errorUpdatingStatus', 'Failed to update status'));
+        } finally {
+            setToggling(false);
+        }
+    };
+
+    const handleToggleAvailability = async () => {
+        if (!id) return;
+        setToggling(true);
+        try {
+            await adminToggleDriverAvailability(id);
+            const response: any = await getDriverById(id);
+            setDriver(response.data || response);
+            toast.success(t('statusUpdated', 'Status updated successfully'));
+        } catch (err) {
+            console.error("Failed to toggle availability status:", err);
             toast.error(t('errorUpdatingStatus', 'Failed to update status'));
         } finally {
             setToggling(false);
@@ -349,14 +368,28 @@ const DriverDetail: React.FC = () => {
                             <div className="group/item">
                                 <div className="flex items-center justify-between mb-3">
                                     <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('fields.availability')}</span>
-                                    <div className={clsx(
-                                        "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
-                                        driver.deliveryProfile?.isAvailableForWork
-                                            ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50"
-                                            : "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:border-slate-700"
-                                    )}>
-                                        <span className={clsx("w-2 h-2 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 animate-pulse" : "bg-slate-400")} />
-                                        {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
+                                    <div className="flex items-center gap-3">
+                                        {canToggleAvailability && (
+                                            <label className={clsx("relative inline-flex items-center", !toggling ? "cursor-pointer" : "cursor-default")}>
+                                                <input
+                                                    type="checkbox"
+                                                    className="sr-only peer"
+                                                    checked={driver.deliveryProfile?.isAvailableForWork}
+                                                    onChange={handleToggleAvailability}
+                                                    disabled={toggling}
+                                                />
+                                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-sm transition-all"></div>
+                                            </label>
+                                        )}
+                                        <div className={clsx(
+                                            "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
+                                            driver.deliveryProfile?.isAvailableForWork
+                                                ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50"
+                                                : "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:border-slate-700"
+                                        )}>
+                                            <span className={clsx("w-2 h-2 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 animate-pulse" : "bg-slate-400")} />
+                                            {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
+                                        </div>
                                     </div>
                                 </div>
                                 <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">

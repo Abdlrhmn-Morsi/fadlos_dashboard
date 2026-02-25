@@ -124,6 +124,15 @@ export const adminToggleDriverBusy = async (driverId: string) => {
     }
 };
 
+export const adminToggleDriverAvailability = async (driverId: string) => {
+    try {
+        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-availability`);
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const updateDriverStatus = async (driverId: string, status: 'VERIFIED' | 'UNDER_REVIEW') => {
     try {
         const response = await apiService.patch(`/delivery-drivers/${driverId}/status`, { status });
