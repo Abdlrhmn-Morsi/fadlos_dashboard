@@ -161,6 +161,7 @@
     "driver_assigned": "Driver Assigned",
     "out_for_delivery": "Out for Delivery",
     "returned": "Returned",
+    "sortOrder": "Display Order",
     "total": "Total",
     "page": "Page",
     "of": "of",

@@ -19,7 +19,7 @@
     "deleteSuccess": "Category deleted successfully",
     "categoryNameAr": "Category Name (Arabic)",
     "categoryNameEn": "Category Name (English)",
-    "sortOrder": "Sort Order",
+    "sortOrder": "Display Order",
     "sortOrderInfo": "Lower numbers appear first in the list.",
     "placeholderNameAr": "مثلاً: مشروبات، أطباق رئيسية",
     "placeholderNameEn": "e.g. Beverages, Main Courses",
