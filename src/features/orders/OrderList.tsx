@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, Search, Filter, Clock, CheckCircle, Package, Truck, AlertTriangle, Calendar, Hash, User } from 'lucide-react';
+import { Eye, Search, Filter, Clock, CheckCircle, Package, Truck, AlertTriangle, Calendar, Hash, User, MapPin } from 'lucide-react';
 import ordersApi from './api/orders.api';
+import { branchesApi } from '../branches/api/branches.api';
 import { OrderStatus } from '../../types/order-status';
 
 import { useTranslation } from 'react-i18next';
@@ -18,6 +19,8 @@ const OrderList = () => {
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState('');
+    const [branchFilter, setBranchFilter] = useState('');
+    const [branches, setBranches] = useState<any[]>([]);
 
     // Pagination State
     const [page, setPage] = useState(1);
@@ -81,7 +84,19 @@ const OrderList = () => {
             fetchOrders();
         }, 500);
         return () => clearTimeout(timer);
-    }, [statusFilter, page, orderNumberFilter, dateFilter, customerNameFilter]);
+    }, [statusFilter, page, orderNumberFilter, dateFilter, customerNameFilter, branchFilter]);
+
+    useEffect(() => {
+        const fetchBranches = async () => {
+            try {
+                const data = await branchesApi.findAllByStore();
+                setBranches(data);
+            } catch (error) {
+                console.error('Failed to fetch branches', error);
+            }
+        };
+        fetchBranches();
+    }, []);
 
     // Reset to page 1 when filter changes
     useEffect(() => {
@@ -95,6 +110,7 @@ const OrderList = () => {
                 limit
             };
             if (statusFilter) params.status = statusFilter;
+            if (branchFilter) params.branchId = branchFilter;
             if (orderNumberFilter) params.orderNumber = orderNumberFilter;
             if (customerNameFilter) params.customerName = customerNameFilter;
             if (dateFilter) {
@@ -122,6 +138,7 @@ const OrderList = () => {
             setLoading(true);
 
             const response: any = await ordersApi.getOrders(params);
+            console.log('Orders API Response:', response);
 
             // Handle paginated response { data: [...], meta: {...} } or plain array
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
@@ -283,6 +300,24 @@ const OrderList = () => {
                         />
                     </div>
                     <div className="relative">
+                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                        <select
+                            className={clsx(
+                                "pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none w-48",
+                                isRTL && "text-right"
+                            )}
+                            value={branchFilter}
+                            onChange={(e) => setBranchFilter(e.target.value)}
+                        >
+                            <option value="">{t('allBranches')}</option>
+                            {Array.isArray(branches) && branches.map(branch => (
+                                <option key={branch.id} value={branch.id}>
+                                    {isRTL ? (branch.town.arName || branch.town.enName) + ' - ' + (branch.place.arName || branch.place.enName) + ' - ' + (branch.addressAr || branch.addressEn) : (branch.town.enName || branch.town.arName) + ' - ' + (branch.place.enName || branch.place.arName) + ' - ' + (branch.addressEn || branch.addressAr)}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className="relative">
                         <input
                             type="date"
                             className={clsx(
@@ -321,6 +356,7 @@ const OrderList = () => {
                             <tr>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('orderNo')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('customer')}</th>
+                                <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('branch')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('date')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('total')}</th>
                                 <th className="px-6 py-4 font-semibold text-slate-600 dark:text-slate-400">{t('status')}</th>
@@ -330,11 +366,11 @@ const OrderList = () => {
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">{t('common:loading')}</td>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-slate-500">{t('common:loading')}</td>
                                 </tr>
                             ) : orders.length === 0 ? (
                                 <tr>
-                                    <td colSpan={6} className="px-6 py-8 text-center text-slate-500">{t('noOrdersFound')}</td>
+                                    <td colSpan={7} className="px-6 py-8 text-center text-slate-500">{t('noOrdersFound')}</td>
                                 </tr>
                             ) : (
                                 orders.map((order) => (
@@ -344,6 +380,9 @@ const OrderList = () => {
                                         </td>
                                         <td className="px-6 py-4 font-medium text-slate-800 dark:text-white">
                                             {order.client?.name || `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim() || t('common:guest', { defaultValue: 'Guest' })}
+                                        </td>
+                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
+                                            {order.branch ? (isRTL ? (order.branch.nameAr || order.branch.arName || order.branch.name) : (order.branch.name || order.branch.enName)) : '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                                             {new Date(order.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}

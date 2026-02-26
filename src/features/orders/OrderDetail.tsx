@@ -209,8 +209,10 @@ const OrderDetail = () => {
 
             // Invalidate dashboard cache to refresh stats
             invalidateCache('dashboard-stats');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to update status', error);
+            const errorMessage = error.response?.data?.message || t('common:error', 'Failed to update order status');
+            toast.error(errorMessage);
         } finally {
             setUpdating(false);
             setNewStatus('');

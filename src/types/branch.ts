@@ -6,6 +6,13 @@ export interface Branch {
     link?: string;
     isActive: boolean;
     storeId: string;
+    townId: string;
+    placeId: string;
+    town?: { id: string; enName: string; arName: string };
+    place?: { id: string; enName: string; arName: string };
+    isMainBranch: boolean;
+    latitude?: number;
+    longitude?: number;
     createdAt: string;
     updatedAt: string;
 }
@@ -16,6 +23,11 @@ export interface CreateBranchDto {
     phone: string;
     link?: string;
     isActive?: boolean;
+    townId: string;
+    placeId: string;
+    isMainBranch?: boolean;
+    latitude?: number;
+    longitude?: number;
 }
 
 

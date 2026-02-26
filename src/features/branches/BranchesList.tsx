@@ -7,7 +7,7 @@ import { Branch, CreateBranchDto, UpdateBranchDto } from '../../types/branch';
 import { BranchForm } from './components/BranchForm';
 import { Modal } from '../../components/ui/Modal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe } from 'lucide-react';
+import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe, Star, ExternalLink } from 'lucide-react';
 
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
@@ -88,7 +88,18 @@ export const BranchesList: React.FC = () => {
             setIsModalOpen(false);
 
             // Optimistic update
-            setBranches(prev => [...prev, branchData]);
+            setBranches(prev => {
+                const newBranches = [...prev];
+                // If the new branch is main, unset any existing main branch in the same town
+                if (branchData.isMainBranch) {
+                    return newBranches.map(b =>
+                        (b.townId === branchData.townId && b.isMainBranch)
+                            ? { ...b, isMainBranch: false }
+                            : b
+                    ).concat(branchData);
+                }
+                return [...newBranches, branchData];
+            });
 
             // Invalidate cache
             invalidateCache('branches');
@@ -110,7 +121,16 @@ export const BranchesList: React.FC = () => {
             setEditingBranch(null);
 
             // Optimistic update
-            setBranches(prev => prev.map(b => b.id === id ? branchData : b));
+            setBranches(prev => {
+                return prev.map(b => {
+                    if (b.id === id) return branchData;
+                    // If the updated branch is now main, unset any other main branch in the same town
+                    if (branchData.isMainBranch && b.townId === branchData.townId && b.isMainBranch) {
+                        return { ...b, isMainBranch: false };
+                    }
+                    return b;
+                });
+            });
 
             // Invalidate cache
             invalidateCache('branches');
@@ -135,8 +155,14 @@ export const BranchesList: React.FC = () => {
             setBranchToDelete(null);
             // Invalidate cache after delete
             invalidateCache('branches');
-        } catch (error) {
-            toast.error(t('deleteError'));
+        } catch (error: any) {
+            let errorMessage = error.response?.data?.message || t('deleteError');
+            if (errorMessage === 'Cannot delete the main branch. Please assign another branch as the main branch first.') {
+                errorMessage = t('deleteMainBranchError');
+            } else if (errorMessage === 'Cannot delete branch because there are orders associated with it.') {
+                errorMessage = t('deleteBranchWithOrdersError');
+            }
+            toast.error(errorMessage);
         } finally {
             setIsSaving(false);
         }
@@ -245,6 +271,13 @@ export const BranchesList: React.FC = () => {
                                         {branch.isActive ? t('active') : t('inactive')}
                                     </div>
 
+                                    {branch.isMainBranch && (
+                                        <div className="flex items-center gap-1.5 rounded bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest">
+                                            <Star size={10} className="fill-amber-500" />
+                                            {t('mainBranch')}
+                                        </div>
+                                    )}
+
                                     <div className="flex items-center gap-2">
                                         <button
                                             onClick={() => openEditModal(branch)}
@@ -264,29 +297,40 @@ export const BranchesList: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-4">
+                                    {/* Town & Area Row */}
                                     <div className="flex items-start gap-4">
                                         <div className="flex-shrink-0 p-3 bg-indigo-50 dark:bg-indigo-500/10 rounded group-hover:scale-110 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-500/20 transition-all duration-500">
-                                            <Home className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
+                                            <MapPin className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
                                             <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('branchLocation')}</p>
-                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-snug mb-1 group-hover:text-indigo-600 transition-colors">
-                                                {branch.addressAr}
+                                            <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-snug group-hover:text-indigo-600 transition-colors">
+                                                {branch.town ? (isRTL ? branch.town.arName : branch.town.enName) : '...'}
+                                                {branch.place && ` - ${isRTL ? branch.place.arName : branch.place.enName}`}
                                             </h3>
-                                            {branch.addressEn && (
-                                                <p className="text-gray-500 dark:text-gray-400 text-sm font-medium leading-relaxed">
-                                                    {branch.addressEn}
-                                                </p>
-                                            )}
                                         </div>
                                     </div>
 
-                                    <div className="flex items-center gap-4">
+                                    {/* Localized Address Row */}
+                                    <div className="flex items-start gap-4">
+                                        <div className="flex-shrink-0 p-3 bg-sky-50 dark:bg-sky-500/10 rounded group-hover:scale-110 group-hover:bg-sky-100 dark:group-hover:bg-sky-500/20 transition-all duration-500">
+                                            <Home className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('address') || t('common:address')}</p>
+                                            <p className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed">
+                                                {isRTL ? branch.addressAr : (branch.addressEn || branch.addressAr)}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    {/* Phone Row */}
+                                    <div className="flex items-start gap-4">
                                         <div className="flex-shrink-0 p-3 bg-emerald-50 dark:bg-emerald-500/10 rounded group-hover:scale-110 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-500/20 transition-all duration-500">
                                             <Phone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                         </div>
-                                        <div>
-                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-0.5">{t('contactDetails')}</p>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('contactDetails')}</p>
                                             <p className="text-base font-bold text-gray-900 dark:text-white tabular-nums tracking-wide">
                                                 {branch.phone}
                                             </p>
@@ -296,27 +340,41 @@ export const BranchesList: React.FC = () => {
                             </div>
 
                             {/* Card Footer Actions */}
-                            {branch.link && (
-                                <div className="p-4 bg-gray-50/50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 flex gap-3">
+                            <div className="p-4 bg-gray-50/50 dark:bg-gray-700/30 border-t border-gray-100 dark:border-gray-700 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {branch.link && (
                                     <a
                                         href={branch.link}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex-1 flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-xs font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-[10px] font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
+                                        title={t('visitMapLink')}
                                     >
-                                        <MapPin size={16} className="text-emerald-500 group-hover/btn:text-white transition-colors" />
-                                        <span>{t('navigateOnMaps')}</span>
+                                        <ExternalLink size={14} className="text-indigo-500 group-hover/btn:text-white transition-colors" />
+                                        <span className="truncate">{t('visitMapLink')}</span>
                                     </a>
-                                    <button
-                                        onClick={() => handleCopyLink(branch.link)}
-                                        className="p-3 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 active:scale-90"
-                                        title={t('common:copy')}
-                                    >
-                                        <Globe size={16} />
-                                    </button>
-                                </div>
-                            )}
+                                )}
 
+                                {branch.latitude && branch.longitude ? (
+                                    <a
+                                        href={`https://www.google.com/maps/search/?api=1&query=${branch.latitude},${branch.longitude}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-[10px] font-bold text-gray-700 dark:text-gray-200 hover:bg-amber-600 dark:hover:bg-amber-600 hover:text-white dark:hover:text-white hover:border-amber-600 dark:hover:border-amber-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
+                                        title={t('verifyOnMap')}
+                                    >
+                                        <MapPin size={14} className="text-amber-500 group-hover/btn:text-white transition-colors" />
+                                        <span className="truncate">{t('verifyOnMap')}</span>
+                                    </a>
+                                ) : (
+                                    <button
+                                        disabled
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 rounded text-[10px] font-bold text-gray-400 cursor-not-allowed opacity-50"
+                                    >
+                                        <MapPin size={14} />
+                                        <span>{t('verifyOnMap')}</span>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                     ))
                 ) : (
@@ -342,7 +400,7 @@ export const BranchesList: React.FC = () => {
                         </button>
                     </div>
                 )}
-            </div>
+            </div >
 
 
             <Modal
@@ -368,6 +426,6 @@ export const BranchesList: React.FC = () => {
                 isLoading={isSaving}
                 type="danger"
             />
-        </div>
+        </div >
     );
 };

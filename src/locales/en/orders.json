@@ -12,6 +12,8 @@
     "viewDetails": "View Details",
     "updateStatus": "Update Status",
     "loadFailed": "Failed to load orders",
+    "branch": "Branch",
+    "allBranches": "All Branches",
     "updateSuccess": "Order status updated successfully",
     "orderNumber": "Order #{{number}}",
     "placedOn": "Placed on {{date}}",

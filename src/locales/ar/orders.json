@@ -12,6 +12,8 @@
     "viewDetails": "عرض التفاصيل",
     "updateStatus": "تحديث الحالة",
     "loadFailed": "فشل تحميل الطلبات",
+    "branch": "الفرع",
+    "allBranches": "جميع الفروع",
     "updateSuccess": "تم تحديث حالة الطلب بنجاح",
     "orderNumber": "طلب رقم #{{number}}",
     "placedOn": "تاريخ الطلب {{date}}",
