@@ -312,7 +312,9 @@ const OrderList = () => {
                             <option value="">{t('allBranches')}</option>
                             {Array.isArray(branches) && branches.map(branch => (
                                 <option key={branch.id} value={branch.id}>
-                                    {isRTL ? (branch.town.arName || branch.town.enName) + ' - ' + (branch.place.arName || branch.place.enName) + ' - ' + (branch.addressAr || branch.addressEn) : (branch.town.enName || branch.town.arName) + ' - ' + (branch.place.enName || branch.place.arName) + ' - ' + (branch.addressEn || branch.addressAr)}
+                                    {isRTL
+                                        ? [branch.town?.arName || branch.town?.enName, branch.place?.arName || branch.place?.enName, branch.addressAr || branch.addressEn].filter(Boolean).join(' - ')
+                                        : [branch.town?.enName || branch.town?.arName, branch.place?.enName || branch.place?.arName, branch.addressEn || branch.addressAr].filter(Boolean).join(' - ')}
                                 </option>
                             ))}
                         </select>
@@ -382,7 +384,10 @@ const OrderList = () => {
                                             {order.client?.name || `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim() || t('common:guest', { defaultValue: 'Guest' })}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
-                                            {order.branch ? (isRTL ? (order.branch.nameAr || order.branch.arName || order.branch.name) : (order.branch.name || order.branch.enName)) : '-'}
+                                            {order.branch ? (isRTL
+                                                ? [order.branch.town?.arName || order.branch.town?.enName, order.branch.place?.arName || order.branch.place?.enName, order.branch.addressAr || order.branch.addressEn].filter(Boolean).join(' - ')
+                                                : [order.branch.town?.enName || order.branch.town?.arName, order.branch.place?.enName || order.branch.place?.arName, order.branch.addressEn || order.branch.addressAr].filter(Boolean).join(' - '))
+                                                : '-'}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-300">
                                             {new Date(order.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US')}

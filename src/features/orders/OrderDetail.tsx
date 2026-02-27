@@ -675,6 +675,48 @@ const OrderDetail = () => {
                         )}
 
 
+                        {/* Branch Details */}
+                        {order.branch && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
+                                <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
+                                    <Package className="text-indigo-500" size={20} />
+                                    {t('branch')}
+                                </h3>
+                                <div className="space-y-3 text-sm">
+                                    {(order.branch.town?.enName || order.branch.town?.arName) && (
+                                        <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                            <Globe size={16} className="text-slate-400 mt-0.5" />
+                                            <p className="font-medium text-slate-900 dark:text-white">
+                                                {isRTL
+                                                    ? (order.branch.town?.arName || order.branch.town?.enName)
+                                                    : (order.branch.town?.enName || order.branch.town?.arName)}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {(order.branch.place?.enName || order.branch.place?.arName) && (
+                                        <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                            <MapPin size={16} className="text-slate-400 mt-0.5" />
+                                            <p>
+                                                {isRTL
+                                                    ? (order.branch.place?.arName || order.branch.place?.enName)
+                                                    : (order.branch.place?.enName || order.branch.place?.arName)}
+                                            </p>
+                                        </div>
+                                    )}
+                                    {(order.branch.addressEn || order.branch.addressAr) && (
+                                        <div className="flex items-start gap-3 text-slate-600 dark:text-slate-400">
+                                            <MapPin size={16} className="text-slate-400 mt-0.5" />
+                                            <p>
+                                                {isRTL
+                                                    ? (order.branch.addressAr || order.branch.addressEn)
+                                                    : (order.branch.addressEn || order.branch.addressAr)}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Customer Details */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                             <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
@@ -701,6 +743,7 @@ const OrderDetail = () => {
 
                             </div>
                         </div>
+
 
                         {/* Delivery Details */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
