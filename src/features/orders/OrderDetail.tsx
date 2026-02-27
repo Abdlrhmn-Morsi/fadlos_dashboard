@@ -47,6 +47,7 @@ const OrderDetail = () => {
     const [driverPage, setDriverPage] = useState(1);
     const [driverTotal, setDriverTotal] = useState(0);
     const [driverLoading, setDriverLoading] = useState(false);
+    const [maxOrdersPerDriver, setMaxOrdersPerDriver] = useState(5);
 
     const [filterByTown, setFilterByTown] = useState(true);
     const [filterByPlace, setFilterByPlace] = useState(false);
@@ -109,6 +110,7 @@ const OrderDetail = () => {
             const meta = response.meta || {};
             setAvailableDrivers(drivers);
             setDriverTotal(meta.total || drivers.length);
+            if (meta.maxOrdersPerDriver) setMaxOrdersPerDriver(meta.maxOrdersPerDriver);
         } catch (error) {
             console.error('Failed to fetch available drivers', error);
         } finally {
@@ -1246,7 +1248,8 @@ const OrderDetail = () => {
                                 availableDrivers.map((driver) => {
                                     const isVerified = ['VERIFIED', 'Verified', 'verified'].includes(driver.deliveryProfile?.verificationStatus);
                                     const isSelected = order.driverId === driver.id;
-                                    const isBusy = driver.deliveryProfile?.isBusy; // REQ: Rely on profile isBusy flag only
+                                    const isBusy = driver.deliveryProfile?.isBusy
+                                        || (driver.activeDeliveriesCount >= maxOrdersPerDriver);
 
                                     return (
                                         <div
