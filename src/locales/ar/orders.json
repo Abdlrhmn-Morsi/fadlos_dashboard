@@ -96,6 +96,7 @@
     "confirmCollectionTitle": "تأكيد تحصيل المبالغ النقدية",
     "confirmCollectionDesc": "هل أنت متأكد من رغبتك في تأكيد تحصيل هذا المبلغ النقدي؟ لا يمكن التراجع عن هذا الإجراء.",
     "ordersTotal": "إجمالي الطلبات",
+    "amountToCollect": "المبلغ المطلوب تحصيله",
     "driverEarningsSubtracted": "أرباح السائق (مخصومة)",
     "collectionSuccess": "تم تأكيد التحصيل بنجاح",
     "settlementFailed": "فشل عملية التحصيل",

@@ -96,6 +96,7 @@
     "confirmCollectionTitle": "Confirm Cash Collection",
     "confirmCollectionDesc": "Are you sure you want to confirm collection of this cash? This action cannot be undone.",
     "ordersTotal": "Orders Total",
+    "amountToCollect": "Amount to Collect",
     "driverEarningsSubtracted": "Driver Earnings (Subtracted)",
     "collectionSuccess": "Collection confirmed successfully",
     "settlementFailed": "Settlement failed",
