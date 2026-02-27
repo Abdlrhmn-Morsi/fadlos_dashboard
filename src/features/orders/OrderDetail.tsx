@@ -48,32 +48,35 @@ const OrderDetail = () => {
     const [driverTotal, setDriverTotal] = useState(0);
     const [driverLoading, setDriverLoading] = useState(false);
 
+    const [filterByTown, setFilterByTown] = useState(true);
+    const [filterByPlace, setFilterByPlace] = useState(false);
+
     const [storeReturnModal, setStoreReturnModal] = useState(false);
 
     useEffect(() => {
         fetchOrder();
     }, [id]);
 
-    // Fetch drivers when modal opens
     useEffect(() => {
         if (assignDriverModal) {
             setDriverPage(1);
             setDriverSearch('');
-            fetchAvailableDrivers(1, '');
+            const hasTown = !!order?.branch?.town;
+            setFilterByTown(hasTown);
+            setFilterByPlace(false);
+            fetchAvailableDrivers(1, '', hasTown, false);
         }
     }, [assignDriverModal]);
 
-    // Debounced search
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (assignDriverModal) fetchAvailableDrivers(1, driverSearch);
+            if (assignDriverModal) fetchAvailableDrivers(1, driverSearch, filterByTown, filterByPlace);
         }, 500);
         return () => clearTimeout(timer);
     }, [driverSearch]);
 
-    // Pagination
     useEffect(() => {
-        if (assignDriverModal && driverPage > 1) fetchAvailableDrivers(driverPage, driverSearch);
+        if (assignDriverModal && driverPage > 1) fetchAvailableDrivers(driverPage, driverSearch, filterByTown, filterByPlace);
     }, [driverPage]);
 
     const fetchOrder = async () => {
@@ -90,12 +93,18 @@ const OrderDetail = () => {
         }
     };
 
-    const fetchAvailableDrivers = async (page = 1, search = '') => {
+    const fetchAvailableDrivers = async (page = 1, search = '', byTown = filterByTown, byPlace = filterByPlace) => {
         try {
             setDriverLoading(true);
-            // Import dynamically or ensure it's available
             const { getStoreDrivers } = await import('../delivery/api/delivery-drivers.api');
-            const response: any = await getStoreDrivers({ page, limit: 5, search });
+            const params: any = { page, limit: 5, search };
+            if (byTown && order?.branch?.town?.id) {
+                params.townId = order.branch.town.id;
+            }
+            if (byPlace && order?.branch?.place?.id) {
+                params.placeId = order.branch.place.id;
+            }
+            const response: any = await getStoreDrivers(params);
             const drivers = Array.isArray(response) ? response : (response.data || []);
             const meta = response.meta || {};
             setAvailableDrivers(drivers);
@@ -105,6 +114,15 @@ const OrderDetail = () => {
         } finally {
             setDriverLoading(false);
         }
+    };
+
+    const handleBranchFilterChange = (filter: 'town' | 'place') => {
+        const newTown = filter === 'town' ? !filterByTown : filterByTown;
+        const newPlace = filter === 'place' ? !filterByPlace : filterByPlace;
+        setFilterByTown(newTown);
+        setFilterByPlace(newPlace);
+        setDriverPage(1);
+        fetchAvailableDrivers(1, driverSearch, newTown, newPlace);
     };
 
     const handleAssignDriver = async (driverId: string) => {
@@ -1178,6 +1196,44 @@ const OrderDetail = () => {
                                 />
                             </div>
                         </div>
+
+                        {/* Branch Filter Buttons */}
+                        {order.branch && (order.branch.town || order.branch.place) && (
+                            <div className="px-4 pb-3 flex gap-2 flex-wrap">
+                                {order.branch.town && (
+                                    <button
+                                        onClick={() => handleBranchFilterChange('town')}
+                                        className={clsx(
+                                            "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5",
+                                            filterByTown
+                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:text-indigo-600"
+                                        )}
+                                    >
+                                        <Globe size={12} />
+                                        {isRTL
+                                            ? (order.branch.town?.arName || order.branch.town?.enName)
+                                            : (order.branch.town?.enName || order.branch.town?.arName)}
+                                    </button>
+                                )}
+                                {order.branch.place && (
+                                    <button
+                                        onClick={() => handleBranchFilterChange('place')}
+                                        className={clsx(
+                                            "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5",
+                                            filterByPlace
+                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
+                                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:text-indigo-600"
+                                        )}
+                                    >
+                                        <MapPin size={12} />
+                                        {isRTL
+                                            ? (order.branch.place?.arName || order.branch.place?.enName)
+                                            : (order.branch.place?.enName || order.branch.place?.arName)}
+                                    </button>
+                                )}
+                            </div>
+                        )}
 
                         {/* Driver List */}
                         <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">

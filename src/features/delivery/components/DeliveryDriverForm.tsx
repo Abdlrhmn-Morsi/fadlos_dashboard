@@ -9,7 +9,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { toast } from '../../../utils/toast';
 import { createStoreDriver, getDriverById, updateStoreDriver } from '../api/delivery-drivers.api';
-import { getTowns, getPlacesByTown } from '../../towns/api/towns.api';
+import { getMyStoreDeliveryAreas } from '../../towns/api/towns.api';
 import clsx from 'clsx';
 
 import { VehicleType } from '../../../types/vehicle-type';
@@ -38,6 +38,7 @@ const DeliveryDriverForm = () => {
     });
     const [availableTowns, setAvailableTowns] = useState<any[]>([]);
     const [availablePlaces, setAvailablePlaces] = useState<any[]>([]);
+    const [storeDeliveryAreas, setStoreDeliveryAreas] = useState<any[]>([]);
     const [placeSearch, setPlaceSearch] = useState('');
     const [verificationStatus, setVerificationStatus] = useState<string | null>(null);
     const [rejectionReason, setRejectionReason] = useState<string | null>(null);
@@ -98,43 +99,51 @@ const DeliveryDriverForm = () => {
 
     const fetchTowns = async () => {
         try {
-            const towns = await getTowns();
-            setAvailableTowns(towns || []);
+            const areas = await getMyStoreDeliveryAreas();
+            const areasArr = Array.isArray(areas) ? areas : [];
+            setStoreDeliveryAreas(areasArr);
+
+            // Extract unique towns from delivery areas
+            const townsMap = new Map<string, any>();
+            areasArr.forEach((area: any) => {
+                const town = area.place?.town;
+                if (town && town.id && !townsMap.has(town.id)) {
+                    townsMap.set(town.id, town);
+                }
+            });
+            setAvailableTowns(Array.from(townsMap.values()));
         } catch (error) {
-            console.error('Failed to fetch towns:', error);
+            console.error('Failed to fetch store delivery areas:', error);
         }
     };
 
     useEffect(() => {
         if (formData.townIds.length > 0) {
-            fetchPlaces(formData.townIds);
+            // Derive places from store delivery areas for the selected towns
+            const places = storeDeliveryAreas
+                .filter((area: any) => area.place?.town?.id && formData.townIds.includes(area.place.town.id))
+                .map((area: any) => area.place)
+                .filter(Boolean);
+
+            // Deduplicate by place id
+            const uniquePlaces = Array.from(
+                new Map(places.map((p: any) => [p.id, p])).values()
+            );
+            setAvailablePlaces(uniquePlaces);
+
+            // Clean up placeIds that are no longer valid
+            const validPlaceIds = uniquePlaces.map((p: any) => p.id);
+            setFormData(prev => ({
+                ...prev,
+                placeIds: prev.placeIds.filter(id => validPlaceIds.includes(id))
+            }));
         } else {
             setAvailablePlaces([]);
             if (formData.placeIds.length > 0) {
                 setFormData(prev => ({ ...prev, placeIds: [] }));
             }
         }
-    }, [formData.townIds]);
-
-    const fetchPlaces = async (townIds: string[]) => {
-        try {
-            // Fetch places for all selected towns
-            const allPlaces = await Promise.all(
-                townIds.map(townId => getPlacesByTown(townId))
-            );
-            const flatPlaces = (allPlaces.flat() || []) as any[];
-            setAvailablePlaces(flatPlaces);
-
-            // Clean up placeIds that are no longer valid for the selected towns
-            const validPlaceIds = flatPlaces.map(p => p.id);
-            setFormData(prev => ({
-                ...prev,
-                placeIds: prev.placeIds.filter(id => validPlaceIds.includes(id))
-            }));
-        } catch (error) {
-            console.error('Failed to fetch places:', error);
-        }
-    };
+    }, [formData.townIds, storeDeliveryAreas]);
 
     const fetchDriverDetails = async () => {
         if (!id) return;
