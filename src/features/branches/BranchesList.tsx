@@ -11,6 +11,7 @@ import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe, Star, Externa
 
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
+import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 
 export const BranchesList: React.FC = () => {
     const { t } = useTranslation(['branches', 'common']);
@@ -168,9 +169,18 @@ export const BranchesList: React.FC = () => {
         }
     };
 
-    const openCreateModal = () => {
-        setEditingBranch(null);
-        setIsModalOpen(true);
+    const openCreateModal = async () => {
+        try {
+            const usage = await getMySubscriptionUsage();
+            if (usage.limits.branches !== -1 && branches.length >= usage.limits.branches) {
+                toast.error(t('common:upgradeRequired', { feature: t('branches') }));
+                return;
+            }
+            setEditingBranch(null);
+            setIsModalOpen(true);
+        } catch (error) {
+            toast.error(t('common:errorCheckingLimits'));
+        }
     };
 
     const openEditModal = (branch: Branch) => {

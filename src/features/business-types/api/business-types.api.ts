@@ -1,6 +1,6 @@
 import apiService from '../../../services/api.service';
 
-export const getBusinessTypes = async () => {
+export const getBusinessTypes = async (): Promise<any[]> => {
     try {
         const responseBody = await apiService.get('/business-types');
         const data = responseBody.data || responseBody;
@@ -15,7 +15,7 @@ export const getBusinessTypes = async () => {
     }
 };
 
-export const createBusinessType = async (payload) => {
+export const createBusinessType = async (payload: Record<string, any>) => {
     try {
         return await apiService.post('/business-types', payload);
     } catch (error) {
@@ -23,7 +23,7 @@ export const createBusinessType = async (payload) => {
     }
 };
 
-export const updateBusinessType = async (id, payload) => {
+export const updateBusinessType = async (id: string, payload: Record<string, any>) => {
     try {
         return await apiService.patch(`/business-types/${id}`, payload);
     } catch (error) {
@@ -31,7 +31,7 @@ export const updateBusinessType = async (id, payload) => {
     }
 };
 
-export const toggleBusinessTypeStatus = async (id, is_active) => {
+export const toggleBusinessTypeStatus = async (id: string, is_active: boolean) => {
     try {
         return await apiService.patch(`/business-types/${id}`, { is_active: !is_active });
     } catch (error) {

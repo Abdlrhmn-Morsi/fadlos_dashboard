@@ -28,7 +28,9 @@
         "alreadyHired": "تم التوظيف مسبقاً",
         "hiringStatus": "حالة التوظيف",
         "driverVerification": "توثيق السائقين",
-        "select_options": "اختر..."
+        "select_options": "اختر...",
+        "upgradeRequired": "لقد وصلت إلى الحد المسموح به لـ {{feature}}. يرجى ترقية باقتك.",
+        "errorCheckingLimits": "خطأ في التحقق من حدود الاشتراك"
     },
     "results": "نتائج",
     "save": "حفظ",
@@ -259,7 +261,7 @@
     "needHelpDesc": "إدارة تواجدك بالكامل من مكان واحد. تأكد من دقة بيانات متجرك لتحسين ثقة العملاء وظهورك.",
     "businessReady": "جاهز للعمل",
     "secureAccount": "حساب آمن",
-    "currencySymbol": "ج.م",
+    "currencySymbol": "$",
     "notifications": "الإشعارات",
     "markAllRead": "تحديد الكل كمقروء",
     "markAllAsRead": "تحديد الكل كمقروء",

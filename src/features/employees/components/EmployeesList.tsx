@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Users, Power, PowerOff } from 'lucide-react';
 import clsx from 'clsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { EmployeesService } from '../api/employees.api';
+import { getMySubscriptionUsage } from '../../subscriptions/api/subscriptions.api';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { toast } from '../../../utils/toast';
 import { useTranslation } from 'react-i18next';
@@ -195,13 +196,24 @@ const EmployeesList = () => {
                         {t('manageEmployeesDesc', { defaultValue: 'Manage store staff and their access' })}
                     </p>
                 </div>
-                <Link
-                    to="/employees/new"
+                <button
+                    onClick={async () => {
+                        try {
+                            const usage = await getMySubscriptionUsage();
+                            if (usage.limits.staff_accounts !== -1 && usage.limits.staff_accounts <= employees.length) {
+                                toast.error(t('common:upgradeRequired', { feature: t('staffAccounts', { defaultValue: 'Staff Accounts' }) }));
+                                return;
+                            }
+                            navigate('/employees/new');
+                        } catch (err) {
+                            toast.error(t('common:errorCheckingLimits'));
+                        }
+                    }}
                     className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
                 >
                     <Plus size={20} />
                     <span>{t('addEmployee', { defaultValue: 'Add Employee' })}</span>
-                </Link>
+                </button>
             </div>
 
             {/* Search Bar */}

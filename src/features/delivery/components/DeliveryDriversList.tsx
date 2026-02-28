@@ -12,6 +12,7 @@ import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
 import { Permissions } from '../../../types/permissions';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { getMySubscriptionUsage } from '../../subscriptions/api/subscriptions.api';
 
 const DeliveryDriversList = () => {
     const { getCache, setCache, updateCacheItem, invalidateCache } = useCache();
@@ -287,9 +288,18 @@ const DeliveryDriversList = () => {
                     </div>
                     {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
                         <button
-                            onClick={(e) => {
+                            onClick={async (e) => {
                                 e.stopPropagation();
-                                navigate('/delivery-drivers/new');
+                                try {
+                                    const usage = await getMySubscriptionUsage();
+                                    if (usage.limits.drivers !== -1 && usage.limits.drivers <= drivers.length) {
+                                        toast.error(t('common:upgradeRequired', { feature: t('deliveryDrivers') }));
+                                        return;
+                                    }
+                                    navigate('/delivery-drivers/new');
+                                } catch (err) {
+                                    toast.error(t('common:errorCheckingLimits'));
+                                }
                             }}
                             className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2 justify-center"
                         >

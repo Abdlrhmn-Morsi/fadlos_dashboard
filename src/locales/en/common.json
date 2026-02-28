@@ -28,7 +28,9 @@
         "alreadyHired": "Already Hired",
         "hiringStatus": "Hiring Status",
         "driverVerification": "Driver Verification",
-        "select_options": "Select options..."
+        "select_options": "Select options...",
+        "upgradeRequired": "You have reached your {{feature}} limit. Please upgrade your plan.",
+        "errorCheckingLimits": "Error checking subscription limits"
     },
     "results": "results",
     "save": "Save",
@@ -264,7 +266,7 @@
     "needHelpDesc": "Manage your entire presence from one place. Ensure your store data is accurate to improve customer trust and visibility.",
     "businessReady": "Business Ready",
     "secureAccount": "Secure Account",
-    "currencySymbol": "LE",
+    "currencySymbol": "$",
     "notifications": "Notifications",
     "markAllRead": "Mark all as read",
     "markAllAsRead": "Mark all as read",

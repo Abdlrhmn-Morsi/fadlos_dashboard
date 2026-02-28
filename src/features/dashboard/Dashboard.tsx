@@ -11,9 +11,10 @@ import {
     ResponsiveContainer,
     Cell
 } from 'recharts';
-import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, CheckCircle, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck, MapPin } from 'lucide-react';
+import { LucideIcon, Users, ShoppingBag, DollarSign, Store, Heart, Star, CheckCircle, Layers, ShieldAlert, AlertTriangle, Info, Clock, Edit, ChevronRight, Zap, Activity, Truck, MapPin, Crown, Shield } from 'lucide-react';
 import { fetchDashboardStats } from './api/dashboard.api';
 import { getMyStore } from '../stores/api/stores.api';
+import { getMySubscriptionUsage, SubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 import { respondToHiringRequest, cancelHiringRequest } from '../delivery/api/delivery-drivers.api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -66,6 +67,7 @@ const Dashboard: React.FC = () => {
     const [error, setError] = useRecoilState(dashboardErrorState);
     const [chartData, setChartData] = useRecoilState(dashboardChartDataState);
     const [storeDetails, setStoreDetails] = useState<any>(null);
+    const [subscription, setSubscription] = useState<SubscriptionUsage | null>(null);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
     const [confirmData, setConfirmData] = useState<{ id: string, type: 'CANCEL' | 'REJECT' | 'ACCEPT', name: string } | null>(null);
@@ -137,6 +139,16 @@ const Dashboard: React.FC = () => {
 
                         // Cache store details
                         setCache(storeCacheKey, storeData);
+                    }
+                }
+
+                // Fetch subscription usage for store owners
+                if (user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) {
+                    try {
+                        const subData = await getMySubscriptionUsage();
+                        setSubscription(subData as SubscriptionUsage);
+                    } catch (subErr) {
+                        console.warn('Could not fetch subscription:', subErr);
                     }
                 }
 
@@ -566,6 +578,70 @@ const Dashboard: React.FC = () => {
     return (
         <div className="p-6 space-y-8 animate-in animate-fade">
             {renderStatusBanner()}
+
+            {/* Subscription Badge */}
+            {subscription && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (() => {
+                const plan = (subscription.plan || 'free').toUpperCase();
+                const planKey = plan.toLowerCase();
+                const isPremium = plan === 'PREMIUM';
+                const isPro = plan === 'PRO';
+
+                const bgClass = isPremium
+                    ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-none'
+                    : isPro
+                        ? 'bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20'
+                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800';
+                const textClassPrimary = isPremium ? 'text-amber-400' : isPro ? 'text-primary' : 'text-slate-900 dark:text-slate-100';
+                const textClassSecondary = isPremium ? 'text-white/60' : isPro ? 'text-primary/60' : 'text-slate-500';
+                const badgeClass = isPremium
+                    ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-slate-900 shadow-lg shadow-amber-500/20'
+                    : isPro
+                        ? 'bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg shadow-primary/20'
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
+                const PlanIcon = isPremium ? Crown : isPro ? Zap : Shield;
+
+                return (
+                    <div className={clsx('relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 px-8 py-6 rounded-2xl transition-all duration-500 group', bgClass)}>
+                        {/* Decorative background elements */}
+                        {isPremium && (
+                            <>
+                                <div className={clsx("absolute top-0 -mt-10 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-150", isRTL ? "left-0 -ml-10" : "right-0 -mr-10")} />
+                                <div className={clsx("absolute bottom-0 -mb-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none transition-transform duration-700 group-hover:translate-x-8", isRTL ? "right-0 -mr-10" : "left-0 -ml-10")} />
+                            </>
+                        )}
+                        {isPro && (
+                            <div className={clsx("absolute inset-y-0 w-1/2 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity", isRTL ? "left-0" : "right-0")} />
+                        )}
+
+                        <div className="relative z-10 flex items-center gap-5">
+                            <div className={clsx('w-14 h-14 rounded-2xl flex items-center justify-center transform -rotate-3 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110', badgeClass)}>
+                                <PlanIcon size={28} className={isPremium ? 'animate-pulse' : ''} />
+                            </div>
+                            <div className="flex flex-col justify-center text-start">
+                                <p className={clsx('text-xs font-bold uppercase tracking-widest mb-1', textClassSecondary)}>
+                                    {t('subscriptions:currentPlan')}
+                                </p>
+                                <p className={clsx('text-2xl font-black uppercase tracking-tight', textClassPrimary)}>
+                                    {t(`subscriptions:plans.${planKey}.name`, plan)}
+                                </p>
+                            </div>
+                        </div>
+                        <button
+                            onClick={() => navigate('/subscription')}
+                            className={clsx(
+                                'relative z-10 w-full sm:w-auto px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0',
+                                isPremium
+                                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 hover:shadow-lg hover:shadow-amber-500/30'
+                                    : isPro
+                                        ? 'bg-primary text-white hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30'
+                                        : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-[1.02] shadow-md hover:shadow-xl'
+                            )}
+                        >
+                            {t('common:manage')}
+                        </button>
+                    </div>
+                );
+            })()}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {/* Today's Revenue */}

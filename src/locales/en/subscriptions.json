@@ -1,0 +1,72 @@
+{
+    "title": "Subscription",
+    "upgradeTo": "Upgrade to",
+    "premium": "Fadlos Premium",
+    "description": "Unlock higher limits, advanced analytics, and priority support to grow your business.",
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "save": "Save",
+    "billedAnnually": "Billed annually",
+    "currentPlan": "Current Plan",
+    "daysLeft": "{{days}} days left",
+    "renewsOn": "Renews on {{date}}",
+    "downgradeConfirmationTitle": "Downgrade to Free Bundle",
+    "downgradeConfirmationDescription": "Are you sure you want to downgrade to the Free Bundle? You will lose access to premium features immediately.",
+    "confirmDowngrade": "Yes, Downgrade",
+    "cancelDowngrade": "Cancel",
+    "cancelSuccess": "Successfully cancelled subscription",
+    "cancelError": "Could not cancel subscription",
+    "cancelSubscription": "Cancel Subscription",
+    "cancelConfirmationTitle": "Cancel Subscription",
+    "cancelConfirmationDescription": "Are you sure you want to cancel your subscription? You will lose access to premium features at the end of your billing cycle.",
+    "keepSubscription": "Keep Subscription",
+    "confirmCancel": "Yes, Cancel",
+    "cancelledStatus": "Cancelled",
+    "subscriptionCancelledTitle": "Your subscription will be canceled",
+    "subscriptionCancelledDesc": "Your subscription will be canceled on {{date}}. You will have access to your subscription until the end of your billing cycle.",
+    "defaultPlan": "Default Plan",
+    "getPlan": "Get {{name}} plan",
+    "noPlans": "No plans available right now",
+    "noPlansDesc": "Please check back later or contact support if the issue persists.",
+    "everythingIn": "Everything in {{name}} and:",
+    "includes": "Includes:",
+    "branches": "Branches",
+    "products": "Products",
+    "orders": "Orders/mo",
+    "drivers": "Drivers",
+    "unlimited": "Unlimited",
+    "plans": {
+        "free": {
+            "name": "Free Bundle",
+            "description": "Entry-level tier for new stores"
+        },
+        "pro": {
+            "name": "Pro Bundle",
+            "description": "Aimed at growing stores"
+        },
+        "premium": {
+            "name": "Premium Bundle",
+            "description": "Full-featured tier for large operations"
+        }
+    },
+    "features": {
+        "1 Location": "1 Location",
+        "Up to 15 Menu Items": "Up to 15 Menu Items",
+        "30 Orders per month": "30 Orders per month",
+        "1 Delivery Driver": "1 Delivery Driver",
+        "1 Admin Account": "1 Admin Account",
+        "Basic Dashboard": "Basic Dashboard",
+        "Up to 3 Locations": "Up to 3 Locations",
+        "Unlimited Menu Items": "Unlimited Menu Items",
+        "Unlimited Orders": "Unlimited Orders",
+        "Up to 10 Delivery Drivers": "Up to 10 Delivery Drivers",
+        "Up to 5 Staff Roles": "Up to 5 Staff Roles",
+        "Promo Codes & Discounts": "Promo Codes & Discounts",
+        "Advanced Analytics": "Advanced Analytics",
+        "Customer Reviews management": "Customer Reviews management",
+        "Unlimited Locations": "Unlimited Locations",
+        "Unlimited Delivery Drivers": "Unlimited Delivery Drivers",
+        "Advanced Store Clients CRM": "Advanced Store Clients CRM",
+        "Priority Support": "Priority Support"
+    }
+}

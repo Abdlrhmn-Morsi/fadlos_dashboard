@@ -38,6 +38,8 @@ import branchesEN from './locales/en/branches.json';
 import branchesAR from './locales/ar/branches.json';
 import addonsEN from './locales/en/addons.json';
 import addonsAR from './locales/ar/addons.json';
+import subscriptionsEN from './locales/en/subscriptions.json';
+import subscriptionsAR from './locales/ar/subscriptions.json';
 
 
 const resources = {
@@ -60,6 +62,7 @@ const resources = {
         followers: followersEN,
         branches: branchesEN,
         addons: addonsEN,
+        subscriptions: subscriptionsEN,
     },
     ar: {
         common: commonAR,
@@ -80,6 +83,7 @@ const resources = {
         followers: followersAR,
         branches: branchesAR,
         addons: addonsAR,
+        subscriptions: subscriptionsAR,
     },
 };
 

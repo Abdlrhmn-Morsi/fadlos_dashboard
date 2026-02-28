@@ -19,7 +19,8 @@ import {
   Shield,
   Layers,
   TrendingUp,
-  DollarSign
+  DollarSign,
+  CreditCard
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -32,6 +33,7 @@ import { NotificationBadge } from '../features/notification/components/Notificat
 import { NotificationList } from '../features/notification/components/NotificationList';
 import { useAuth } from '../contexts/AuthContext';
 import { Permissions } from '../types/permissions';
+import { useSubscription } from '../hooks/useSubscription';
 
 interface SidebarItemProps {
   to: string;
@@ -81,9 +83,10 @@ const DashboardLayout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
-  const { t } = useTranslation('common');
+  const { t } = useTranslation(['common', 'subscriptions']);
   const { isRTL } = useLanguage();
   const { user, logout, hasPermission } = useAuth(); // Use AuthContext
+  const { hasFeature } = useSubscription();
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -160,7 +163,7 @@ const DashboardLayout: React.FC = () => {
           {user?.role === UserRole.DELIVERY && (
             <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
           )}
-          {hasPermission(Permissions.ANALYTICS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && (
+          {hasPermission(Permissions.ANALYTICS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && hasFeature('advanced_analytics') && (
             <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
           )}
 
@@ -213,13 +216,13 @@ const DashboardLayout: React.FC = () => {
               {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
                 <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
               )}
-              {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && (
+              {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && hasFeature('reviews_management') && (
                 <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
               )}
-              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && (
+              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature('promocodes') && (
                 <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
               )}
-              {hasPermission(Permissions.USERS_VIEW) && ( // View customers?
+              {hasPermission(Permissions.USERS_VIEW) && hasFeature('store_clients_management') && ( // View customers?
                 <>
                   <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
                   <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
@@ -260,7 +263,10 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
             )}
           {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
-            <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
+            <>
+              <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:title')} collapsed={collapsed} />
+              <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
+            </>
           )}
         </nav>
 
