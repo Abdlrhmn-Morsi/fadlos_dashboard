@@ -39,6 +39,17 @@
     "orders": "الطلبات/الشهر",
     "drivers": "السائقين",
     "unlimited": "غير محدود",
+    "limit_1": "{{resource}} واحد",
+    "limit_up_to": "ما يصل إلى {{count}} {{resource}}",
+    "limit_unlimited": "{{resource}} غير محدودة",
+    "resource_names": {
+        "branches": "فروع",
+        "products": "منتجات",
+        "categories": "فئات",
+        "orders_per_month": "طلبات في الشهر",
+        "drivers": "سائقي توصيل",
+        "staff_accounts": "أدوار موظفين"
+    },
     "plans": {
         "free": {
             "name": "الباقة المجانية",
@@ -77,7 +88,17 @@
         "Order Management": "إدارة الطلبات",
         "Product Discounts & Offers": "خصومات وعروض المنتجات",
         "Frequently Bought Together Products": "منتجات تُشترى معًا بشكل متكرر",
-        "Custom Roles": "أدوار مخصصة"
+        "Custom Roles": "أدوار مخصصة",
+        "basic_dashboard": "لوحة تحكم أساسية",
+        "order_management": "إدارة الطلبات",
+        "promocodes": "أكواد الخصم",
+        "store_clients_management": "نظام إدارة علاقات العملاء المتقدم",
+        "advanced_analytics": "تحليلات متقدمة",
+        "custom_roles": "أدوار مخصصة",
+        "reviews_management": "إدارة مراجعات العملاء",
+        "priority_support": "دعم ذو أولوية",
+        "product_discounts_offers": "خصومات وعروض المنتجات",
+        "frequently_bought_together": "منتجات تُشترى معًا بشكل متكرر"
     },
     "admin": {
         "title": "باقات الاشتراك",

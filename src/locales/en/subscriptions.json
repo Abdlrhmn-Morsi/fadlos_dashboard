@@ -39,6 +39,17 @@
     "orders": "Orders/mo",
     "drivers": "Drivers",
     "unlimited": "Unlimited",
+    "limit_1": "1 {{resource}}",
+    "limit_up_to": "Up to {{count}} {{resource}}",
+    "limit_unlimited": "Unlimited {{resource}}",
+    "resource_names": {
+        "branches": "Branches",
+        "products": "Products",
+        "categories": "Categories",
+        "orders_per_month": "Orders per month",
+        "drivers": "Delivery Drivers",
+        "staff_accounts": "Staff Roles"
+    },
     "plans": {
         "free": {
             "name": "Free Bundle",
@@ -77,7 +88,17 @@
         "Order Management": "Order Management",
         "Product Discounts & Offers": "Product Discounts & Offers",
         "Frequently Bought Together Products": "Frequently Bought Together Products",
-        "Custom Roles": "Custom Roles"
+        "Custom Roles": "Custom Roles",
+        "basic_dashboard": "Basic Dashboard",
+        "order_management": "Order Management",
+        "promocodes": "Promo Codes",
+        "store_clients_management": "Advanced Store Clients CRM",
+        "advanced_analytics": "Advanced Analytics",
+        "custom_roles": "Custom Roles",
+        "reviews_management": "Customer Reviews management",
+        "priority_support": "Priority Support",
+        "product_discounts_offers": "Product Discounts & Offers",
+        "frequently_bought_together": "Frequently Bought Together Products"
     },
     "admin": {
         "title": "Subscription Bundles",

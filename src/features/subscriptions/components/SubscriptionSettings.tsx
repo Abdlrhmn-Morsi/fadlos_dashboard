@@ -282,8 +282,22 @@ const SubscriptionSettings = () => {
                                                 )}>
                                                     <Check size={10} strokeWidth={4} />
                                                 </div>
-                                                <span className="text-[13px] font-bold leading-tight">
-                                                    {t(`subscriptions:features.${feature}`, { defaultValue: feature })}
+                                                <span className="text-[13px] font-bold leading-tight line-clamp-2">
+                                                    {(() => {
+                                                        if (feature.startsWith('limit:')) {
+                                                            const [, resource, value] = feature.split(':');
+                                                            const resourceLabel = t(`subscriptions:resource_names.${resource}`);
+
+                                                            if (value === 'unlimited') {
+                                                                return t('subscriptions:limit_unlimited', { resource: resourceLabel });
+                                                            } else if (parseInt(value) === 1) {
+                                                                return t('subscriptions:limit_1', { resource: resourceLabel });
+                                                            } else {
+                                                                return t('subscriptions:limit_up_to', { count: Number(value), resource: resourceLabel });
+                                                            }
+                                                        }
+                                                        return t(`subscriptions:features.${feature}`, { defaultValue: feature });
+                                                    })()}
                                                 </span>
                                             </li>
                                         ))}
