@@ -71,5 +71,48 @@
         "Unlimited Delivery Drivers": "Unlimited Delivery Drivers",
         "Advanced Store Clients CRM": "Advanced Store Clients CRM",
         "Priority Support": "Priority Support"
+    },
+    "admin": {
+        "title": "Subscription Bundles",
+        "description": "Manage features, limits, and pricing for all plans.",
+        "refreshPlans": "Refresh Plans",
+        "monthlyPrice": "Monthly Price",
+        "yearlyPrice": "Yearly Price",
+        "unlockedFeatures": "Unlocked Features",
+        "resourceLimits": "Resource Limits",
+        "updateBundle": "Update Bundle",
+        "updateConfirmationTitle": "Update Plan",
+        "updateConfirmationDescription": "Are you sure you want to update the features and limits for the {{name}} plan?",
+        "confirmUpdate": "Yes, Update",
+        "cancelUpdate": "Cancel",
+        "loadError": "Failed to load plans",
+        "updateSuccess": "Plan updated successfully",
+        "updateError": "Failed to update plan",
+        "refreshSuccess": "Plans refreshed successfully",
+        "noBundles": "No Bundles Found",
+        "noBundlesDesc": "It looks like there are no subscription plans in the database yet. Use the seeder to populate default plans.",
+        "connectError": "There was an issue connecting to the server.",
+        "tryAgain": "Try Again",
+        "unlimitedHint": "* Use -1 for unlimited access.",
+        "featureKeys": {
+            "discounts": "Discounts",
+            "promocodes": "Promo Codes",
+            "store_clients_management": "Clients Management",
+            "advanced_analytics": "Advanced Analytics",
+            "custom_roles": "Custom Roles",
+            "reviews_management": "Reviews Management",
+            "priority_support": "Priority Support",
+            "product_discounts_offers": "Product Discounts & Offers",
+            "basic_dashboard": "Basic Dashboard",
+            "order_management": "Order Management"
+        },
+        "limitKeys": {
+            "branches": "Branches",
+            "products": "Products",
+            "orders_per_month": "Orders per Month",
+            "drivers": "Drivers",
+            "staff_accounts": "Staff Accounts",
+            "categories": "Categories"
+        }
     }
 }

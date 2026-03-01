@@ -47,6 +47,7 @@ import DriverDashboard from './features/delivery/pages/DriverDashboard';
 import DriverVerificationPage from './features/delivery/pages/DriverVerificationPage';
 import DriverDetail from './features/delivery/pages/DriverDetail';
 import SubscriptionPage from './features/subscriptions/pages/SubscriptionPage';
+import PlansManagement from './features/subscriptions-admin/pages/PlansManagement';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
@@ -145,7 +146,9 @@ const AppContent = () => {
             <Route path="business-categories" element={<BusinessCategories />} />
             <Route path="reported-reviews" element={<ReportedReviewList />} />
             <Route path="drivers/verification" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DriverVerificationPage /></PermissionGate>} />
-
+            <Route path="plans-management" element={
+              user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
+            } />
 
             <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
             <Route path="profile-settings" element={<ProfileSettings />} />

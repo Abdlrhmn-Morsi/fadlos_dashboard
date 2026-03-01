@@ -71,5 +71,48 @@
         "Unlimited Delivery Drivers": "سائقي توصيل غير محدودين",
         "Advanced Store Clients CRM": "نظام إدارة علاقات العملاء المتقدم",
         "Priority Support": "دعم ذو أولوية"
+    },
+    "admin": {
+        "title": "باقات الاشتراك",
+        "description": "إدارة الميزات والحدود والأسعار لجميع الخطط.",
+        "refreshPlans": "تحديث الخطط",
+        "monthlyPrice": "السعر الشهري",
+        "yearlyPrice": "السعر السنوي",
+        "unlockedFeatures": "الميزات المفتوحة",
+        "resourceLimits": "حدود الموارد",
+        "updateBundle": "تحديث الباقة",
+        "updateConfirmationTitle": "تحديث الخطة",
+        "updateConfirmationDescription": "هل أنت متأكد أنك تريد تحديث الميزات والحدود لخطة {{name}}؟",
+        "confirmUpdate": "نعم، تحديث",
+        "cancelUpdate": "إلغاء",
+        "loadError": "فشل في تحميل الخطط",
+        "updateSuccess": "تم تحديث الخطة بنجاح",
+        "updateError": "فشل في تحديث الخطة",
+        "refreshSuccess": "تم تحديث الخطط بنجاح",
+        "noBundles": "لم يتم العثور على باقات",
+        "noBundlesDesc": "يبدو أنه لا توجد خطط اشتراك في قاعدة البيانات بعد. استخدم أداة الملء لملء الخطط الافتراضية.",
+        "connectError": "حدثت مشكلة في الاتصال بالخادم.",
+        "tryAgain": "حاول مرة أخرى",
+        "unlimitedHint": "* استخدم -1 للوصول غير المحدود.",
+        "featureKeys": {
+            "discounts": "الخصومات",
+            "promocodes": "أكواد الخصم",
+            "store_clients_management": "إدارة العملاء",
+            "advanced_analytics": "تحليلات متقدمة",
+            "custom_roles": "أدوار مخصصة",
+            "reviews_management": "إدارة المراجعات",
+            "priority_support": "دعم ذو أولوية",
+            "product_discounts_offers": "خصومات وعروض المنتجات",
+            "basic_dashboard": "لوحة تحكم أساسية",
+            "order_management": "إدارة الطلبات"
+        },
+        "limitKeys": {
+            "branches": "الفروع",
+            "products": "المنتجات",
+            "orders_per_month": "الطلبات شهريًا",
+            "drivers": "السائقين",
+            "staff_accounts": "حسابات الموظفين",
+            "categories": "الفئات"
+        }
     }
 }

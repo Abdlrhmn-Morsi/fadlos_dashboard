@@ -188,6 +188,9 @@ const DashboardLayout: React.FC = () => {
               <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />
               <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />
               <SidebarItem to="/reported-reviews" icon={Shield} label={t('reportedReviews')} collapsed={collapsed} />
+              {user?.role === UserRole.SUPER_ADMIN && (
+                <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
+              )}
             </>
           )}
 
