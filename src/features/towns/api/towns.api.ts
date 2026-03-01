@@ -3,7 +3,7 @@ import apiService from '../../../services/api.service';
 export const getTowns = async (params: any = {}) => {
     try {
         // Use admin endpoint if asking for all records (which implies admin access)
-        const url = params.includeAll ? '/towns/admin' : '/towns';
+        const url = params.includeAll ? '/places/admin' : '/places';
         const responseBody = await apiService.get(url, { params });
         // Return full response if pagination is requested
         if (params.page) return responseBody;

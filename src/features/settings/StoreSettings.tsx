@@ -870,7 +870,7 @@ const StoreSettings = () => {
                                 <div>
                                     <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">{t('common:towns')}</label>
                                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {towns.filter(t => formData.townIds.includes(t.town?.id)).map(town => (
+                                        {towns.filter(t => formData.townIds.includes(t.townId)).map(town => (
                                             <button
                                                 key={town.id}
                                                 type="button"
