@@ -194,7 +194,7 @@ const SubscriptionSettings = () => {
                                 className={clsx(
                                     "flex flex-col p-8 rounded-[4px] border-2 transition-all duration-500",
                                     isMax
-                                        ? "bg-slate-900 dark:bg-slate-800 border-slate-900 dark:border-slate-700 text-white shadow-2xl shadow-slate-900/10 scale-105" :
+                                        ? "bg-slate-900 dark:bg-slate-800 border-slate-900 dark:border-slate-700 text-white shadow-2xl shadow-slate-900/10" :
                                         isPro
                                             ? "bg-orange-50/50 dark:bg-orange-500/5 border-orange-100/50 dark:border-orange-500/10 text-slate-900 dark:text-white" :
                                             "bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-800 text-slate-900 dark:text-white"
@@ -309,6 +309,10 @@ const SubscriptionSettings = () => {
                                             <div className="space-y-1 text-right">
                                                 <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:drivers')}</div>
                                                 <div className="text-sm font-black">{plan.limits.drivers === -1 ? t('subscriptions:unlimited') : plan.limits.drivers}</div>
+                                            </div>
+                                            <div className="space-y-1">
+                                                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:categories')}</div>
+                                                <div className="text-sm font-black">{plan.limits.categories === -1 ? t('subscriptions:unlimited') : plan.limits.categories}</div>
                                             </div>
                                         </div>
                                     </div>

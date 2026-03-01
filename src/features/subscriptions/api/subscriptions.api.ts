@@ -12,6 +12,7 @@ export interface Plan {
     limits: {
         branches: number;
         products: number;
+        categories: number;
         orders_per_month: number;
         drivers: number;
         staff_accounts: number;
