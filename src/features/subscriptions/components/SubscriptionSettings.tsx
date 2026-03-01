@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Shield, Check, X, CreditCard, Clock, Zap } from 'lucide-react';
-import { getPlans, getMySubscriptionUsage, Plan, SubscriptionUsage, createCheckoutSession, cancelSubscription } from '../api/subscriptions.api';
+import { getPlans, getMySubscriptionUsage, Plan, SubscriptionUsage, createCheckoutSession, cancelSubscription, syncSubscription } from '../api/subscriptions.api';
+import { Shield, Check, X, CreditCard, Clock, Zap, RefreshCw } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from '../../../utils/toast';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
@@ -17,6 +17,7 @@ const SubscriptionSettings = () => {
     const [usage, setUsage] = useState<SubscriptionUsage | null>(null);
     const [billingCycle, setBillingCycle] = useState<'monthly' | 'yearly'>('monthly');
     const [processingId, setProcessingId] = useState<string | null>(null);
+    const [syncLoading, setSyncLoading] = useState(false);
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
     const { openCheckout } = usePaddle();
 
@@ -84,6 +85,23 @@ const SubscriptionSettings = () => {
         }
     };
 
+    const handleSync = async () => {
+        try {
+            setSyncLoading(true);
+            const updatedUsage = await syncSubscription();
+            setUsage(updatedUsage);
+            toast.success(t('subscriptions:syncSuccess'));
+            // Also refresh plans just in case
+            const plansData = await getPlans();
+            setPlans(Array.isArray(plansData) ? plansData : []);
+        } catch (error) {
+            console.error('Sync error:', error);
+            toast.error(t('subscriptions:syncError'));
+        } finally {
+            setSyncLoading(false);
+        }
+    };
+
     if (loading) {
         return <LoadingSpinner />;
     }
@@ -100,6 +118,17 @@ const SubscriptionSettings = () => {
                                 <Clock size={14} />
                                 {t('subscriptions:renewsOn', { date: new Date(usage.currentPeriodEnd).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) })}
                             </span>
+                        )}
+                        {usage?.plan !== 'free' && (
+                            <button
+                                onClick={handleSync}
+                                disabled={syncLoading}
+                                className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-sm font-bold mt-1 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                                title={t('subscriptions:syncStatus')}
+                            >
+                                <RefreshCw size={14} className={clsx(syncLoading && "animate-spin")} />
+                                {t('subscriptions:syncStatus')}
+                            </button>
                         )}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">

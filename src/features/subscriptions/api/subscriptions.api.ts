@@ -46,3 +46,8 @@ export const createCheckoutSession = async (plan: string, billingCycle: 'monthly
 export const cancelSubscription = async (): Promise<void> => {
     await api.post('/subscriptions/cancel');
 };
+
+export const syncSubscription = async (): Promise<SubscriptionUsage> => {
+    const response = await api.post('/subscriptions/sync');
+    return response.data.data;
+};
