@@ -318,6 +318,11 @@ export const BranchesList: React.FC = () => {
                                                 {branch.town ? (isRTL ? branch.town.arName : branch.town.enName) : '...'}
                                                 {branch.place && ` - ${isRTL ? branch.place.arName : branch.place.enName}`}
                                             </h3>
+                                            {(branch as any).isOverLimit && (
+                                                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter">
+                                                    {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
+                                                </span>
+                                            )}
                                         </div>
                                     </div>
 

@@ -345,13 +345,18 @@ const ProductList = () => {
                                                     )}
                                                 </div>
                                                 <div>
-                                                    <div className="flex items-center gap-2">
+                                                    <div className="flex flex-col">
                                                         <h3
                                                             onClick={() => navigate(`/products/${product.id}`)}
                                                             className="font-semibold text-slate-800 dark:text-white hover:text-indigo-600 dark:hover:text-indigo-400 cursor-pointer transition-colors"
                                                         >
                                                             {isRTL ? product.nameAr || product.name : product.name}
                                                         </h3>
+                                                        {(product as any).isOverLimit && (
+                                                            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter">
+                                                                {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
+                                                            </span>
+                                                        )}
                                                     </div>
                                                     <div className="flex items-center text-xs text-slate-500 mt-0.5">
                                                         <Tag size={12} className={isRTL ? "ml-1" : "mr-1"} />

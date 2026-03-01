@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import {
     ArrowLeft, Upload, Save, Image as ImageIcon,
     Box, DollarSign, Layers, Globe, RefreshCcw,
-    Loader2, Trash2, Plus, X, Search, CheckCircle2, Package
+    Loader2, Trash2, Plus, X, Search, CheckCircle2, Package, Lock
 } from 'lucide-react';
 import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
@@ -12,6 +12,7 @@ import toolsApi from '../../services/tools.api';
 import addonsApi from '../addons/api/addons.api';
 import CategoryFormModal from '../categories/components/CategoryFormModal';
 import { useTranslation } from 'react-i18next';
+import { getMySubscriptionUsage, SubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
@@ -100,10 +101,11 @@ const ProductForm = () => {
     const canSubmit = canModifyProduct || canModifyVariants;
 
     // Feature gating based on subscription plan
-    const storePlan = (user as any)?.store?.plan;
+    const [subscriptionUsage, setSubscriptionUsage] = useState<SubscriptionUsage | null>(null);
     const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
-    const canUseOffersAndDiscounts = isSuperAdmin || storePlan === 'pro' || storePlan === 'premium';
-    const canUseFrequentlyBoughtTogether = isSuperAdmin || storePlan === 'pro' || storePlan === 'premium';
+
+    const canUseOffersAndDiscounts = isSuperAdmin || (subscriptionUsage?.features?.includes('product_discounts_offers') ?? true);
+    const canUseFrequentlyBoughtTogether = isSuperAdmin || (subscriptionUsage?.features?.includes('frequently_bought_together') ?? true);
 
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -152,10 +154,20 @@ const ProductForm = () => {
         fetchCategories();
         fetchAllProductsForSelection();
         fetchAllAddonsForSelection();
+        fetchSubscriptionUsage();
         if (isEditMode) {
             fetchProduct();
         }
     }, [id]);
+
+    const fetchSubscriptionUsage = async () => {
+        try {
+            const usage = await getMySubscriptionUsage();
+            setSubscriptionUsage(usage);
+        } catch (error) {
+            console.error('Error fetching subscription usage', error);
+        }
+    };
 
     const fetchAllAddonsForSelection = async () => {
         try {
@@ -944,13 +956,39 @@ const ProductForm = () => {
                         </div>
 
                         {/* Frequently Bought Together Section */}
-                        {canUseFrequentlyBoughtTogether && (
-                            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                                    <Plus className="w-5 h-5 text-indigo-500" />
-                                    {t('frequentlyBoughtTogether')}
-                                </h2>
+                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                <Plus className="w-5 h-5 text-indigo-500" />
+                                {t('frequentlyBoughtTogether')}
+                                {!canUseFrequentlyBoughtTogether && (
+                                    <span className="ms-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded uppercase tracking-wider border border-amber-200 dark:border-amber-800">
+                                        {t('common:premiumFeature', { defaultValue: 'Premium' })}
+                                    </span>
+                                )}
+                            </h2>
 
+                            {!canUseFrequentlyBoughtTogether ? (
+                                <div className="p-6 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-dashed border-slate-300 dark:border-slate-700 text-center space-y-3">
+                                    <div className="w-12 h-12 bg-amber-50 dark:bg-amber-900/20 rounded-full flex items-center justify-center mx-auto text-amber-500">
+                                        <Lock size={24} />
+                                    </div>
+                                    <div className="space-y-1">
+                                        <p className="text-sm font-bold text-slate-900 dark:text-white">
+                                            {t('common:frequentlyBoughtTogetherLocked', { defaultValue: 'Feature Locked' })}
+                                        </p>
+                                        <p className="text-xs text-slate-500 dark:text-slate-400 max-w-[300px] mx-auto">
+                                            {t('common:frequentlyBoughtTogetherLockedDesc', { defaultValue: 'Upgrade your plan to unlock "Frequently Bought Together" and increase average order value.' })}
+                                        </p>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => navigate('/usage')}
+                                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors"
+                                    >
+                                        {t('common:upgradePlan', { defaultValue: 'Upgrade Plan' })}
+                                    </button>
+                                </div>
+                            ) : (
                                 <div className="space-y-4">
                                     <div className="relative">
                                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -1030,8 +1068,8 @@ const ProductForm = () => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
-                        )}
+                            )}
+                        </div>
 
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <div className="flex items-center justify-between mb-6">
@@ -1154,22 +1192,37 @@ const ProductForm = () => {
                         {/* Status */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className={clsx("text-sm font-bold text-slate-400 uppercase tracking-wider mb-4", isRTL && "text-right")}>{t('status')}</h2>
-                            {canUseOffersAndDiscounts && (
-                                <div className="flex items-center justify-between mb-4">
-                                    <div className={isRTL ? "text-right" : "text-left"}>
+
+                            <div className="flex items-center justify-between mb-4">
+                                <div className={isRTL ? "text-right" : "text-left"}>
+                                    <div className="flex items-center gap-2">
                                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isOffer')}</label>
-                                        <p className="text-[10px] text-slate-400">{t('isOfferSubtitle')}</p>
+                                        {!canUseOffersAndDiscounts && (
+                                            <Lock size={10} className="text-amber-500" />
+                                        )}
                                     </div>
-                                    <label className={clsx("relative inline-flex items-center", canModifyProduct ? "cursor-pointer" : "cursor-default")}>
-                                        <input
-                                            type="checkbox"
-                                            className="sr-only peer"
-                                            checked={formData.isOffer}
-                                            onChange={e => setFormData({ ...formData, isOffer: e.target.checked })}
-                                            disabled={!canModifyProduct}
-                                        />
-                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
-                                    </label>
+                                    <p className="text-[10px] text-slate-400">{t('isOfferSubtitle')}</p>
+                                </div>
+                                <label className={clsx(
+                                    "relative inline-flex items-center",
+                                    (canModifyProduct && canUseOffersAndDiscounts) ? "cursor-pointer" : "cursor-default opacity-50"
+                                )}>
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.isOffer}
+                                        onChange={e => setFormData({ ...formData, isOffer: e.target.checked })}
+                                        disabled={!canModifyProduct || !canUseOffersAndDiscounts}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
+                                </label>
+                            </div>
+
+                            {!canUseOffersAndDiscounts && (
+                                <div className="mb-4 p-2 bg-amber-50 dark:bg-amber-900/10 rounded border border-amber-100 dark:border-amber-800/50">
+                                    <p className="text-[10px] text-amber-700 dark:text-amber-400 leading-tight">
+                                        {t('common:offersLockedUpgradeWarning', { defaultValue: 'Upgrade your plan to enable Offers and Discounts for this product.' })}
+                                    </p>
                                 </div>
                             )}
                             <div className="flex items-center justify-between mb-4">
@@ -1296,32 +1349,50 @@ const ProductForm = () => {
                                         />
                                     </div>
                                 </InputGroup>
-                                {canUseOffersAndDiscounts && (
-                                    <InputGroup label={t('comparePrice')} subtitle={t('comparePriceSubtitle')}>
-                                        <div className="relative">
-                                            <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 start-3">$</span>
-                                            <input
-                                                type="number"
-                                                step="0.01"
-                                                className={clsx(
-                                                    "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all ps-8 pe-4",
-                                                    formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0')
-                                                        ? "border-rose-500 focus:border-rose-500"
-                                                        : "border-slate-200 dark:border-slate-700 focus:border-indigo-500"
-                                                )}
-                                                value={formData.comparePrice}
-                                                onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
-                                                disabled={!canModifyProduct}
-                                            />
+
+                                <InputGroup
+                                    label={
+                                        <div className="flex items-center justify-between">
+                                            <span>{t('comparePrice')}</span>
+                                            {!canUseOffersAndDiscounts && (
+                                                <Lock size={12} className="text-amber-500" />
+                                            )}
                                         </div>
-                                        {formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0') && (
-                                            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
-                                                <X size={12} />
-                                                {t('comparePriceError')}
-                                            </p>
+                                    }
+                                    subtitle={t('comparePriceSubtitle')}
+                                >
+                                    <div className="relative group/price">
+                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 start-3">$</span>
+                                        <input
+                                            type="number"
+                                            step="0.01"
+                                            className={clsx(
+                                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-lg outline-none transition-all ps-8 pe-4",
+                                                !canUseOffersAndDiscounts ? "border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-50" : "focus:ring-2 focus:ring-indigo-500/20",
+                                                formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0')
+                                                    ? "border-rose-500 focus:border-rose-500"
+                                                    : "border-slate-200 dark:border-slate-700 focus:border-indigo-500"
+                                            )}
+                                            value={formData.comparePrice}
+                                            onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
+                                            disabled={!canModifyProduct || !canUseOffersAndDiscounts}
+                                        />
+                                        {!canUseOffersAndDiscounts && (
+                                            <div className="absolute inset-0 bg-transparent cursor-pointer" onClick={() => navigate('/usage')} />
                                         )}
-                                    </InputGroup>
-                                )}
+                                    </div>
+                                    {!canUseOffersAndDiscounts && (
+                                        <p className="text-[10px] text-amber-600 dark:text-amber-500 mt-1 font-medium">
+                                            {t('common:upgradeToEnableDiscounts', { defaultValue: 'Upgrade plan to enable discounts' })}
+                                        </p>
+                                    )}
+                                    {canUseOffersAndDiscounts && formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0') && (
+                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
+                                            <X size={12} />
+                                            {t('comparePriceError')}
+                                        </p>
+                                    )}
+                                </InputGroup>
                             </div>
                         </div>
 

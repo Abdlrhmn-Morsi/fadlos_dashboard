@@ -258,9 +258,16 @@ const CategoryList = () => {
                                                 <div className="p-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-lg group-hover:scale-110 transition-transform duration-200">
                                                     <Tag size={18} />
                                                 </div>
-                                                <span className="font-semibold text-slate-700 dark:text-slate-200">
-                                                    {isRTL ? category.nameAr || category.name : category.name}
-                                                </span>
+                                                <div className="flex flex-col">
+                                                    <span className="font-semibold text-slate-700 dark:text-slate-200">
+                                                        {isRTL ? category.nameAr || category.name : category.name}
+                                                    </span>
+                                                    {category.isOverLimit && (
+                                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter">
+                                                            {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">

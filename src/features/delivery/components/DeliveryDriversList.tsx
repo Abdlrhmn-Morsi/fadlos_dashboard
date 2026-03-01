@@ -382,6 +382,11 @@ const DeliveryDriversList = () => {
                                                         <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{driver.name}</span>
                                                     </div>
                                                     <span className="text-[10px] text-slate-500 lowercase font-medium">@{driver.username}</span>
+                                                    {(driver as any).isOverLimit && (
+                                                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight mt-0.5">
+                                                            {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>
@@ -483,15 +488,17 @@ const DeliveryDriversList = () => {
                 </div>
             </div>
 
-            {meta.totalPages > 1 && (
-                <div className="mt-6 flex justify-center">
-                    <Pagination
-                        currentPage={page}
-                        totalPages={meta.totalPages}
-                        onPageChange={setPage}
-                    />
-                </div>
-            )}
+            {
+                meta.totalPages > 1 && (
+                    <div className="mt-6 flex justify-center">
+                        <Pagination
+                            currentPage={page}
+                            totalPages={meta.totalPages}
+                            onPageChange={setPage}
+                        />
+                    </div>
+                )
+            }
 
             <ConfirmModal
                 isOpen={deleteModal.isOpen}
@@ -501,7 +508,7 @@ const DeliveryDriversList = () => {
                 message={t('delivery.drivers.remove_confirm_message', 'Are you sure you want to remove this driver from your store? This action cannot be undone.')}
             />
 
-        </div>
+        </div >
     );
 };
 

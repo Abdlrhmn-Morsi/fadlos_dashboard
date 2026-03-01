@@ -287,6 +287,11 @@ const EmployeesList = () => {
                                                     <div className="text-xs text-slate-500">
                                                         {emp.username}
                                                     </div>
+                                                    {(emp as any).isOverLimit && (
+                                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter text-amber-600 dark:text-amber-400">
+                                                            {t('common:restrictedAccess', { defaultValue: 'Restricted Access' })}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
                                         </td>

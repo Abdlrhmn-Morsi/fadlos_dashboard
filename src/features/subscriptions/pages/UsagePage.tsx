@@ -217,13 +217,13 @@ const UsagePage: React.FC = () => {
 
                                 {!isUnlimited && (
                                     <div className={clsx(
-                                        "mt-3 flex flex-col gap-1",
+                                        "mt-4 flex flex-col gap-1",
                                         isAtLimit ? "text-rose-500" : isNearLimit ? "text-amber-500" : "text-slate-400"
                                     )}>
-                                        <p className="text-[12px] font-black leading-none uppercase tracking-[0.1em]">
+                                        <p className="text-[13px] font-black leading-none uppercase tracking-wider">
                                             {Math.round(percentage)}%
                                         </p>
-                                        <p className="text-[9px] font-bold uppercase tracking-widest opacity-70">
+                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-0.5">
                                             {t('usage.used', { count: used })}
                                         </p>
                                     </div>
