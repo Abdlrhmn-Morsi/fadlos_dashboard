@@ -110,13 +110,15 @@ export const NotificationPage = () => {
                                 <div className="flex-1 min-w-0">
                                     <div className="flex justify-between items-start">
                                         <p className={clsx("text-sm font-medium text-gray-900 dark:text-white", !notification.isRead && "font-bold")}>
-                                            {notification.title}
+                                            {isRTL && notification.titleAr ? notification.titleAr : notification.title}
                                         </p>
                                         <span className="text-xs text-gray-500 dark:text-slate-400 whitespace-nowrap ml-2">
                                             {new Date(notification.createdAt).toLocaleDateString()} {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                         </span>
                                     </div>
-                                    <p className="text-sm text-gray-600 dark:text-slate-300 mt-1">{notification.message}</p>
+                                    <p className="text-sm text-gray-600 dark:text-slate-300 mt-1">
+                                        {isRTL && notification.messageAr ? notification.messageAr : notification.message}
+                                    </p>
                                 </div>
                                 {!notification.isRead && (
                                     <div className="flex-shrink-0 self-center">

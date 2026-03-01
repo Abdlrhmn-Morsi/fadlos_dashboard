@@ -107,10 +107,10 @@ export const NotificationList = () => {
                                     </div>
                                     <div className="flex-1 min-w-0">
                                         <p className={clsx("text-sm font-medium text-gray-900 dark:text-white", !notification.isRead && "font-semibold")}>
-                                            {notification.title}
+                                            {isRTL && notification.titleAr ? notification.titleAr : notification.title}
                                         </p>
                                         <p className="text-sm text-gray-500 dark:text-slate-400 line-clamp-2">
-                                            {notification.message}
+                                            {isRTL && notification.messageAr ? notification.messageAr : notification.message}
                                         </p>
                                         <p className="text-xs text-gray-400 dark:text-slate-500 mt-1">
                                             {new Date(notification.createdAt).toLocaleDateString()} {new Date(notification.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

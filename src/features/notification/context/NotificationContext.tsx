@@ -11,7 +11,9 @@ import { useTranslation } from 'react-i18next';
 interface Notification {
     id: string;
     title: string;
+    titleAr?: string;
     message: string;
+    messageAr?: string;
     isRead: boolean;
     createdAt: string;
     type?: string;
