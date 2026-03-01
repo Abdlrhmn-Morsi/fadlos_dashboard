@@ -73,7 +73,11 @@
         "Advanced Store Clients CRM": "نظام إدارة علاقات العملاء المتقدم",
         "Priority Support": "دعم ذو أولوية",
         "Unlimited Categories": "فئات غير محدودة",
-        "Up to 3 Categories": "ما يصل إلى 3 فئات"
+        "Up to 3 Categories": "ما يصل إلى 3 فئات",
+        "Order Management": "إدارة الطلبات",
+        "Product Discounts & Offers": "خصومات وعروض المنتجات",
+        "Frequently Bought Together Products": "منتجات تُشترى معًا بشكل متكرر",
+        "Custom Roles": "أدوار مخصصة"
     },
     "admin": {
         "title": "باقات الاشتراك",
@@ -98,7 +102,6 @@
         "tryAgain": "حاول مرة أخرى",
         "unlimitedHint": "* استخدم -1 للوصول غير المحدود.",
         "featureKeys": {
-            "discounts": "الخصومات",
             "promocodes": "أكواد الخصم",
             "store_clients_management": "إدارة العملاء",
             "advanced_analytics": "تحليلات متقدمة",
@@ -106,6 +109,7 @@
             "reviews_management": "إدارة المراجعات",
             "priority_support": "دعم ذو أولوية",
             "product_discounts_offers": "خصومات وعروض المنتجات",
+            "frequently_bought_together": "منتجات تُشترى معًا بشكل متكرر",
             "basic_dashboard": "لوحة تحكم أساسية",
             "order_management": "إدارة الطلبات"
         },
@@ -117,5 +121,17 @@
             "staff_accounts": "حسابات الموظفين",
             "categories": "الفئات"
         }
+    },
+    "usage": {
+        "title": "استخدام الخطة",
+        "description": "تابع استهلاك مواردك ضمن خطتك الحالية.",
+        "used": "{{count}} مستخدم",
+        "of": "من {{limit}}",
+        "unlimited": "غير محدود",
+        "upgradeForMore": "قم بترقية خطتك للحصول على حدود أعلى",
+        "currentPlan": "الخطة الحالية",
+        "resourceUsage": "استخدام الموارد",
+        "ordersThisMonth": "طلبات هذا الشهر",
+        "unlockedFeatures": "ميزات الخطة"
     }
 }

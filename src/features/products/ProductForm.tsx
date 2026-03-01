@@ -17,6 +17,7 @@ import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 import { useAuth } from '../../contexts/AuthContext';
 import { Permissions } from '../../types/permissions';
+import { UserRole } from '../../types/user-role';
 
 const InputGroup = ({ label, children, required = false, subtitle = '' }: any) => (
     <div className="space-y-1.5">
@@ -97,6 +98,12 @@ const ProductForm = () => {
     const canModifyVariants = isEditMode ? canUpdateVariants : canCreateVariants;
 
     const canSubmit = canModifyProduct || canModifyVariants;
+
+    // Feature gating based on subscription plan
+    const storePlan = (user as any)?.store?.plan;
+    const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
+    const canUseOffersAndDiscounts = isSuperAdmin || storePlan === 'pro' || storePlan === 'premium';
+    const canUseFrequentlyBoughtTogether = isSuperAdmin || storePlan === 'pro' || storePlan === 'premium';
 
     const [loading, setLoading] = useState(false);
     const [submitting, setSubmitting] = useState(false);
@@ -937,92 +944,94 @@ const ProductForm = () => {
                         </div>
 
                         {/* Frequently Bought Together Section */}
-                        <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
-                            <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
-                                <Plus className="w-5 h-5 text-indigo-500" />
-                                {t('frequentlyBoughtTogether')}
-                            </h2>
+                        {canUseFrequentlyBoughtTogether && (
+                            <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
+                                <h2 className="text-lg font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-2">
+                                    <Plus className="w-5 h-5 text-indigo-500" />
+                                    {t('frequentlyBoughtTogether')}
+                                </h2>
 
-                            <div className="space-y-4">
-                                <div className="relative">
-                                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                                    <input
-                                        type="text"
-                                        placeholder={t('searchRelatedProducts')}
-                                        className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                                        value={relatedSearchTerm}
-                                        onChange={(e) => setRelatedSearchTerm(e.target.value)}
-                                        disabled={!canModifyProduct}
-                                    />
-                                </div>
+                                <div className="space-y-4">
+                                    <div className="relative">
+                                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                                        <input
+                                            type="text"
+                                            placeholder={t('searchRelatedProducts')}
+                                            className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                            value={relatedSearchTerm}
+                                            onChange={(e) => setRelatedSearchTerm(e.target.value)}
+                                            disabled={!canModifyProduct}
+                                        />
+                                    </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-1">
-                                    {allProducts
-                                        .filter(p => {
-                                            const name = p.name || '';
-                                            const nameAr = p.nameAr || '';
-                                            const searchLower = relatedSearchTerm.toLowerCase();
-                                            return name.toLowerCase().includes(searchLower) || nameAr.toLowerCase().includes(searchLower);
-                                        })
-                                        .map(p => {
-                                            const isSelected = formData.relatedProductIds.includes(p.id);
-                                            return (
-                                                <div
-                                                    key={p.id}
-                                                    onClick={() => {
-                                                        if (!canModifyProduct) return;
-                                                        const newIds = isSelected
-                                                            ? formData.relatedProductIds.filter(id => id !== p.id)
-                                                            : [...formData.relatedProductIds, p.id];
-                                                        setFormData({ ...formData, relatedProductIds: newIds });
-                                                    }}
-                                                    className={clsx(
-                                                        "relative flex items-center gap-3 p-3 rounded-xl border transition-all group",
-                                                        !canModifyProduct ? "cursor-default opacity-80" : "cursor-pointer",
-                                                        isSelected
-                                                            ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
-                                                            : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800",
-                                                        canModifyProduct && !isSelected && "hover:border-indigo-300"
-                                                    )}
-                                                >
-                                                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
-                                                        {p.coverImage ? (
-                                                            <img src={p.coverImage} className="w-full h-full object-cover" alt="" />
-                                                        ) : (
-                                                            <ImageIcon className="w-6 h-6 absolute inset-0 m-auto text-slate-300" />
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-h-[400px] overflow-y-auto p-1">
+                                        {allProducts
+                                            .filter(p => {
+                                                const name = p.name || '';
+                                                const nameAr = p.nameAr || '';
+                                                const searchLower = relatedSearchTerm.toLowerCase();
+                                                return name.toLowerCase().includes(searchLower) || nameAr.toLowerCase().includes(searchLower);
+                                            })
+                                            .map(p => {
+                                                const isSelected = formData.relatedProductIds.includes(p.id);
+                                                return (
+                                                    <div
+                                                        key={p.id}
+                                                        onClick={() => {
+                                                            if (!canModifyProduct) return;
+                                                            const newIds = isSelected
+                                                                ? formData.relatedProductIds.filter(id => id !== p.id)
+                                                                : [...formData.relatedProductIds, p.id];
+                                                            setFormData({ ...formData, relatedProductIds: newIds });
+                                                        }}
+                                                        className={clsx(
+                                                            "relative flex items-center gap-3 p-3 rounded-xl border transition-all group",
+                                                            !canModifyProduct ? "cursor-default opacity-80" : "cursor-pointer",
+                                                            isSelected
+                                                                ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800"
+                                                                : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800",
+                                                            canModifyProduct && !isSelected && "hover:border-indigo-300"
+                                                        )}
+                                                    >
+                                                        <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
+                                                            {p.coverImage ? (
+                                                                <img src={p.coverImage} className="w-full h-full object-cover" alt="" />
+                                                            ) : (
+                                                                <ImageIcon className="w-6 h-6 absolute inset-0 m-auto text-slate-300" />
+                                                            )}
+                                                        </div>
+                                                        <div className="flex-1 min-w-0">
+                                                            <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
+                                                                {isRTL ? (p.nameAr || p.name) : p.name}
+                                                            </p>
+                                                            <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                                {p.price.toFixed(2)} {t('common:currencySymbol')}
+                                                            </p>
+                                                        </div>
+                                                        {isSelected && (
+                                                            <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-indigo-600 rounded-full text-white shadow-sm">
+                                                                <CheckCircle2 size={12} strokeWidth={3} />
+                                                            </div>
                                                         )}
                                                     </div>
-                                                    <div className="flex-1 min-w-0">
-                                                        <p className="text-sm font-semibold text-slate-900 dark:text-white truncate">
-                                                            {isRTL ? (p.nameAr || p.name) : p.name}
-                                                        </p>
-                                                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                            {p.price.toFixed(2)} {t('common:currencySymbol')}
-                                                        </p>
-                                                    </div>
-                                                    {isSelected && (
-                                                        <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-indigo-600 rounded-full text-white shadow-sm">
-                                                            <CheckCircle2 size={12} strokeWidth={3} />
-                                                        </div>
-                                                    )}
-                                                </div>
-                                            );
-                                        })}
-                                    {searchingProducts && (
-                                        <div className="col-span-full py-8 flex flex-col items-center justify-center gap-2 text-slate-400">
-                                            <Loader2 className="w-6 h-6 animate-spin" />
-                                            <span className="text-xs">{t('loadingProducts')}</span>
-                                        </div>
-                                    )}
-                                    {!searchingProducts && allProducts.length === 0 && (
-                                        <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
-                                            <p>{t('noRelatedProductsFound')}</p>
-                                            <p className="text-xs mt-1">{t('common:adjustSearch')}</p>
-                                        </div>
-                                    )}
+                                                );
+                                            })}
+                                        {searchingProducts && (
+                                            <div className="col-span-full py-8 flex flex-col items-center justify-center gap-2 text-slate-400">
+                                                <Loader2 className="w-6 h-6 animate-spin" />
+                                                <span className="text-xs">{t('loadingProducts')}</span>
+                                            </div>
+                                        )}
+                                        {!searchingProducts && allProducts.length === 0 && (
+                                            <div className="col-span-full py-8 text-center text-sm text-slate-400 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded-xl">
+                                                <p>{t('noRelatedProductsFound')}</p>
+                                                <p className="text-xs mt-1">{t('common:adjustSearch')}</p>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        )}
 
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <div className="flex items-center justify-between mb-6">
@@ -1145,22 +1154,24 @@ const ProductForm = () => {
                         {/* Status */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm p-6">
                             <h2 className={clsx("text-sm font-bold text-slate-400 uppercase tracking-wider mb-4", isRTL && "text-right")}>{t('status')}</h2>
-                            <div className="flex items-center justify-between mb-4">
-                                <div className={isRTL ? "text-right" : "text-left"}>
-                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isOffer')}</label>
-                                    <p className="text-[10px] text-slate-400">{t('isOfferSubtitle')}</p>
+                            {canUseOffersAndDiscounts && (
+                                <div className="flex items-center justify-between mb-4">
+                                    <div className={isRTL ? "text-right" : "text-left"}>
+                                        <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('isOffer')}</label>
+                                        <p className="text-[10px] text-slate-400">{t('isOfferSubtitle')}</p>
+                                    </div>
+                                    <label className={clsx("relative inline-flex items-center", canModifyProduct ? "cursor-pointer" : "cursor-default")}>
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={formData.isOffer}
+                                            onChange={e => setFormData({ ...formData, isOffer: e.target.checked })}
+                                            disabled={!canModifyProduct}
+                                        />
+                                        <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
+                                    </label>
                                 </div>
-                                <label className={clsx("relative inline-flex items-center", canModifyProduct ? "cursor-pointer" : "cursor-default")}>
-                                    <input
-                                        type="checkbox"
-                                        className="sr-only peer"
-                                        checked={formData.isOffer}
-                                        onChange={e => setFormData({ ...formData, isOffer: e.target.checked })}
-                                        disabled={!canModifyProduct}
-                                    />
-                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
-                                </label>
-                            </div>
+                            )}
                             <div className="flex items-center justify-between mb-4">
                                 <div className={isRTL ? "text-right" : "text-left"}>
                                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('active')}</label>
@@ -1285,30 +1296,32 @@ const ProductForm = () => {
                                         />
                                     </div>
                                 </InputGroup>
-                                <InputGroup label={t('comparePrice')} subtitle={t('comparePriceSubtitle')}>
-                                    <div className="relative">
-                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 start-3">$</span>
-                                        <input
-                                            type="number"
-                                            step="0.01"
-                                            className={clsx(
-                                                "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all ps-8 pe-4",
-                                                formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0')
-                                                    ? "border-rose-500 focus:border-rose-500"
-                                                    : "border-slate-200 dark:border-slate-700 focus:border-indigo-500"
-                                            )}
-                                            value={formData.comparePrice}
-                                            onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
-                                            disabled={!canModifyProduct}
-                                        />
-                                    </div>
-                                    {formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0') && (
-                                        <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
-                                            <X size={12} />
-                                            {t('comparePriceError')}
-                                        </p>
-                                    )}
-                                </InputGroup>
+                                {canUseOffersAndDiscounts && (
+                                    <InputGroup label={t('comparePrice')} subtitle={t('comparePriceSubtitle')}>
+                                        <div className="relative">
+                                            <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 start-3">$</span>
+                                            <input
+                                                type="number"
+                                                step="0.01"
+                                                className={clsx(
+                                                    "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border rounded-lg focus:ring-2 focus:ring-indigo-500/20 outline-none transition-all ps-8 pe-4",
+                                                    formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0')
+                                                        ? "border-rose-500 focus:border-rose-500"
+                                                        : "border-slate-200 dark:border-slate-700 focus:border-indigo-500"
+                                                )}
+                                                value={formData.comparePrice}
+                                                onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
+                                                disabled={!canModifyProduct}
+                                            />
+                                        </div>
+                                        {formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0') && (
+                                            <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
+                                                <X size={12} />
+                                                {t('comparePriceError')}
+                                            </p>
+                                        )}
+                                    </InputGroup>
+                                )}
                             </div>
                         </div>
 

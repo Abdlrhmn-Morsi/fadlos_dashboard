@@ -30,7 +30,10 @@
         "driverVerification": "توثيق السائقين",
         "select_options": "اختر...",
         "upgradeRequired": "لقد وصلت إلى الحد المسموح به لـ {{feature}}. يرجى ترقية باقتك.",
-        "errorCheckingLimits": "خطأ في التحقق من حدود الاشتراك"
+        "errorCheckingLimits": "خطأ في التحقق من حدود الاشتراك",
+        "addFirstProduct": "أضف منتجك الأول",
+        "addFirstCategory": "أضف قسمك الأول",
+        "yourCurrentPlanDoesNotSupportProductDiscountsOrOffers": "خطتك الحالية لا تدعم الخصومات أو العروض على المنتجات."
     },
     "results": "نتائج",
     "save": "حفظ",

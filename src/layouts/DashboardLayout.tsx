@@ -20,7 +20,8 @@ import {
   Layers,
   TrendingUp,
   DollarSign,
-  CreditCard
+  CreditCard,
+  BarChart3
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -268,6 +269,7 @@ const DashboardLayout: React.FC = () => {
           {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
             <>
               <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:title')} collapsed={collapsed} />
+              <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
               <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
             </>
           )}

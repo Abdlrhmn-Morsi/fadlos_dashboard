@@ -30,7 +30,10 @@
         "driverVerification": "Driver Verification",
         "select_options": "Select options...",
         "upgradeRequired": "You have reached your {{feature}} limit. Please upgrade your plan.",
-        "errorCheckingLimits": "Error checking subscription limits"
+        "errorCheckingLimits": "Error checking subscription limits",
+        "addFirstProduct": "Add Your First Product",
+        "addFirstCategory": "Add Your First Category",
+        "yourCurrentPlanDoesNotSupportProductDiscountsOrOffers": "Your current plan does not support product discounts or offers."
     },
     "results": "results",
     "save": "Save",

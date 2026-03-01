@@ -860,12 +860,12 @@ const Dashboard: React.FC = () => {
                     {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                             <ShoppingBag size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common.no_results')}</p>
+                            <p className="text-slate-500 text-sm font-medium">{t('common:common.no_results')}</p>
                             <button
                                 onClick={() => navigate('/products')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
                             >
-                                {t('common:addFirstProduct')}
+                                {t('common:common.addFirstProduct')}
                             </button>
                         </div>
                     ) : (
@@ -935,12 +935,12 @@ const Dashboard: React.FC = () => {
                     {!stats.topCategories || stats.topCategories.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                             <Layers size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common.no_results')}</p>
+                            <p className="text-slate-500 text-sm font-medium">{t('common:common.no_results')}</p>
                             <button
                                 onClick={() => navigate('/categories')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
                             >
-                                {t('common:addFirstCategory')}
+                                {t('common:common.addFirstCategory')}
                             </button>
                         </div>
                     ) : (

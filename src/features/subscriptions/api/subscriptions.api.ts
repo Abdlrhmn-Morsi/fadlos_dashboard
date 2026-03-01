@@ -27,6 +27,7 @@ export interface SubscriptionUsage {
     cancelAtPeriodEnd: boolean;
     features: string[];
     limits: Record<string, number>;
+    usage: Record<string, number>;
 }
 
 export const getPlans = async (): Promise<Plan[]> => {

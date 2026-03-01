@@ -274,7 +274,7 @@ const SubscriptionSettings = () => {
                                     </div>
 
                                     <ul className="space-y-4">
-                                        {plan.features.slice(0, 6).map((feature, i) => (
+                                        {plan.features.map((feature, i) => (
                                             <li key={i} className="flex items-start gap-3">
                                                 <div className={clsx(
                                                     "mt-1 p-0.5 rounded-full shrink-0",

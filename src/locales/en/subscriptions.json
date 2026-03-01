@@ -73,7 +73,11 @@
         "Advanced Store Clients CRM": "Advanced Store Clients CRM",
         "Priority Support": "Priority Support",
         "Unlimited Categories": "Unlimited Categories",
-        "Up to 3 Categories": "Up to 3 Categories"
+        "Up to 3 Categories": "Up to 3 Categories",
+        "Order Management": "Order Management",
+        "Product Discounts & Offers": "Product Discounts & Offers",
+        "Frequently Bought Together Products": "Frequently Bought Together Products",
+        "Custom Roles": "Custom Roles"
     },
     "admin": {
         "title": "Subscription Bundles",
@@ -98,7 +102,6 @@
         "tryAgain": "Try Again",
         "unlimitedHint": "* Use -1 for unlimited access.",
         "featureKeys": {
-            "discounts": "Discounts",
             "promocodes": "Promo Codes",
             "store_clients_management": "Clients Management",
             "advanced_analytics": "Advanced Analytics",
@@ -106,6 +109,7 @@
             "reviews_management": "Reviews Management",
             "priority_support": "Priority Support",
             "product_discounts_offers": "Product Discounts & Offers",
+            "frequently_bought_together": "Frequently Bought Together Products",
             "basic_dashboard": "Basic Dashboard",
             "order_management": "Order Management"
         },
@@ -117,5 +121,17 @@
             "staff_accounts": "Staff Accounts",
             "categories": "Categories"
         }
+    },
+    "usage": {
+        "title": "Plan Usage",
+        "description": "Track your resource consumption across your current plan.",
+        "used": "{{count}} used",
+        "of": "of {{limit}}",
+        "unlimited": "Unlimited",
+        "upgradeForMore": "Upgrade your plan for higher limits",
+        "currentPlan": "Current Plan",
+        "resourceUsage": "Resource Usage",
+        "ordersThisMonth": "Orders This Month",
+        "unlockedFeatures": "Plan Features"
     }
 }
