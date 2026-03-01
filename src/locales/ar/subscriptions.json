@@ -65,7 +65,7 @@
         "Unlimited Orders": "طلبات غير محدودة",
         "Up to 10 Delivery Drivers": "ما يصل إلى 10 سائقي توصيل",
         "Up to 5 Staff Roles": "ما يصل إلى 5 أدوار موظفين",
-        "Promo Codes & Discounts": "أكواد الخصم والخصومات",
+        "Promo Codes": "أكواد الخصم",
         "Advanced Analytics": "تحليلات متقدمة",
         "Customer Reviews management": "إدارة مراجعات العملاء",
         "Unlimited Branches": "فروع غير محدودة",
@@ -102,6 +102,7 @@
         "tryAgain": "حاول مرة أخرى",
         "unlimitedHint": "* استخدم -1 للوصول غير المحدود.",
         "featureKeys": {
+            "discounts": "الخصومات",
             "promocodes": "أكواد الخصم",
             "store_clients_management": "إدارة العملاء",
             "advanced_analytics": "تحليلات متقدمة",

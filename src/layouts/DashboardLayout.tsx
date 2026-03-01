@@ -266,12 +266,14 @@ const DashboardLayout: React.FC = () => {
             hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
               <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
             )}
-          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
+          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && (
             <>
               <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:title')} collapsed={collapsed} />
               <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
-              <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
             </>
+          )}
+          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
+            <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
           )}
         </nav>
 

@@ -65,7 +65,7 @@
         "Unlimited Orders": "Unlimited Orders",
         "Up to 10 Delivery Drivers": "Up to 10 Delivery Drivers",
         "Up to 5 Staff Roles": "Up to 5 Staff Roles",
-        "Promo Codes & Discounts": "Promo Codes & Discounts",
+        "Promo Codes": "Promo Codes",
         "Advanced Analytics": "Advanced Analytics",
         "Customer Reviews management": "Customer Reviews management",
         "Unlimited Branches": "Unlimited Branches",
@@ -102,6 +102,7 @@
         "tryAgain": "Try Again",
         "unlimitedHint": "* Use -1 for unlimited access.",
         "featureKeys": {
+            "discounts": "Discounts",
             "promocodes": "Promo Codes",
             "store_clients_management": "Clients Management",
             "advanced_analytics": "Advanced Analytics",
