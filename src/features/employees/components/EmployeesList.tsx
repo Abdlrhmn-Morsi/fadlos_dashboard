@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Users, Power, PowerOff } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Users, Power, PowerOff, ShieldAlert } from 'lucide-react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { EmployeesService } from '../api/employees.api';
@@ -288,9 +288,10 @@ const EmployeesList = () => {
                                                         {emp.username}
                                                     </div>
                                                     {(emp as any).isOverLimit && (
-                                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter text-amber-600 dark:text-amber-400">
-                                                            {t('common:restrictedAccess', { defaultValue: 'Restricted Access' })}
-                                                        </span>
+                                                        <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
+                                                            <ShieldAlert size={14} />
+                                                            {t('common:notAvailableInPlan', { defaultValue: 'Not available in your current plan' })}
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>

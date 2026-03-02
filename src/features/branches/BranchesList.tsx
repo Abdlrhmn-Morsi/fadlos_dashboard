@@ -7,7 +7,7 @@ import { Branch, CreateBranchDto, UpdateBranchDto } from '../../types/branch';
 import { BranchForm } from './components/BranchForm';
 import { Modal } from '../../components/ui/Modal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe, Star, ExternalLink } from 'lucide-react';
+import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe, Star, ExternalLink, ShieldAlert } from 'lucide-react';
 
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
@@ -319,9 +319,10 @@ export const BranchesList: React.FC = () => {
                                                 {branch.place && ` - ${isRTL ? branch.place.arName : branch.place.enName}`}
                                             </h3>
                                             {(branch as any).isOverLimit && (
-                                                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter">
-                                                    {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
-                                                </span>
+                                                <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
+                                                    <ShieldAlert size={14} />
+                                                    {t('common:notAvailableInPlan', { defaultValue: 'Not available in your current plan' })}
+                                                </div>
                                             )}
                                         </div>
                                     </div>

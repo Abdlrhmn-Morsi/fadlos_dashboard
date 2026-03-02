@@ -36,6 +36,7 @@
     "addFirstCategory": "أضف قسمك الأول",
     "yourCurrentPlanDoesNotSupportProductDiscountsOrOffers": "خطتك الحالية لا تدعم الخصومات أو العروض على المنتجات.",
     "hiddenFromCustomers": "مخفي عن العملاء",
+    "notAvailableInPlan": "غير متاح في خطتك الحالية",
     "restrictedAccess": "وصول محدود",
     "planLimitReached:staff_accounts": "تم الوصول إلى الحد الأقصى لحسابات الموظفين لخطتك.",
     "planLimitReached:products": "تم الوصول إلى الحد الأقصى للمنتجات لخطتك.",

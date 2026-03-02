@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Tag, LayoutGrid, ArrowUpDown, MoreHorizontal } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, LayoutGrid, ArrowUpDown, MoreHorizontal, ShieldAlert } from 'lucide-react';
 import categoriesApi from './api/categories.api';
 import CategoryFormModal from './components/CategoryFormModal';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -263,9 +263,10 @@ const CategoryList = () => {
                                                         {isRTL ? category.nameAr || category.name : category.name}
                                                     </span>
                                                     {category.isOverLimit && (
-                                                        <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tighter">
-                                                            {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
-                                                        </span>
+                                                        <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
+                                                            <ShieldAlert size={14} />
+                                                            {t('common:notAvailableInPlan', { defaultValue: 'Not available in your current plan' })}
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>

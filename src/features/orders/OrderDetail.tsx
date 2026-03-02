@@ -1250,97 +1250,108 @@ const OrderDetail = () => {
                                     const isSelected = order.driverId === driver.id;
                                     const isBusy = driver.deliveryProfile?.isBusy
                                         || (driver.activeDeliveriesCount >= maxOrdersPerDriver);
+                                    const isOverLimit = (driver as any).isOverLimit === true;
+                                    const isDisabled = !isVerified || isBusy || isOverLimit;
 
                                     return (
                                         <div
                                             key={driver.id}
-                                            onClick={() => isVerified && !isBusy && handleAssignDriver(driver.id)}
+                                            onClick={() => !isDisabled && handleAssignDriver(driver.id)}
                                             className={clsx(
-                                                "relative w-full flex items-center justify-between p-4 rounded-xl border transition-all text-start group",
-                                                (!isVerified || isBusy)
+                                                "relative w-full flex flex-col p-4 rounded-xl border transition-all text-start group",
+                                                isDisabled
                                                     ? "opacity-60 bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800 cursor-not-allowed grayscale-[0.5]"
                                                     : isSelected
                                                         ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-1 ring-indigo-500/30 cursor-default"
                                                         : "bg-white border-slate-200 hover:border-indigo-300 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-700 hover:shadow-md cursor-pointer"
                                             )}
                                         >
-                                            <div className="flex items-center gap-4">
-                                                <div className={clsx(
-                                                    "w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg shadow-inner",
-                                                    isVerified ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" : "bg-slate-200 dark:bg-slate-800 text-slate-500"
-                                                )}>
-                                                    {driver.deliveryProfile?.avatarUrl ? (
-                                                        <ImageWithFallback
-                                                            src={driver.deliveryProfile.avatarUrl}
-                                                            alt={driver.name}
-                                                            className="w-full h-full object-cover"
-                                                        />
-                                                    ) : (
-                                                        driver.name ? driver.name.charAt(0) : '?'
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <div className="flex items-center gap-2">
-                                                        <h4 className="font-bold text-slate-900 dark:text-white">{driver.name}</h4>
-                                                        {isVerified ? (
-                                                            <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded">
-                                                                <BadgeCheck size={12} />
-                                                                {t('verified', 'Verified')}
-                                                            </div>
+                                            <div className="flex items-center justify-between">
+                                                <div className="flex items-center gap-4">
+                                                    <div className={clsx(
+                                                        "w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg shadow-inner",
+                                                        isVerified ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" : "bg-slate-200 dark:bg-slate-800 text-slate-500"
+                                                    )}>
+                                                        {driver.deliveryProfile?.avatarUrl ? (
+                                                            <ImageWithFallback
+                                                                src={driver.deliveryProfile.avatarUrl}
+                                                                alt={driver.name}
+                                                                className="w-full h-full object-cover"
+                                                            />
                                                         ) : (
-                                                            <div className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-500 dark:bg-slate-700">
-                                                                {driver.deliveryProfile?.verificationStatus || 'Unknown'}
-                                                            </div>
+                                                            driver.name ? driver.name.charAt(0) : '?'
                                                         )}
                                                     </div>
-                                                    <div className="flex items-center gap-3 mt-1">
-                                                        <div className="flex items-center gap-1.5">
-                                                            <span className={clsx(
-                                                                "w-2 h-2 rounded-full",
-                                                                isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
-                                                            )} />
-                                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-                                                                {isBusy
-                                                                    ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
-                                                                    : (t('common:delivery.drivers.status.available', 'Available') as string)}
-                                                            </span>
-                                                        </div>
-                                                        {(driver.activeDeliveriesCount > 0) && (
-                                                            <>
-                                                                <span className="text-slate-300 dark:text-slate-700">•</span>
-                                                                <div className="flex items-center gap-1 text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                                                    <Package size={12} />
-                                                                    <span>{driver.activeDeliveriesCount} {t('activeTasks', 'Active')}</span>
+                                                    <div>
+                                                        <div className="flex items-center gap-2">
+                                                            <h4 className="font-bold text-slate-900 dark:text-white">{driver.name}</h4>
+                                                            {isVerified ? (
+                                                                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded">
+                                                                    <BadgeCheck size={12} />
+                                                                    {t('verified', 'Verified')}
                                                                 </div>
-                                                            </>
-                                                        )}
-                                                        <span className="text-slate-300 dark:text-slate-700">•</span>
-                                                        <span className="text-xs text-slate-500">{driver.phone}</span>
-                                                        {driver.deliveryProfile?.vehicleType && (
-                                                            <>
-                                                                <span className="text-slate-300 dark:text-slate-700">•</span>
-                                                                <span className="text-[10px] text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
-                                                                    {t(`common:vehicle_types.${driver.deliveryProfile.vehicleType}`, driver.deliveryProfile.vehicleType) as string}
+                                                            ) : (
+                                                                <div className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-500 dark:bg-slate-700">
+                                                                    {driver.deliveryProfile?.verificationStatus || 'Unknown'}
+                                                                </div>
+                                                            )}
+                                                        </div>
+                                                        <div className="flex items-center gap-3 mt-1">
+                                                            <div className="flex items-center gap-1.5">
+                                                                <span className={clsx(
+                                                                    "w-2 h-2 rounded-full",
+                                                                    isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
+                                                                )} />
+                                                                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
+                                                                    {isBusy
+                                                                        ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
+                                                                        : (t('common:delivery.drivers.status.available', 'Available') as string)}
                                                                 </span>
-                                                            </>
-                                                        )}
+                                                            </div>
+                                                            {(driver.activeDeliveriesCount > 0) && (
+                                                                <>
+                                                                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                                    <div className="flex items-center gap-1 text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
+                                                                        <Package size={12} />
+                                                                        <span>{driver.activeDeliveriesCount} {t('activeTasks', 'Active')}</span>
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                            <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                            <span className="text-xs text-slate-500">{driver.phone}</span>
+                                                            {driver.deliveryProfile?.vehicleType && (
+                                                                <>
+                                                                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                                                                    <span className="text-[10px] text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
+                                                                        {t(`common:vehicle_types.${driver.deliveryProfile.vehicleType}`, driver.deliveryProfile.vehicleType) as string}
+                                                                    </span>
+                                                                </>
+                                                            )}
+                                                        </div>
                                                     </div>
                                                 </div>
+
+                                                {isSelected ? (
+                                                    <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
+                                                        <CheckCircle size={14} />
+                                                        {t('selected', 'Selected')}
+                                                    </div>
+                                                ) : isVerified && !isBusy && !isOverLimit ? (
+                                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-indigo-200 dark:shadow-none">
+                                                        {t('assign', 'Assign')}
+                                                    </div>
+                                                ) : !isOverLimit ? (
+                                                    <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                                                        <ShieldAlert size={12} />
+                                                        {isBusy ? (t('common:delivery.drivers.status.busy', 'Busy') as string) : t('unverified', 'Unverified')}
+                                                    </div>
+                                                ) : null}
                                             </div>
 
-                                            {isSelected ? (
-                                                <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
-                                                    <CheckCircle size={14} />
-                                                    {t('selected', 'Selected')}
-                                                </div>
-                                            ) : isVerified ? (
-                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-indigo-200 dark:shadow-none">
-                                                    {t('assign', 'Assign')}
-                                                </div>
-                                            ) : (
-                                                <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
-                                                    <ShieldAlert size={12} />
-                                                    {t('unverified', 'Unverified')}
+                                            {isOverLimit && (
+                                                <div className="mt-2 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg">
+                                                    <ShieldAlert size={14} />
+                                                    {t('common:notAvailableInPlan', 'Not available in your current plan')}
                                                 </div>
                                             )}
                                         </div>

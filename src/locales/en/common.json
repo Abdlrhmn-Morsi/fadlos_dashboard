@@ -36,6 +36,7 @@
     "addFirstCategory": "Add Your First Category",
     "yourCurrentPlanDoesNotSupportProductDiscountsOrOffers": "Your current plan does not support product discounts or offers.",
     "hiddenFromCustomers": "Hidden from Customers",
+    "notAvailableInPlan": "Not available in your current plan",
     "restrictedAccess": "Restricted Access",
     "planLimitReached:staff_accounts": "Staff accounts limit reached for your plan.",
     "planLimitReached:products": "Products limit reached for your plan.",

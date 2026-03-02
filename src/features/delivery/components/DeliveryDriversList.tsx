@@ -1,4 +1,4 @@
-import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit, Bike, Footprints, Package, ShieldCheck, Mail, Phone, X, Eye } from 'lucide-react';
+import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit, Bike, Footprints, Package, ShieldCheck, ShieldAlert, Mail, Phone, X, Eye } from 'lucide-react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
@@ -383,9 +383,10 @@ const DeliveryDriversList = () => {
                                                     </div>
                                                     <span className="text-[10px] text-slate-500 lowercase font-medium">@{driver.username}</span>
                                                     {(driver as any).isOverLimit && (
-                                                        <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-tight mt-0.5">
-                                                            {t('common:hiddenFromCustomers', { defaultValue: 'Hidden from Customers' })}
-                                                        </span>
+                                                        <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
+                                                            <ShieldAlert size={14} />
+                                                            {t('common:notAvailableInPlan', { defaultValue: 'Not available in your current plan' })}
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
