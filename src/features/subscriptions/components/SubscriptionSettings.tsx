@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getPlans, getMySubscriptionUsage, Plan, SubscriptionUsage, createCheckoutSession, cancelSubscription, syncSubscription } from '../api/subscriptions.api';
-import { Shield, Check, X, CreditCard, Clock, Zap, RefreshCw } from 'lucide-react';
+import { Shield, Check, X, CreditCard, Clock, Zap, RefreshCw, AlertTriangle } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from '../../../utils/toast';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
+import CountdownTimer from '../../../components/common/CountdownTimer';
 import { usePaddle } from '../../../hooks/usePaddle';
 import { useLanguage } from '../../../contexts/LanguageContext';
 
@@ -134,7 +135,32 @@ const SubscriptionSettings = () => {
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
                         {t('subscriptions:description')}
                     </p>
-                    {usage?.cancelAtPeriodEnd && usage?.currentPeriodEnd && (
+                    {usage?.isGracePeriod ? (
+                        <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-none flex items-start gap-3">
+                            <div className="mt-0.5 text-amber-600 dark:text-amber-400">
+                                <AlertTriangle size={20} />
+                            </div>
+                            <div>
+                                <h4 className="text-sm font-bold text-amber-800 dark:text-amber-300 uppercase tracking-tight">
+                                    {t('subscriptions:planEndingAlert')}
+                                </h4>
+                                <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-amber-200 dark:bg-amber-800 text-amber-900 dark:text-amber-100 font-mono font-bold rounded text-lg shadow-sm">
+                                    {usage.gracePeriodEnd && <CountdownTimer expiryDate={usage.gracePeriodEnd} />}
+                                </div>
+                                <p className="mt-2">
+                                    <button
+                                        onClick={() => {
+                                            const proPlan = plans.find(p => p.id === 'pro');
+                                            if (proPlan) handleSubscribe('pro');
+                                        }}
+                                        className="text-amber-700 dark:text-amber-400 text-xs font-bold underline uppercase tracking-widest hover:text-amber-600 transition-colors"
+                                    >
+                                        {t('subscriptions:renewBundle')}
+                                    </button>
+                                </p>
+                            </div>
+                        </div>
+                    ) : usage?.cancelAtPeriodEnd && usage?.currentPeriodEnd ? (
                         <div className="mt-4 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-[4px] flex items-start gap-3">
                             <div className="mt-0.5 text-red-600 dark:text-red-400">
                                 <Shield size={20} />
@@ -150,7 +176,7 @@ const SubscriptionSettings = () => {
                                 </p>
                             </div>
                         </div>
-                    )}
+                    ) : null}
                 </div>
             </div>
 
@@ -247,9 +273,9 @@ const SubscriptionSettings = () => {
                                     >
                                         {processingId === plan.id || (isCurrentPlan && plan.id !== 'free' && processingId === 'cancel') ? (
                                             <LoadingSpinner size="sm" fullHeight={false} />
-                                        ) : isCurrentPlan && plan.id !== 'free' && usage?.cancelAtPeriodEnd ? (
+                                        ) : isCurrentPlan && plan.id !== 'free' && (usage?.isGracePeriod || usage?.cancelAtPeriodEnd) ? (
                                             <>
-                                                <X size={16} /> {t('subscriptions:cancelledStatus')}
+                                                <RefreshCw size={16} /> {t('subscriptions:renewBundle', { defaultValue: 'Renew bundle' })}
                                             </>
                                         ) : isCurrentPlan && plan.id !== 'free' ? (
                                             <>

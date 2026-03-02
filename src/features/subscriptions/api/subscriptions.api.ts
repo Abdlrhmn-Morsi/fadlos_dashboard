@@ -25,6 +25,9 @@ export interface SubscriptionUsage {
     daysUntilExpiry: number;
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
+    isGracePeriod: boolean;
+    graceDaysRemaining: number;
+    gracePeriodEnd: string | null;
     features: string[];
     limits: Record<string, number>;
     usage: Record<string, number>;

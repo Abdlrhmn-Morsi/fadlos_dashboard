@@ -29,6 +29,8 @@
     "subscriptionCancelledDesc": "Your subscription will be canceled on {{date}}. You will have access to your subscription until the end of your billing cycle.",
     "defaultPlan": "Default Plan",
     "getPlan": "Get {{name}} plan",
+    "renewBundle": "Renew bundle",
+    "planEndingAlert": "Your plan has ended. You have a limited time to renew before losing access to your plan features:",
     "noPlans": "No plans available right now",
     "noPlansDesc": "Please check back later or contact support if the issue persists.",
     "everythingIn": "Everything in {{name}} and:",

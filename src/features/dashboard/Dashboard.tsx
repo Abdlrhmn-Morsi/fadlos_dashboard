@@ -20,6 +20,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { ConfirmModal } from '../../components/ConfirmModal';
 import { toast } from '../../utils/toast';
 import { UserRole } from '../../types/user-role';
+import CountdownTimer from '../../components/common/CountdownTimer';
 import {
     dashboardStatsState,
     dashboardLoadingState,
@@ -233,6 +234,37 @@ const Dashboard: React.FC = () => {
                             {t('common:contactSupportMistake')}
                         </div>
                     )}
+                </div>
+            </div>
+        );
+    };
+
+    const renderGracePeriodBanner = () => {
+        if (!subscription?.isGracePeriod) return null;
+
+        return (
+            <div className={clsx(
+                "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
+                isRTL && "flex-row-reverse"
+            )}>
+                <div className={`p-3 rounded-none bg-white/50 dark:bg-black/20 text-amber-500 h-fit`}>
+                    <AlertTriangle size={24} />
+                </div>
+                <div className={clsx("space-y-1 flex-1", isRTL ? "text-right" : "text-left")}>
+                    <h4 className={`text-lg font-black uppercase tracking-tight text-amber-800 dark:text-amber-300`}>
+                        {t('subscriptions:planEndingAlert')}
+                        {subscription?.gracePeriodEnd && (
+                            <span className="mx-2 bg-amber-200 dark:bg-amber-800 px-2 py-0.5 rounded text-sm min-w-[80px] inline-block text-center">
+                                <CountdownTimer expiryDate={subscription.gracePeriodEnd} />
+                            </span>
+                        )}
+                    </h4>
+                    <button
+                        onClick={() => navigate('/subscription')}
+                        className="text-amber-700 dark:text-amber-400 text-xs font-bold underline uppercase tracking-widest mt-1 hover:text-amber-600 transition-colors"
+                    >
+                        {t('subscriptions:renewBundle')}
+                    </button>
                 </div>
             </div>
         );
@@ -578,6 +610,7 @@ const Dashboard: React.FC = () => {
     return (
         <div className="p-6 space-y-8 animate-in animate-fade">
             {renderStatusBanner()}
+            {renderGracePeriodBanner()}
 
             {/* Subscription Badge */}
             {subscription && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (() => {
