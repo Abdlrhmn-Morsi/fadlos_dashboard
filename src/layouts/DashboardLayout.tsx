@@ -87,7 +87,7 @@ const DashboardLayout: React.FC = () => {
   const { t } = useTranslation(['common', 'subscriptions']);
   const { isRTL } = useLanguage();
   const { user, logout, hasPermission } = useAuth(); // Use AuthContext
-  const { hasFeature } = useSubscription();
+  const { hasFeature, usage } = useSubscription();
 
   const handleLogout = () => {
     setShowLogoutConfirm(true);
@@ -159,12 +159,14 @@ const DashboardLayout: React.FC = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
-
           <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
+
           {user?.role === UserRole.DELIVERY && (
             <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
           )}
-          {hasPermission(Permissions.ANALYTICS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && hasFeature('advanced_analytics') && (
+
+          {/* Analytics - Plan then Permission check */}
+          {(hasFeature('advanced_analytics') || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
             <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
           )}
 
@@ -195,7 +197,7 @@ const DashboardLayout: React.FC = () => {
             </>
           )}
 
-          {/* Store Owner & Employee Links */}
+          {/* Store Management Sections */}
           {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
             <>
               {!collapsed && (
@@ -226,16 +228,10 @@ const DashboardLayout: React.FC = () => {
               {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature('promocodes') && (
                 <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
               )}
-              {hasPermission(Permissions.USERS_VIEW) && hasFeature('store_clients_management') && ( // View customers?
+              {hasPermission(Permissions.USERS_VIEW) && hasFeature('store_clients_management') && (
                 <>
                   <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
                   <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
-                </>
-              )}
-              {hasPermission(Permissions.SETTINGS_VIEW) && (
-                <>
-                  <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
-                  <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
                 </>
               )}
 
@@ -255,26 +251,50 @@ const DashboardLayout: React.FC = () => {
               {hasPermission(Permissions.DELIVERY_DRIVERS_VIEW) && (
                 <SidebarItem to="/delivery-drivers" icon={Truck} label={t('deliveryDrivers')} collapsed={collapsed} />
               )}
-            </>
-          )}
 
+              {!collapsed && (
+                <div className={clsx(
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
+                )}>
+                  {t('subscriptions:title')}
+                </div>
+              )}
+              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-
-          {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER ||
-            hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||
-            hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE) ||
-            hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
-              <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
-            )}
-          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && (
-            <>
-              <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:title')} collapsed={collapsed} />
+              <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:currentPlan')} collapsed={collapsed} />
               <SidebarItem to="/billing-history" icon={DollarSign} label={t('subscriptions:billingHistory.title')} collapsed={collapsed} />
               <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
             </>
           )}
-          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && (
-            <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
+
+          {/* Store Config Section - Shared by all authorized roles */}
+          {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
+            <>
+              {!collapsed && (
+                <div className={clsx(
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
+                )}>
+                  {t('common:storeSettings')}
+                </div>
+              )}
+              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+
+              {hasPermission(Permissions.SETTINGS_VIEW) && (
+                <>
+                  <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
+                  <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
+                </>
+              )}
+              {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN ||
+                hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||
+                hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE) ||
+                hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
+                  <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
+                )}
+              {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
+                <SidebarItem to="/settings" icon={Settings} label={t('settings')} collapsed={collapsed} />
+              )}
+            </>
           )}
         </nav>
 
@@ -382,7 +402,7 @@ const DashboardLayout: React.FC = () => {
         onConfirm={confirmLogout}
         confirmText={t('confirmLogout')}
       />
-    </div>
+    </div >
   );
 };
 

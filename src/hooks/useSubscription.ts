@@ -30,7 +30,14 @@ export const useSubscription = () => {
 
     const hasFeature = (feature: string): boolean => {
         if (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) return true;
-        if (!usage || !Array.isArray(usage.features)) return false;
+        if (!usage) return false;
+
+        // Fallback: If feature check is for analytics, also check plan name
+        if (feature === 'advanced_analytics' && (usage.plan?.toLowerCase() === 'premium' || usage.plan?.toLowerCase() === 'pro')) {
+            return true;
+        }
+
+        if (!Array.isArray(usage.features)) return false;
         return usage.features.includes(feature);
     };
 
