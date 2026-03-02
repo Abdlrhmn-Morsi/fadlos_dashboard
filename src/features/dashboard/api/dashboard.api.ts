@@ -55,30 +55,24 @@ export const fetchDashboardStats = async (user: any) => {
             const storeId = user.store?.id || user.storeId;
 
             // 1. Order Stats (Requires orders.view OR analytics.view)
-            // If the user only has orders.update, they might not be allowed to see stats.
-            // We'll require orders.view for now as it's the safest bet for "reading" order data.
             if (hasPerm('orders.view') || hasPerm('analytics.view')) {
                 try {
-                    const [thirtyDays, today] = await Promise.all([
-                        apiService.get('/orders/stats/summary?period=30d'),
-                        apiService.get('/orders/stats/summary?period=today')
-                    ]);
+                    const basicStats = await apiService.get('/orders/stats/basic');
+                    const data = basicStats.data || basicStats;
 
-                    const data = thirtyDays.data || thirtyDays;
                     stats.totalRevenue = data.totalRevenue || 0;
-                    stats.totalConfirmedRevenue = data.confirmedRevenue || 0;
-                    stats.totalPendingRevenue = data.pendingRevenue || 0;
+                    stats.totalConfirmedRevenue = data.totalConfirmedRevenue || 0;
+                    stats.totalPendingRevenue = data.totalPendingRevenue || 0;
                     stats.totalOrders = data.totalOrders || 0;
                     stats.avgOrderValue = data.averageOrderValue || 0;
-                    stats.pendingOrders = data.statusCounts?.pending || 0;
+                    stats.pendingOrders = data.pendingOrders || 0;
                     stats.statusCounts = data.statusCounts || {};
                     stats.chartData = data.chartData || [];
 
-                    const todayData = today.data || today;
-                    stats.todayRevenue = todayData.totalRevenue || 0;
-                    stats.todayConfirmedRevenue = todayData.confirmedRevenue || 0;
-                    stats.todayPendingRevenue = todayData.pendingRevenue || 0;
-                    stats.todayOrders = todayData.totalOrders || 0;
+                    stats.todayRevenue = data.todayRevenue || 0;
+                    stats.todayConfirmedRevenue = data.todayConfirmedRevenue || 0;
+                    stats.todayPendingRevenue = data.todayPendingRevenue || 0;
+                    stats.todayOrders = data.todayOrders || 0;
                 } catch (e) {
                     console.warn('Failed to fetch order stats', e);
                 }
