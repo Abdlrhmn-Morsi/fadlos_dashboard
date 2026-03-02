@@ -269,6 +269,7 @@ const DashboardLayout: React.FC = () => {
           {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE) && user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && (
             <>
               <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:title')} collapsed={collapsed} />
+              <SidebarItem to="/billing-history" icon={DollarSign} label={t('subscriptions:billingHistory.title')} collapsed={collapsed} />
               <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
             </>
           )}

@@ -157,5 +157,19 @@
         "resourceUsage": "استخدام الموارد",
         "ordersThisMonth": "طلبات هذا الشهر",
         "unlockedFeatures": "ميزات الخطة"
+    },
+    "billingHistory": {
+        "title": "تاريخ الفوترة",
+        "description": "عرض وإدارة مدفوعات الاشتراك السابقة الخاصة بك.",
+        "date": "التاريخ",
+        "plan": "الخطة",
+        "amount": "المبلغ",
+        "status": "الحالة",
+        "cycle": "الدورة",
+        "period": "الفترة",
+        "noHistory": "لم يتم العثور على سجل فوترة.",
+        "status_completed": "مكتمل",
+        "status_failed": "فاشل",
+        "status_refunded": "تم الاسترداد"
     }
 }

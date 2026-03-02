@@ -157,5 +157,19 @@
         "resourceUsage": "Resource Usage",
         "ordersThisMonth": "Orders This Month",
         "unlockedFeatures": "Plan Features"
+    },
+    "billingHistory": {
+        "title": "Billing History",
+        "description": "View and manage your past subscription payments.",
+        "date": "Date",
+        "plan": "Plan",
+        "amount": "Amount",
+        "status": "Status",
+        "cycle": "Cycle",
+        "period": "Period",
+        "noHistory": "No billing history found.",
+        "status_completed": "Completed",
+        "status_failed": "Failed",
+        "status_refunded": "Refunded"
     }
 }

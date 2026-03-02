@@ -56,3 +56,8 @@ export const syncSubscription = async (): Promise<SubscriptionUsage> => {
     const response = await api.post('/subscriptions/sync');
     return response.data.data;
 };
+
+export const getBillingHistory = async (): Promise<any[]> => {
+    const response = await api.get('/subscriptions/billing-history');
+    return response.data.data || response.data;
+};

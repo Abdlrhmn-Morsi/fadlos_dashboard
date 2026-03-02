@@ -48,6 +48,7 @@ import DriverVerificationPage from './features/delivery/pages/DriverVerification
 import DriverDetail from './features/delivery/pages/DriverDetail';
 import SubscriptionPage from './features/subscriptions/pages/SubscriptionPage';
 import UsagePage from './features/subscriptions/pages/UsagePage';
+import BillingHistory from './features/subscriptions/components/BillingHistory';
 import PlansManagement from './features/subscriptions-admin/pages/PlansManagement';
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -157,6 +158,7 @@ const AppContent = () => {
             <Route path="app-updates" element={<AppUpdateSettings />} />
             <Route path="app-version-history" element={<AppVersionHistory />} />
             <Route path="subscription" element={<PermissionGate permission={Permissions.STORE_VIEW}><SubscriptionPage /></PermissionGate>} />
+            <Route path="billing-history" element={<PermissionGate permission={Permissions.STORE_VIEW}><BillingHistory /></PermissionGate>} />
             <Route path="usage" element={<PermissionGate permission={Permissions.STORE_VIEW}><UsagePage /></PermissionGate>} />
             <Route path="notifications" element={
               (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER ||
