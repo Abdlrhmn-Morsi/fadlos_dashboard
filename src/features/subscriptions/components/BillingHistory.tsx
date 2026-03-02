@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     CreditCard,
@@ -7,7 +7,9 @@ import {
     CheckCircle2,
     XCircle,
     RefreshCcw,
-    Clock
+    Clock,
+    ChevronLeft,
+    ChevronRight,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { getBillingHistory } from '../api/subscriptions.api';
@@ -26,25 +28,49 @@ interface BillingItem {
     periodEnd?: string;
 }
 
+interface PaginationMeta {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+    hasNextPage: boolean;
+    hasPreviousPage: boolean;
+}
+
+const ITEMS_PER_PAGE = 10;
+
 const BillingHistory: React.FC = () => {
     const { t } = useTranslation(['subscriptions', 'common']);
     const { isRTL } = useLanguage();
     const [history, setHistory] = useState<BillingItem[]>([]);
     const [loading, setLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [meta, setMeta] = useState<PaginationMeta | null>(null);
+
+    const fetchHistory = useCallback(async (pageNum: number) => {
+        setLoading(true);
+        try {
+            const response = await getBillingHistory(pageNum, ITEMS_PER_PAGE);
+            setHistory(response.data || []);
+            setMeta(response.meta || null);
+        } catch (error) {
+            console.error('Failed to fetch billing history:', error);
+        } finally {
+            setLoading(false);
+        }
+    }, []);
 
     useEffect(() => {
-        const fetchHistory = async () => {
-            try {
-                const data = await getBillingHistory();
-                setHistory(data);
-            } catch (error) {
-                console.error('Failed to fetch billing history:', error);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchHistory();
-    }, []);
+        fetchHistory(page);
+    }, [page, fetchHistory]);
+
+    const handlePrevPage = () => {
+        if (meta?.hasPreviousPage) setPage((p) => p - 1);
+    };
+
+    const handleNextPage = () => {
+        if (meta?.hasNextPage) setPage((p) => p + 1);
+    };
 
     const getStatusIcon = (status: string) => {
         switch (status.toLowerCase()) {
@@ -74,7 +100,7 @@ const BillingHistory: React.FC = () => {
         }
     };
 
-    if (loading) {
+    if (loading && history.length === 0) {
         return (
             <div className="p-8 flex justify-center items-center flex-col gap-4">
                 <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
@@ -209,6 +235,83 @@ const BillingHistory: React.FC = () => {
                         </tbody>
                     </table>
                 </div>
+
+                {/* Pagination Controls */}
+                {meta && meta.totalPages > 1 && (
+                    <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+                        <div className="text-xs font-medium text-slate-500">
+                            {t('common:pagination.showing', {
+                                from: (meta.page - 1) * meta.limit + 1,
+                                to: Math.min(meta.page * meta.limit, meta.total),
+                                total: meta.total,
+                                defaultValue: `${(meta.page - 1) * meta.limit + 1}-${Math.min(meta.page * meta.limit, meta.total)} of ${meta.total}`,
+                            })}
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={handlePrevPage}
+                                disabled={!meta.hasPreviousPage || loading}
+                                className={clsx(
+                                    "inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-200",
+                                    meta.hasPreviousPage && !loading
+                                        ? "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white hover:border-primary cursor-pointer"
+                                        : "border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                )}
+                            >
+                                {isRTL ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                            </button>
+
+                            <div className="flex items-center gap-1">
+                                {Array.from({ length: meta.totalPages }, (_, i) => i + 1)
+                                    .filter((p) => {
+                                        if (meta.totalPages <= 5) return true;
+                                        if (p === 1 || p === meta.totalPages) return true;
+                                        if (Math.abs(p - page) <= 1) return true;
+                                        return false;
+                                    })
+                                    .reduce<(number | string)[]>((acc, p, idx, arr) => {
+                                        if (idx > 0 && p - (arr[idx - 1] as number) > 1) {
+                                            acc.push('...');
+                                        }
+                                        acc.push(p);
+                                        return acc;
+                                    }, [])
+                                    .map((p, idx) =>
+                                        typeof p === 'string' ? (
+                                            <span key={`ellipsis-${idx}`} className="px-1 text-slate-400 text-xs">...</span>
+                                        ) : (
+                                            <button
+                                                key={p}
+                                                onClick={() => setPage(p)}
+                                                disabled={loading}
+                                                className={clsx(
+                                                    "w-8 h-8 rounded-lg text-xs font-bold transition-all duration-200",
+                                                    p === page
+                                                        ? "bg-primary text-white shadow-md shadow-primary/30"
+                                                        : "text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                                                )}
+                                            >
+                                                {p}
+                                            </button>
+                                        )
+                                    )}
+                            </div>
+
+                            <button
+                                onClick={handleNextPage}
+                                disabled={!meta.hasNextPage || loading}
+                                className={clsx(
+                                    "inline-flex items-center justify-center w-8 h-8 rounded-lg border transition-all duration-200",
+                                    meta.hasNextPage && !loading
+                                        ? "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white hover:border-primary cursor-pointer"
+                                        : "border-slate-100 dark:border-slate-800 text-slate-300 dark:text-slate-600 cursor-not-allowed"
+                                )}
+                            >
+                                {isRTL ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
+                            </button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

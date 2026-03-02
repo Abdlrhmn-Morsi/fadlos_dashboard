@@ -57,7 +57,7 @@ export const syncSubscription = async (): Promise<SubscriptionUsage> => {
     return response.data.data;
 };
 
-export const getBillingHistory = async (): Promise<any[]> => {
-    const response = await api.get('/subscriptions/billing-history');
-    return response.data.data || response.data;
+export const getBillingHistory = async (page = 1, limit = 10): Promise<{ data: any[]; meta: any }> => {
+    const response = await api.get(`/subscriptions/billing-history?page=${page}&limit=${limit}`);
+    return response.data;
 };

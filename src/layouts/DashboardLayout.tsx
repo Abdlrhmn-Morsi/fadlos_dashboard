@@ -165,8 +165,8 @@ const DashboardLayout: React.FC = () => {
             <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
           )}
 
-          {/* Analytics - Plan then Permission check */}
-          {(hasFeature('advanced_analytics') || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
+          {/* Analytics - Plan then Permission check (hidden for super admin) */}
+          {user?.role !== UserRole.SUPER_ADMIN && (hasFeature('advanced_analytics') || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
             <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
           )}
 
@@ -279,7 +279,7 @@ const DashboardLayout: React.FC = () => {
               )}
               {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-              {hasPermission(Permissions.SETTINGS_VIEW) && (
+              {hasPermission(Permissions.SETTINGS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && (
                 <>
                   <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
                   <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
