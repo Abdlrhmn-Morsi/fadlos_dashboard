@@ -122,7 +122,7 @@ const EmployeeForm = () => {
     }
 
     return (
-        <form onSubmit={handleSubmit} className="p-6 max-w-4xl mx-auto space-y-6">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className="flex items-center gap-4">

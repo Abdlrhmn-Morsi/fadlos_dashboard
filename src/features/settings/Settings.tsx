@@ -68,7 +68,7 @@ const Settings = () => {
 
     return (
 
-        <div className="p-6 max-w-6xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="p-6" dir={isRTL ? 'rtl' : 'ltr'}>
             {/* Header Area */}
             <div className="flex flex-col gap-4 mb-12">
                 <div className="flex items-center gap-4">

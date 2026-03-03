@@ -143,8 +143,8 @@ const ProfileSettings = () => {
     };
 
     return (
-        <div className="p-6 max-w-2xl mx-auto space-y-8 animate-in animate-fade" dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className="flex items-center gap-4 mb-12">
+        <div className="p-6 space-y-8 animate-in animate-fade" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="max-w-4xl mx-auto flex items-center gap-4 mb-12">
                 <div className="p-4 bg-primary-light dark:bg-primary/20 rounded-none shadow-inner">
                     <User size={32} className="text-primary" />
                 </div>
@@ -163,7 +163,7 @@ const ProfileSettings = () => {
 
             {/* Personal Information Section */}
             {activeTab === 'profile' && (
-                <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <section className="max-w-4xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                         <User size={20} className="text-primary" />
                         <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:personalInformation')}</h3>
@@ -273,7 +273,7 @@ const ProfileSettings = () => {
 
             {/* Security Section */}
             {activeTab === 'security' && (
-                <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
+                <section className="max-w-4xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                         <Lock size={20} className="text-primary" />
                         <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:updatePassword')}</h3>

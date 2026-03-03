@@ -49,7 +49,7 @@ const ProductDetail = () => {
     }
 
     return (
-        <div className="p-6 max-w-5xl mx-auto" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="p-6" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                     <button

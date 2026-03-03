@@ -100,7 +100,7 @@ const DriverDashboard = () => {
     }
 
     return (
-        <div className="p-4 md:p-6 space-y-6 max-w-4xl mx-auto">
+        <div className="p-6 space-y-6">
             {/* Header / Status Card */}
             <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                 <div className="flex items-center justify-between">

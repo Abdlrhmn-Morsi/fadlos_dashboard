@@ -443,7 +443,7 @@ const OrderDetail = () => {
 
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6" dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className="max-w-6xl mx-auto space-y-6">
+            <div className="p-6 space-y-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">

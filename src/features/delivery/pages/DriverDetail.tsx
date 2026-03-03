@@ -215,7 +215,7 @@ const DriverDetail: React.FC = () => {
     }
 
     return (
-        <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6 lg:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 max-w-7xl mx-auto">
+        <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
             {/* Top Bar Navigation */}
             <div className="flex items-center justify-between">
                 <button

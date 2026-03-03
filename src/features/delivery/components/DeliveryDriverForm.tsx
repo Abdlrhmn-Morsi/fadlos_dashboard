@@ -296,7 +296,7 @@ const DeliveryDriverForm = () => {
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="p-6 max-w-4xl mx-auto space-y-6">
+            <form onSubmit={handleSubmit} className="p-6 space-y-6">
                 {isEditMode && verificationStatus === 'REJECTED' && rejectionReason && (
                     <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-900/30 rounded-2xl flex gap-3 animate-in fade-in slide-in-from-top-4 duration-300">
                         <XCircle size={20} className="text-rose-500 shrink-0" />

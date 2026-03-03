@@ -387,9 +387,7 @@ const DashboardLayout: React.FC = () => {
         </header>
 
         <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative z-10 custom-scrollbar transition-colors">
-          <div className="max-w-[1600px] mx-auto">
-            <Outlet />
-          </div>
+          <Outlet />
         </main>
       </div>
 

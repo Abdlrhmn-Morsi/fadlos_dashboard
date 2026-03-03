@@ -207,7 +207,7 @@ export const BranchesList: React.FC = () => {
     );
 
     return (
-        <div className="px-4 sm:px-6 lg:px-8 py-10 bg-gray-50/50 dark:bg-gray-900/50 min-h-screen">
+        <div className="p-6 bg-gray-50/50 dark:bg-gray-900/50 min-h-screen">
             {/* Header Section */}
             <div className="relative mb-6">
                 <div className="absolute -top-10 -left-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>

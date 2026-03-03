@@ -117,7 +117,7 @@ const DeliveryDriversPage = () => {
     };
 
     return (
-        <div className="p-4 space-y-6">
+        <div className="p-6 space-y-6">
             <h1 className="text-2xl font-bold mb-4">{t('delivery.drivers.title', 'Store Drivers')}</h1>
 
             <div className="flex border-b border-slate-200 dark:border-slate-700 overflow-x-auto">

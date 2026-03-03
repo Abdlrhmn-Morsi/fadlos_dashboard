@@ -26,7 +26,7 @@ const DeliveryAreasPage = () => {
             </div>
 
             <section className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm">
-                <div className="p-8">
+                <div className="p-6">
                     <DeliveryAreas />
                 </div>
             </section>

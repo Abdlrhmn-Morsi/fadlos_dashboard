@@ -108,7 +108,7 @@ const SubscriptionSettings = () => {
     }
 
     return (
-        <div className="p-6 max-w-7xl mx-auto space-y-8 animate-fadeIn">
+        <div className="p-6 space-y-8 animate-fadeIn">
             {/* Header Section */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className={isRTL ? 'text-right' : 'text-left'}>

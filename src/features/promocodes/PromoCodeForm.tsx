@@ -231,7 +231,7 @@ const PromoCodeForm = () => {
     );
 
     return (
-        <div className="max-w-5xl mx-auto p-6" dir={isRTL ? 'rtl' : 'ltr'}>
+        <div className="p-6" dir={isRTL ? 'rtl' : 'ltr'}>
             <form onSubmit={handleSubmit}>
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">

@@ -79,7 +79,7 @@ const UsagePage: React.FC = () => {
     const limitEntries = Object.entries(data.limits || {});
 
     return (
-        <div className={clsx("p-6 md:p-8 space-y-8", isRTL && "text-right")}>
+        <div className={clsx("p-6 space-y-8", isRTL && "text-right")}>
             {/* Header */}
             <div>
                 <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
