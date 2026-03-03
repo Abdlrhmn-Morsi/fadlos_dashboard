@@ -7,7 +7,6 @@ import {
     Phone,
     Mail,
     Briefcase,
-    MapPin,
     Loader2,
     CheckCircle,
     XCircle,
@@ -33,8 +32,6 @@ import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getMyStore, updateStore } from '../stores/api/stores.api';
 import { getBusinessTypes } from '../business-types/api/business-types.api';
-import { getCities } from '../cities/api/cities.api';
-import { getTowns } from '../towns/api/towns.api';
 import { getBusinessCategories } from '../store-categories/api/business-categories.api';
 import { toast } from '../../utils/toast';
 import toolsApi from '../../services/tools.api';
@@ -64,8 +61,6 @@ const StoreSettings = () => {
     const [saving, setSaving] = useState(false);
     const [storeData, setStoreData] = useState<any>(null);
     const [businessTypes, setBusinessTypes] = useState<any[]>([]);
-    const [cities, setCities] = useState<any[]>([]);
-    const [towns, setTowns] = useState<any[]>([]);
     const [availableCategories, setAvailableCategories] = useState<any[]>([]);
     const { hasPermission } = useAuth();
     const navigate = useNavigate();
@@ -83,8 +78,6 @@ const StoreSettings = () => {
         phone: '',
         email: '',
         businessTypeId: '',
-        townIds: [] as string[],
-        placeIds: [] as string[],
         businessCategoryIds: [] as string[],
         whatsapp: '',
         socialMedia: [] as { platform: string; url: string }[],
@@ -109,18 +102,14 @@ const StoreSettings = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [store, bTypes, allCities, allTowns, allCategories] = await Promise.all([
+            const [store, bTypes, allCategories] = await Promise.all([
                 getMyStore(),
                 getBusinessTypes(),
-                getCities({}),
-                getTowns({ limit: 0 }),
                 getMyStore().then(store => store.businessType?.id ? getBusinessCategories(store.businessType.id) : [])
             ]);
 
             setStoreData(store);
             setBusinessTypes(bTypes);
-            setCities(allCities);
-            setTowns(Array.isArray(allTowns) ? allTowns : allTowns?.data || []);
             setAvailableCategories(allCategories);
 
             setFormData({
@@ -131,8 +120,6 @@ const StoreSettings = () => {
                 phone: store.phone || '',
                 email: store.email || '',
                 businessTypeId: store.businessType?.id || '',
-                townIds: store.towns?.map((t: any) => t.id) || [],
-                placeIds: store.places?.map((p: any) => p.id) || [],
                 businessCategoryIds: store.businessCategories?.map((c: any) => c.id) || [],
                 whatsapp: store.whatsapp || '',
                 socialMedia: Array.isArray(store.socialMedia)
@@ -208,18 +195,6 @@ const StoreSettings = () => {
         }
     };
 
-    const handleLocationChange = (type: 'townIds' | 'placeIds', id: string) => {
-        setFormData(prev => {
-            const current = [...prev[type]];
-            const index = current.indexOf(id);
-            if (index > -1) {
-                current.splice(index, 1);
-            } else {
-                current.push(id);
-            }
-            return { ...prev, [type]: current };
-        });
-    };
 
     const handleCategoryChange = (id: string) => {
         setFormData(prev => {
@@ -314,17 +289,6 @@ const StoreSettings = () => {
             data.append('email', formData.email);
             data.append('businessTypeId', formData.businessTypeId);
 
-            if (formData.townIds.length > 0) {
-                formData.townIds.forEach(id => data.append('townIds', id));
-            } else {
-                data.append('townIds', '[]');
-            }
-
-            if (formData.placeIds.length > 0) {
-                formData.placeIds.forEach(id => data.append('placeIds', id));
-            } else {
-                data.append('placeIds', '[]');
-            }
 
             if (formData.businessCategoryIds.length > 0) {
                 formData.businessCategoryIds.forEach(id => data.append('businessCategoryIds', id));
@@ -831,100 +795,6 @@ const StoreSettings = () => {
                             </div>
                         </section>
 
-                        <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
-                            <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
-                                <div className="p-2.5 bg-primary/10 rounded-lg">
-                                    <MapPin size={24} className="text-primary" />
-                                </div>
-                                <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('serviceCoverage')}</h3>
-                            </div>
-
-                            <div className="p-8 space-y-8">
-                                <div>
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">{t('common:cities')}</label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {cities.map(city => (
-                                            <button
-                                                key={city.id}
-                                                type="button"
-                                                onClick={() => !isReadOnly && handleLocationChange('townIds', city.id)}
-                                                className={clsx(
-                                                    "flex items-center justify-between p-5 border rounded transition-all font-bold text-sm",
-                                                    formData.townIds.includes(city.id)
-                                                        ? "bg-primary/5 border-primary text-primary shadow-sm"
-                                                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50",
-                                                    isReadOnly && "cursor-default opacity-80"
-                                                )}
-                                            >
-                                                {currentLng.startsWith('ar') ? city.arName : city.enName}
-                                                {formData.townIds.includes(city.id) ? (
-                                                    <div className="bg-primary text-white p-1 rounded-full"><CheckCircle size={14} /></div>
-                                                ) : (
-                                                    <div className="text-slate-300"><XCircle size={14} strokeWidth={1} /></div>
-                                                )}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest block mb-4">{t('common:towns')}</label>
-                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                        {towns.filter(t => formData.townIds.includes(t.townId)).map(town => (
-                                            <button
-                                                key={town.id}
-                                                type="button"
-                                                onClick={() => !isReadOnly && handleLocationChange('placeIds', town.id)}
-                                                className={clsx(
-                                                    "flex items-center justify-between p-5 border rounded transition-all font-bold text-sm",
-                                                    formData.placeIds.includes(town.id)
-                                                        ? "bg-primary/5 border-primary text-primary shadow-sm"
-                                                        : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-primary/50",
-                                                    isReadOnly && "cursor-default opacity-80"
-                                                )}
-                                            >
-                                                {currentLng.startsWith('ar') ? town.arName : town.enName}
-                                                {formData.placeIds.includes(town.id) ? (
-                                                    <div className="bg-primary text-white p-1 rounded-full"><CheckCircle size={14} /></div>
-                                                ) : (
-                                                    <div className="text-slate-300"><XCircle size={14} strokeWidth={1} /></div>
-                                                )}
-                                            </button>
-                                        ))}
-                                        {formData.townIds.length === 0 && (
-                                            <div className="col-span-full py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-400 font-medium">
-                                                {t('selectCitiesFirst')}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
-                                        <Users size={14} /> {t('hiringSettings', 'Hiring Settings')}
-                                    </label>
-                                    <div className="p-6 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-between transition-all">
-                                        <div className="space-y-1">
-                                            <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('isHiringDrivers', 'Are you hiring drivers?')}</h4>
-                                            <p className="text-slate-500 text-[10px] italic leading-relaxed pr-8">
-                                                {t('isHiringDriversDesc', 'Enable this to allow freelance drivers to find and apply to work with your store.')}
-                                            </p>
-                                        </div>
-                                        <label className={"relative inline-flex items-center cursor-pointer"}>
-                                            <input
-                                                type="checkbox"
-                                                name="isHiringDrivers"
-                                                className="sr-only peer"
-                                                checked={formData.isHiringDrivers}
-                                                onChange={handleChange}
-                                                disabled={isReadOnly}
-                                            />
-                                            <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary dark:peer-checked:bg-primary shadow-sm disabled:opacity-50"></div>
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </section>
 
                         {/* Reviews & Feedback Section */}
                         <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
