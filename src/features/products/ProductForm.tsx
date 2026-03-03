@@ -982,7 +982,7 @@ const ProductForm = () => {
                                     </div>
                                     <button
                                         type="button"
-                                        onClick={() => navigate('/usage')}
+                                        onClick={() => navigate('/subscription')}
                                         className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors"
                                     >
                                         {t('common:upgradePlan', { defaultValue: 'Upgrade Plan' })}
@@ -1378,7 +1378,7 @@ const ProductForm = () => {
                                             disabled={!canModifyProduct || !canUseOffersAndDiscounts}
                                         />
                                         {!canUseOffersAndDiscounts && (
-                                            <div className="absolute inset-0 bg-transparent cursor-pointer" onClick={() => navigate('/usage')} />
+                                            <div className="absolute inset-0 bg-transparent cursor-pointer" onClick={() => navigate('/subscription')} />
                                         )}
                                     </div>
                                     {!canUseOffersAndDiscounts && (
