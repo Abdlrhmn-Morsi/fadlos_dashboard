@@ -16,20 +16,10 @@ const RESOURCE_CONFIG: Record<string, { icon: React.ElementType; colorClass: str
     drivers: { icon: Truck, colorClass: 'text-blue-500', bgClass: 'bg-blue-500' },
     staff_accounts: { icon: Users, colorClass: 'text-violet-500', bgClass: 'bg-violet-500' },
     orders_per_month: { icon: ShoppingBag, colorClass: 'text-rose-500', bgClass: 'bg-rose-500' },
+    promotion_ads_per_month: { icon: BarChart3, colorClass: 'text-emerald-500', bgClass: 'bg-emerald-500' },
 };
 
-const ALL_FEATURES = [
-    'basic_dashboard',
-    'order_management',
-    'promocodes',
-    'advanced_analytics',
-    'reviews_management',
-    'store_clients_management',
-    'custom_roles',
-    'product_discounts_offers',
-    'frequently_bought_together',
-    'priority_support',
-];
+// ALL_FEATURES is now dynamic from the backend
 
 const UsagePage: React.FC = () => {
     const { t } = useTranslation(['subscriptions', 'common']);
@@ -242,7 +232,7 @@ const UsagePage: React.FC = () => {
                 </h2>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-                    {ALL_FEATURES.map((feature) => {
+                    {(data.allAvailableFeatures || []).map((feature) => {
                         const isUnlocked = data.features?.includes(feature);
                         return (
                             <div

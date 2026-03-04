@@ -4,19 +4,22 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCache } from '../../contexts/CacheContext';
+import { useNavigate } from 'react-router-dom';
 import followersApi from './api/followers.api';
 import clsx from 'clsx';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 import { Pagination } from '../../components/common/Pagination';
+import { Megaphone } from 'lucide-react';
 
 const FollowerList = () => {
-    const { t } = useTranslation(['followers', 'common']);
+    const { t } = useTranslation(['followers', 'common', 'subscriptions']);
     const { isRTL } = useLanguage();
     const { user } = useAuth();
     const { getCache, setCache } = useCache();
+    const navigate = useNavigate();
     const [followers, setFollowers] = useState<any[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [debouncedSearch, setDebouncedSearch] = useState(''); // Add debounced search state
+    const [debouncedSearch, setDebouncedSearch] = useState('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -30,18 +33,16 @@ const FollowerList = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearch(searchTerm);
-            setPage(1); // Reset page when search changes
+            setPage(1);
         }, 2000);
         return () => clearTimeout(timer);
     }, [searchTerm]);
-
-
 
     useEffect(() => {
         if (user) {
             fetchFollowers();
         }
-    }, [user, debouncedSearch, page]); // Add page to dependencies
+    }, [user, debouncedSearch, page]);
 
     const fetchFollowers = async () => {
         try {
@@ -54,7 +55,6 @@ const FollowerList = () => {
                 return;
             }
 
-            // Check cache first (only if no search)
             const cacheKey = 'followers';
             const params = { page, limit, search: debouncedSearch };
 
@@ -75,21 +75,16 @@ const FollowerList = () => {
                 }
             }
 
-            // Pass debouncedSearch to API
             const response: any = await followersApi.getStoreFollowers(storeId, debouncedSearch, page, limit);
 
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
                 setFollowers(response.data);
-
-                // Update pagination from response
                 if (response.total !== undefined) setTotalItems(response.total);
                 if (response.totalPages !== undefined) {
                     setTotalPages(response.totalPages);
                 } else if (response.total !== undefined) {
                     setTotalPages(Math.ceil(response.total / limit));
                 }
-
-                // Cache the response only if no search filter
                 if (!debouncedSearch) {
                     setCache(cacheKey, response, params);
                 }
@@ -97,7 +92,6 @@ const FollowerList = () => {
                 setFollowers(response);
                 setTotalItems(response.length);
                 setTotalPages(1);
-
                 if (!debouncedSearch) {
                     setCache(cacheKey, response, params);
                 }
@@ -149,6 +143,14 @@ const FollowerList = () => {
                         <Users size={16} className="text-primary" />
                         <span className="font-black text-[10px] uppercase tracking-tight">{t('communityReach')}</span>
                     </div>
+
+                    <button
+                        onClick={() => navigate('/send-promotion?source=followers')}
+                        className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0"
+                    >
+                        <Megaphone size={16} />
+                        <span className="hidden sm:inline">{t('subscriptions:promotions.send')}</span>
+                    </button>
                 </div>
             </div>
 
@@ -193,8 +195,6 @@ const FollowerList = () => {
                                             </h3>
                                         </div>
                                     </div>
-
-                                    {/* High-end accent details */}
                                     <div className={clsx("absolute top-2 w-1.5 h-1.5 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-primary transition-colors", isRTL ? "left-2" : "right-2")} />
                                 </div>
                             );

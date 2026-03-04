@@ -50,7 +50,8 @@
         "categories": "فئات",
         "orders_per_month": "طلبات في الشهر",
         "drivers": "سائقي توصيل",
-        "staff_accounts": "أدوار موظفين"
+        "staff_accounts": "أدوار موظفين",
+        "promotion_ads_per_month": "إعلانات ترويجية"
     },
     "plans": {
         "free": {
@@ -95,6 +96,7 @@
         "order_management": "إدارة الطلبات",
         "promocodes": "أكواد الخصم",
         "store_clients_management": "نظام إدارة علاقات العملاء المتقدم",
+        "store_followers_management": "إدارة متابعي المتجر",
         "advanced_analytics": "تحليلات متقدمة",
         "custom_roles": "أدوار مخصصة",
         "reviews_management": "إدارة مراجعات العملاء",
@@ -128,6 +130,7 @@
             "discounts": "الخصومات",
             "promocodes": "أكواد الخصم",
             "store_clients_management": "إدارة العملاء",
+            "store_followers_management": "إدارة المتابعين",
             "advanced_analytics": "تحليلات متقدمة",
             "custom_roles": "أدوار مخصصة",
             "reviews_management": "إدارة المراجعات",
@@ -135,7 +138,8 @@
             "product_discounts_offers": "خصومات وعروض المنتجات",
             "frequently_bought_together": "منتجات تُشترى معًا بشكل متكرر",
             "basic_dashboard": "لوحة تحكم أساسية",
-            "order_management": "إدارة الطلبات"
+            "order_management": "إدارة الطلبات",
+            "promotion_ads_per_month": "إعلانات ترويجية"
         },
         "limitKeys": {
             "branches": "الفروع",
@@ -143,8 +147,53 @@
             "orders_per_month": "الطلبات شهريًا",
             "drivers": "السائقين",
             "staff_accounts": "حسابات الموظفين",
-            "categories": "الفئات"
+            "categories": "الفئات",
+            "promotion_ads_per_month": "إعلانات ترويجية"
         }
+    },
+    "promotions": {
+        "title": "إرسال إعلان ترويجي",
+        "description": "أرسل إشعاراً لعملائك ومتابعيك.",
+        "message": "الرسالة",
+        "messageAr": "الرسالة (بالعربية)",
+        "messageEn": "الرسالة (بالإنجليزية)",
+        "messagePlaceholder": "أدخل رسالتك الترويجية هنا...",
+        "messageArPlaceholder": "أدخل رسالتك الترويجية باللغة العربية...",
+        "messageEnPlaceholder": "أدخل رسالتك الترويجية باللغة الإنجليزية...",
+        "titleAr": "العنوان (بالعربية)",
+        "titleEn": "العنوان (بالإنجليزية)",
+        "titleArPlaceholder": "أدخل عنوان الترويج باللغة العربية...",
+        "titleEnPlaceholder": "أدخل عنوان الترويج باللغة الإنجليزية...",
+        "target": "الجمهور المستهدف",
+        "all_clients": "جميع العملاء",
+        "all_followers": "جميع المتابعين",
+        "individuals": "عملاء محددون",
+        "usage": "الاستخدام",
+        "count": "{{used}} / {{total}}",
+        "send": "إرسال الترويج",
+        "sending": "جاري الإرسال...",
+        "success": "تم إرسال الترويج بنجاح!",
+        "error": "فشل إرسال الترويج",
+        "noCredits": "تم الوصول إلى الحد الشهري",
+        "upgrade": "رقي للحصول على المزيد من الإعلانات",
+        "characterLimit": "{{count}} / 200",
+        "sourceFollowers": "متابعو المتجر",
+        "sourceClients": "عملاء المتجر",
+        "targetAll": "الكل",
+        "targetAllDesc": "إرسال للجميع",
+        "targetFirstN": "الأوائل",
+        "targetFirstNDesc": "أقدم المتابعين",
+        "targetLastN": "الأحدث",
+        "targetLastNDesc": "أحدث المتابعين",
+        "targetIndividual": "فردي",
+        "targetIndividualDesc": "اختر واحداً تلو الآخر",
+        "selectCount": "عدد المتابعين",
+        "firstNHint": "أقدم {{count}} متابع (الأوائل في المتابعة)",
+        "lastNHint": "أحدث {{count}} متابع (الأحدث في المتابعة)",
+        "searchFollowers": "بحث عن متابعين...",
+        "selectedCount": "{{count}} محدد",
+        "noFollowersFound": "لم يتم العثور على متابعين",
+        "noTargets": "لم يتم العثور على أهداف"
     },
     "usage": {
         "title": "استخدام الخطة",

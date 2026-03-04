@@ -18,6 +18,9 @@ import { toast } from '../../utils/toast';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
+import { PromotionAdModal } from '../notification/components/PromotionAdModal';
+import { PromotionTargetType } from '../notification/api/promotions.api';
+import { Megaphone } from 'lucide-react';
 
 const ClientList = () => {
     const { t } = useTranslation(['clients', 'common', 'orders']);
@@ -27,6 +30,9 @@ const ClientList = () => {
     const { hasPermission, user } = useAuth();
     const [clients, setClients] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
+    const [selectedClientForPromo, setSelectedClientForPromo] = useState<string[]>([]);
+    const [promoTargetType, setPromoTargetType] = useState<PromotionTargetType>(PromotionTargetType.ALL_CLIENTS);
     const [searchTerm, setSearchTerm] = useState('');
     const [sortBy, setSortBy] = useState('createdAt');
     const [order, setOrder] = useState<'ASC' | 'DESC'>('DESC');
@@ -226,6 +232,17 @@ const ClientList = () => {
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
                 </form>
+
+                <button
+                    onClick={() => {
+                        setPromoTargetType(PromotionTargetType.ALL_CLIENTS);
+                        setIsPromoModalOpen(true);
+                    }}
+                    className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0"
+                >
+                    <Megaphone size={16} />
+                    {t('subscriptions:promotions.send')}
+                </button>
             </div>
 
             {/* Sorting Actions */}
@@ -664,6 +681,13 @@ const ClientList = () => {
                     </div>
                 </div>
             </div>
+
+            <PromotionAdModal
+                isOpen={isPromoModalOpen}
+                onClose={() => setIsPromoModalOpen(false)}
+                initialTarget={promoTargetType}
+                initialTargetIds={selectedClientForPromo}
+            />
         </div>
     );
 };

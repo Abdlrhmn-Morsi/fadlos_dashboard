@@ -9,6 +9,7 @@ import Modal from '../../../components/common/Modal';
 import CountdownTimer from '../../../components/common/CountdownTimer';
 import { usePaddle } from '../../../hooks/usePaddle';
 import { useLanguage } from '../../../contexts/LanguageContext';
+import { PlanFeature } from '../../../types/plan-feature';
 
 const SubscriptionSettings = () => {
     const { t } = useTranslation(['common', 'stores', 'subscriptions']);
@@ -300,7 +301,13 @@ const SubscriptionSettings = () => {
                                     </div>
 
                                     <ul className="space-y-4">
-                                        {plan.features.map((feature, i) => (
+                                        {plan.features.filter(feature => {
+                                            if (feature.startsWith('limit:promotion_ads_per_month:')) {
+                                                return plan.features.includes(PlanFeature.STORE_CLIENTS_MANAGEMENT) ||
+                                                    plan.features.includes(PlanFeature.STORE_FOLLOWERS_MANAGEMENT);
+                                            }
+                                            return true;
+                                        }).map((feature, i) => (
                                             <li key={i} className="flex items-start gap-3">
                                                 <div className={clsx(
                                                     "mt-1 p-0.5 rounded-full shrink-0",

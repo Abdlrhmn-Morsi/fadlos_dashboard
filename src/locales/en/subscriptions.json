@@ -50,7 +50,8 @@
         "categories": "Categories",
         "orders_per_month": "Orders per month",
         "drivers": "Delivery Drivers",
-        "staff_accounts": "Staff Roles"
+        "staff_accounts": "Staff Roles",
+        "promotion_ads_per_month": "Promotion Ads"
     },
     "plans": {
         "free": {
@@ -95,6 +96,7 @@
         "order_management": "Order Management",
         "promocodes": "Promo Codes",
         "store_clients_management": "Advanced Store Clients CRM",
+        "store_followers_management": "Store Followers Management",
         "advanced_analytics": "Advanced Analytics",
         "custom_roles": "Custom Roles",
         "reviews_management": "Customer Reviews management",
@@ -128,6 +130,7 @@
             "discounts": "Discounts",
             "promocodes": "Promo Codes",
             "store_clients_management": "Clients Management",
+            "store_followers_management": "Followers Management",
             "advanced_analytics": "Advanced Analytics",
             "custom_roles": "Custom Roles",
             "reviews_management": "Reviews Management",
@@ -135,7 +138,8 @@
             "product_discounts_offers": "Product Discounts & Offers",
             "frequently_bought_together": "Frequently Bought Together Products",
             "basic_dashboard": "Basic Dashboard",
-            "order_management": "Order Management"
+            "order_management": "Order Management",
+            "promotion_ads_per_month": "Promotional Ads"
         },
         "limitKeys": {
             "branches": "Branches",
@@ -143,8 +147,53 @@
             "orders_per_month": "Orders per Month",
             "drivers": "Drivers",
             "staff_accounts": "Staff Accounts",
-            "categories": "Categories"
+            "categories": "Categories",
+            "promotion_ads_per_month": "Promotion Ads"
         }
+    },
+    "promotions": {
+        "title": "Send Promotion Ad",
+        "description": "Send a push notification to your customers and followers.",
+        "message": "Message",
+        "messageAr": "Message (Arabic)",
+        "messageEn": "Message (English)",
+        "messagePlaceholder": "Enter your promotional message here...",
+        "messageArPlaceholder": "Enter your promotional message in Arabic...",
+        "messageEnPlaceholder": "Enter your promotional message in English...",
+        "titleAr": "Title (Arabic)",
+        "titleEn": "Title (English)",
+        "titleArPlaceholder": "Enter promotional title in Arabic...",
+        "titleEnPlaceholder": "Enter promotional title in English...",
+        "target": "Target Audience",
+        "all_clients": "All Clients",
+        "all_followers": "All Followers",
+        "individuals": "Specific Customers",
+        "usage": "Usage",
+        "count": "{{used}} / {{total}}",
+        "send": "Send Promotion",
+        "sending": "Sending...",
+        "success": "Promotion sent successfully!",
+        "error": "Failed to send promotion",
+        "noCredits": "Monthly limit reached",
+        "upgrade": "Upgrade for more ads",
+        "characterLimit": "{{count}} / 200",
+        "sourceFollowers": "Store Followers",
+        "sourceClients": "Store Clients",
+        "targetAll": "All",
+        "targetAllDesc": "Send to everyone",
+        "targetFirstN": "First N",
+        "targetFirstNDesc": "Earliest followers",
+        "targetLastN": "Last N",
+        "targetLastNDesc": "Most recent followers",
+        "targetIndividual": "Individual",
+        "targetIndividualDesc": "Pick one by one",
+        "selectCount": "Number of followers",
+        "firstNHint": "Oldest {{count}} followers (first to follow)",
+        "lastNHint": "Newest {{count}} followers (most recent)",
+        "searchFollowers": "Search followers...",
+        "selectedCount": "{{count}} selected",
+        "noFollowersFound": "No followers found",
+        "noTargets": "No targets found"
     },
     "usage": {
         "title": "Plan Usage",

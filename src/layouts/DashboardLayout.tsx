@@ -35,6 +35,7 @@ import { NotificationList } from '../features/notification/components/Notificati
 import { useAuth } from '../contexts/AuthContext';
 import { Permissions } from '../types/permissions';
 import { useSubscription } from '../hooks/useSubscription';
+import { PlanFeature } from '../types/plan-feature';
 
 interface SidebarItemProps {
   to: string;
@@ -166,7 +167,7 @@ const DashboardLayout: React.FC = () => {
           )}
 
           {/* Analytics - Plan then Permission check (hidden for super admin) */}
-          {user?.role !== UserRole.SUPER_ADMIN && (hasFeature('advanced_analytics') || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
+          {user?.role !== UserRole.SUPER_ADMIN && (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
             <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
           )}
 
@@ -222,19 +223,22 @@ const DashboardLayout: React.FC = () => {
               {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
                 <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
               )}
-              {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && hasFeature('reviews_management') && (
+              {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && (
                 <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
               )}
-              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature('promocodes') && (
+              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature(PlanFeature.PROMOCODES) && (
                 <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
               )}
-              {hasPermission(Permissions.USERS_VIEW) && hasFeature('store_clients_management') && (
+              {hasPermission(Permissions.USERS_VIEW) && (
                 <>
-                  <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
-                  <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
+                  {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
+                    <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
+                  )}
+                  {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT) && (
+                    <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
+                  )}
                 </>
               )}
-
               {!collapsed && (
                 <div className={clsx(
                   "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"

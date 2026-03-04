@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { getMySubscriptionUsage, SubscriptionUsage } from '../features/subscriptions/api/subscriptions.api';
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types/user-role';
+import { PlanFeature } from '../types/plan-feature';
 
 export const useSubscription = () => {
     const { user } = useAuth();
@@ -28,17 +29,17 @@ export const useSubscription = () => {
         fetchUsage();
     }, [user?.id]);
 
-    const hasFeature = (feature: string): boolean => {
+    const hasFeature = (feature: PlanFeature | string): boolean => {
         if (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) return true;
         if (!usage) return false;
 
         // Fallback: If feature check is for analytics, also check plan name
-        if (feature === 'advanced_analytics' && (usage.plan?.toLowerCase() === 'premium' || usage.plan?.toLowerCase() === 'pro')) {
+        if (feature === PlanFeature.ADVANCED_ANALYTICS && (usage.plan?.toLowerCase() === 'premium' || usage.plan?.toLowerCase() === 'pro')) {
             return true;
         }
 
         if (!Array.isArray(usage.features)) return false;
-        return usage.features.includes(feature);
+        return usage.features.includes(feature as string);
     };
 
     return { usage, loading, hasFeature, refreshUsage: fetchUsage };

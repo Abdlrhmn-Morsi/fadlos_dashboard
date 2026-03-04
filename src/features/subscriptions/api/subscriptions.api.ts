@@ -29,6 +29,7 @@ export interface SubscriptionUsage {
     graceDaysRemaining: number;
     gracePeriodEnd: string | null;
     features: string[];
+    allAvailableFeatures: string[];
     limits: Record<string, number>;
     usage: Record<string, number>;
 }
