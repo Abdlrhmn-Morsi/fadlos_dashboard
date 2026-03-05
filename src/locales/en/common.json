@@ -354,6 +354,7 @@
     "Addons": "Add-ons",
     "Delivery Drivers": "Store Drivers",
     "Cash Settlement": "Cash Settlement",
+    "Promotion Ads": "Promotion Ads",
     "searchEmployeePlaceholder": "Search by name or email...",
     "activate": "Activate",
     "leaveBlankToKeepCurrent": "Leave blank to keep current",
@@ -562,6 +563,16 @@
             "manage": {
                 "name": "Manage Cash Settlements",
                 "description": "• Create new settlement batches to collect cash from drivers"
+            }
+        },
+        "promotion_ads": {
+            "view": {
+                "name": "View Promotion History",
+                "description": "• View sent promotion ads and their history"
+            },
+            "send": {
+                "name": "Send Promotion Ads",
+                "description": "• Send push notification ads to followers and clients"
             }
         }
     },
