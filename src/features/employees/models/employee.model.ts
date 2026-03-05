@@ -4,6 +4,7 @@ import { Role } from '../../roles/models/role.model';
 export interface Employee extends User {
     employeeRole: Role; // Custom role details
     roleId?: string;
+    branchId?: string;
     lastLoginAt?: string;
 }
 
@@ -15,6 +16,7 @@ export interface CreateEmployeeDto {
     password: string;
     roleId: string;
     storeId?: string;
+    branchId?: string;
     isActive?: boolean;
 }
 
@@ -24,6 +26,7 @@ export interface UpdateEmployeeDto {
     email?: string;
     phone?: string;
     roleId?: string;
+    branchId?: string;
     isActive?: boolean;
 }
 

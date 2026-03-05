@@ -17,12 +17,21 @@ import {
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { ResendConfirmationModal } from '../components/ResendConfirmationModal';
 import { toast } from 'react-hot-toast';
+import { useAuth } from '../../../contexts/AuthContext';
+import { Permissions } from '../../../types/permissions';
 import clsx from 'clsx';
 
 const PromotionHistoryPage: React.FC = () => {
     const { t } = useTranslation(['subscriptions', 'common']);
     const { isRTL } = useLanguage();
+    const { hasPermission } = useAuth();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        if (!hasPermission(Permissions.PROMOTION_ADS_VIEW)) {
+            navigate('/');
+        }
+    }, [hasPermission, navigate]);
 
     const [logs, setLogs] = useState<PromotionLogItem[]>([]);
     const [isLoading, setIsLoading] = useState(true);

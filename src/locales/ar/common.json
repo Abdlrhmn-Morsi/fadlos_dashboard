@@ -266,6 +266,7 @@
     "manageProfileDesc": "تحديث معلومات ملفك الشخصي",
     "changeProfilePicture": "تغيير صورة الملف الشخصي",
     "fullName": "الاسم الكامل",
+    "username": "اسم المستخدم",
     "changePassword": "الأمان وكلمة المرور",
     "updatePassword": "تحديث كلمة المرور",
     "oldPassword": "كلمة المرور الحالية",
@@ -354,6 +355,12 @@
     "searchPlaceholder": "بحث...",
     "activate": "تفعيل",
     "leaveBlankToKeepCurrent": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
+    "password": "كلمة المرور",
+    "assignToBranch": "تعيين لفرع",
+    "allBranches": "جميع الفروع (دخول كامل)",
+    "branchAssignmentDesc": "اتركه فارغاً للسماح للموظف بإدارة جميع الفروع",
+    "branchOrderManager": "مدير طلبات الفرع",
+    "superOrderManager": "مدير طلبات عام",
     "personalInfo": "المعلومات الشخصية",
     "permissions": {
         "store": {

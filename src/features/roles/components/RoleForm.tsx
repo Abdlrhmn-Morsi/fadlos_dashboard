@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
 import { RolesService } from '../api/roles.api';
-import { PermissionGroup } from '../../../types/permission';
+import { PermissionGroup } from '../../../types/permissions';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 const RoleForm = () => {

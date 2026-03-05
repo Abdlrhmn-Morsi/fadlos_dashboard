@@ -68,4 +68,17 @@ export enum Permissions {
     // Cash Settlement
     CASH_SETTLEMENT_READ = 'cash_settlement.read',
     CASH_SETTLEMENT_MANAGE = 'cash_settlement.manage',
+
+    // Promotion Ads
+    PROMOTION_ADS_VIEW = 'promotion_ads.view',
+    PROMOTION_ADS_SEND = 'promotion_ads.send',
+}
+
+export interface PermissionGroup {
+    category: string;
+    permissions: {
+        key: string;
+        name: string;
+        description?: string;
+    }[];
 }

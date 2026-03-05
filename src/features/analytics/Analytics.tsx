@@ -32,6 +32,8 @@ import { useTheme } from '../../contexts/ThemeContext';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { fetchOrderStats, fetchProductMerchantStats, fetchCustomerAnalytics } from './api/analytics.api';
+import { branchesApi } from '../branches/api/branches.api';
+import { Branch } from '../../types/branch';
 import clsx from 'clsx';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
@@ -95,6 +97,12 @@ const Analytics: React.FC = () => {
     const [orderStats, setOrderStats] = useState<any>(null);
     const [merchantStats, setMerchantStats] = useState<any>(null);
     const [customerStats, setCustomerStats] = useState<any>(null);
+    const [branches, setBranches] = useState<Branch[]>([]);
+    const [selectedBranchId, setSelectedBranchId] = useState<string>('');
+
+    useEffect(() => {
+        branchesApi.findAllByStore().then(setBranches).catch(console.error);
+    }, []);
 
     useEffect(() => {
         const loadStats = async () => {
@@ -103,10 +111,11 @@ const Analytics: React.FC = () => {
 
             setLoading(true);
             try {
+                const branchFilter = selectedBranchId || undefined;
                 const [orders, merchant, customers] = await Promise.all([
-                    fetchOrderStats(period, startDate, endDate),
-                    fetchProductMerchantStats(startDate, endDate),
-                    fetchCustomerAnalytics(period === 'all' ? '30d' : period, startDate, endDate)
+                    fetchOrderStats(period, startDate, endDate, branchFilter),
+                    fetchProductMerchantStats(startDate, endDate, branchFilter),
+                    fetchCustomerAnalytics(period === 'all' ? '30d' : period, startDate, endDate, branchFilter)
                 ]);
                 setOrderStats(orders);
                 setMerchantStats(merchant);
@@ -118,7 +127,7 @@ const Analytics: React.FC = () => {
             }
         };
         loadStats();
-    }, [period, startDate, endDate]);
+    }, [period, startDate, endDate, selectedBranchId]);
 
     const gridColor = isDark ? '#1e293b' : '#f1f5f9';
     const textColor = isDark ? '#64748b' : '#94a3b8';
@@ -190,6 +199,27 @@ const Analytics: React.FC = () => {
                                     className="pl-9 pr-3 py-2 text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all"
                                 />
                             </div>
+                        </div>
+                    )}
+
+                    {/* Branch Filter */}
+                    {branches.length > 0 && (
+                        <div className={clsx("flex items-center gap-2", isRTL && "flex-row-reverse")}>
+                            <MapPin size={14} className="text-slate-400" />
+                            <select
+                                value={selectedBranchId}
+                                onChange={(e) => setSelectedBranchId(e.target.value)}
+                                className="px-3 py-2 text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 focus:border-primary focus:ring-1 focus:ring-primary/20 outline-none transition-all min-w-[160px]"
+                            >
+                                <option value="">{t('orders:allBranches')}</option>
+                                {branches.map((branch) => (
+                                    <option key={branch.id} value={branch.id}>
+                                        {isRTL
+                                            ? [branch.town?.arName || branch.town?.enName, branch.place?.arName || branch.place?.enName, branch.addressAr || branch.addressEn].filter(Boolean).join(' - ')
+                                            : [branch.town?.enName || branch.town?.arName, branch.place?.enName || branch.place?.arName, branch.addressEn || branch.addressAr].filter(Boolean).join(' - ')}
+                                    </option>
+                                ))}
+                            </select>
                         </div>
                     )}
                 </div>

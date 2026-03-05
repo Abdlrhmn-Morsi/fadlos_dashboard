@@ -358,6 +358,11 @@
     "searchEmployeePlaceholder": "Search by name or email...",
     "activate": "Activate",
     "leaveBlankToKeepCurrent": "Leave blank to keep current",
+    "assignToBranch": "Assign to Branch",
+    "allBranches": "All Branches (Super Access)",
+    "branchAssignmentDesc": "Leave empty to allow employee to manage all branches",
+    "branchOrderManager": "Branch Order Manager",
+    "superOrderManager": "Super Order Manager",
     "searchPlaceholder": "Search...",
     "personalInfo": "Personal Information",
     "permissions": {

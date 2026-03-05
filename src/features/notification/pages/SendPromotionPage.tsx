@@ -15,6 +15,7 @@ import {
 } from '../api/promotions.api';
 import toolsApi from '../../../services/tools.api';
 import { useAuth } from '../../../contexts/AuthContext';
+import { Permissions } from '../../../types/permissions';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { ImageWithFallback } from '../../../components/common/ImageWithFallback';
 import clsx from 'clsx';
@@ -28,9 +29,10 @@ const SendPromotionPage: React.FC = () => {
     const { t } = useTranslation(['subscriptions', 'common']);
     const navigate = useNavigate();
     const { isRTL } = useLanguage();
-    const { user } = useAuth();
+    const { user, hasPermission } = useAuth();
     const [searchParams] = useSearchParams();
     const source = searchParams.get('source') || 'followers';
+
 
     // Determine base target type from source
     const baseTargetType = source === 'clients'
@@ -66,6 +68,12 @@ const SendPromotionPage: React.FC = () => {
     const [loading, setLoading] = useState(false);
 
     const storeId = user?.store?.id;
+
+    useEffect(() => {
+        if (!hasPermission(Permissions.PROMOTION_ADS_SEND)) {
+            navigate('/');
+        }
+    }, [hasPermission, navigate]);
 
     useEffect(() => {
         loadCredits();

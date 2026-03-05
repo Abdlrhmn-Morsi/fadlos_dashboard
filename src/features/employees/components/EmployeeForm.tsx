@@ -9,7 +9,10 @@ import clsx from 'clsx';
 import { EmployeesService } from '../api/employees.api';
 import { RolesService } from '../../roles/api/roles.api';
 import { Role } from '../../roles/models/role.model';
+import { branchesApi } from '../../branches/api/branches.api';
+import { Branch } from '../../../types/branch';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { MapPin } from 'lucide-react';
 
 const EmployeeForm = () => {
     const { t } = useTranslation(['common']);
@@ -23,6 +26,7 @@ const EmployeeForm = () => {
     const [submitting, setSubmitting] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [roles, setRoles] = useState<Role[]>([]);
+    const [branches, setBranches] = useState<Branch[]>([]);
 
     const [formData, setFormData] = useState({
         name: '',
@@ -31,11 +35,13 @@ const EmployeeForm = () => {
         phone: '',
         password: '',
         roleId: '',
+        branchId: '',
         isActive: true,
     });
 
     useEffect(() => {
         fetchRoles();
+        fetchBranches();
         if (isEditMode) {
             fetchEmployee();
         }
@@ -59,6 +65,15 @@ const EmployeeForm = () => {
         }
     };
 
+    const fetchBranches = async () => {
+        try {
+            const response = await branchesApi.findAllByStore();
+            setBranches(response);
+        } catch (error) {
+            console.error('Failed to fetch branches', error);
+        }
+    };
+
     const fetchEmployee = async () => {
         try {
             if (!id) return;
@@ -72,6 +87,7 @@ const EmployeeForm = () => {
                 phone: employee.phone || '',
                 password: '', // Don't fill password on edit
                 roleId: employee.roleId || '',
+                branchId: employee.branchId || '',
                 isActive: employee.isActive ?? true,
             });
         } catch (error) {
@@ -254,6 +270,34 @@ const EmployeeForm = () => {
                         </div>
                         <div className="space-y-1.5">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                                {t('assignToBranch', { defaultValue: 'Assign to Branch' })}
+                            </label>
+                            <div className="relative">
+                                <MapPin size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold", isRTL ? "right-3" : "left-3")} />
+                                <select
+                                    value={formData.branchId}
+                                    onChange={e => setFormData({ ...formData, branchId: e.target.value })}
+                                    className={clsx(
+                                        "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all appearance-none",
+                                        isRTL ? "pr-10 pl-4" : "pl-10 pr-4"
+                                    )}
+                                >
+                                    <option value="">{t('allBranches', { defaultValue: 'All Branches (Super Access)' })}</option>
+                                    {Array.isArray(branches) && branches.map(branch => (
+                                        <option key={branch.id} value={branch.id}>
+                                            {isRTL
+                                                ? [branch.town?.arName || branch.town?.enName, branch.place?.arName || branch.place?.enName, branch.addressAr || branch.addressEn].filter(Boolean).join(' - ')
+                                                : [branch.town?.enName || branch.town?.arName, branch.place?.enName || branch.place?.arName, branch.addressEn || branch.addressAr].filter(Boolean).join(' - ')}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                            <p className="text-[11px] text-slate-500 mt-1 pl-1">
+                                {t('branchAssignmentDesc', { defaultValue: 'Leave empty to allow employee to manage all branches' })}
+                            </p>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
                                 {t('password', { defaultValue: 'Password' })} {isEditMode ? '' : <span className="text-rose-500">*</span>}
                             </label>
                             <div className="relative">
@@ -266,7 +310,7 @@ const EmployeeForm = () => {
                                     onChange={e => setFormData({ ...formData, password: e.target.value })}
                                     className={clsx(
                                         "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
-                                        isRTL ? "pr-10 pl-4" : "pl-10 pr-10"
+                                        isRTL ? "pr-10 pl-10" : "pl-10 pr-10"
                                     )}
                                     placeholder={isEditMode ? t('leaveBlankToKeepCurrent', { defaultValue: 'Leave blank to keep current' }) : ''}
                                 />

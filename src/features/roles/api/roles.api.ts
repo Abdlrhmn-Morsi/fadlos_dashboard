@@ -1,6 +1,6 @@
 import api from '../../../services/api';
 import { CreateRoleDto, Role, UpdateRoleDto } from '../models/role.model';
-import { PermissionGroup } from '../../../types/permission';
+import { PermissionGroup } from '../../../types/permissions';
 
 export const RolesService = {
     getPermissions: async () => {
