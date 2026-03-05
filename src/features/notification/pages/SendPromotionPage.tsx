@@ -20,7 +20,9 @@ import { ImageWithFallback } from '../../../components/common/ImageWithFallback'
 import clsx from 'clsx';
 import toast from 'react-hot-toast';
 
-type TargetMode = 'all' | 'first_n' | 'last_n' | 'individual';
+import clientsApi from '../../clients/api/clients.api';
+
+type TargetMode = 'all' | 'first_n' | 'last_n' | 'individual' | 'first_n_spent' | 'last_n_spent' | 'first_n_orders' | 'last_n_orders';
 
 const SendPromotionPage: React.FC = () => {
     const { t } = useTranslation(['subscriptions', 'common']);
@@ -103,18 +105,42 @@ const SendPromotionPage: React.FC = () => {
         if (!storeId) return;
         setLoadingFollowers(true);
         try {
-            const res = await getFollowersForSelection(storeId, {
-                page: followerPage,
-                limit: 10,
-                search: debouncedFollowerSearch || undefined,
-                order: 'DESC',
-            });
-            const newData = res.data || [];
-            setFollowers((prev) => followerPage === 1 ? newData : [...prev, ...newData]);
-            setFollowerTotal(res.total || 0);
-            setHasMoreFollowers(newData.length === 10);
+            if (source === 'clients') {
+                const res: any = await clientsApi.getStoreClients({
+                    page: followerPage,
+                    limit: 10,
+                    search: debouncedFollowerSearch || undefined,
+                    order: 'DESC',
+                });
+                const newData = (res.data || []).map((c: any) => ({
+                    id: c.clientId,
+                    name: c.client?.name,
+                    username: c.client?.username,
+                    email: c.client?.email,
+                    profileImage: c.client?.profileImage,
+                    followedAt: c.createdAt,
+                }));
+                setFollowers((prev) => followerPage === 1 ? newData : [...prev, ...newData]);
+                if (res.pagination) {
+                    setFollowerTotal(res.pagination.totalItems || 0);
+                } else if (res.meta) {
+                    setFollowerTotal(res.meta.totalItems || 0);
+                }
+                setHasMoreFollowers(newData.length === 10);
+            } else {
+                const res = await getFollowersForSelection(storeId, {
+                    page: followerPage,
+                    limit: 10,
+                    search: debouncedFollowerSearch || undefined,
+                    order: 'DESC',
+                });
+                const newData = res.data || [];
+                setFollowers((prev) => followerPage === 1 ? newData : [...prev, ...newData]);
+                setFollowerTotal(res.total || 0);
+                setHasMoreFollowers(newData.length === 10);
+            }
         } catch (err) {
-            console.error('Failed to load followers', err);
+            console.error(`Failed to load ${source}`, err);
         } finally {
             setLoadingFollowers(false);
         }
@@ -153,10 +179,17 @@ const SendPromotionPage: React.FC = () => {
     };
 
     const resolveTargetType = (): PromotionTargetType => {
-        if (targetMode === 'individual') return PromotionTargetType.INDIVIDUALS;
-        if (targetMode === 'first_n' || targetMode === 'last_n') return PromotionTargetType.INDIVIDUALS;
-        return baseTargetType;
+        if (source === 'followers') {
+            if (targetMode === 'all') return PromotionTargetType.ALL_FOLLOWERS;
+            if (targetMode === 'individual') return PromotionTargetType.INDIVIDUAL_FOLLOWERS;
+            return PromotionTargetType.FOLLOWERS_SEGMENT;
+        } else {
+            if (targetMode === 'all') return PromotionTargetType.ALL_CLIENTS;
+            if (targetMode === 'individual') return PromotionTargetType.INDIVIDUAL_CLIENTS;
+            return PromotionTargetType.CLIENTS_SEGMENT;
+        }
     };
+
 
     const handleSend = async () => {
         if (!messageAr || !message) return;
@@ -164,7 +197,7 @@ const SendPromotionPage: React.FC = () => {
 
         setLoading(true);
         try {
-            let targetIds: string[] | undefined;
+            let targetIds: string[] = [];
 
             if (targetMode === 'first_n' || targetMode === 'last_n') {
                 // Fetch the specific N followers from the API
@@ -181,9 +214,39 @@ const SendPromotionPage: React.FC = () => {
                     setLoading(false);
                     return;
                 }
+            } else if (targetMode === 'first_n_spent' || targetMode === 'last_n_spent') {
+                if (!storeId) return;
+                const order = targetMode === 'first_n_spent' ? 'DESC' : 'ASC';
+                const res: any = await clientsApi.getStoreClients({
+                    page: 1,
+                    limit: selectCount,
+                    sortBy: 'totalSpent',
+                    order,
+                });
+                targetIds = (res.data || []).map((c: any) => c.clientId);
+                if (!targetIds.length) {
+                    toast.error(t('promotions.noTargets', 'No clients found'));
+                    setLoading(false);
+                    return;
+                }
+            } else if (targetMode === 'first_n_orders' || targetMode === 'last_n_orders') {
+                if (!storeId) return;
+                const order = targetMode === 'first_n_orders' ? 'DESC' : 'ASC';
+                const res: any = await clientsApi.getStoreClients({
+                    page: 1,
+                    limit: selectCount,
+                    sortBy: 'totalOrders',
+                    order,
+                });
+                targetIds = (res.data || []).map((c: any) => c.clientId);
+                if (!targetIds.length) {
+                    toast.error(t('promotions.noTargets', 'No clients found'));
+                    setLoading(false);
+                    return;
+                }
             } else if (targetMode === 'individual') {
                 if (selectedIds.length === 0) {
-                    toast.error(t('promotions.noTargets', 'Select at least one follower'));
+                    toast.error(t('promotions.noTargets', 'Select at least one user'));
                     setLoading(false);
                     return;
                 }
@@ -197,6 +260,7 @@ const SendPromotionPage: React.FC = () => {
                 messageAr,
                 targetType: resolveTargetType(),
                 targetIds,
+                criteria: targetMode,
             });
             toast.success(t('promotions.success'));
             await loadCredits();
@@ -211,12 +275,49 @@ const SendPromotionPage: React.FC = () => {
 
     const isAtLimit = credits?.remaining === 0;
 
-    const targetModes: { key: TargetMode; icon: any; label: string; desc: string }[] = [
+    const targetModes: { key: TargetMode; icon: any; label: string; desc: string }[] = source === 'clients' ? [
         {
             key: 'all',
             icon: Users,
             label: t('promotions.targetAll', 'All'),
-            desc: t('promotions.targetAllDesc', `Send to all ${source}`),
+            desc: t('promotions.targetAllDesc', `Send to all clients`),
+        },
+        {
+            key: 'first_n_spent',
+            icon: ArrowUp,
+            label: t('promotions.targetFirstNSpent', 'Top Spenders'),
+            desc: t('promotions.targetFirstNSpentDesc', 'Highest lifetime value'),
+        },
+        {
+            key: 'last_n_spent',
+            icon: ArrowDown,
+            label: t('promotions.targetLastNSpent', 'Lowest Spenders'),
+            desc: t('promotions.targetLastNSpentDesc', 'Lowest lifetime value'),
+        },
+        {
+            key: 'first_n_orders',
+            icon: ArrowUp,
+            label: t('promotions.targetFirstNOrders', 'Most Active'),
+            desc: t('promotions.targetFirstNOrdersDesc', 'Highest number of orders'),
+        },
+        {
+            key: 'last_n_orders',
+            icon: ArrowDown,
+            label: t('promotions.targetLastNOrders', 'Least Active'),
+            desc: t('promotions.targetLastNOrdersDesc', 'Lowest number of orders'),
+        },
+        {
+            key: 'individual',
+            icon: UserCheck,
+            label: t('promotions.targetIndividual', 'Individual'),
+            desc: t('promotions.targetIndividualDesc', 'Pick one by one'),
+        },
+    ] : [
+        {
+            key: 'all',
+            icon: Users,
+            label: t('promotions.targetAll', 'All'),
+            desc: t('promotions.targetAllDesc', `Send to all followers`),
         },
         {
             key: 'first_n',
@@ -251,9 +352,18 @@ const SendPromotionPage: React.FC = () => {
                     <ArrowLeft size={20} className={clsx("text-slate-600 dark:text-slate-400", isRTL && "rotate-180")} />
                 </button>
                 <div className="flex-1">
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
-                        {t('promotions.title')}
-                    </h1>
+                    <div className="flex items-center justify-between">
+                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                            {t('promotions.title')}
+                        </h1>
+                        <button
+                            onClick={() => navigate('/promotions/history')}
+                            className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary/50 transition-all shadow-sm hover:shadow text-primary font-bold text-xs uppercase"
+                        >
+                            <Clock size={16} />
+                            {t('promotions.history', 'History')}
+                        </button>
+                    </div>
                     <div className="flex items-center gap-2 mt-1">
                         <span className={clsx(
                             "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest",
@@ -267,6 +377,7 @@ const SendPromotionPage: React.FC = () => {
                         </span>
                     </div>
                 </div>
+
             </div>
 
             <div className="space-y-6">
@@ -355,10 +466,10 @@ const SendPromotionPage: React.FC = () => {
                 </div>
 
                 {/* Count Input for First N / Last N */}
-                {(targetMode === 'first_n' || targetMode === 'last_n') && (
+                {['first_n', 'last_n', 'first_n_spent', 'last_n_spent', 'first_n_orders', 'last_n_orders'].includes(targetMode) && (
                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest">
-                            {t('promotions.selectCount', 'Number of followers')}
+                            {source === 'clients' ? t('promotions.selectCountClients', 'Number of clients') : t('promotions.selectCount', 'Number of followers')}
                         </label>
                         <div className="flex items-center gap-4">
                             <input
@@ -370,9 +481,12 @@ const SendPromotionPage: React.FC = () => {
                                 className="w-32 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl p-3 text-center text-lg font-black focus:border-primary focus:ring-0 transition-all"
                             />
                             <p className="text-sm text-slate-500 font-medium">
-                                {targetMode === 'first_n'
-                                    ? t('promotions.firstNHint', 'Oldest {{count}} followers (first to follow)', { count: selectCount })
-                                    : t('promotions.lastNHint', 'Newest {{count}} followers (most recent)', { count: selectCount })}
+                                {targetMode === 'first_n' && t('promotions.firstNHint', 'Oldest {{count}} followers (first to follow)', { count: selectCount })}
+                                {targetMode === 'last_n' && t('promotions.lastNHint', 'Newest {{count}} followers (most recent)', { count: selectCount })}
+                                {targetMode === 'first_n_spent' && t('promotions.firstNSpentHint', 'Top {{count}} spenders', { count: selectCount })}
+                                {targetMode === 'last_n_spent' && t('promotions.lastNSpentHint', 'Lowest {{count}} spenders', { count: selectCount })}
+                                {targetMode === 'first_n_orders' && t('promotions.firstNOrdersHint', 'Top {{count}} most active clients', { count: selectCount })}
+                                {targetMode === 'last_n_orders' && t('promotions.lastNOrdersHint', 'Lowest {{count}} least active clients', { count: selectCount })}
                             </p>
                         </div>
                     </div>

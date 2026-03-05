@@ -21,7 +21,9 @@ import {
   TrendingUp,
   DollarSign,
   CreditCard,
-  BarChart3
+  BarChart3,
+  Tag,
+  MessageSquare
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -223,22 +225,39 @@ const DashboardLayout: React.FC = () => {
               {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
                 <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
               )}
-              {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && (
-                <SidebarItem to="/reviews" icon={Briefcase} label={t('feedback')} collapsed={collapsed} />
-              )}
-              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature(PlanFeature.PROMOCODES) && (
-                <SidebarItem to="/promocodes" icon={Briefcase} label={t('promoCodes')} collapsed={collapsed} />
-              )}
-              {hasPermission(Permissions.USERS_VIEW) && (
-                <>
-                  {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
-                    <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
-                  )}
-                  {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT) && (
-                    <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
-                  )}
-                </>
-              )}
+              {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE) ||
+                (user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) ||
+                hasPermission(Permissions.USERS_VIEW)) && (
+                  <>
+                    {!collapsed && (
+                      <div className={clsx(
+                        "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
+                      )}>
+                        {t('marketingAndCustomers')}
+                      </div>
+                    )}
+                    {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+
+                    {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && (
+                      <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
+                    )}
+                    {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature(PlanFeature.PROMOCODES) && (
+                      <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
+                    )}
+
+                    {hasPermission(Permissions.USERS_VIEW) && (
+                      <>
+                        {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
+                          <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
+                        )}
+                        {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT) && (
+                          <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
+                        )}
+                      </>
+                    )}
+                  </>
+                )}
+
               {!collapsed && (
                 <div className={clsx(
                   "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"

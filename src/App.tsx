@@ -51,6 +51,8 @@ import UsagePage from './features/subscriptions/pages/UsagePage';
 import BillingHistory from './features/subscriptions/components/BillingHistory';
 import PlansManagement from './features/subscriptions-admin/pages/PlansManagement';
 import SendPromotionPage from './features/notification/pages/SendPromotionPage';
+import PromotionHistoryPage from './features/notification/pages/PromotionHistoryPage';
+
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
 import { Toaster } from './utils/toast';
@@ -162,6 +164,8 @@ const AppContent = () => {
             <Route path="billing-history" element={<PermissionGate permission={Permissions.STORE_VIEW}><BillingHistory /></PermissionGate>} />
             <Route path="usage" element={<PermissionGate permission={Permissions.STORE_VIEW}><UsagePage /></PermissionGate>} />
             <Route path="send-promotion" element={<SendPromotionPage />} />
+            <Route path="promotions/history" element={<PromotionHistoryPage />} />
+
             <Route path="notifications" element={
               (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER ||
                 hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||

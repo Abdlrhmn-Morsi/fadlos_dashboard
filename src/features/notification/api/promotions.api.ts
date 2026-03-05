@@ -4,8 +4,12 @@ import apiService from '../../../services/api.service';
 export enum PromotionTargetType {
     ALL_CLIENTS = 'all_clients',
     ALL_FOLLOWERS = 'all_followers',
-    INDIVIDUALS = 'individuals',
+    INDIVIDUAL_CLIENTS = 'individual_clients',
+    INDIVIDUAL_FOLLOWERS = 'individual_followers',
+    CLIENTS_SEGMENT = 'clients_segment',
+    FOLLOWERS_SEGMENT = 'followers_segment',
 }
+
 
 export interface SendPromotionAdDto {
     title?: string;
@@ -14,6 +18,7 @@ export interface SendPromotionAdDto {
     messageAr?: string;
     targetType: PromotionTargetType;
     targetIds?: string[];
+    criteria?: string;
 }
 
 export interface PromotionCredits {
@@ -50,3 +55,35 @@ export const getFollowersForSelection = async (
     if (params.order) qp.append('order', params.order);
     return apiService.get(`/follows/store/${storeId}/followers?${qp.toString()}`);
 };
+
+export interface PromotionLogItem {
+    id: string;
+    message: string;
+    messageAr?: string;
+    title?: string;
+    titleAr?: string;
+    targetType: string;
+    targetCount: number;
+    criteria?: string;
+    createdAt: string;
+}
+
+export interface PromotionHistoryResponse {
+    data: PromotionLogItem[];
+    meta: {
+        totalItems: number;
+        itemCount: number;
+        itemsPerPage: number;
+        totalPages: number;
+        currentPage: number;
+    };
+}
+
+export const getPromotionHistory = async (params: {
+    page?: number;
+    limit?: number;
+    type?: 'followers' | 'clients';
+}): Promise<PromotionHistoryResponse> => {
+    return apiService.get('/promotions/history', { params });
+};
+
