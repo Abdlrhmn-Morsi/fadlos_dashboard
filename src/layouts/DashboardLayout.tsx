@@ -226,8 +226,8 @@ const DashboardLayout: React.FC = () => {
                 <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
               )}
               {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE) ||
-                (user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) ||
-                hasPermission(Permissions.USERS_VIEW)) && (
+                (user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.CLIENTS_VIEW)) ||
+                hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW)) && (
                   <>
                     {!collapsed && (
                       <div className={clsx(
@@ -238,14 +238,14 @@ const DashboardLayout: React.FC = () => {
                     )}
                     {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-                    {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.USERS_VIEW)) && hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && (
+                    {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.CLIENTS_VIEW)) && hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && (
                       <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
                     )}
                     {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature(PlanFeature.PROMOCODES) && (
                       <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
                     )}
 
-                    {hasPermission(Permissions.USERS_VIEW) && (
+                    {hasPermission(Permissions.CLIENTS_VIEW) && (
                       <>
                         {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
                           <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
@@ -311,7 +311,7 @@ const DashboardLayout: React.FC = () => {
               {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN ||
                 hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||
                 hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE) ||
-                hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
+                hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
                   <SidebarItem to="/notifications" icon={Bell} label={t('notifications') || 'Notifications'} collapsed={collapsed} />
                 )}
               {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.EMPLOYEE || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
@@ -400,7 +400,7 @@ const DashboardLayout: React.FC = () => {
             {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER ||
               hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||
               hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE) ||
-              hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
+              hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) && (
                 <div className="relative">
                   <NotificationBadge />
                   <NotificationList />

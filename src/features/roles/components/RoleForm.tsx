@@ -120,7 +120,8 @@ const RoleForm = () => {
             navigate('/roles');
         } catch (error: any) {
             console.error('Failed to save role', error);
-            toast.error(error.response?.data?.message || t('error'));
+            const errorMessage = error.response?.data?.message;
+            toast.error(errorMessage ? t(errorMessage) : t('error'));
         } finally {
             setSubmitting(false);
         }

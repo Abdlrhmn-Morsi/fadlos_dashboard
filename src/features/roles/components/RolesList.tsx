@@ -115,9 +115,10 @@ const RolesList = () => {
             setTimeout(() => {
                 fetchRoles();
             }, 100);
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to delete role', error);
-            toast.error(t('error'));
+            const errorMessage = error.response?.data?.message;
+            toast.error(errorMessage ? t(errorMessage) : t('error'));
             // Refetch on error to restore correct state
             fetchRoles();
         } finally {

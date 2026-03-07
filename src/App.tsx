@@ -121,7 +121,7 @@ const AppContent = () => {
             <Route path="orders" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderList /></PermissionGate>} />
             <Route path="orders/settlement" element={<PermissionGate permission={Permissions.CASH_SETTLEMENT_READ}><CashSettlement /></PermissionGate>} />
             <Route path="orders/:id" element={
-              (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW))
+              (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.CLIENTS_VIEW))
                 ? <OrderDetail />
                 : <Navigate to="/" replace />
             } />
@@ -131,13 +131,13 @@ const AppContent = () => {
             <Route path="promocodes/edit/:id" element={<PermissionGate permission={Permissions.PROMO_CODES_UPDATE}><PromoCodeForm /></PermissionGate>} />
 
             <Route path="reviews" element={
-              (hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.USERS_VIEW))
+              (hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.CLIENTS_VIEW))
                 ? <ReviewList />
                 : <Navigate to="/" replace />
             } />
 
-            <Route path="clients" element={<PermissionGate permission={Permissions.USERS_VIEW}><ClientList /></PermissionGate>} />
-            <Route path="followers" element={<PermissionGate permission={Permissions.USERS_VIEW}><FollowerList /></PermissionGate>} />
+            <Route path="clients" element={<PermissionGate permission={Permissions.CLIENTS_VIEW}><ClientList /></PermissionGate>} />
+            <Route path="followers" element={<PermissionGate permission={Permissions.FOLLOWERS_VIEW}><FollowerList /></PermissionGate>} />
             <Route path="delivery-areas" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><DeliveryAreasPage /></PermissionGate>} />
             <Route path="branches" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><BranchesList /></PermissionGate>} />
 
@@ -170,7 +170,7 @@ const AppContent = () => {
               (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN || user?.role === UserRole.STORE_OWNER ||
                 hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE) ||
                 hasPermission(Permissions.STORE_VIEW) || hasPermission(Permissions.STORE_UPDATE) ||
-                hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE))
+                hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW) || hasPermission(Permissions.USERS_UPDATE))
                 ? <NotificationPage />
                 : <Navigate to="/" replace />
             } />

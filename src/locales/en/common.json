@@ -140,6 +140,9 @@
     "error": "Error",
     "errorUpdatingData": "Error updating data",
     "errorFetchingData": "Error fetching data",
+    "cannotDeleteRoleThatIsAssignedToUsersPleaseReassignUsersFirst": "Cannot delete role that is assigned to users. Please reassign users first.",
+    "roleNotFound": "Role not found",
+    "roleWithThisNameAlreadyExists": "A role with this name already exists",
     "success": "Success",
     "statusUpdated": "Status updated successfully",
     "set_available": "Set Available",
@@ -369,29 +372,23 @@
         "store": {
             "view": {
                 "name": "View Store Info",
-                "description": "• View store profile and QR codes\n• Access store contact details\n• See basic configuration"
+                "description": "• View store profile and identity\n• Access contact info and social links\n• Review operating hours and policies\n• See current subscription plan and limits"
             },
             "update": {
                 "name": "Update Store Info",
-                "description": "• Modify store name and description\n• Update store logo and cover\n• Change operating hours and settings"
+                "description": "• Modify store identity (logo, banner, name)\n• Update business category and description\n• Manage contact details and social media\n• Configure opening hours and closed-time rules\n• Toggle store availability and hiring status"
             }
         },
-        "users": {
+        "followers": {
             "view": {
-                "name": "View Users",
-                "description": "• Browse customer directory\n• View customer profiles and history\n• See follower list and statistics\n• Access and manage customer feedback"
-            },
-            "create": {
-                "name": "Invite Users",
-                "description": "• Add new customer entries\n• Manually invite users to the store"
-            },
-            "update": {
-                "name": "Update Users",
-                "description": "• Edit customer information\n• Modify user status or badges"
-            },
-            "delete": {
-                "name": "Remove Users",
-                "description": "• Remove customer records\n• Block users from the store"
+                "name": "View Store Followers",
+                "description": "• Access the list of store followers\n• View follower engagement statistics"
+            }
+        },
+        "clients": {
+            "view": {
+                "name": "View Store Clients",
+                "description": "• Access the directory of store clients\n• View customer purchase history and analytics\n• Monitor reviews and feedback"
             }
         },
         "employees": {
@@ -475,11 +472,11 @@
         "settings": {
             "view": {
                 "name": "View Settings",
-                "description": "• View system-wide settings\n• Access roles and permissions\n• View store branches and delivery areas"
+                "description": "• View store branches and locations\n• Access delivery area configurations\n• See employee roles and assigned permissions"
             },
             "update": {
                 "name": "Update Settings",
-                "description": "• Modify branch details and delivery areas\n• Update delivery fees and thresholds\n• Manage system configurations"
+                "description": "• Manage store branches and their details\n• Configure delivery areas, fees, and minimums\n• Update system preferences"
             }
         },
         "roles": {

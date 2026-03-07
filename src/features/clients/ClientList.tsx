@@ -179,7 +179,7 @@ const ClientList = () => {
     };
 
     const viewOrderDetailInPage = async (orderId: string) => {
-        if (!hasPermission(Permissions.ORDERS_VIEW) && !hasPermission(Permissions.USERS_VIEW)) {
+        if (!hasPermission(Permissions.ORDERS_VIEW) && !hasPermission(Permissions.CLIENTS_VIEW)) {
             toast.error(t('common:noPermission'));
             return;
         }
@@ -678,7 +678,7 @@ const ClientList = () => {
                                 </div>
                             </div>
                         )}
-                        {viewMode === 'detail' && selectedOrder && (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW)) && user?.role !== UserRole.EMPLOYEE && (
+                        {viewMode === 'detail' && selectedOrder && (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.CLIENTS_VIEW)) && user?.role !== UserRole.EMPLOYEE && (
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                 <button
                                     onClick={() => navigate(`/orders/${selectedOrder.id}`)}

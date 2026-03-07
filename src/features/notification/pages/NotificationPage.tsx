@@ -40,7 +40,7 @@ export const NotificationPage = () => {
         if (notification.type === 'order') {
             const orderId = notification.data?.order?.id || notification.data?.order?.orderId;
             if (orderId) {
-                if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.USERS_VIEW)) {
+                if (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW)) {
                     navigate(`/orders/${orderId}`);
                 } else {
                     toast.error(t('common:noPermission'));

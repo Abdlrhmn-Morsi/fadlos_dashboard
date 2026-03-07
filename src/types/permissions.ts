@@ -4,7 +4,8 @@ export enum Permissions {
     STORE_UPDATE = 'store.update',
 
     // User Management
-    USERS_VIEW = 'users.view',
+    FOLLOWERS_VIEW = 'followers.view',
+    CLIENTS_VIEW = 'clients.view',
     USERS_CREATE = 'users.create',
     USERS_UPDATE = 'users.update',
     USERS_DELETE = 'users.delete',

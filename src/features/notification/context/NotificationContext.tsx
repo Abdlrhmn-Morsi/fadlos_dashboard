@@ -66,7 +66,7 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
         }
 
         // If employee has User Management (clients) permissions, show review notifications
-        if (hasPermission(Permissions.USERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) {
+        if (hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW) || hasPermission(Permissions.USERS_UPDATE)) {
             types.push('review');
         }
 
