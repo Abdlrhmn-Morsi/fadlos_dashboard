@@ -127,7 +127,10 @@ const EmployeeForm = () => {
             navigate('/employees');
         } catch (error: any) {
             console.error('Failed to save employee', error);
-            toast.error(error.response?.data?.message || t('error'));
+            const errorData = error.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('error');
+            toast.error(message);
         } finally {
             setSubmitting(false);
         }

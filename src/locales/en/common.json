@@ -51,6 +51,12 @@
     "staffAccounts": "Staff Accounts",
     "results": "results",
     "save": "Save",
+    "promoCodeMustBeAtLeast3Characters": "Promo code must be at least 3 characters",
+    "promoCodeDescriptionMustBeAtLeast3Characters": "Promo code description (English) must be at least 3 characters",
+    "promoCodeDescriptionArMustBeAtLeast3Characters": "Promo code description (Arabic) must be at least 3 characters",
+    "fixedAmountMustBeGreaterThan0": "Fixed amount must be strictly greater than 0",
+    "percentageDiscountCannotExceed100": "Percentage discount cannot exceed 100",
+    "showingResults": "Showing {{start}} to {{end}} of {{total}} results",
     "dashboard": "Dashboard",
     "revenue": "Revenue",
     "orders": "Orders",
@@ -138,6 +144,7 @@
     "loading": "Loading",
     "required": "Required",
     "error": "Error",
+    "Branch Management": "Branch Management",
     "errorUpdatingData": "Error updating data",
     "errorFetchingData": "Error fetching data",
     "cannotDeleteRoleThatIsAssignedToUsersPleaseReassignUsersFirst": "Cannot delete role that is assigned to users. Please reassign users first.",
@@ -167,6 +174,13 @@
     "selectCitiesFirst": "Please select cities first to see available towns",
     "emailAlreadyExists": "This email is already in use by another user.",
     "phoneAlreadyExists": "This phone number is already in use by another user.",
+    "emailAlreadyUsed": "This email is already registered to another account.",
+    "phoneAlreadyUsed": "This phone number is already registered to another account.",
+    "usernameAlreadyUsed": "This username is already taken by another account.",
+    "avatarAndIdentityImagesFrontBackSelfieAreRequired": "Avatar, ID Front, ID Back, and Selfie with ID are all required.",
+    "storeNameAlreadyExists": "A store with this name is already registered.",
+    "phoneNumberAlreadyExists": "This phone number is already in use by another user.",
+    "usernameAlreadyExists": "This username is already taken by another user.",
     "email": "Email Address",
     "phone": "Phone Number",
     "actions": "Actions",
@@ -443,6 +457,20 @@
             "delete": {
                 "name": "Delete Categories",
                 "description": "• Remove product categories"
+            }
+        },
+        "branches": {
+            "create": {
+                "name": "Create Branch",
+                "description": "• Add new branches to the store\n• Configure branch location and status"
+            },
+            "update": {
+                "name": "Update Branch",
+                "description": "• Edit branch details and location\n• Update branch operating hours\n• Change branch active status"
+            },
+            "delete": {
+                "name": "Delete Branch",
+                "description": "• Remove existing branches from the store"
             }
         },
         "orders": {

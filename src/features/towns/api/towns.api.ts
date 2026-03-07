@@ -67,7 +67,8 @@ export const assignTownToStore = async (dto: { townId: string; defaultPrice: num
 export const getMyStoreDeliveryAreas = async () => {
     try {
         const responseBody = await apiService.get('/towns/delivery-areas/my-store');
-        return responseBody.data || responseBody;
+        const data = responseBody.data !== undefined ? responseBody.data : responseBody;
+        return Array.isArray(data) ? data : [];
     } catch (error) {
         throw error;
     }

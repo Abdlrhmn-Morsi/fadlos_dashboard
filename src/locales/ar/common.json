@@ -51,6 +51,12 @@
     "staffAccounts": "حسابات الموظفين",
     "results": "نتائج",
     "save": "حفظ",
+    "promoCodeMustBeAtLeast3Characters": "يجب أن يتكون كود الخصم من 3 أحرف على الأقل",
+    "promoCodeDescriptionMustBeAtLeast3Characters": "يجب أن يتكون وصف كود الخصم (الإنجليزي) من 3 أحرف على الأقل",
+    "promoCodeDescriptionArMustBeAtLeast3Characters": "يجب أن يتكون وصف كود الخصم (العربي) من 3 أحرف على الأقل",
+    "fixedAmountMustBeGreaterThan0": "يجب أن يكون المبلغ الثابت أكبر من 0",
+    "percentageDiscountCannotExceed100": "لا يمكن أن تتجاوز نسبة الخصم 100",
+    "showingResults": "عرض {{start}} إلى {{end}} من أصل {{total}} نتيجة",
     "dashboard": "لوحة التحكم",
     "status": "الحالة",
     "active": "نشط",
@@ -141,6 +147,7 @@
     "loading": "جاري التحميل",
     "required": "مطلوب",
     "error": "خطأ",
+    "Branch Management": "إدارة الفروع",
     "errorUpdatingData": "خطأ في تحديث البيانات",
     "errorFetchingData": "خطأ في جلب البيانات",
     "cannotDeleteRoleThatIsAssignedToUsersPleaseReassignUsersFirst": "لا يمكن حذف الدور المرتبط بمستخدمين. يرجى إعادة تعيين المستخدمين أولاً.",
@@ -170,6 +177,13 @@
     "selectCitiesFirst": "يرجى اختيار المدن أولاً لرؤية المناطق المتاحة",
     "emailAlreadyExists": "هذا البريد الإلكتروني مستخدم بالفعل من قبل مستخدم آخر.",
     "phoneAlreadyExists": "رقم الهاتف هذا مستخدم بالفعل من قبل مستخدم آخر.",
+    "emailAlreadyUsed": "هذا البريد الإلكتروني مسجل بالفعل لحساب آخر.",
+    "phoneAlreadyUsed": "رقم الهاتف هذا مسجل بالفعل لحساب آخر.",
+    "usernameAlreadyUsed": "اسم المستخدم هذا مأخوذ بالفعل من قبل حساب آخر.",
+    "avatarAndIdentityImagesFrontBackSelfieAreRequired": "الصورة الشخصية، وصورة الهوية الأمامية والخلفية، والسيلفي مع الهوية جميعها مطلوبة.",
+    "storeNameAlreadyExists": "يوجد متجر بهذا الاسم مسجل بالفعل.",
+    "phoneNumberAlreadyExists": "رقم الهاتف هذا مستخدم بالفعل من قبل مستخدم آخر.",
+    "usernameAlreadyExists": "اسم المستخدم هذا مأخوذ بالفعل من قبل مستخدم آخر.",
     "email": "البريد الإلكتروني",
     "phone": "رقم الهاتف",
     "actions": "الإجراءات",
@@ -440,6 +454,20 @@
             "delete": {
                 "name": "حذف التصنيف",
                 "description": "• إزالة تصنيفات المنتجات"
+            }
+        },
+        "branches": {
+            "create": {
+                "name": "إضافة فرع",
+                "description": "• إضافة فروع جديدة للمتجر\n• تكوين موقع الفرع وحالته"
+            },
+            "update": {
+                "name": "تحديث الفرع",
+                "description": "• تعديل تفاصيل الفرع وموقعه\n• تحديث ساعات عمل الفرع\n• تغيير حالة تنشيط الفرع"
+            },
+            "delete": {
+                "name": "حذف الفرع",
+                "description": "• إزالة الفروع الحالية من المتجر"
             }
         },
         "orders": {

@@ -48,7 +48,7 @@ const FreelancerMarketplace = () => {
     const fetchTowns = async () => {
         try {
             const response = await getCities({ limit: 100 });
-            setTowns(Array.isArray(response) ? response : response?.data?.data || response?.data || []);
+            setTowns(Array.isArray(response) ? response : (response as any)?.data?.data || (response as any)?.data || []);
         } catch (error) {
             console.error('Failed to fetch towns', error);
         }
@@ -121,7 +121,10 @@ const FreelancerMarketplace = () => {
             setFreelancers(prev => prev.map(f => f.user.id === userId ? { ...f, hiringStatus: null, hiringRequestId: null } : f));
         } catch (error: any) {
             console.error('Failed to cancel hiring request', error);
-            toast.error(error.response?.data?.message || t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request'));
+            const errorData = error.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request');
+            toast.error(message);
         } finally {
             setHiringId(null);
             setCancelData(null);
@@ -141,7 +144,10 @@ const FreelancerMarketplace = () => {
             setFreelancers(prev => prev.map(f => f.user.id === userId ? { ...f, hiringStatus: 'PENDING' } : f));
         } catch (error: any) {
             console.error('Failed to hire freelancer', error);
-            toast.error(error.response?.data?.message || t('common.error', 'Failed to hire freelancer'));
+            const errorData = error.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common.error', 'Failed to hire freelancer');
+            toast.error(message);
         } finally {
             setHiringId(null);
         }

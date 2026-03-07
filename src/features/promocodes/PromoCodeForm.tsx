@@ -218,7 +218,8 @@ const PromoCodeForm = () => {
         } catch (error: any) {
             console.error('Failed to save promo code', error);
             const message = error.response?.data?.message || t('common:errorUpdatingData');
-            toast.error(Array.isArray(message) ? message[0] : message);
+            const errorMsgKey = Array.isArray(message) ? message[0] : message;
+            toast.error(t(`common:${errorMsgKey}`, { defaultValue: errorMsgKey }));
         } finally {
             setSubmitting(false);
         }

@@ -49,7 +49,7 @@ const DeliveryAreas = () => {
         setLoading(true);
         try {
             // Check cache first
-            const cachedCities = getCache<any[]>('cities', { limit: 1000 });
+            const cachedCities = getCache<any[]>('cities_all');
             const cachedAreas = force ? null : getCache<any[]>('delivery-areas');
 
             if (cachedCities && cachedAreas) {
@@ -63,7 +63,7 @@ const DeliveryAreas = () => {
 
             console.log('[API] Fetching delivery areas and cities from API');
             const [allCities, areas] = await Promise.all([
-                getCities({ limit: 1000 }),
+                getCities({ limit: 0 }),
                 getMyStoreDeliveryAreas()
             ]);
 
@@ -71,7 +71,7 @@ const DeliveryAreas = () => {
             setDeliveryAreas(areas);
 
             // Store in cache
-            setCache('cities', allCities, { limit: 1000 });
+            setCache('cities_all', allCities);
             setCache('delivery-areas', areas);
         } catch (error) {
             console.error('Failed to fetch delivery areas:', error);

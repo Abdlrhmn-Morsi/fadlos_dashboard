@@ -2,6 +2,8 @@ import apiService from '../../../services/api.service';
 import { UserRole } from '../../../types/user-role';
 import { OrderStatus } from '../../../types/order-status';
 import { DashboardStats } from '../models/dashboard.model';
+import { PlanFeature } from '../../../types/plan-feature';
+import { Permissions } from '../../../types/permissions';
 
 export const fetchDashboardStats = async (user: any) => {
     try {
@@ -35,10 +37,10 @@ export const fetchDashboardStats = async (user: any) => {
         };
 
         // Helper to check permission
-        const hasPerm = (perm: string) => {
+        const hasPerm = (perm: Permissions | string) => {
             if (userRole === UserRole.SUPER_ADMIN || userRole === UserRole.ADMIN || userRole === UserRole.STORE_OWNER) return true;
             if (userRole === UserRole.EMPLOYEE) {
-                return user.employeeRole?.permissions?.includes(perm) || false;
+                return user.employeeRole?.permissions?.includes(perm as string) || false;
             }
             return false;
         };
@@ -55,7 +57,7 @@ export const fetchDashboardStats = async (user: any) => {
             const storeId = user.store?.id || user.storeId;
 
             // 1. Order Stats (Requires orders.view OR analytics.view)
-            if (hasPerm('orders.view') || hasPerm('analytics.view')) {
+            if (hasPerm(Permissions.ORDERS_VIEW) || hasPerm(Permissions.ANALYTICS_VIEW)) {
                 try {
                     const basicStats = await apiService.get('/orders/stats/basic');
                     const data = basicStats.data || basicStats;
@@ -85,8 +87,13 @@ export const fetchDashboardStats = async (user: any) => {
             promises.push(apiService.get('/products/store-products?limit=1').then(res => ({ key: 'products', val: res.meta?.total || 0 })).catch(() => ({ key: 'products', val: 0 })));
 
             // Clients count (users.view or clients.view)
-            if (hasPerm('users.view')) {
-                promises.push(apiService.get('/store/clients?limit=1').then(res => ({ key: 'clients', val: res.meta?.total || 0 })).catch(() => ({ key: 'clients', val: 0 })));
+            if (hasPerm(Permissions.CLIENTS_VIEW)) {
+                const hasClientsFeature = user.subscription?.features?.includes(PlanFeature.STORE_CLIENTS_MANAGEMENT);
+                if (hasClientsFeature) {
+                    promises.push(apiService.get('/store/clients?limit=1').then(res => ({ key: 'clients', val: res.meta?.total || 0 })).catch(() => ({ key: 'clients', val: 0 })));
+                } else {
+                    stats.totalClients = 0;
+                }
             }
 
 
@@ -94,17 +101,17 @@ export const fetchDashboardStats = async (user: any) => {
             promises.push(apiService.get('/categories/seller-categories?limit=1').then(res => ({ key: 'categories', val: res.meta?.total || 0 })).catch(() => ({ key: 'categories', val: 0 })));
 
             // Drivers count (delivery_drivers.view)
-            if (hasPerm('delivery_drivers.view')) {
+            if (hasPerm(Permissions.DELIVERY_DRIVERS_VIEW)) {
                 promises.push(apiService.get('/delivery-drivers/store-drivers?limit=1').then(res => ({ key: 'drivers', val: res.meta?.total || 0 })).catch(() => ({ key: 'drivers', val: 0 })));
             }
 
             // Followers (store.view) - Assuming store view allows seeing followers
-            if (storeId && hasPerm('store.view')) {
+            if (storeId && hasPerm(Permissions.STORE_VIEW)) {
                 promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0, extra: res })).catch(() => ({ key: 'rating', val: 0 })));
             }
 
             // Hiring Stats (delivery_drivers.create or delivery_drivers.update or delivery_drivers.view)
-            if (hasPerm('delivery_drivers.view')) {
+            if (hasPerm(Permissions.DELIVERY_DRIVERS_VIEW)) {
                 promises.push(apiService.get('/delivery-drivers/hiring-requests/me').then(res => {
                     const data = (res as any).data || {};
                     const incomingRequests = data.incomingRequests || [];

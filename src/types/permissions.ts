@@ -28,6 +28,11 @@ export enum Permissions {
     CATEGORIES_UPDATE = 'categories.update',
     CATEGORIES_DELETE = 'categories.delete',
 
+    // Branch Management
+    BRANCHES_CREATE = 'branches.create',
+    BRANCHES_UPDATE = 'branches.update',
+    BRANCHES_DELETE = 'branches.delete',
+
     // Order Management
     ORDERS_VIEW = 'orders.view',
     ORDERS_UPDATE = 'orders.update',

@@ -20,6 +20,13 @@ interface User {
         name: string;
         permissions: string[];
     };
+    subscription?: {
+        plan: string;
+        status: string | null;
+        features: string[];
+        limits: Record<string, number>;
+        hasAccess: boolean;
+    };
 }
 
 interface AuthContextType {

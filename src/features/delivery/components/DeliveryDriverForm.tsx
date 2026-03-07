@@ -245,8 +245,10 @@ const DeliveryDriverForm = () => {
             navigate('/delivery-drivers');
         } catch (error: any) {
             console.error('Failed to save driver', error);
-            const message = error.response?.data?.message || t('common.error', 'Failed to save driver');
-            toast.error(message);
+            const errorData = error.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(errorKey, errorKey)) : t('common.error', 'Failed to save driver');
+            toast.error(message as string);
         } finally {
             setSubmitting(false);
         }

@@ -898,7 +898,7 @@ const Dashboard: React.FC = () => {
                                 onClick={() => navigate('/products')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
                             >
-                                {t('common:common.addFirstProduct')}
+                                {t('common:addFirstProduct')}
                             </button>
                         </div>
                     ) : (
@@ -973,7 +973,7 @@ const Dashboard: React.FC = () => {
                                 onClick={() => navigate('/categories')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
                             >
-                                {t('common:common.addFirstCategory')}
+                                {t('common:addFirstCategory')}
                             </button>
                         </div>
                     ) : (

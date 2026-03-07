@@ -31,6 +31,13 @@ export const useSubscription = () => {
 
     const hasFeature = (feature: PlanFeature | string): boolean => {
         if (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) return true;
+
+        // Priority 1: Check user.subscription from AuthContext (flattened from backend /auth/me)
+        if (user?.subscription?.features) {
+            return user.subscription.features.includes(feature as string);
+        }
+
+        // Priority 2: Use fetched usage data
         if (!usage) return false;
 
         // Fallback: If feature check is for analytics, also check plan name
