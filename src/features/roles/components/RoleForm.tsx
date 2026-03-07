@@ -6,6 +6,7 @@ import { ArrowLeft, Save, Shield, Check } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
+import { useAppConfig } from '../../../contexts/AppConfigContext';
 import { RolesService } from '../api/roles.api';
 import { PermissionGroup } from '../../../types/permissions';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
@@ -17,6 +18,7 @@ const RoleForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
+    const { permissions: dynamicPermissions, loading: configLoading } = useAppConfig();
 
     const [loading, setLoading] = useState(isEditMode);
     const [submitting, setSubmitting] = useState(false);
@@ -30,51 +32,35 @@ const RoleForm = () => {
     });
 
     useEffect(() => {
-        fetchPermissions();
+        if (!configLoading) {
+            groupDynamicPermissions(dynamicPermissions);
+        }
         if (isEditMode) {
             fetchRole();
         }
-    }, [id]);
+    }, [id, configLoading, dynamicPermissions]);
 
-    const fetchPermissions = async () => {
-        try {
-            const response = await RolesService.getPermissions();
-            // Handle both { permissions, permissionGroups, ... } and nested { data: { ... } }
-            const raw = (response as any).data || response;
+    const groupDynamicPermissions = (perms: string[]) => {
+        const groups: Record<string, any[]> = {};
+        perms.forEach((p: string) => {
+            const [category, action] = p.split('.');
+            if (!groups[category]) groups[category] = [];
+            groups[category].push({
+                key: p,
+                name: action,
+                description: p
+            });
+        });
 
-            let structured: PermissionGroup[] = [];
+        const structured: PermissionGroup[] = Object.keys(groups).map(category => ({
+            category,
+            permissions: groups[category]
+        }));
 
-            if (raw.permissionGroups && Array.isArray(raw.permissionGroups)) {
-                structured = raw.permissionGroups;
-            } else if (raw.permissions && Array.isArray(raw.permissions)) {
-                // If backend only gives flat list, group it
-                const groups: Record<string, any[]> = {};
-                raw.permissions.forEach((p: any) => {
-                    const cat = p.category || 'Other';
-                    if (!groups[cat]) groups[cat] = [];
-                    groups[cat].push({
-                        key: p.key,
-                        name: p.name || p.key,
-                        description: p.description
-                    });
-                });
-                const defaultIncluded = ['products.view', 'categories.view'];
-                structured = Object.entries(groups).map(([category, permissions]) => ({
-                    category,
-                    permissions: permissions.filter((p: any) => !defaultIncluded.includes(p.key)) as any
-                })).filter(group => group.permissions.length > 0);
-            }
-
-            if (structured.length > 0) {
-                setPermissionsData({
-                    categories: structured.map(s => s.category),
-                    permissions: structured
-                });
-            }
-        } catch (error) {
-            console.error('Failed to fetch permissions', error);
-            toast.error(t('errorFetchingData'));
-        }
+        setPermissionsData({
+            categories: Object.keys(groups),
+            permissions: structured
+        });
     };
 
     const fetchRole = async () => {

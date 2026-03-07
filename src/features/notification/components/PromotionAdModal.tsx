@@ -84,7 +84,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                 message,
                 messageAr,
                 targetType,
-                targetIds: targetType === PromotionTargetType.INDIVIDUALS ? initialTargetIds : undefined,
+                targetIds: (targetType === PromotionTargetType.INDIVIDUAL_CLIENTS || targetType === PromotionTargetType.INDIVIDUAL_FOLLOWERS) ? initialTargetIds : undefined,
             });
             toast.success(t('promotions.success'));
             onClose();
@@ -243,7 +243,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                     <CheckCircle2 size={16} className="text-primary" />
                     <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
                         {t('promotions.target')}: <span className="font-bold text-slate-900 dark:text-white uppercase">{t(`promotions.${targetType}`)}</span>
-                        {targetType === PromotionTargetType.INDIVIDUALS && (
+                        {(targetType === PromotionTargetType.INDIVIDUAL_CLIENTS || targetType === PromotionTargetType.INDIVIDUAL_FOLLOWERS) && (
                             <span className="ms-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-black">
                                 {initialTargetIds.length}
                             </span>
