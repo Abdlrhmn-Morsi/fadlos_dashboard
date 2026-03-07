@@ -2,24 +2,25 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import api from '../services/api';
 
 interface AppConfigContextType {
-    permissions: string[];
-    planFeatures: string[];
+    dynamicPermissions: string[];
+    permissionGroups: any[];
+    dynamicPlanFeatures: string[];
     loading: boolean;
     error: string | null;
 }
 
 const AppConfigContext = createContext<AppConfigContextType>({
-    permissions: [],
-    planFeatures: [],
+    dynamicPermissions: [],
+    permissionGroups: [],
+    dynamicPlanFeatures: [],
     loading: true,
     error: null,
 });
 
 export const AppConfigProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [config, setConfig] = useState<{ permissions: string[], planFeatures: string[] }>({
-        permissions: [],
-        planFeatures: []
-    });
+    const [dynamicPermissions, setDynamicPermissions] = useState<string[]>([]);
+    const [permissionGroups, setPermissionGroups] = useState<any[]>([]);
+    const [dynamicPlanFeatures, setDynamicPlanFeatures] = useState<string[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -30,10 +31,9 @@ export const AppConfigProvider: React.FC<{ children: React.ReactNode }> = ({ chi
                 // Handle unwrapping the 'data' property if it exists, sometimes axios or interceptors wrap it
                 const actualData = response.data?.data || response.data || response;
 
-                setConfig({
-                    permissions: actualData.permissions || [],
-                    planFeatures: actualData.planFeatures || []
-                });
+                setDynamicPermissions(actualData.permissions || []);
+                setPermissionGroups(actualData.permissionGroups || []);
+                setDynamicPlanFeatures(actualData.planFeatures || []);
                 setError(null);
             } catch (err: any) {
                 console.error('Failed to fetch app configuration constants', err);
@@ -47,7 +47,7 @@ export const AppConfigProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }, []);
 
     return (
-        <AppConfigContext.Provider value={{ ...config, loading, error }}>
+        <AppConfigContext.Provider value={{ dynamicPermissions, permissionGroups, dynamicPlanFeatures, loading, error }}>
             {children}
         </AppConfigContext.Provider>
     );

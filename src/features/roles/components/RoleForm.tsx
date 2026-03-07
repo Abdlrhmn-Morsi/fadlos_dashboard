@@ -18,7 +18,7 @@ const RoleForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const isEditMode = !!id;
-    const { permissions: dynamicPermissions, loading: configLoading } = useAppConfig();
+    const { permissionGroups, loading: configLoading } = useAppConfig();
 
     const [loading, setLoading] = useState(isEditMode);
     const [submitting, setSubmitting] = useState(false);
@@ -32,36 +32,16 @@ const RoleForm = () => {
     });
 
     useEffect(() => {
-        if (!configLoading) {
-            groupDynamicPermissions(dynamicPermissions);
+        if (!configLoading && permissionGroups) {
+            setPermissionsData({
+                categories: permissionGroups.map(g => g.category),
+                permissions: permissionGroups
+            });
         }
         if (isEditMode) {
             fetchRole();
         }
-    }, [id, configLoading, dynamicPermissions]);
-
-    const groupDynamicPermissions = (perms: string[]) => {
-        const groups: Record<string, any[]> = {};
-        perms.forEach((p: string) => {
-            const [category, action] = p.split('.');
-            if (!groups[category]) groups[category] = [];
-            groups[category].push({
-                key: p,
-                name: action,
-                description: p
-            });
-        });
-
-        const structured: PermissionGroup[] = Object.keys(groups).map(category => ({
-            category,
-            permissions: groups[category]
-        }));
-
-        setPermissionsData({
-            categories: Object.keys(groups),
-            permissions: structured
-        });
-    };
+    }, [id, configLoading, permissionGroups]);
 
     const fetchRole = async () => {
         try {
