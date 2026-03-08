@@ -21,8 +21,8 @@ export const settlementsApi = {
     /**
      * Create a new settlement batch
      */
-    createSettlement: async (driverId: string, orderIds: string[]) => {
-        return apiService.post('/settlements', { driverId, orderIds });
+    createSettlement: async (deliveryId: string, orderIds: string[]) => {
+        return apiService.post('/settlements', { deliveryId, orderIds });
     },
 
     /**

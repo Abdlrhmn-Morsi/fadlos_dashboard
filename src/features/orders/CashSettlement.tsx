@@ -46,7 +46,7 @@ const CashSettlement = () => {
     };
 
     const handleDriverClick = async (driver: any) => {
-        if (selectedDriver?.driverId === driver.driverId) {
+        if (selectedDriver?.deliveryId === driver.deliveryId) {
             setSelectedDriver(null);
             setDriverOrders([]);
             setSelectedOrderIds([]);
@@ -56,7 +56,7 @@ const CashSettlement = () => {
         try {
             setSelectedDriver(driver);
             setLoadingOrders(true);
-            const data: any = await settlementsApi.getPendingOrdersByDriver(driver.driverId);
+            const data: any = await settlementsApi.getPendingOrdersByDriver(driver.deliveryId);
             setDriverOrders(data);
             // Default to selecting all orders
             setSelectedOrderIds(data.map((o: any) => o.id));
@@ -80,8 +80,8 @@ const CashSettlement = () => {
         if (!selectedDriver || selectedOrderIds.length === 0) return;
 
         try {
-            setSettling(selectedDriver.driverId);
-            await settlementsApi.createSettlement(selectedDriver.driverId, selectedOrderIds);
+            setSettling(selectedDriver.deliveryId);
+            await settlementsApi.createSettlement(selectedDriver.deliveryId, selectedOrderIds);
 
             toast.success(t('collectionSuccess'));
 
@@ -143,11 +143,11 @@ const CashSettlement = () => {
                     )}>
                         {pendingCollections.map((collection) => (
                             <div
-                                key={collection.driverId}
+                                key={collection.deliveryId}
                                 onClick={() => handleDriverClick(collection)}
                                 className={clsx(
                                     "bg-white dark:bg-slate-900 rounded-2xl border transition-all cursor-pointer overflow-hidden p-6 shadow-sm hover:shadow-md",
-                                    selectedDriver?.driverId === collection.driverId
+                                    selectedDriver?.deliveryId === collection.deliveryId
                                         ? "border-primary ring-1 ring-primary"
                                         : "border-slate-200 dark:border-slate-800"
                                 )}
@@ -247,14 +247,14 @@ const CashSettlement = () => {
                                     {hasPermission(Permissions.CASH_SETTLEMENT_MANAGE) && (
                                         <button
                                             onClick={() => setShowConfirmModal(true)}
-                                            disabled={settling === selectedDriver.driverId || selectedOrderIds.length === 0}
+                                            disabled={settling === selectedDriver.deliveryId || selectedOrderIds.length === 0}
                                             className={clsx(
                                                 "px-6 py-2.5 rounded-xl font-bold transition-all flex items-center justify-center gap-2",
                                                 "bg-primary text-white hover:bg-primary-dark shadow-lg shadow-primary/20",
                                                 "disabled:opacity-50 disabled:cursor-not-allowed"
                                             )}
                                         >
-                                            {settling === selectedDriver.driverId ? (
+                                            {settling === selectedDriver.deliveryId ? (
                                                 <Loader2 size={18} className="animate-spin" />
                                             ) : (
                                                 <CheckCircle size={18} />
