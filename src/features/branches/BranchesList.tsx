@@ -94,7 +94,7 @@ export const BranchesList: React.FC = () => {
                 // If the new branch is main, unset any existing main branch in the same town
                 if (branchData.isMainBranch) {
                     return newBranches.map(b =>
-                        (b.townId === branchData.townId && b.isMainBranch)
+                        b.isMainBranch
                             ? { ...b, isMainBranch: false }
                             : b
                     ).concat(branchData);
@@ -125,8 +125,8 @@ export const BranchesList: React.FC = () => {
             setBranches(prev => {
                 return prev.map(b => {
                     if (b.id === id) return branchData;
-                    // If the updated branch is now main, unset any other main branch in the same town
-                    if (branchData.isMainBranch && b.townId === branchData.townId && b.isMainBranch) {
+                    // If the updated branch is now main, unset any other main branch globally
+                    if (branchData.isMainBranch && b.isMainBranch) {
                         return { ...b, isMainBranch: false };
                     }
                     return b;

@@ -100,8 +100,8 @@ const FreelancerMarketplace = () => {
         fetchPlaces(townId);
     };
 
-    const handleCancelRequest = (requestId: string, userId: string) => {
-        setCancelData({ requestId, userId });
+    const handleCancelRequest = (requestId: string, deliveryId: string) => {
+        setCancelData({ requestId, userId: deliveryId });
         setIsCancelModalOpen(true);
     };
 
@@ -118,7 +118,7 @@ const FreelancerMarketplace = () => {
             invalidateCache('delivery_drivers');
 
             // Update status locally
-            setFreelancers(prev => prev.map(f => f.user.id === userId ? { ...f, hiringStatus: null, hiringRequestId: null } : f));
+            setFreelancers(prev => prev.map(f => f.id === userId ? { ...f, hiringStatus: null, hiringRequestId: null } : f));
         } catch (error: any) {
             console.error('Failed to cancel hiring request', error);
             const errorData = error.response?.data?.message;
@@ -131,17 +131,17 @@ const FreelancerMarketplace = () => {
         }
     };
 
-    const handleHire = async (userId: string) => {
-        setHiringId(userId);
+    const handleHire = async (deliveryId: string) => {
+        setHiringId(deliveryId);
         try {
-            await hireFreelancer(userId);
+            await hireFreelancer(deliveryId);
             toast.success(t('delivery.drivers.hire_success', 'Freelancer hired successfully'));
 
             // Invalidate My Drivers cache
             invalidateCache('delivery_drivers');
 
             // Update status locally
-            setFreelancers(prev => prev.map(f => f.user.id === userId ? { ...f, hiringStatus: 'PENDING' } : f));
+            setFreelancers(prev => prev.map(f => f.id === deliveryId ? { ...f, hiringStatus: 'PENDING' } : f));
         } catch (error: any) {
             console.error('Failed to hire freelancer', error);
             const errorData = error.response?.data?.message;
@@ -223,9 +223,9 @@ const FreelancerMarketplace = () => {
                                     <div className="relative flex-shrink-0">
                                         <div className="w-14 h-14 rounded-2xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600 font-bold text-xl overflow-hidden group-hover:scale-105 transition-transform">
                                             {profile.avatarUrl ? (
-                                                <img src={profile.avatarUrl} alt={profile.user.name} className="w-full h-full object-cover" />
+                                                <img src={profile.avatarUrl} alt={profile.profile?.user?.name} className="w-full h-full object-cover" />
                                             ) : (
-                                                profile.user.name.charAt(0)
+                                                profile.profile?.user?.name?.charAt(0) || '?'
                                             )}
                                         </div>
                                         <div className={clsx(
@@ -235,7 +235,7 @@ const FreelancerMarketplace = () => {
                                         )} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{profile.user.name}</h3>
+                                        <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{profile.profile?.user?.name || t('delivery.drivers.unknown_driver')}</h3>
                                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold uppercase tracking-wider mt-1">
                                             <Shield size={12} />
                                             {t('common.verified')}
@@ -297,12 +297,12 @@ const FreelancerMarketplace = () => {
                                         {t('common.requestSent', 'Request Sent')}
                                     </button>
                                     <button
-                                        onClick={() => handleCancelRequest(profile.hiringRequestId, profile.user.id)}
-                                        disabled={hiringId === profile.user.id}
+                                        onClick={() => handleCancelRequest(profile.hiringRequestId, profile.id)}
+                                        disabled={hiringId === profile.id}
                                         className="px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 font-bold rounded-xl transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
                                         title={t('delivery.drivers.cancel_hiring', 'Cancel Application')}
                                     >
-                                        {hiringId === profile.user.id ? (
+                                        {hiringId === profile.id ? (
                                             <div className="w-5 h-5 border-2 border-rose-600/30 border-t-rose-600 rounded-full animate-spin" />
                                         ) : (
                                             <XCircle size={20} />
@@ -311,11 +311,11 @@ const FreelancerMarketplace = () => {
                                 </div>
                             ) : (
                                 <button
-                                    onClick={() => handleHire(profile.user.id)}
-                                    disabled={hiringId === profile.user.id}
+                                    onClick={() => handleHire(profile.id)}
+                                    disabled={hiringId === profile.id}
                                     className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-indigo-600/20 active:scale-[0.98]"
                                 >
-                                    {hiringId === profile.user.id ? (
+                                    {hiringId === profile.id ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                                     ) : (
                                         <CheckCircle size={20} />
