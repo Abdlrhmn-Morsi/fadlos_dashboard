@@ -908,7 +908,7 @@ const OrderDetail = () => {
                                                             className="w-full h-full object-cover"
                                                         />
                                                     ) : (
-                                                        order.driver.name.charAt(0)
+                                                        (order.driver.name || '?').charAt(0)
                                                     )}
                                                 </div>
                                                 <div className="min-w-0 flex-1">
