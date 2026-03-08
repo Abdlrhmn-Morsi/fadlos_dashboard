@@ -101,5 +101,7 @@
     "collectionSuccess": "Collection confirmed successfully",
     "settlementFailed": "Settlement failed",
     "pendingRevenue": "Pending Revenue",
+    "todayPendingRevenue": "Today's Pending Revenue",
+    "totalPendingRevenue": "Total Pending Revenue",
     "confirmedRevenue": "Confirmed Revenue"
 }

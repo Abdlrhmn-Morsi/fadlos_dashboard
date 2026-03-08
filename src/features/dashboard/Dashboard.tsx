@@ -690,7 +690,7 @@ const Dashboard: React.FC = () => {
                 {/* Today's Pending Revenue */}
                 {hasPermission('analytics.view') && (
                     <StatCard
-                        title={t('orders:pendingRevenue')}
+                        title={t('orders:todayPendingRevenue')}
                         value={`${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
                         icon={Clock}
                         color="amber"
@@ -710,7 +710,7 @@ const Dashboard: React.FC = () => {
                 {/* Total Pending Revenue */}
                 {hasPermission('analytics.view') && (
                     <StatCard
-                        title={t('orders:pendingRevenue')}
+                        title={t('orders:totalPendingRevenue')}
                         value={`${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
                         icon={Clock}
                         color="amber"

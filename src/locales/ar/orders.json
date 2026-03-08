@@ -101,5 +101,7 @@
     "collectionSuccess": "تم تأكيد التحصيل بنجاح",
     "settlementFailed": "فشل عملية التحصيل",
     "pendingRevenue": "الأرباح المعلقة",
+    "todayPendingRevenue": "الأرباح المعلقة اليوم",
+    "totalPendingRevenue": "إجمالي الأرباح المعلقة",
     "confirmedRevenue": "الأرباح المؤكدة"
 }
