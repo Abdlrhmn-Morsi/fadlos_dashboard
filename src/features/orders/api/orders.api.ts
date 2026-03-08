@@ -64,14 +64,14 @@ export const ordersApi = {
      * Assign a driver to an order
      */
     assignDriver: async (id: string, driverId: string) => {
-        return apiService.patch(`/orders/${id}/assign-driver`, { driverId });
+        return apiService.patch(`/orders/${id}/assign-driver`, { deliveryId: driverId });
     },
 
     /**
      * Reassign a driver to an order
      */
     reassignDriver: async (id: string, driverId: string) => {
-        return apiService.patch(`/orders/${id}/reassign-driver`, { driverId });
+        return apiService.patch(`/orders/${id}/reassign-driver`, { deliveryId: driverId });
     },
 
     /**

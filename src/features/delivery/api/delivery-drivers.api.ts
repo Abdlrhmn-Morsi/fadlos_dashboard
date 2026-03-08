@@ -1,6 +1,6 @@
 import apiService from '../../../services/api.service';
 
-export const getStoreDrivers = async (params: any = {}) => {
+export const getStoreDrivers = async (params: { page?: number; limit?: number; search?: string; townId?: string; placeId?: string; storeId?: string } = {}) => {
     try {
         const response = await apiService.get('/delivery-drivers/store-drivers', { params });
         // If it's a paginated response, apiService returns { data, meta }

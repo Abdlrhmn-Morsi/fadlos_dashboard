@@ -98,7 +98,7 @@ const OrderDetail = () => {
         try {
             setDriverLoading(true);
             const { getStoreDrivers } = await import('../delivery/api/delivery-drivers.api');
-            const params: any = { page, limit: 5, search };
+            const params: any = { page, limit: 5, search, storeId: order?.storeId };
             if (byTown && order?.branch?.town?.id) {
                 params.townId = order.branch.town.id;
             }
@@ -134,8 +134,10 @@ const OrderDetail = () => {
             await method(id!, driverId);
             setAssignDriverModal(false);
             fetchOrder(); // Refresh order data
-        } catch (error) {
+            toast.success(t('driverAssigned', 'Driver assigned successfully'));
+        } catch (error: any) {
             console.error('Failed to assign driver', error);
+            toast.error(error.response?.data?.message || t('common.error', 'Failed to assign driver'));
         } finally {
             setUpdating(false);
         }
