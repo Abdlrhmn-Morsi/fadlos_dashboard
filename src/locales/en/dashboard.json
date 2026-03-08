@@ -99,5 +99,7 @@
     "incomingRequests": "Incoming Requests",
     "sentInvitations": "Sent Invitations",
     "reviewRequest": "Review Request",
-    "cancelInvitation": "Cancel Invitation"
+    "cancelInvitation": "Cancel Invitation",
+    "noPendingApprovals": "No pending approvals at the moment.",
+    "noHiringRequests": "No hiring requests found."
 }

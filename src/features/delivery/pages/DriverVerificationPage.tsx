@@ -103,13 +103,13 @@ const DriverVerificationPage = () => {
                         <div className="p-5 space-y-4 flex-1">
                             <div className="flex items-center gap-4">
                                 <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-xl text-indigo-600 shadow-inner">
-                                    {profile.user?.name?.charAt(0)}
+                                    {(profile.profile?.user?.name || 'U').charAt(0)}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <h3 className="font-black text-slate-900 dark:text-white truncate">{profile.user?.name}</h3>
+                                    <h3 className="font-black text-slate-900 dark:text-white truncate">{profile.profile?.user?.name || 'Unknown Driver'}</h3>
                                     <div className="flex items-center gap-1 text-slate-400 text-xs">
                                         <Mail size={12} />
-                                        <span className="truncate">{profile.user?.email}</span>
+                                        <span className="truncate">{profile.profile?.user?.email || '-'}</span>
                                     </div>
                                 </div>
                             </div>
@@ -121,7 +121,7 @@ const DriverVerificationPage = () => {
                                 </div>
                                 <div className="space-y-1">
                                     <p className="text-slate-400 font-bold uppercase tracking-tighter">{t('fields.phone', 'Phone')}</p>
-                                    <p className="font-black text-slate-700 dark:text-slate-300">{profile.user?.phone || '-'}</p>
+                                    <p className="font-black text-slate-700 dark:text-slate-300">{profile.profile?.user?.phone || '-'}</p>
                                 </div>
                             </div>
 
@@ -155,7 +155,7 @@ const DriverVerificationPage = () => {
                         {/* Actions */}
                         <div className="p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
                             <button
-                                onClick={() => handleVerifyClick(profile.user.id, profile.user.name, 'VERIFIED')}
+                                onClick={() => handleVerifyClick(profile.id, profile.profile?.user?.name || 'Unknown Driver', 'VERIFIED')}
                                 disabled={profile.verificationStatus === 'VERIFIED'}
                                 className={clsx(
                                     "flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm",
@@ -168,7 +168,7 @@ const DriverVerificationPage = () => {
                                 {t('approve', 'Approve')}
                             </button>
                             <button
-                                onClick={() => handleVerifyClick(profile.user.id, profile.user.name, 'REJECTED')}
+                                onClick={() => handleVerifyClick(profile.id, profile.profile?.user?.name || 'Unknown Driver', 'REJECTED')}
                                 disabled={profile.verificationStatus === 'REJECTED'}
                                 className={clsx(
                                     "flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm",

@@ -381,7 +381,7 @@ const OrderList = () => {
                                             {order.orderNumber || order.id?.slice(0, 8)}
                                         </td>
                                         <td className="px-6 py-4 font-medium text-slate-800 dark:text-white">
-                                            {order.client?.name || `${order.client?.firstName || ''} ${order.client?.lastName || ''}`.trim() || t('common:guest', { defaultValue: 'Guest' })}
+                                            {order.client?.name || order.clientInfo?.name || t('common:guest', { defaultValue: 'Guest' })}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
                                             {order.branch ? (isRTL

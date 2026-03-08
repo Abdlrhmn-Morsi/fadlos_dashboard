@@ -99,5 +99,7 @@
     "incomingRequests": "الطلبات الواردة",
     "sentInvitations": "الدعوات المرسلة",
     "reviewRequest": "مراجعة الطلب",
-    "cancelInvitation": "إلغاء الدعوة"
+    "cancelInvitation": "إلغاء الدعوة",
+    "noPendingApprovals": "لا توجد طلبات موافقة معلقة في الوقت الحالي.",
+    "noHiringRequests": "لم يتم العثور على طلبات توظيف."
 }

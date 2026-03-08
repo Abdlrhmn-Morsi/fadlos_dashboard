@@ -12,7 +12,8 @@ import {
     DollarSign,
     RefreshCw,
     Filter,
-    RotateCcw
+    RotateCcw,
+    Search
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -44,6 +45,7 @@ const DeliveryAreas = () => {
     const [filterTownId, setFilterTownId] = useState<string>('all');
     const [showResetConfirm, setShowResetConfirm] = useState(false);
     const [resetting, setResetting] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const fetchData = async (force = false) => {
         setLoading(true);
@@ -169,9 +171,15 @@ const DeliveryAreas = () => {
         })
         .filter(t => t.id);
 
-    const filteredAreas = filterTownId === 'all'
-        ? deliveryAreas
-        : deliveryAreas.filter(area => area.place?.town?.id === filterTownId);
+    const filteredAreas = deliveryAreas
+        .filter(area => filterTownId === 'all' || area.place?.town?.id === filterTownId)
+        .filter(area => {
+            if (!searchQuery) return true;
+            const search = searchQuery.toLowerCase();
+            const placeNameEn = area.place?.enName?.toLowerCase() || '';
+            const placeNameAr = area.place?.arName?.toLowerCase() || '';
+            return placeNameEn.includes(search) || placeNameAr.includes(search);
+        });
 
     return (
         <div className="space-y-8">
@@ -261,6 +269,18 @@ const DeliveryAreas = () => {
                                     </option>
                                 ))}
                             </select>
+                        </div>
+
+                        {/* Search Input */}
+                        <div className="relative">
+                            <Search size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-3" />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                placeholder={t('common:search')}
+                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4 min-w-[150px]"
+                            />
                         </div>
 
                         {/* Reset All Button */}

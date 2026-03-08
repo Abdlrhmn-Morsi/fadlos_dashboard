@@ -745,16 +745,22 @@ const OrderDetail = () => {
                             </h3>
                             <div className="space-y-4">
                                 <div className="flex items-center gap-3 pb-4 border-b border-slate-100 dark:border-slate-800">
-                                    <div className="w-10 h-10 bg-indigo-50 dark:bg-indigo-900/30 rounded-full flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold overflow-hidden">
-                                        {(order.client?.profileImage || order.clientInfo?.profileImage) ? (
-                                            <ImageWithFallback src={order.client?.profileImage || order.clientInfo?.profileImage} alt={order.client?.name || order.clientInfo?.name} className="w-full h-full object-cover" />
+                                    <div className="w-10 h-10 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center overflow-hidden border border-indigo-100 dark:border-indigo-800">
+                                        {(order.clientInfo?.profileImage || order.client?.profileImage) ? (
+                                            <ImageWithFallback
+                                                src={order.clientInfo?.profileImage || order.client?.profileImage!}
+                                                alt={order.clientInfo?.name || order.client?.name || ''}
+                                                className="w-full h-full object-cover"
+                                            />
                                         ) : (
-                                            order.client?.name?.[0] || order.clientInfo?.name?.[0] || 'G'
+                                            <span className="text-indigo-600 dark:text-indigo-400 font-bold">
+                                                {(order.clientInfo?.name || order.client?.name || 'G')[0].toUpperCase()}
+                                            </span>
                                         )}
                                     </div>
-                                    <div>
-                                        <p className="font-bold text-slate-900 dark:text-white">
-                                            {order.client?.name || order.clientInfo?.name || t('guest')}
+                                    <div className="flex flex-col">
+                                        <p className="font-bold text-slate-900 dark:text-white leading-tight">
+                                            {order.clientInfo?.name || order.client?.name || t('guest')}
                                         </p>
                                         <p className="text-xs text-slate-500">{t('customer')}</p>
                                     </div>

@@ -294,7 +294,7 @@ const Dashboard: React.FC = () => {
                         </h4>
                         <div className="space-y-3">
                             {stores.length === 0 ? (
-                                <p className="text-xs text-slate-400 italic">{t('common.no_results')}</p>
+                                <p className="text-xs text-slate-400 italic">{t('noPendingApprovals')}</p>
                             ) : (
                                 stores.map((store: any) => (
                                     <div key={store.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
@@ -326,7 +326,7 @@ const Dashboard: React.FC = () => {
                         </h4>
                         <div className="space-y-3">
                             {drivers.length === 0 ? (
-                                <p className="text-xs text-slate-400 italic">{t('common.no_results')}</p>
+                                <p className="text-xs text-slate-400 italic">{t('noPendingApprovals')}</p>
                             ) : (
                                 drivers.map((profile: any) => (
                                     <div key={profile.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800">
@@ -335,12 +335,12 @@ const Dashboard: React.FC = () => {
                                                 {profile.avatarUrl ? <img src={profile.avatarUrl} alt="" className="w-full h-full object-cover" /> : <Users size={20} className="text-slate-300" />}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{profile.user?.name || 'Unknown Driver'}</p>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{profile.profile?.user?.name || 'Unknown Driver'}</p>
                                                 <p className="text-[10px] text-slate-400">{profile.driverType}</p>
                                             </div>
                                         </div>
                                         <button
-                                            onClick={() => navigate(`/delivery-drivers`)}
+                                            onClick={() => navigate(`/drivers/verification`)}
                                             className="px-3 py-1.5 bg-primary text-white text-[10px] font-bold uppercase tracking-wider hover:bg-primary/90 transition-colors"
                                         >
                                             {t('review')}
@@ -441,19 +441,19 @@ const Dashboard: React.FC = () => {
                         <div className="space-y-3">
                             {incoming.length === 0 ? (
                                 <div className="py-12 text-center">
-                                    <p className="text-sm text-slate-400 italic">{t('common.no_results')}</p>
+                                    <p className="text-sm text-slate-400 italic">{t('noHiringRequests')}</p>
                                 </div>
                             ) : (
                                 incoming.map((req: any) => (
                                     <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-lg group hover:border-primary/30 transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-full overflow-hidden shadow-sm">
-                                                {req.driver?.deliveryProfile?.avatarUrl ?
-                                                    <img src={req.driver.deliveryProfile.avatarUrl} alt="" className="w-full h-full object-cover" /> :
+                                                {req.delivery?.avatarUrl ?
+                                                    <img src={req.delivery.avatarUrl} alt="" className="w-full h-full object-cover" /> :
                                                     <Users size={24} className="text-slate-200" />}
                                             </div>
                                             <div className={isRTL ? "text-right" : "text-left"}>
-                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{req.driver?.name || 'Unknown Driver'}</p>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{req.delivery?.profile?.user?.name || 'Unknown Driver'}</p>
                                                 <div className="flex flex-wrap items-center gap-2 mt-1">
                                                     <div className="flex items-center gap-1">
                                                         <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.hiringStatus')}:</span>
@@ -465,11 +465,11 @@ const Dashboard: React.FC = () => {
                                                         <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.driverVerification')}:</span>
                                                         <span className={clsx(
                                                             "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
-                                                            req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED'
+                                                            req.delivery?.verificationStatus === 'VERIFIED'
                                                                 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                                 : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                                                         )}>
-                                                            {req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED' ? t('common.verified') : (req.driver?.deliveryProfile?.verificationStatus || 'Unknown')}
+                                                            {req.delivery?.verificationStatus === 'VERIFIED' ? t('common.verified') : (req.delivery?.verificationStatus || 'Unknown')}
                                                         </span>
                                                     </div>
                                                     {req.notes && <span className="text-[10px] text-slate-400 truncate max-w-[150px]">— {req.notes}</span>}
@@ -479,7 +479,7 @@ const Dashboard: React.FC = () => {
                                         <div className="flex gap-2">
                                             <button
                                                 onClick={() => {
-                                                    setConfirmData({ id: req.id, type: 'ACCEPT', name: req.driver?.name });
+                                                    setConfirmData({ id: req.id, type: 'ACCEPT', name: req.delivery?.profile?.user?.name });
                                                     setIsConfirmModalOpen(true);
                                                 }}
                                                 disabled={actionLoading === req.id}
@@ -489,7 +489,7 @@ const Dashboard: React.FC = () => {
                                             </button>
                                             <button
                                                 onClick={() => {
-                                                    setConfirmData({ id: req.id, type: 'REJECT', name: req.driver?.name });
+                                                    setConfirmData({ id: req.id, type: 'REJECT', name: req.delivery?.profile?.user?.name });
                                                     setIsConfirmModalOpen(true);
                                                 }}
                                                 disabled={actionLoading === req.id}
@@ -506,19 +506,19 @@ const Dashboard: React.FC = () => {
                         <div className="space-y-3">
                             {sent.length === 0 ? (
                                 <div className="py-12 text-center">
-                                    <p className="text-sm text-slate-400 italic">{t('common.no_results')}</p>
+                                    <p className="text-sm text-slate-400 italic">{t('noHiringRequests')}</p>
                                 </div>
                             ) : (
                                 sent.map((req: any) => (
                                     <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-lg group hover:border-slate-300 dark:hover:border-slate-600 transition-all text-start">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-full overflow-hidden shadow-sm">
-                                                {req.driver?.deliveryProfile?.avatarUrl ?
-                                                    <img src={req.driver.deliveryProfile.avatarUrl} alt="" className="w-full h-full object-cover" /> :
+                                                {req.delivery?.avatarUrl ?
+                                                    <img src={req.delivery.avatarUrl} alt="" className="w-full h-full object-cover" /> :
                                                     <Users size={24} className="text-slate-200" />}
                                             </div>
                                             <div className={isRTL ? "text-right" : "text-left"}>
-                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{req.driver?.name || 'Unknown Driver'}</p>
+                                                <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{req.delivery?.profile?.user?.name || 'Unknown Driver'}</p>
                                                 <div className="flex flex-wrap items-center gap-2 mt-1">
                                                     <div className="flex items-center gap-1">
                                                         <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.hiringStatus')}:</span>
@@ -530,11 +530,11 @@ const Dashboard: React.FC = () => {
                                                         <span className="text-[10px] text-slate-500 font-medium uppercase tracking-tighter">{t('common.driverVerification')}:</span>
                                                         <span className={clsx(
                                                             "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
-                                                            req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED'
+                                                            req.delivery?.verificationStatus === 'VERIFIED'
                                                                 ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                                 : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                                                         )}>
-                                                            {req.driver?.deliveryProfile?.verificationStatus === 'VERIFIED' ? t('common.verified') : (req.driver?.deliveryProfile?.verificationStatus || 'Unknown')}
+                                                            {req.delivery?.verificationStatus === 'VERIFIED' ? t('common.verified') : (req.delivery?.verificationStatus || 'Unknown')}
                                                         </span>
                                                     </div>
                                                 </div>
@@ -542,7 +542,7 @@ const Dashboard: React.FC = () => {
                                         </div>
                                         <button
                                             onClick={() => {
-                                                setConfirmData({ id: req.id, type: 'CANCEL', name: req.driver?.name });
+                                                setConfirmData({ id: req.id, type: 'CANCEL', name: req.delivery?.profile?.user?.name });
                                                 setIsConfirmModalOpen(true);
                                             }}
                                             disabled={actionLoading === req.id}
@@ -893,7 +893,7 @@ const Dashboard: React.FC = () => {
                     {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                             <ShoppingBag size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common:common.no_results')}</p>
+                            <p className="text-slate-500 text-sm font-medium">{t('common:noResults')}</p>
                             <button
                                 onClick={() => navigate('/products')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
@@ -968,7 +968,7 @@ const Dashboard: React.FC = () => {
                     {!stats.topCategories || stats.topCategories.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
                             <Layers size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common:common.no_results')}</p>
+                            <p className="text-slate-500 text-sm font-medium">{t('common:no_results')}</p>
                             <button
                                 onClick={() => navigate('/categories')}
                                 className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
