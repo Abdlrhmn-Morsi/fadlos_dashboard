@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import {
     Megaphone, ArrowLeft, Loader2, CheckCircle2, User, Users, Search,
-    Clock, ArrowDown, ArrowUp, UserCheck, Check
+    Clock, ArrowDown, ArrowUp, UserCheck, Check, ImagePlus, X
 } from 'lucide-react';
 import {
     getPromotionCredits,
@@ -66,6 +66,9 @@ const SendPromotionPage: React.FC = () => {
 
     // Sending
     const [loading, setLoading] = useState(false);
+    const [coverImage, setCoverImage] = useState<File | null>(null);
+    const [coverPreview, setCoverPreview] = useState<string | null>(null);
+    const coverInputRef = useRef<HTMLInputElement>(null);
 
     const storeId = user?.store?.id;
 
@@ -269,6 +272,7 @@ const SendPromotionPage: React.FC = () => {
                 targetType: resolveTargetType(),
                 targetIds,
                 criteria: targetMode,
+                coverImage: coverImage || undefined,
             });
             toast.success(t('promotions.success'));
             await loadCredits();
@@ -606,6 +610,100 @@ const SendPromotionPage: React.FC = () => {
                     </div>
                 )}
 
+                {/* Promotional Images Section */}
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden">
+                    <div className="p-4 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20">
+                        <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                            {t('promotions.promoImages', 'Promotional Images')}
+                        </h2>
+                    </div>
+                    <div className="p-4 space-y-6">
+                        {/* 1. Large Icon (Store Logo) - Automatic */}
+                        <div className="flex items-center gap-4">
+                            <div className="w-16 h-16 rounded-2xl border-2 border-slate-100 dark:border-slate-800 p-1 shrink-0 overflow-hidden">
+                                <ImageWithFallback
+                                    src={user?.store?.logo}
+                                    alt="Store Logo"
+                                    className="w-full h-full object-cover rounded-xl"
+                                />
+                            </div>
+                            <div>
+                                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                    {t('promotions.largeIcon', 'Large Icon')}
+                                </h3>
+                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
+                                    {t('promotions.logoHint', 'Your store logo is used automatically')}
+                                </p>
+                            </div>
+                        </div>
+
+                        {/* 2. Cover Image (Big Picture) - Custom Upload */}
+                        <div className="space-y-3 pt-4 border-t border-slate-50 dark:border-slate-800">
+                            <div className="flex items-center justify-between">
+                                <div>
+                                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                        {t('promotions.coverImage', 'Cover Image (Big Picture)')}
+                                    </h3>
+                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                        {t('promotions.coverImageDesc', 'Shown when notification is expanded')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {coverPreview ? (
+                                <div className="relative group rounded-xl overflow-hidden border-2 border-dashed border-primary/30 bg-primary/5">
+                                    <img
+                                        src={coverPreview}
+                                        alt="Cover"
+                                        className="w-full h-48 object-cover"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            setCoverImage(null);
+                                            setCoverPreview(null);
+                                            if (coverInputRef.current) coverInputRef.current.value = '';
+                                        }}
+                                        disabled={loading}
+                                        className="absolute top-3 end-3 p-2 bg-rose-500 text-white rounded-xl shadow-lg hover:bg-rose-600 transition-all active:scale-95"
+                                    >
+                                        <X size={18} />
+                                    </button>
+                                </div>
+                            ) : (
+                                <button
+                                    type="button"
+                                    onClick={() => coverInputRef.current?.click()}
+                                    disabled={loading || isAtLimit}
+                                    className="w-full h-40 flex flex-col items-center justify-center gap-3 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl bg-slate-50/50 dark:bg-slate-950/20 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed group"
+                                >
+                                    <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm group-hover:shadow group-hover:text-primary transition-all">
+                                        <ImagePlus size={32} className="text-slate-400 group-hover:text-primary transition-colors" />
+                                    </div>
+                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">
+                                        {t('promotions.addCoverImage', 'Choose Cover Image')}
+                                    </span>
+                                </button>
+                            )}
+                            <input
+                                ref={coverInputRef}
+                                type="file"
+                                accept="image/*"
+                                className="hidden"
+                                onChange={(e) => {
+                                    const file = e.target.files?.[0];
+                                    if (file) {
+                                        setCoverImage(file);
+                                        const reader = new FileReader();
+                                        reader.onloadend = () => setCoverPreview(reader.result as string);
+                                        reader.readAsDataURL(file);
+                                    }
+                                }}
+                            />
+                        </div>
+                    </div>
+                </div>
+
                 {/* Title Input (Arabic) */}
                 <div className="space-y-2">
                     <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
@@ -637,6 +735,7 @@ const SendPromotionPage: React.FC = () => {
                         dir="ltr"
                     />
                 </div>
+
 
                 {/* Message Input (Arabic) */}
                 <div className="space-y-2">
@@ -685,6 +784,7 @@ const SendPromotionPage: React.FC = () => {
                         </div>
                     </div>
                 </div>
+
 
                 {/* Summary & Send */}
                 <div className="space-y-4">

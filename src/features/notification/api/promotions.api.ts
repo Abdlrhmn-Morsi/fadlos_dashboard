@@ -19,6 +19,8 @@ export interface SendPromotionAdDto {
     targetType: PromotionTargetType;
     targetIds?: string[];
     criteria?: string;
+    coverImage?: File;
+    coverImageUrl?: string;
 }
 
 export interface PromotionCredits {
@@ -37,7 +39,23 @@ export interface FollowerItem {
 }
 
 export const sendPromotionAd = async (dto: SendPromotionAdDto): Promise<any> => {
-    return apiService.post('/promotions/send', dto);
+    const formData = new FormData();
+    formData.append('message', dto.message);
+    formData.append('targetType', dto.targetType);
+    if (dto.title) formData.append('title', dto.title);
+    if (dto.titleAr) formData.append('titleAr', dto.titleAr);
+    if (dto.messageAr) formData.append('messageAr', dto.messageAr);
+    if (dto.criteria) formData.append('criteria', dto.criteria);
+    if (dto.targetIds && dto.targetIds.length > 0) {
+        dto.targetIds.forEach(id => formData.append('targetIds', id));
+    }
+    if (dto.coverImage) {
+        formData.append('coverImage', dto.coverImage);
+    }
+    if (dto.coverImageUrl) {
+        formData.append('coverImageUrl', dto.coverImageUrl);
+    }
+    return apiService.post('/promotions/send', formData);
 };
 
 export const getPromotionCredits = async (): Promise<PromotionCredits> => {
@@ -65,6 +83,7 @@ export interface PromotionLogItem {
     targetType: string;
     targetCount: number;
     criteria?: string;
+    coverImageUrl?: string;
     createdAt: string;
 }
 

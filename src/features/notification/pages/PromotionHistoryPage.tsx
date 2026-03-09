@@ -102,6 +102,7 @@ const PromotionHistoryPage: React.FC = () => {
                 title: selectedLog.title,
                 titleAr: selectedLog.titleAr,
                 targetType: selectedLog.targetType as any,
+                coverImageUrl: selectedLog.coverImageUrl,
                 // For direct resends from logs, we're assuming the same target type criteria applies
             });
             toast.success(t('promotions.promotionSentSuccessfully', 'Promotion sent successfully!'));
@@ -287,15 +288,22 @@ const PromotionHistoryPage: React.FC = () => {
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5 min-w-[300px]">
-                                                <div className="flex flex-col gap-1">
-                                                    {log.title && (
-                                                        <span className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
-                                                            {isRTL ? log.titleAr || log.title : log.title}
-                                                        </span>
+                                                <div className="flex gap-3 items-start">
+                                                    {log.coverImageUrl && (
+                                                        <div className="w-16 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
+                                                            <img src={log.coverImageUrl} alt="" className="w-full h-full object-cover" />
+                                                        </div>
                                                     )}
-                                                    <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
-                                                        {isRTL ? log.messageAr || log.message : log.message}
-                                                    </p>
+                                                    <div className="flex flex-col gap-1">
+                                                        {log.title && (
+                                                            <span className="text-sm font-bold text-slate-900 dark:text-white line-clamp-1">
+                                                                {isRTL ? log.titleAr || log.title : log.title}
+                                                            </span>
+                                                        )}
+                                                        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed">
+                                                            {isRTL ? log.messageAr || log.message : log.message}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5 whitespace-nowrap">
