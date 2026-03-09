@@ -110,7 +110,7 @@ const BillingHistory: React.FC = () => {
     }
 
     return (
-        <div className="p-6 space-y-6 animate-in fade-in duration-500">
+        <div className="p-6 space-y-6">
             <div className="flex flex-col gap-1">
                 <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                     <CreditCard className="text-primary" size={28} />
