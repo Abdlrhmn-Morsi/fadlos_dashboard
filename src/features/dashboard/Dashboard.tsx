@@ -799,7 +799,7 @@ const Dashboard: React.FC = () => {
                                                     </span>
                                                 </div>
                                                 <span className="text-[10px] text-slate-400 font-medium">
-                                                    ({product.reviewCount || 0} {t('common:reviews') || 'reviews'})
+                                                    ({product.totalReviews || 0} {t('common:reviews')})
                                                 </span>
                                             </div>
                                         </div>

@@ -53,6 +53,7 @@
     "branchesLimit": "branches",
     "productsLimit": "products",
     "deliveryDriversLimit": "delivery drivers",
+    "reviews": "reviews",
     "results": "results",
     "save": "Save",
     "promoCodeMustBeAtLeast3Characters": "Promo code must be at least 3 characters",
