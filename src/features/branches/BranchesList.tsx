@@ -173,7 +173,7 @@ export const BranchesList: React.FC = () => {
         try {
             const usage = await getMySubscriptionUsage();
             if (usage.limits.branches !== -1 && branches.length >= usage.limits.branches) {
-                toast.error(t('common:upgradeRequired', { feature: t('branches') }));
+                toast.error(t('common:upgradeRequired', { feature: t('common:branchesLimit') }));
                 return;
             }
             setEditingBranch(null);
@@ -394,26 +394,50 @@ export const BranchesList: React.FC = () => {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full py-32 bg-white dark:bg-gray-800 rounded border-2 border-dashed border-gray-200 dark:border-gray-700 text-center flex flex-col items-center justify-center space-y-8 shadow-inner overflow-hidden relative">
-                        <div className="absolute top-0 inset-x-0 h-1 bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent"></div>
-                        <div className="relative group">
-                            <div className="absolute -inset-4 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition-all duration-500"></div>
-                            <div className="relative w-28 h-28 bg-indigo-50 dark:bg-indigo-900/20 rounded-full flex items-center justify-center animate-bounce duration-[3s]">
-                                <Search className="h-12 w-12 text-indigo-400" />
+                    <div className="col-span-full py-32 flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/30 dark:shadow-none overflow-hidden relative">
+                        {/* Decorative elements */}
+                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
+                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+
+                        <div className="relative flex flex-col items-center text-center max-w-md mx-auto">
+                            <div className="mb-8 relative transition-transform duration-500 hover:scale-110">
+                                <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
+                                <div className="relative w-32 h-32 bg-gradient-to-br from-indigo-50 to-white dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-slate-700">
+                                    {searchTerm ? (
+                                        <Search className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                                    ) : (
+                                        <MapPin className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                                    )}
+                                </div>
+                                {!searchTerm && (
+                                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center border-2 border-indigo-50 dark:border-slate-800 shadow-md animate-bounce">
+                                        <Plus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
+                                    </div>
+                                )}
                             </div>
-                        </div>
-                        <div className="max-w-sm px-6">
-                            <h3 className="text-3xl font-black text-gray-900 dark:text-white mb-3 tracking-tight">{t('noBranches')}</h3>
-                            <p className="text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-                                {searchTerm ? t('noMatchingBranches', { term: searchTerm }) : t('emptyEcosystem')}
+
+                            <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
+                                {searchTerm ? t('noMatchingBranches', { term: searchTerm }) : t('noBranches')}
+                            </h3>
+
+                            <p className="text-slate-500 dark:text-slate-400 text-lg font-medium leading-relaxed mb-10">
+                                {searchTerm
+                                    ? t('common:adjustSearch', { defaultValue: 'Try adjusting your search terms to find what you are looking for.' })
+                                    : t('emptyEcosystem', { defaultValue: 'Start growing your business by adding your first store branch to the map.' })}
                             </p>
+
+                            {!searchTerm && (
+                                <button
+                                    onClick={openCreateModal}
+                                    className="group relative px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all duration-300 shadow-xl shadow-indigo-600/30 active:scale-95 overflow-hidden"
+                                >
+                                    <span className="relative z-10 flex items-center gap-2">
+                                        <Plus className="w-5 h-5" />
+                                        {t('addBranch')}
+                                    </span>
+                                </button>
+                            )}
                         </div>
-                        <button
-                            onClick={openCreateModal}
-                            className="bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 px-8 py-3 rounded font-bold hover:bg-indigo-600 hover:text-white transition-all duration-300"
-                        >
-                            {t('addBranch')}
-                        </button>
                     </div>
                 )}
             </div >

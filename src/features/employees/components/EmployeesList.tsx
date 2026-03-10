@@ -201,7 +201,7 @@ const EmployeesList = () => {
                         try {
                             const usage = await getMySubscriptionUsage();
                             if (usage.limits.staff_accounts !== -1 && usage.limits.staff_accounts <= employees.length) {
-                                toast.error(t('common:upgradeRequired', { feature: t('staffAccounts', { defaultValue: 'Staff Accounts' }) }));
+                                toast.error(t('common:upgradeRequired', { feature: t('common:staffAccountsLimit', { defaultValue: 'staff accounts' }) }));
                                 return;
                             }
                             navigate('/employees/new');

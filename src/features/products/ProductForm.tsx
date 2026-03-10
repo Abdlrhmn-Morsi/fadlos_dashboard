@@ -980,13 +980,6 @@ const ProductForm = () => {
                                             {t('common:frequentlyBoughtTogetherLockedDesc', { defaultValue: 'Upgrade your plan to unlock "Frequently Bought Together" and increase average order value.' })}
                                         </p>
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => navigate('/subscription')}
-                                        className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-lg transition-colors"
-                                    >
-                                        {t('common:upgradePlan', { defaultValue: 'Upgrade Plan' })}
-                                    </button>
                                 </div>
                             ) : (
                                 <div className="space-y-4">
@@ -1377,15 +1370,7 @@ const ProductForm = () => {
                                             onChange={e => setFormData({ ...formData, comparePrice: e.target.value })}
                                             disabled={!canModifyProduct || !canUseOffersAndDiscounts}
                                         />
-                                        {!canUseOffersAndDiscounts && (
-                                            <div className="absolute inset-0 bg-transparent cursor-pointer" onClick={() => navigate('/subscription')} />
-                                        )}
                                     </div>
-                                    {!canUseOffersAndDiscounts && (
-                                        <p className="text-[10px] text-amber-600 dark:text-amber-500 mt-1 font-medium">
-                                            {t('common:upgradeToEnableDiscounts', { defaultValue: 'Upgrade plan to enable discounts' })}
-                                        </p>
-                                    )}
                                     {canUseOffersAndDiscounts && formData.comparePrice && parseFloat(formData.comparePrice) <= parseFloat(formData.price || '0') && (
                                         <p className="text-xs text-rose-500 mt-1 flex items-center gap-1">
                                             <X size={12} />

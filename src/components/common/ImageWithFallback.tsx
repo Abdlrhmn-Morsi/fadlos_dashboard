@@ -20,6 +20,12 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
     const [imgSrc, setImgSrc] = useState(src || fallbackSrc);
     const [hasError, setHasError] = useState(false);
 
+    // Synchronize imgSrc when src prop changes
+    React.useEffect(() => {
+        setImgSrc(src || fallbackSrc);
+        setHasError(false);
+    }, [src, fallbackSrc]);
+
     const handleError = () => {
         if (!hasError) {
             setHasError(true);

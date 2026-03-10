@@ -293,7 +293,7 @@ const DeliveryDriversList = () => {
                                 try {
                                     const usage = await getMySubscriptionUsage();
                                     if (usage.limits.drivers !== -1 && usage.limits.drivers <= drivers.length) {
-                                        toast.error(t('common:upgradeRequired', { feature: t('deliveryDrivers') }));
+                                        toast.error(t('common:upgradeRequired', { feature: t('common:deliveryDriversLimit') }));
                                         return;
                                     }
                                     navigate('/delivery-drivers/new');

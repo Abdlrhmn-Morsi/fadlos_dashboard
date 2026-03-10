@@ -173,7 +173,7 @@ const ProductList = () => {
                             try {
                                 const usage = await getMySubscriptionUsage();
                                 if (usage.limits.products !== -1 && usage.limits.products <= products.length) { // Note: this might need totalItems from meta
-                                    toast.error(t('common:upgradeRequired', { feature: t('products') }));
+                                    toast.error(t('common:upgradeRequired', { feature: t('common:productsLimit') }));
                                     return;
                                 }
                                 navigate('/products/new');

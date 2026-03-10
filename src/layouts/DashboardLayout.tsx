@@ -23,7 +23,8 @@ import {
   CreditCard,
   BarChart3,
   Tag,
-  MessageSquare
+  MessageSquare,
+  Crown
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -46,9 +47,10 @@ interface SidebarItemProps {
   collapsed: boolean;
   replace?: boolean;
   end?: boolean;
+  isPremium?: boolean;
 }
 
-const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed, replace, end }) => {
+const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed, replace, end, isPremium }) => {
   const { isRTL } = useLanguage();
   return (
     <NavLink
@@ -56,7 +58,8 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
       replace={replace}
       end={end}
       className={({ isActive }) => clsx(
-        'flex items-center gap-3 px-4 py-3 rounded-[4px] transition-all duration-200 group relative',
+        'flex items-center rounded-[4px] transition-all duration-200 group relative',
+        collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
         isActive
           ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
           : 'text-slate-500 hover:bg-primary-light hover:text-primary'
@@ -64,21 +67,72 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
     >
       <Icon size={20} className={clsx('shrink-0', collapsed ? 'mx-auto' : '')} />
       {!collapsed && (
-        <span className={clsx(
-          "font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300 flex-1"
-        )}>
-          {label}
-        </span>
+        <>
+          <span className={clsx(
+            "font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300"
+          )}>
+            {label}
+          </span>
+          {isPremium && (
+            <>
+              <div className="flex-1" />
+              <Crown size={14} className="text-amber-500 shrink-0" />
+            </>
+          )}
+        </>
       )}
       {collapsed && (
         <div className={clsx(
-          "absolute px-2 py-1 bg-slate-900 text-white text-xs rounded-[4px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50",
+          "absolute px-2 py-1 bg-slate-900 text-white text-xs rounded-[4px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 flex items-center gap-1.5",
           isRTL ? "right-full mr-2" : "left-full ml-2"
         )}>
           {label}
+          {isPremium && <Crown size={10} className="text-amber-400" />}
         </div>
       )}
     </NavLink>
+  );
+};
+
+interface LockedSidebarItemProps {
+  icon: LucideIcon;
+  label: string;
+  collapsed: boolean;
+}
+
+const LockedSidebarItem: React.FC<LockedSidebarItemProps> = ({ icon: Icon, label, collapsed }) => {
+  const { isRTL } = useLanguage();
+  const navigate = useNavigate();
+
+  return (
+    <button
+      onClick={() => navigate('/subscription')}
+      className={clsx(
+        'flex items-center rounded-[4px] transition-all duration-200 group relative w-full',
+        collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
+        'text-slate-300 dark:text-slate-500 cursor-pointer hover:bg-amber-50/50 dark:hover:bg-amber-900/10'
+      )}
+    >
+      <Icon size={20} className={clsx('shrink-0', collapsed ? 'mx-auto' : '')} />
+      {!collapsed && (
+        <>
+          <span className="font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300">
+            {label}
+          </span>
+          <div className="flex-1" />
+          <Crown size={14} className="text-amber-500 shrink-0" />
+        </>
+      )}
+      {collapsed && (
+        <div className={clsx(
+          "absolute px-2 py-1 bg-slate-900 text-white text-xs rounded-[4px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all whitespace-nowrap z-50 flex items-center gap-1.5",
+          isRTL ? "right-full mr-2" : "left-full ml-2"
+        )}>
+          {label}
+          <Crown size={10} className="text-amber-400" />
+        </div>
+      )}
+    </button>
   );
 };
 
@@ -168,9 +222,17 @@ const DashboardLayout: React.FC = () => {
             <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
           )}
 
-          {/* Analytics - Plan then Permission check (hidden for super admin) */}
-          {user?.role !== UserRole.SUPER_ADMIN && (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
-            <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
+          {/* Analytics - Role-aware feature gating */}
+          {user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && (
+            user?.role === UserRole.STORE_OWNER ? (
+              (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro')
+                ? hasPermission(Permissions.ANALYTICS_VIEW) && <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} isPremium={true} />
+                : <LockedSidebarItem icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
+            ) : (
+              (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
+                <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} isPremium={true} />
+              )
+            )
           )}
 
           {/* Admin Links */}
@@ -238,22 +300,51 @@ const DashboardLayout: React.FC = () => {
                     )}
                     {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-                    {(user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.CLIENTS_VIEW)) && hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && (
-                      <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
-                    )}
-                    {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && hasFeature(PlanFeature.PROMOCODES) && (
-                      <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
+                    {/* Reviews - Role-aware */}
+                    {user?.role === UserRole.STORE_OWNER ? (
+                      hasFeature(PlanFeature.REVIEWS_MANAGEMENT)
+                        ? hasPermission(Permissions.STORE_VIEW) && <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} isPremium={true} />
+                        : <LockedSidebarItem icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
+                    ) : (
+                      hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && hasPermission(Permissions.CLIENTS_VIEW) && (
+                        <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} isPremium={true} />
+                      )
                     )}
 
-                    {hasPermission(Permissions.CLIENTS_VIEW) && (
+                    {/* PromoCodes - Role-aware */}
+                    {user?.role === UserRole.STORE_OWNER ? (
+                      hasFeature(PlanFeature.PROMOCODES)
+                        ? (hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} isPremium={true} />
+                        : <LockedSidebarItem icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
+                    ) : (
+                      hasFeature(PlanFeature.PROMOCODES) && (hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && (
+                        <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} isPremium={true} />
+                      )
+                    )}
+
+                    {/* Clients - Role-aware */}
+                    {user?.role === UserRole.STORE_OWNER ? (
                       <>
-                        {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
-                          <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
-                        )}
-                        {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT) && (
-                          <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
-                        )}
+                        {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT)
+                          ? hasPermission(Permissions.CLIENTS_VIEW) && <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} isPremium={true} />
+                          : <LockedSidebarItem icon={Users} label={t('clients')} collapsed={collapsed} />
+                        }
+                        {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT)
+                          ? hasPermission(Permissions.CLIENTS_VIEW) && <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} isPremium={true} />
+                          : <LockedSidebarItem icon={Users} label={t('followers')} collapsed={collapsed} />
+                        }
                       </>
+                    ) : (
+                      hasPermission(Permissions.CLIENTS_VIEW) && (
+                        <>
+                          {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
+                            <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} isPremium={true} />
+                          )}
+                          {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT) && (
+                            <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} isPremium={true} />
+                          )}
+                        </>
+                      )
                     )}
                   </>
                 )}
