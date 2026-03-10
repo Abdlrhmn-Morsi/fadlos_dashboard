@@ -435,8 +435,8 @@ const Analytics: React.FC = () => {
                     <h3 className={clsx("text-lg font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6", isRTL && "text-right")}>
                         {t('topProducts')}
                     </h3>
-                    <div className="space-y-4">
-                        {merchantStats?.bestSellers?.map((product: any, idx: number) => (
+                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                        {merchantStats?.bestSellers?.slice(0, 10).map((product: any, idx: number) => (
                             <div key={product.id} className={clsx(
                                 "flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:border-primary/50",
                                 isRTL && "flex-row-reverse"
