@@ -36,16 +36,20 @@ export const BranchesList: React.FC = () => {
             // Check cache first
             const cacheKey = 'branches';
             const cachedData = getCache<Branch[]>(cacheKey);
-            if (cachedData) {
-                setBranches(Array.isArray(cachedData) ? cachedData : []);
-                setLoading(false);
-                return;
-            }
 
-            const data = await branchesApi.findAllByStore();
-            setBranches(data);
+            const [data, usage] = await Promise.all([
+                branchesApi.findAllByStore(),
+                getMySubscriptionUsage().catch(() => null)
+            ]);
+
+            const enrichedData = data.map((branch, index) => ({
+                ...branch,
+                isOverLimit: usage && usage.limits.branches !== -1 && index >= usage.limits.branches
+            }));
+
+            setBranches(enrichedData);
             // Cache the response
-            setCache(cacheKey, data);
+            setCache(cacheKey, enrichedData);
         } catch (error) {
             toast.error(t('loadError'));
         } finally {
@@ -394,45 +398,49 @@ export const BranchesList: React.FC = () => {
                         </div>
                     ))
                 ) : (
-                    <div className="col-span-full py-32 flex flex-col items-center justify-center p-8 bg-white dark:bg-gray-800 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-xl shadow-slate-200/30 dark:shadow-none overflow-hidden relative">
-                        {/* Decorative elements */}
-                        <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -mr-32 -mt-32 blur-3xl"></div>
-                        <div className="absolute bottom-0 left-0 w-64 h-64 bg-amber-500/5 rounded-full -ml-32 -mb-32 blur-3xl"></div>
+                    <div className="col-span-full py-40 flex flex-col items-center justify-center p-12 bg-white dark:bg-gray-800 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-2xl shadow-indigo-500/5 overflow-hidden relative group/empty">
+                        {/* Dramatic decorative backgrounds */}
+                        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-indigo-500/5 rounded-full -mr-64 -mt-64 blur-[100px] transition-transform duration-1000 group-hover/empty:scale-110"></div>
+                        <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-amber-500/5 rounded-full -ml-48 -mb-48 blur-[80px] transition-transform duration-1000 group-hover/empty:scale-110 group-hover/empty:translate-x-10"></div>
 
-                        <div className="relative flex flex-col items-center text-center max-w-md mx-auto">
-                            <div className="mb-8 relative transition-transform duration-500 hover:scale-110">
-                                <div className="absolute inset-0 bg-indigo-500/20 rounded-full blur-2xl animate-pulse"></div>
-                                <div className="relative w-32 h-32 bg-gradient-to-br from-indigo-50 to-white dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center shadow-lg border-4 border-white dark:border-slate-700">
+                        <div className="relative flex flex-col items-center text-center max-w-lg mx-auto">
+                            {/* Signature Icon Display */}
+                            <div className="mb-12 relative">
+                                <div className="absolute inset-0 bg-indigo-500/20 rounded-[2rem] blur-3xl animate-pulse"></div>
+                                <div className="relative w-40 h-40 bg-gradient-to-br from-indigo-50 to-white dark:from-slate-700 dark:to-slate-800 rounded-[2.5rem] flex items-center justify-center shadow-2xl border-4 border-white dark:border-slate-700 transform rotate-6 transition-all duration-700 group-hover/empty:rotate-0 group-hover/empty:scale-110">
                                     {searchTerm ? (
-                                        <Search className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                                        <Search className="w-16 h-16 text-indigo-600 dark:text-indigo-400" />
                                     ) : (
-                                        <MapPin className="w-12 h-12 text-indigo-600 dark:text-indigo-400" />
+                                        <div className="relative">
+                                            <MapPin className="w-16 h-16 text-indigo-600 dark:text-indigo-400" />
+                                            <div className="absolute -top-4 -right-4 w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center shadow-lg animate-bounce">
+                                                <Plus className="w-6 h-6 text-white" />
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
-                                {!searchTerm && (
-                                    <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-white dark:bg-slate-700 rounded-xl flex items-center justify-center border-2 border-indigo-50 dark:border-slate-800 shadow-md animate-bounce">
-                                        <Plus className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
-                                    </div>
-                                )}
                             </div>
 
-                            <h3 className="text-3xl font-black text-slate-900 dark:text-white mb-4 tracking-tight">
-                                {searchTerm ? t('noMatchingBranches', { term: searchTerm }) : t('noBranches')}
+                            <h3 className="text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight">
+                                {searchTerm
+                                    ? (isRTL ? `لا توجد نتائج لـ "${searchTerm}"` : `No results for "${searchTerm}"`)
+                                    : t('noBranches')}
                             </h3>
 
-                            <p className="text-slate-500 dark:text-slate-400 text-lg font-medium leading-relaxed mb-10">
+                            <p className="text-slate-500 dark:text-slate-400 text-xl font-medium leading-relaxed mb-12 px-6">
                                 {searchTerm
-                                    ? t('common:adjustSearch', { defaultValue: 'Try adjusting your search terms to find what you are looking for.' })
-                                    : t('emptyEcosystem', { defaultValue: 'Start growing your business by adding your first store branch to the map.' })}
+                                    ? t('common:adjustSearch', { defaultValue: 'Try refining your search terms to discover specific locations.' })
+                                    : t('emptyEcosystem', { defaultValue: 'Your store ecosystem is waiting to grow. Add your first branch to start reaching more customers.' })}
                             </p>
 
                             {!searchTerm && (
                                 <button
                                     onClick={openCreateModal}
-                                    className="group relative px-10 py-4 bg-indigo-600 text-white font-bold rounded-2xl hover:bg-indigo-700 transition-all duration-300 shadow-xl shadow-indigo-600/30 active:scale-95 overflow-hidden"
+                                    className="group relative px-12 py-5 bg-indigo-600 text-white text-lg font-bold rounded-2xl hover:bg-indigo-700 transition-all duration-300 shadow-2xl shadow-indigo-600/30 hover:shadow-indigo-600/50 active:scale-95 overflow-hidden"
                                 >
-                                    <span className="relative z-10 flex items-center gap-2">
-                                        <Plus className="w-5 h-5" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                    <span className="relative z-10 flex items-center gap-3">
+                                        <Plus className="w-6 h-6" />
                                         {t('addBranch')}
                                     </span>
                                 </button>

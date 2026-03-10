@@ -1,5 +1,6 @@
 {
     "title": "نظرة عامة على لوحة التحكم",
+    "orderSummary": "ملخص الطلبات",
     "pendingOrders": "طلبات قيد الانتظار",
     "needsAction": "بانتظار إجراء",
     "newOrderReceived": "🎉 تم استلام طلب جديد!",

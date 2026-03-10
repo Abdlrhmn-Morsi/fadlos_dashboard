@@ -43,15 +43,27 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color }) => {
     const { isRTL } = useLanguage();
+
+    const colorVariants: Record<string, string> = {
+        emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400',
+        amber: 'bg-amber-50 text-amber-600 dark:bg-amber-900/20 dark:text-amber-400',
+        blue: 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400',
+        orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
+        violet: 'bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400',
+        indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400',
+    };
+
+    const colorClass = colorVariants[color] || colorVariants.blue;
+
     return (
-        <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:-translate-y-1">
-            <div className="flex justify-between items-start">
-                <div className={isRTL ? "text-right" : "text-left"}>
-                    <p className="text-slate-500 dark:text-slate-400 text-sm font-medium mb-1">{title}</p>
-                    <h3 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</h3>
+        <div className="bg-white dark:bg-slate-900 px-6 py-4 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all hover:shadow-[0_8px_30px_rgb(0,0,0,0.08)] hover:-translate-y-1 h-full">
+            <div className="flex items-center gap-4 h-full">
+                <div className={clsx(`w-14 h-14 rounded flex items-center justify-center shrink-0`, colorClass)}>
+                    <Icon size={28} strokeWidth={1.5} />
                 </div>
-                <div className={`w-12 h-12 rounded-none flex items-center justify-center bg-${color}-50 dark:bg-${color}-900/20 text-${color}-600 dark:text-${color}-400`}>
-                    <Icon size={24} />
+                <div className={clsx("flex flex-col justify-center", isRTL ? "text-right" : "text-left")}>
+                    <p className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider">{title}</p>
+                    <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none mt-1">{value}</h3>
                 </div>
             </div>
         </div>
@@ -59,7 +71,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color }) 
 };
 
 const Dashboard: React.FC = () => {
-    const { t } = useTranslation(['dashboard', 'common']);
+    const { t } = useTranslation(['dashboard', 'common', 'orders', 'subscriptions']);
     const { isDark } = useTheme();
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
@@ -144,10 +156,19 @@ const Dashboard: React.FC = () => {
                 }
 
                 // Fetch subscription usage for store owners
-                if (user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN) {
+                if (user?.role !== UserRole.STORE_OWNER && user?.role !== UserRole.EMPLOYEE) {
+                    // Skip for admin roles
+                } else {
                     try {
-                        const subData = await getMySubscriptionUsage();
-                        setSubscription(subData as SubscriptionUsage);
+                        const subCacheKey = 'subscription-usage';
+                        const cachedSub = getCache<SubscriptionUsage>(subCacheKey);
+                        if (cachedSub) {
+                            setSubscription(cachedSub);
+                        } else {
+                            const subData = await getMySubscriptionUsage();
+                            setSubscription(subData as SubscriptionUsage);
+                            setCache(subCacheKey, subData);
+                        }
                     } catch (subErr) {
                         console.warn('Could not fetch subscription:', subErr);
                     }
@@ -177,7 +198,7 @@ const Dashboard: React.FC = () => {
     }
 
     if (error) return (
-        <div className="p-6 bg-rose-50 border border-rose-200 rounded-none text-rose-600 font-medium m-6">
+        <div className="p-6 bg-rose-50 border border-rose-200 rounded text-rose-600 font-medium m-6">
             {error}
         </div>
     );
@@ -214,10 +235,10 @@ const Dashboard: React.FC = () => {
 
         return (
             <div className={clsx(
-                bgColor, borderColor, "border rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
+                bgColor, borderColor, "border rounded p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
                 isRTL && "flex-row-reverse"
             )}>
-                <div className={`p-3 rounded-none bg-white/50 dark:bg-black/20 ${iconColor} h-fit`}>
+                <div className={`p-3 rounded bg-white/50 dark:bg-black/20 ${iconColor} h-fit`}>
                     <Icon size={24} />
                 </div>
                 <div className={clsx("space-y-1 flex-1", isRTL ? "text-right" : "text-left")}>
@@ -244,10 +265,10 @@ const Dashboard: React.FC = () => {
 
         return (
             <div className={clsx(
-                "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-none p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
+                "bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded p-5 flex gap-4 animate-in slide-in-from-top-4 duration-500",
                 isRTL && "flex-row-reverse"
             )}>
-                <div className={`p-3 rounded-none bg-white/50 dark:bg-black/20 text-amber-500 h-fit`}>
+                <div className={`p-3 rounded bg-white/50 dark:bg-black/20 text-amber-500 h-fit`}>
                     <AlertTriangle size={24} />
                 </div>
                 <div className={clsx("space-y-1 flex-1", isRTL ? "text-right" : "text-left")}>
@@ -278,7 +299,7 @@ const Dashboard: React.FC = () => {
         if (stores.length === 0 && drivers.length === 0) return null;
 
         return (
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
                 <div className="flex items-center gap-2 mb-6">
                     <ShieldAlert size={20} className="text-amber-500" />
                     <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
@@ -445,7 +466,7 @@ const Dashboard: React.FC = () => {
                                 </div>
                             ) : (
                                 incoming.map((req: any) => (
-                                    <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-lg group hover:border-primary/30 transition-all">
+                                    <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded group hover:border-primary/30 transition-all">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-full overflow-hidden shadow-sm">
                                                 {req.delivery?.avatarUrl ?
@@ -510,7 +531,7 @@ const Dashboard: React.FC = () => {
                                 </div>
                             ) : (
                                 sent.map((req: any) => (
-                                    <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded-lg group hover:border-slate-300 dark:hover:border-slate-600 transition-all text-start">
+                                    <div key={req.id} className="flex items-center justify-between p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded group hover:border-slate-300 dark:hover:border-slate-600 transition-all text-start">
                                         <div className="flex items-center gap-4">
                                             <div className="w-12 h-12 bg-white dark:bg-slate-800 flex items-center justify-center border border-slate-200 dark:border-slate-700 rounded-full overflow-hidden shadow-sm">
                                                 {req.delivery?.avatarUrl ?
@@ -565,7 +586,7 @@ const Dashboard: React.FC = () => {
         if (!stats.topStores || stats.topStores.length === 0) return null;
 
         return (
-            <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
+            <div className="bg-white dark:bg-slate-900 p-6 rounded border border-slate-200 dark:border-slate-700 shadow-sm mt-8">
                 <div className="flex items-center justify-between mb-6">
                     <div className="flex items-center gap-2">
                         <Star size={20} className="text-yellow-500" />
@@ -608,424 +629,269 @@ const Dashboard: React.FC = () => {
 
 
     return (
-        <div className="p-6 space-y-8 animate-in animate-fade">
+        <div className={clsx(
+            "p-6 max-w-7xl mx-auto space-y-6 min-h-full bg-[#fdfdfd] dark:bg-slate-950 transition-colors duration-500",
+            isRTL ? "font-cairo" : "font-inter"
+        )}>
             {renderStatusBanner()}
             {renderGracePeriodBanner()}
 
-            {/* Subscription Badge */}
-            {subscription && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (() => {
-                const plan = (subscription.plan || 'free').toUpperCase();
-                const planKey = plan.toLowerCase();
-                const isPremium = plan === 'PREMIUM';
-                const isPro = plan === 'PRO';
 
-                const bgClass = isPremium
-                    ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-none'
-                    : isPro
-                        ? 'bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20'
-                        : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800';
-                const textClassPrimary = isPremium ? 'text-amber-400' : isPro ? 'text-primary' : 'text-slate-900 dark:text-slate-100';
-                const textClassSecondary = isPremium ? 'text-white/60' : isPro ? 'text-primary/60' : 'text-slate-500';
-                const badgeClass = isPremium
-                    ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-slate-900 shadow-lg shadow-amber-500/20'
-                    : isPro
-                        ? 'bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg shadow-primary/20'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
-                const PlanIcon = isPremium ? Crown : isPro ? Zap : Shield;
 
-                return (
-                    <div className={clsx('relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 px-8 py-6 rounded-2xl transition-all duration-500 group', bgClass)}>
-                        {/* Decorative background elements */}
-                        {isPremium && (
-                            <>
-                                <div className={clsx("absolute top-0 -mt-10 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-150", isRTL ? "left-0 -ml-10" : "right-0 -mr-10")} />
-                                <div className={clsx("absolute bottom-0 -mb-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none transition-transform duration-700 group-hover:translate-x-8", isRTL ? "right-0 -mr-10" : "left-0 -ml-10")} />
-                            </>
-                        )}
-                        {isPro && (
-                            <div className={clsx("absolute inset-y-0 w-1/2 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity", isRTL ? "left-0" : "right-0")} />
-                        )}
-
-                        <div className="relative z-10 flex items-center gap-5">
-                            <div className={clsx('w-14 h-14 rounded-2xl flex items-center justify-center transform -rotate-3 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110', badgeClass)}>
-                                <PlanIcon size={28} className={isPremium ? 'animate-pulse' : ''} />
-                            </div>
-                            <div className="flex flex-col justify-center text-start">
-                                <p className={clsx('text-xs font-bold uppercase tracking-widest mb-1', textClassSecondary)}>
-                                    {t('subscriptions:currentPlan')}
-                                </p>
-                                <p className={clsx('text-2xl font-black uppercase tracking-tight', textClassPrimary)}>
-                                    {t(`subscriptions:plans.${planKey}.name`, plan)}
-                                </p>
-                            </div>
-                        </div>
-                        <button
-                            onClick={() => navigate('/subscription')}
-                            className={clsx(
-                                'relative z-10 w-full sm:w-auto px-8 py-3.5 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0',
-                                isPremium
-                                    ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 hover:shadow-lg hover:shadow-amber-500/30'
-                                    : isPro
-                                        ? 'bg-primary text-white hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30'
-                                        : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-[1.02] shadow-md hover:shadow-xl'
-                            )}
-                        >
-                            {t('common:manage')}
-                        </button>
-                    </div>
-                );
-            })()}
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {/* Today's Revenue */}
-                {hasPermission('analytics.view') && (
-                    <StatCard
-                        title={t('todayRevenue')}
-                        value={`${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        icon={Zap}
-                        color="emerald"
-                    />
-                )}
-
-                {/* Today's Pending Revenue */}
-                {hasPermission('analytics.view') && (
-                    <StatCard
-                        title={t('orders:todayPendingRevenue')}
-                        value={`${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        icon={Clock}
-                        color="amber"
-                    />
-                )}
-
-                {/* Total Revenue */}
-                {hasPermission('analytics.view') && (
-                    <StatCard
-                        title={t('totalRevenue')}
-                        value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        icon={DollarSign}
-                        color="emerald"
-                    />
-                )}
-
-                {/* Total Pending Revenue */}
-                {hasPermission('analytics.view') && (
-                    <StatCard
-                        title={t('orders:totalPendingRevenue')}
-                        value={`${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                        icon={Clock}
-                        color="amber"
-                    />
-                )}
-
-                {/* Today's Orders */}
-                {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
-                    <StatCard
-                        title={t('todayOrders')}
-                        value={stats.todayOrders || 0}
-                        icon={Activity}
-                        color="blue"
-                    />
-                )}
-
-                {/* Total Orders */}
-                {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
-                    <StatCard
-                        title={t('totalOrders')}
-                        value={stats.totalOrders || 0}
-                        icon={ShoppingBag}
-                        color="orange"
-                    />
-                )}
-
-                {/* Pending Orders */}
-                {(hasPermission('orders.view') || hasPermission('orders.update')) && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                    <StatCard
-                        title={t('pendingOrders')}
-                        value={stats.pendingOrders || 0}
-                        icon={Clock}
-                        color="amber"
-                    />
-                )}
-
-                {/* Conditional Cards */}
-                {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) ? (
-                    <>
+            {/* Main Content Grid: Stats, Summary, Best Deal */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+                {/* Left Columns: Stat Cards Grid */}
+                <div className="lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                    {/* Today's Revenue */}
+                    {hasPermission('analytics.view') && (
                         <StatCard
-                            title={t('totalStores')}
-                            value={stats.totalStores || 0}
-                            icon={Store}
-                            color="blue"
-                        />
-                        <StatCard
-                            title={t('pendingStores')}
-                            value={stats.pendingStores || 0}
-                            icon={Store}
-                            color="amber"
-                        />
-                        <StatCard
-                            title={t('platformUsers')}
-                            value={stats.totalUsers || 0}
-                            icon={Users}
-                            color="violet"
-                        />
-                        <StatCard
-                            title={t('totalCustomers')}
-                            value={stats.totalCustomers || 0}
-                            icon={Users}
-                            color="emerald"
-                        />
-                        <StatCard
-                            title={t('platformDrivers')}
-                            value={stats.totalDrivers || 0}
-                            icon={Truck}
-                            color="blue"
-                        />
-                        <StatCard
-                            title={t('totalProducts')}
-                            value={stats.totalProducts || 0}
-                            icon={Layers}
-                            color="indigo"
-                        />
-                        <StatCard
-                            title={t('activeSubscriptions')}
-                            value={stats.activeSubscriptions || 0}
+                            title={t('todayRevenue')}
+                            value={`${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
                             icon={Zap}
                             color="emerald"
                         />
+                    )}
+
+                    {/* Today's Pending Revenue */}
+                    {hasPermission('analytics.view') && (
                         <StatCard
-                            title={t('totalTowns')}
-                            value={stats.totalTowns || 0}
-                            icon={MapPin}
-                            color="indigo"
+                            title={t('orders:todayPendingRevenue')}
+                            value={`${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                            icon={Clock}
+                            color="amber"
                         />
-                    </>
-                ) : (
-                    <>
-                        {hasPermission('users.view') && (
-                            <StatCard
-                                title={t('totalClients')}
-                                value={stats.totalClients || 0}
-                                icon={Users}
-                                color="blue"
-                            />
-                        )}
-                    </>
-                )}
+                    )}
+
+                    {/* Today's Orders */}
+                    {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
+                        <StatCard
+                            title={t('todayOrders')}
+                            value={stats.todayOrders || 0}
+                            icon={Activity}
+                            color="blue"
+                        />
+                    )}
+
+                    {/* Total Revenue */}
+                    {hasPermission('analytics.view') && (
+                        <StatCard
+                            title={t('totalRevenue')}
+                            value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                            icon={DollarSign}
+                            color="emerald"
+                        />
+                    )}
+
+                    {/* Total Pending Revenue */}
+                    {hasPermission('analytics.view') && (
+                        <StatCard
+                            title={t('orders:totalPendingRevenue')}
+                            value={`${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                            icon={Clock}
+                            color="amber"
+                        />
+                    )}
+
+                    {/* Total Orders */}
+                    {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
+                        <StatCard
+                            title={t('totalOrders')}
+                            value={stats.totalOrders || 0}
+                            icon={ShoppingBag}
+                            color="orange"
+                        />
+                    )}
+                </div>
+
+                {/* Right Column: Summary */}
+                <div className="flex flex-col gap-8">
+
+                    {/* Order Summary Card */}
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                        <div className="flex items-center justify-between mb-6">
+                            <h3 className="font-black text-slate-900 dark:text-white tracking-tight">{t('dashboard:orderSummary') || "Order Summary"}</h3>
+                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full">
+                                {t('common:this_month') || "This Month"}
+                            </div>
+                        </div>
+                        <div className="space-y-4">
+                            {[
+                                { label: t('common:pending') || "Pending", value: stats.pendingOrders || stats.statusCounts?.pending || 0, bg: "bg-amber-500" },
+                                { label: t('common:confirmed') || "Confirmed", value: stats.statusCounts?.confirmed || 0, bg: "bg-blue-500" },
+                                { label: t('orders:onTheWay') || "On The Way", value: stats.statusCounts?.out_for_delivery || 0, bg: "bg-indigo-500" },
+                                { label: t('common:delivered') || "Delivered", value: stats.statusCounts?.delivered || 0, bg: "bg-emerald-500" },
+                                { label: t('common:cancelled') || "Cancelled", value: stats.statusCounts?.cancelled || 0, bg: "bg-rose-500" },
+                            ].map((item, idx) => (
+                                <div key={idx} className="flex items-center justify-between group">
+                                    <div className="flex items-center gap-3">
+                                        <div className={clsx("w-2 h-2 rounded-full", item.bg)} />
+                                        <span className="text-sm font-bold text-slate-500 dark:text-slate-400">{item.label}</span>
+                                    </div>
+                                    <span className={clsx("text-sm font-black tracking-tight", isDark ? "text-slate-200" : "text-slate-900")}>{item.value}</span>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
             </div>
+
 
             {/* Phase 2: Super Admin Sections */}
             {renderPendingApprovals()}
             {renderStoreHiringRequests()}
             {renderTopPerformingStores()}
 
-            {/* Quick Actions for Sellers - Stage 6 Streamlined Layout */}
-            {hasPermission('store.update') && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                <div className={clsx(
-                    "relative overflow-hidden group rounded-none",
-                    "p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-8",
-                    isRTL ? "text-right" : "text-left"
-                )}>
-                    {/* Background: Direct Primary to Secondary Gradient - Direction Aware */}
-                    <div className={clsx(
-                        "absolute inset-0",
-                        isRTL ? "bg-gradient-to-l from-primary to-primary" : "bg-gradient-to-r from-primary to-primary"
-                    )} />
-                    <div className="absolute inset-0 bg-black/5 mix-blend-overlay" />
 
-                    {/* Subtle Glass Accents */}
-                    <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
-                    <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-black/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
-
-                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 grow">
-                        {/* 1. Icon (Star) */}
-                        <div className="shrink-0">
-                            <div className="w-20 h-20 bg-white/10 backdrop-blur-xl border border-white/30 rounded-none flex items-center justify-center text-white shadow-xl transform group-hover:rotate-6 transition-transform duration-500">
-                                <Store size={44} strokeWidth={1} />
-                            </div>
-                        </div>
-
-                        {/* 2. Content (Center) */}
-                        <div className="flex-1 space-y-1">
-                            <h3 className="text-3xl md:text-4xl font-black text-white uppercase tracking-tight leading-none">
-                                {t('common:manageYourStore')}
+            {/* Lists Section: Top Rated Products & Top Categories */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    {/* Top Rated Products */}
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
+                                {t('topRatedProducts')}
                             </h3>
-                            <p className="text-white/80 font-medium text-lg md:text-xl opacity-90">
-                                {t('common:updateStoreDirectly')}
-                            </p>
-                        </div>
-                    </div>
-
-                    {/* 3. Action Block (End) */}
-                    <div className="relative z-10 shrink-0">
-                        <button
-                            onClick={() => navigate('/store-settings')}
-                            className={clsx(
-                                "group/btn relative px-10 py-5 bg-white text-slate-900 overflow-hidden transition-all duration-300 shadow-xl active:scale-95 hover:bg-slate-900 hover:text-white"
+                            {stats.topRatedProducts && stats.topRatedProducts.length > 0 && (
+                                <button
+                                    onClick={() => navigate('/products')}
+                                    className="text-primary text-sm font-bold hover:underline"
+                                >
+                                    {t('common:viewAll')}
+                                </button>
                             )}
-                        >
-                            <span className="relative z-10 flex items-center gap-4 font-black uppercase tracking-[0.2em] text-[10px]">
-                                {t('common:storeSettings')}
-                                <ChevronRight size={18} className={clsx("transition-transform group-hover/btn:translate-x-1", isRTL && "rotate-180")} />
-                            </span>
-                        </button>
-                    </div>
-                </div>
-            )}
-
-            {/* Top Rated Products Section */}
-            {/* Top Rated Products Section */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
-                            {t('topRatedProducts')}
-                        </h3>
-                        {stats.topRatedProducts && stats.topRatedProducts.length > 0 && (
-                            <button
-                                onClick={() => navigate('/products')}
-                                className="text-primary text-sm font-bold hover:underline"
-                            >
-                                {t('common:viewAll')}
-                            </button>
-                        )}
-                    </div>
-
-                    {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                            <ShoppingBag size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common:noResults')}</p>
-                            <button
-                                onClick={() => navigate('/products')}
-                                className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
-                            >
-                                {t('common:addFirstProduct')}
-                            </button>
                         </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                            {stats.topRatedProducts.map((product: any) => (
-                                <div
-                                    key={product.id}
-                                    className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative"
-                                    onClick={() => navigate(`/products/${product.id}`)}
-                                >
-                                    {hasPermission('products.update') && (
-                                        <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
-                                            <Edit size={14} className="text-primary" />
+
+                        {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
+                                <ShoppingBag size={48} className="text-slate-200 mb-4" />
+                                <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-3">
+                                {stats.topRatedProducts.slice(0, 5).map((product: any, index: number) => (
+                                    <div
+                                        key={product.id}
+                                        className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                                        onClick={() => navigate(`/products/${product.id}`)}
+                                    >
+                                        <div className="w-16 h-16 rounded overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                            {product.coverImage ? (
+                                                <img
+                                                    src={product.coverImage}
+                                                    alt={product.name}
+                                                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                    <ShoppingBag size={24} strokeWidth={1.5} />
+                                                </div>
+                                            )}
                                         </div>
-                                    )}
-                                    <div className="aspect-square w-full mb-3 overflow-hidden bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
-                                        {product.coverImage ? (
-                                            <img
-                                                src={product.coverImage}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover transition-transform group-hover:scale-105"
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                <ShoppingBag size={32} strokeWidth={1} />
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
+                                                {isRTL ? product.nameAr || product.name : product.name}
+                                            </h4>
+                                            <div className={clsx("flex items-center gap-2 mt-1", isRTL && "flex-row-reverse justify-end")}>
+                                                <div className="flex items-center gap-0.5">
+                                                    <Star size={12} className="fill-amber-400 text-amber-400" />
+                                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                        {Number(product.averageRating || 0).toFixed(1)}
+                                                    </span>
+                                                </div>
+                                                <span className="text-[10px] text-slate-400 font-medium">
+                                                    ({product.reviewCount || 0} {t('common:reviews') || 'reviews'})
+                                                </span>
                                             </div>
-                                        )}
+                                        </div>
+                                        <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
+                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                                                #{index + 1}
+                                            </span>
+                                            <span className="text-xs font-bold text-primary">
+                                                {product.orderCount || 0} {t('common:orders') || 'Orders'}
+                                            </span>
+                                        </div>
                                     </div>
-                                    <div className="flex items-center justify-between gap-2 mb-1">
-                                        <h4 className={clsx("font-bold text-sm text-slate-800 dark:text-slate-200 truncate flex-1", isRTL && "text-right")}>
-                                            {isRTL ? product.nameAr || product.name : product.name}
-                                        </h4>
-                                    </div>
-                                    <div className={clsx("flex items-center gap-1", isRTL && "flex-row-reverse")}>
-                                        <Star size={14} className="fill-yellow-400 text-yellow-400" />
-                                        <span className="text-xs font-black text-slate-700 dark:text-slate-400">
-                                            {Number(product.averageRating || 0).toFixed(1)}
-                                        </span>
-                                        <span className="text-[10px] text-slate-400 lowercase">
-                                            {t('review_count', { count: product.reviewCount || 0 })}
-                                        </span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
-            )}
-
-            {/* Top Categories Section */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                <div className="bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors mt-8">
-                    <div className="flex items-center justify-between mb-6">
-                        <h3 className={clsx("text-lg font-bold text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
-                            {t('topCategories')}
-                        </h3>
-                        {stats.topCategories && stats.topCategories.length > 0 && (
-                            <button
-                                onClick={() => navigate('/categories')}
-                                className="text-primary text-sm font-bold hover:underline"
-                            >
-                                {t('common:viewAll')}
-                            </button>
+                                ))}
+                            </div>
                         )}
                     </div>
 
-                    {!stats.topCategories || stats.topCategories.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 border border-dashed border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                            <Layers size={48} className="text-slate-300 mb-4" />
-                            <p className="text-slate-500 text-sm font-medium">{t('common:no_results')}</p>
-                            <button
-                                onClick={() => navigate('/categories')}
-                                className="mt-4 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
-                            >
-                                {t('common:addFirstCategory')}
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                            {stats.topCategories.map((category: any) => (
-                                <div
-                                    key={category.id}
-                                    className="group bg-slate-50 dark:bg-slate-800/50 p-4 border border-slate-100 dark:border-slate-800 transition-all hover:shadow-md cursor-pointer relative flex flex-col items-center justify-center text-center"
+                    {/* Top Categories */}
+                    <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
+                                {t('topCategories')}
+                            </h3>
+                            {stats.topCategories && stats.topCategories.length > 0 && (
+                                <button
                                     onClick={() => navigate('/categories')}
+                                    className="text-primary text-sm font-bold hover:underline"
                                 >
-                                    {hasPermission('categories.update') && (
-                                        <div className="absolute top-2 right-2 z-10 bg-white dark:bg-slate-700 p-1.5 shadow-sm border border-slate-100 dark:border-slate-600 shadow-xl">
-                                            <Edit size={14} className="text-primary" />
-                                        </div>
-                                    )}
-                                    <div className="w-16 h-16 mb-3 rounded-none bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 flex items-center justify-center text-primary group-hover:scale-110 transition-transform">
-                                        <Layers size={32} strokeWidth={1.5} />
-                                    </div>
-                                    <h4 className="font-bold text-sm text-slate-800 dark:text-slate-200 truncate w-full">
-                                        {isRTL ? category.nameAr || category.name : category.name}
-                                    </h4>
-                                    <p className="text-[10px] text-slate-400 mt-1 uppercase font-bold tracking-wider">
-                                        {t('product_count', { count: category.productCount || 0 })}
-                                    </p>
-                                </div>
-                            ))}
+                                    {t('common:viewAll')}
+                                </button>
+                            )}
                         </div>
-                    )}
+
+                        {!stats.topCategories || stats.topCategories.length === 0 ? (
+                            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
+                                <Layers size={48} className="text-slate-200 mb-4" />
+                                <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
+                            </div>
+                        ) : (
+                            <div className="flex flex-col gap-3">
+                                {stats.topCategories.slice(0, 5).map((category: any, index: number) => (
+                                    <div
+                                        key={category.id}
+                                        className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                                        onClick={() => navigate('/categories')}
+                                    >
+                                        <div className="w-16 h-16 rounded bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary shrink-0 transition-transform group-hover:rotate-6">
+                                            <Layers size={28} strokeWidth={1.5} />
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
+                                                {isRTL ? category.nameAr || category.name : category.name}
+                                            </h4>
+                                            <p className={clsx("text-xs text-slate-500 mt-0.5 font-medium", isRTL ? "text-right" : "text-left")}>
+                                                {category.productCount || 0} {t('common:products') || 'Products'}
+                                            </p>
+                                        </div>
+                                        <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
+                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">
+                                                #{index + 1}
+                                            </span>
+                                            <ChevronRight size={18} className={clsx("text-slate-300 group-hover:text-primary transition-colors", isRTL && "rotate-180")} />
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
                 </div>
             )}
 
             {/* Revenue Performance section */}
             {hasPermission('analytics.view') && user?.role !== UserRole.SUPER_ADMIN && (
-                <div className={clsx("bg-white dark:bg-slate-900 p-6 rounded-none border border-slate-200 dark:border-slate-700 shadow-sm transition-colors", isRTL ? "text-right" : "text-left")}>
+                <div className={clsx("bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors", isRTL ? "text-right" : "text-left")}>
                     <div className="flex flex-col mb-8">
-                        <h3 className="text-lg font-bold text-slate-900 dark:text-slate-100">{t('revenuePerformance')}</h3>
-                        <p className="text-xs text-slate-400 font-medium">{t('last30Days')}</p>
+                        <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('revenuePerformance')}</h3>
+                        <p className="text-sm text-slate-400 font-medium">{t('last30Days')}</p>
                     </div>
-                    <div className="h-[300px]">
+                    <div className="h-[350px]">
                         <ResponsiveContainer width="100%" height="100%">
                             <BarChart
                                 key={`chart-${isRTL}`}
                                 data={chartData}
                                 margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
                             >
-                                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />
+                                <CartesianGrid strokeDasharray="0 0" vertical={false} stroke={isDark ? '#1e293b' : '#f1f5f9'} />
                                 <XAxis
                                     dataKey="label"
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: textColor, fontSize: 10 }}
-                                    dy={10}
+                                    tick={{ fill: isDark ? '#64748b' : '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                    dy={15}
                                     reversed={isRTL}
                                     tickFormatter={(str) => {
                                         const parts = str.split('-');
@@ -1036,54 +902,176 @@ const Dashboard: React.FC = () => {
                                 <YAxis
                                     axisLine={false}
                                     tickLine={false}
-                                    tick={{ fill: textColor, fontSize: 11 }}
-                                    dx={isRTL ? 10 : -10}
-                                    tickFormatter={(val) => `${val}`}
+                                    tick={{ fill: isDark ? '#64748b' : '#94a3b8', fontSize: 11, fontWeight: 600 }}
+                                    dx={isRTL ? 15 : -15}
+                                    tickFormatter={(val) => `${val.toLocaleString()}`}
                                     orientation={isRTL ? "right" : "left"}
                                 />
                                 <Tooltip
-                                    cursor={{ fill: cursorFill, opacity: 0.4 }}
+                                    cursor={{ fill: isDark ? '#1e293b' : '#f8fafc', opacity: 0.8 }}
                                     contentStyle={{
-                                        backgroundColor: tooltipBg,
-                                        borderRadius: '0px',
-                                        border: `1px solid ${tooltipBorder}`,
-                                        boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                        fontSize: '14px',
-                                        color: isDark ? '#f1f5f9' : '#0f172a',
+                                        backgroundColor: isDark ? '#0f172a' : '#ffffff',
+                                        borderRadius: '4px',
+                                        border: 'none',
+                                        boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+                                        padding: '12px 16px',
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
-                                    itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
-                                    labelStyle={{ color: isDark ? '#94a3b8' : '#64748b', marginBottom: '4px' }}
+                                    itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a', fontWeight: 700 }}
+                                    labelStyle={{ color: '#94a3b8', marginBottom: '8px', fontSize: '11px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}
                                     formatter={(val: any) => [`${val.toLocaleString()} ${t('common:currencySymbol')}`, t('totalRevenue')]}
                                     labelFormatter={(label) => {
                                         const parts = label.split('-');
                                         if (parts.length === 3) {
                                             const date = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
-                                            return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+                                            return date.toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { weekday: 'short', month: 'short', day: 'numeric' });
                                         }
                                         return label;
                                     }}
                                 />
                                 <Bar
                                     dataKey="revenue"
-                                    radius={[2, 2, 0, 0]}
-                                    barSize={20}
+                                    radius={[4, 4, 4, 4]}
+                                    barSize={12}
                                     minPointSize={4}
-                                    animationDuration={1500}
                                 >
-                                    {(() => {
+                                    {chartData.map((entry, index) => {
                                         const todayStr = new Date().toLocaleDateString('sv-SE');
-                                        return chartData.map((entry, index) => (
+                                        return (
                                             <Cell
                                                 key={`cell-${index}`}
-                                                fill={entry.label === todayStr ? '#4F46E5' : '#FF5C00'}
+                                                fill={entry.label === todayStr ? '#4F46E5' : (isDark ? '#334155' : '#e2e8f0')}
+                                                className="transition-all duration-300 hover:fill-primary"
                                             />
-                                        ));
-                                    })()}
+                                        );
+                                    })}
                                 </Bar>
                             </BarChart>
                         </ResponsiveContainer>
                     </div>
+                </div>
+            )}
+
+            {/* Subscription & Management Section - Moved to bottom */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch pt-4">
+                    {/* My Plan Card */}
+                    {subscription && (() => {
+                        const plan = (subscription?.plan || 'free').toUpperCase();
+                        const planKey = plan.toLowerCase();
+                        const isPremium = plan === 'PREMIUM';
+                        const isPro = plan === 'PRO';
+
+                        const bgClass = isPremium
+                            ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border-none'
+                            : isPro
+                                ? 'bg-gradient-to-r from-primary/10 via-primary/5 to-transparent border border-primary/20'
+                                : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-[0_8px_30px_rgb(0,0,0,0.04)]';
+                        const textClassPrimary = isPremium ? 'text-amber-400' : isPro ? 'text-primary' : 'text-slate-900 dark:text-slate-100';
+                        const textClassSecondary = isPremium ? 'text-white/60' : isPro ? 'text-primary/60' : 'text-slate-500';
+                        const badgeClass = isPremium
+                            ? 'bg-gradient-to-br from-amber-300 to-amber-500 text-slate-900 shadow-lg shadow-amber-500/20'
+                            : isPro
+                                ? 'bg-gradient-to-br from-primary to-primary/80 text-white shadow-lg shadow-primary/20'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400';
+                        const PlanIcon = isPremium ? Crown : isPro ? Zap : Shield;
+
+                        return (
+                            <div className={clsx('relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 px-8 py-4 rounded transition-all duration-500 group h-full', bgClass)}>
+                                {/* Decorative background elements */}
+                                {isPremium && (
+                                    <>
+                                        <div className={clsx("absolute top-0 -mt-10 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl pointer-events-none transition-transform duration-700 group-hover:scale-150", isRTL ? "left-0 -ml-10" : "right-0 -mr-10")} />
+                                        <div className={clsx("absolute bottom-0 -mb-10 w-32 h-32 bg-amber-500/20 rounded-full blur-2xl pointer-events-none transition-transform duration-700 group-hover:translate-x-8", isRTL ? "right-0 -mr-10" : "left-0 -ml-10")} />
+                                    </>
+                                )}
+                                {isPro && (
+                                    <div className={clsx("absolute inset-y-0 w-1/2 bg-gradient-to-l from-primary/5 to-transparent pointer-events-none opacity-50 group-hover:opacity-100 transition-opacity", isRTL ? "left-0" : "right-0")} />
+                                )}
+
+                                <div className="relative z-10 flex items-center gap-5">
+                                    <div className={clsx('w-12 h-12 rounded flex items-center justify-center transform -rotate-3 transition-transform duration-500 group-hover:rotate-0 group-hover:scale-110', badgeClass)}>
+                                        <PlanIcon size={24} className={isPremium ? 'animate-pulse' : ''} />
+                                    </div>
+                                    <div className="flex flex-col justify-center text-start">
+                                        <p className={clsx('text-[10px] font-bold uppercase tracking-widest mb-0.5', textClassSecondary)}>
+                                            {t('subscriptions:currentPlan')}
+                                        </p>
+                                        <p className={clsx('text-xl font-black uppercase tracking-tight', textClassPrimary)}>
+                                            {t(`subscriptions:plans.${planKey}.name`, plan)}
+                                        </p>
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={() => navigate('/subscription')}
+                                    className={clsx(
+                                        'relative z-10 w-full sm:w-auto px-6 py-2.5 text-[10px] font-black uppercase tracking-widest rounded transition-all duration-300 hover:-translate-y-0.5 active:translate-y-0',
+                                        isPremium
+                                            ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-900 hover:from-amber-300 hover:to-amber-400 hover:shadow-lg hover:shadow-amber-500/30'
+                                            : isPro
+                                                ? 'bg-primary text-white hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30'
+                                                : 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 hover:scale-[1.02] shadow-md hover:shadow-xl'
+                                    )}
+                                >
+                                    {t('common:manage')}
+                                </button>
+                            </div>
+                        );
+                    })()}
+
+                    {/* Manage Your Store Card */}
+                    {hasPermission('store.update') && (
+                        <div className={clsx(
+                            "relative overflow-hidden group rounded h-full",
+                            "p-5 md:py-5 md:px-8 flex flex-col md:flex-row items-center justify-between gap-8 shadow-[0_8px_30px_rgb(0,0,0,0.04)]",
+                            isRTL ? "text-right" : "text-left"
+                        )}>
+                            {/* Background: Direct Primary to Secondary Gradient - Direction Aware */}
+                            <div className={clsx(
+                                "absolute inset-0",
+                                isRTL ? "bg-gradient-to-l from-primary to-primary" : "bg-gradient-to-r from-primary to-primary"
+                            )} />
+                            <div className="absolute inset-0 bg-black/5 mix-blend-overlay" />
+
+                            {/* Subtle Glass Accents */}
+                            <div className="absolute -top-32 -left-32 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
+                            <div className="absolute -bottom-32 -right-32 w-64 h-64 bg-black/10 rounded-full blur-3xl group-hover:scale-125 transition-transform duration-[2000ms]" />
+
+                            <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-10 grow">
+                                {/* 1. Icon (Star) */}
+                                <div className="shrink-0">
+                                    <div className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/30 rounded flex items-center justify-center text-white shadow-xl transform group-hover:rotate-6 transition-transform duration-500">
+                                        <Store size={28} strokeWidth={1} />
+                                    </div>
+                                </div>
+
+                                {/* 2. Content (Center) */}
+                                <div className="flex-1 space-y-0.5">
+                                    <h3 className="text-xl md:text-2xl font-black text-white uppercase tracking-tight leading-none">
+                                        {t('common:manageYourStore')}
+                                    </h3>
+                                    <p className="text-white/80 font-medium text-xs md:text-sm opacity-90 max-w-[200px] md:max-w-none">
+                                        {t('common:updateStoreDirectly')}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* 3. Action Block (End) */}
+                            <div className="relative z-10 shrink-0">
+                                <button
+                                    onClick={() => navigate('/store-settings')}
+                                    className={clsx(
+                                        "group/btn relative px-6 py-3 bg-white text-slate-900 overflow-hidden transition-all duration-300 shadow-xl active:scale-95 hover:bg-slate-900 hover:text-white rounded"
+                                    )}
+                                >
+                                    <span className="relative z-10 flex items-center gap-4 font-black uppercase tracking-[0.2em] text-[8px]">
+                                        {t('common:storeSettings')}
+                                        <ChevronRight size={14} className={clsx("transition-transform group-hover/btn:translate-x-1", isRTL && "rotate-180")} />
+                                    </span>
+                                </button>
+                            </div>
+                        </div>
+                    )}
                 </div>
             )}
 

@@ -36,6 +36,7 @@ import { branchesApi } from '../branches/api/branches.api';
 import { Branch } from '../../types/branch';
 import clsx from 'clsx';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useCache } from '../../contexts/CacheContext';
 
 interface StatCardProps {
     title: string;
@@ -99,15 +100,44 @@ const Analytics: React.FC = () => {
     const [customerStats, setCustomerStats] = useState<any>(null);
     const [branches, setBranches] = useState<Branch[]>([]);
     const [selectedBranchId, setSelectedBranchId] = useState<string>('');
+    const { getCache, setCache } = useCache();
 
     useEffect(() => {
-        branchesApi.findAllByStore().then(setBranches).catch(console.error);
-    }, []);
+        const loadBranches = async () => {
+            const cacheKey = 'store-branches';
+            const cachedBranches = getCache<Branch[]>(cacheKey);
+            if (cachedBranches) {
+                setBranches(cachedBranches);
+                return;
+            }
+            try {
+                const data = await branchesApi.findAllByStore();
+                setBranches(data);
+                setCache(cacheKey, data);
+            } catch (err) {
+                console.error(err);
+            }
+        };
+        loadBranches();
+    }, [getCache, setCache]);
 
     useEffect(() => {
         const loadStats = async () => {
             // Only fetch if not custom OR if both dates are set for custom
             if (period === 'custom' && (!startDate || !endDate)) return;
+
+            const cacheParams = { period, startDate, endDate, branchId: selectedBranchId };
+            const cacheKey = 'analytics-stats';
+
+            // Check cache
+            const cachedData = getCache<any>(cacheKey, cacheParams);
+            if (cachedData) {
+                setOrderStats(cachedData.orders);
+                setMerchantStats(cachedData.merchant);
+                setCustomerStats(cachedData.customers);
+                setLoading(false);
+                return;
+            }
 
             setLoading(true);
             try {
@@ -120,6 +150,9 @@ const Analytics: React.FC = () => {
                 setOrderStats(orders);
                 setMerchantStats(merchant);
                 setCustomerStats(customers);
+
+                // Update cache
+                setCache(cacheKey, { orders, merchant, customers }, cacheParams);
             } catch (err) {
                 console.error("Failed to load analytics:", err);
             } finally {
@@ -127,7 +160,7 @@ const Analytics: React.FC = () => {
             }
         };
         loadStats();
-    }, [period, startDate, endDate, selectedBranchId]);
+    }, [period, startDate, endDate, selectedBranchId, getCache, setCache]);
 
     const gridColor = isDark ? '#1e293b' : '#f1f5f9';
     const textColor = isDark ? '#64748b' : '#94a3b8';

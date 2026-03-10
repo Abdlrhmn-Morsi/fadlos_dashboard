@@ -65,19 +65,22 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
           : 'text-slate-500 hover:bg-primary-light hover:text-primary'
       )}
     >
-      <Icon size={20} className={clsx('shrink-0', collapsed ? 'mx-auto' : '')} />
+      <Icon
+        size={20}
+        className={clsx(
+          'shrink-0 transition-transform duration-200 group-hover:scale-110',
+          collapsed ? 'mx-auto' : (isRTL ? 'ml-3' : 'mr-3')
+        )}
+      />
       {!collapsed && (
         <>
-          <span className={clsx(
-            "font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300"
-          )}>
+          <span className="font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300">
             {label}
           </span>
           {isPremium && (
-            <>
-              <div className="flex-1" />
+            <div className={clsx("flex-1 flex justify-end", isRTL ? "mr-4" : "ml-4")}>
               <Crown size={14} className="text-amber-500 shrink-0" />
-            </>
+            </div>
           )}
         </>
       )}
@@ -113,14 +116,21 @@ const LockedSidebarItem: React.FC<LockedSidebarItemProps> = ({ icon: Icon, label
         'text-slate-300 dark:text-slate-500 cursor-pointer hover:bg-amber-50/50 dark:hover:bg-amber-900/10'
       )}
     >
-      <Icon size={20} className={clsx('shrink-0', collapsed ? 'mx-auto' : '')} />
+      <Icon
+        size={20}
+        className={clsx(
+          'shrink-0 transition-transform duration-200 group-hover:scale-110',
+          collapsed ? 'mx-auto' : (isRTL ? 'ml-3' : 'mr-3')
+        )}
+      />
       {!collapsed && (
         <>
           <span className="font-semibold text-sm whitespace-nowrap overflow-hidden transition-all duration-300">
             {label}
           </span>
-          <div className="flex-1" />
-          <Crown size={14} className="text-amber-500 shrink-0" />
+          <div className={clsx("flex-1 flex justify-end", isRTL ? "mr-4" : "ml-4")}>
+            <Crown size={14} className="text-amber-500 shrink-0" />
+          </div>
         </>
       )}
       {collapsed && (
@@ -226,11 +236,11 @@ const DashboardLayout: React.FC = () => {
           {user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && (
             user?.role === UserRole.STORE_OWNER ? (
               (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro')
-                ? hasPermission(Permissions.ANALYTICS_VIEW) && <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} isPremium={true} />
+                ? hasPermission(Permissions.ANALYTICS_VIEW) && <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
                 : <LockedSidebarItem icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
             ) : (
               (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
-                <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} isPremium={true} />
+                <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
               )
             )
           )}
@@ -303,22 +313,22 @@ const DashboardLayout: React.FC = () => {
                     {/* Reviews - Role-aware */}
                     {user?.role === UserRole.STORE_OWNER ? (
                       hasFeature(PlanFeature.REVIEWS_MANAGEMENT)
-                        ? hasPermission(Permissions.STORE_VIEW) && <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} isPremium={true} />
+                        ? hasPermission(Permissions.STORE_VIEW) && <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
                         : <LockedSidebarItem icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
                     ) : (
                       hasFeature(PlanFeature.REVIEWS_MANAGEMENT) && hasPermission(Permissions.CLIENTS_VIEW) && (
-                        <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} isPremium={true} />
+                        <SidebarItem to="/reviews" icon={MessageSquare} label={t('feedback')} collapsed={collapsed} />
                       )
                     )}
 
                     {/* PromoCodes - Role-aware */}
                     {user?.role === UserRole.STORE_OWNER ? (
                       hasFeature(PlanFeature.PROMOCODES)
-                        ? (hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} isPremium={true} />
+                        ? (hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
                         : <LockedSidebarItem icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
                     ) : (
                       hasFeature(PlanFeature.PROMOCODES) && (hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE)) && (
-                        <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} isPremium={true} />
+                        <SidebarItem to="/promocodes" icon={Tag} label={t('promoCodes')} collapsed={collapsed} />
                       )
                     )}
 
@@ -326,11 +336,11 @@ const DashboardLayout: React.FC = () => {
                     {user?.role === UserRole.STORE_OWNER ? (
                       <>
                         {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT)
-                          ? hasPermission(Permissions.CLIENTS_VIEW) && <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} isPremium={true} />
+                          ? hasPermission(Permissions.CLIENTS_VIEW) && <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
                           : <LockedSidebarItem icon={Users} label={t('clients')} collapsed={collapsed} />
                         }
                         {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT)
-                          ? hasPermission(Permissions.CLIENTS_VIEW) && <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} isPremium={true} />
+                          ? hasPermission(Permissions.CLIENTS_VIEW) && <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
                           : <LockedSidebarItem icon={Users} label={t('followers')} collapsed={collapsed} />
                         }
                       </>
@@ -338,10 +348,10 @@ const DashboardLayout: React.FC = () => {
                       hasPermission(Permissions.CLIENTS_VIEW) && (
                         <>
                           {hasFeature(PlanFeature.STORE_CLIENTS_MANAGEMENT) && (
-                            <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} isPremium={true} />
+                            <SidebarItem to="/clients" icon={Users} label={t('clients')} collapsed={collapsed} />
                           )}
                           {hasFeature(PlanFeature.STORE_FOLLOWERS_MANAGEMENT) && (
-                            <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} isPremium={true} />
+                            <SidebarItem to="/followers" icon={Users} label={t('followers')} collapsed={collapsed} />
                           )}
                         </>
                       )
