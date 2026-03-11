@@ -23,7 +23,7 @@ import { PromotionTargetType } from '../notification/api/promotions.api';
 import { Megaphone } from 'lucide-react';
 
 const ClientList = () => {
-    const { t } = useTranslation(['clients', 'common', 'orders']);
+    const { t, i18n } = useTranslation(['clients', 'common', 'orders']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const { getCache, setCache } = useCache();
@@ -198,11 +198,39 @@ const ClientList = () => {
     };
 
     const getStatusColor = (status: string) => {
-        const s = status.toLowerCase();
-        if (s === 'delivered') return 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20';
-        if (s === 'pending') return 'text-amber-600 bg-amber-50 dark:bg-amber-900/20';
-        if (s === 'cancelled') return 'text-rose-600 bg-rose-50 dark:bg-rose-900/20';
-        return 'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20';
+        if (!status) return 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800';
+        const s = status.toUpperCase();
+        switch (s) {
+            case 'PENDING': return 'bg-amber-100 text-amber-700 border-amber-200 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800';
+            case 'CONFIRMED': return 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800';
+            case 'PREPARING': return 'bg-indigo-100 text-indigo-700 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-400 dark:border-indigo-800';
+            case 'READY': return 'bg-emerald-100 text-emerald-700 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800';
+            case 'DRIVER_ASSIGNED': return 'bg-cyan-100 text-cyan-700 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-400 dark:border-cyan-800';
+            case 'OUT_FOR_DELIVERY': return 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800';
+            case 'DELIVERED': return 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800';
+            case 'CANCELLED': return 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800';
+            case 'RETURNED': return 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800';
+            default: return 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-900/30 dark:text-slate-400 dark:border-slate-800';
+        }
+    };
+
+    const getStatusLabel = (status: string) => {
+        if (!status) return '';
+        return t('common:' + status.toLowerCase());
+    };
+
+    const extractReason = (history: any[]) => {
+        if (!history || history.length === 0) return null;
+        const relevantRecord = history.slice().reverse().find(h => 
+            h.status?.toUpperCase() === 'CANCELLED' || h.status?.toUpperCase() === 'RETURNED'
+        );
+        if (!relevantRecord || !relevantRecord.notes) return null;
+        try {
+            const notesObj = JSON.parse(relevantRecord.notes);
+            return i18n.language.startsWith('ar') ? notesObj.ar : notesObj.en;
+        } catch (e) {
+            return relevantRecord.notes;
+        }
     };
 
     return (
@@ -470,7 +498,7 @@ const ClientList = () => {
                                                             "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider",
                                                             getStatusColor(order.status)
                                                         )}>
-                                                            {order.status}
+                                                            {getStatusLabel(order.status)}
                                                         </span>
                                                     </div>
                                                     <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-tighter">
@@ -480,7 +508,7 @@ const ClientList = () => {
                                                 </div>
                                                 <div className={clsx(isRTL ? "text-left" : "text-right")}>
                                                     <p className="text-lg font-black text-slate-900 dark:text-white leading-tight">{Number(order.total).toFixed(2)}$</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{order.items?.length || 0} {t('common:items')}</p>
+                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{t('orders:itemsCount', { count: order.items?.length || 0 })}</p>
                                                 </div>
                                             </div>
 
@@ -503,7 +531,7 @@ const ClientList = () => {
                                                 </div>
                                                 <span className="flex-1" />
                                                 <button className="flex items-center gap-1 text-[10px] font-black text-primary uppercase tracking-widest group-hover:gap-2 transition-all">
-                                                    {t('common:details')}
+                                                    {t('orders:viewDetails')}
                                                     <ChevronRight size={14} className={isRTL ? "rotate-180" : ""} />
                                                 </button>
                                             </div>
@@ -527,7 +555,7 @@ const ClientList = () => {
                                                     "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border",
                                                     getStatusColor(selectedOrder.status)
                                                 )}>
-                                                    {selectedOrder.status}
+                                                    {getStatusLabel(selectedOrder.status)}
                                                 </span>
                                             </div>
                                             <div className={clsx(isRTL ? "text-left" : "text-right")}>
@@ -537,6 +565,17 @@ const ClientList = () => {
                                                 </p>
                                             </div>
                                         </div>
+
+                                        {(selectedOrder.status?.toUpperCase() === 'CANCELLED' || selectedOrder.status?.toUpperCase() === 'RETURNED') && (
+                                            <div className="bg-rose-50 dark:bg-rose-900/20 p-4 rounded-xl border border-rose-100 dark:border-rose-900/50">
+                                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">
+                                                    {selectedOrder.status?.toUpperCase() === 'CANCELLED' ? t('orders:cancellationReason') : t('orders:returnOrder')}
+                                                </p>
+                                                <p className="text-sm font-bold text-rose-700 dark:text-rose-400">
+                                                    {extractReason(selectedOrder.statusHistory) || t('common:noResults')}
+                                                </p>
+                                            </div>
+                                        )}
 
                                         <div className="space-y-4">
                                             <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('purchasedItems')}</h3>

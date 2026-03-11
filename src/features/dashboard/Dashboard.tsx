@@ -744,7 +744,7 @@ const Dashboard: React.FC = () => {
 
             {/* Lists Section: Top Rated Products & Top Categories */}
             {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Top Rated Products */}
                     <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
                         <div className="flex items-center justify-between mb-8">
@@ -954,7 +954,7 @@ const Dashboard: React.FC = () => {
 
             {/* Subscription & Management Section - Moved to bottom */}
             {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch pt-4">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch pt-4">
                     {/* My Plan Card */}
                     {subscription && (() => {
                         const plan = (subscription?.plan || 'free').toUpperCase();
