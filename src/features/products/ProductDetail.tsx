@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import clsx from 'clsx';
-import { ArrowLeft, Edit, Tag, DollarSign, Package, CheckCircle, XCircle, Eye } from 'lucide-react';
+import { ArrowLeft, Edit, Tag, DollarSign, Package, CheckCircle, XCircle, Eye, PackageOpen, TrendingUp, Hash } from 'lucide-react';
 import productsApi from './api/products.api';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useTranslation } from 'react-i18next';
@@ -167,6 +167,23 @@ const ProductDetail = () => {
                                 <Package size={20} />
                                 <span className="font-semibold">{t('products:category')}:</span>
                                 <span>{(isRTL ? product.category?.nameAr || product.category?.name : product.category?.name) || t('products:uncategorized')}</span>
+                            </div>
+                            {product.sku && (
+                                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                    <Hash size={20} />
+                                    <span className="font-semibold">{t('products:sku')}:</span>
+                                    <span className="font-mono text-sm">{product.sku}</span>
+                                </div>
+                            )}
+                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                <PackageOpen size={20} />
+                                <span className="font-semibold">{t('products:orderCount')}:</span>
+                                <span>{product.orderCount || 0}</span>
+                            </div>
+                            <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
+                                <TrendingUp size={20} />
+                                <span className="font-semibold">{t('products:unitsSold')}:</span>
+                                <span>{product.unitsSold || 0}</span>
                             </div>
                         </div>
 

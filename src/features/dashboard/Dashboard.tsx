@@ -768,7 +768,7 @@ const Dashboard: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-3">
-                                {stats.topRatedProducts.slice(0, 5).map((product: any, index: number) => (
+                                {stats.topRatedProducts.slice(0, 3).map((product: any, index: number) => (
                                     <div
                                         key={product.id}
                                         className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
@@ -808,7 +808,7 @@ const Dashboard: React.FC = () => {
                                                 #{index + 1}
                                             </span>
                                             <span className="text-xs font-bold text-primary">
-                                                {product.orderCount || 0} {t('common:orders') || 'Orders'}
+                                                {product.unitsSold || 0} {t('common:unitsSold') || 'Units Sold'}
                                             </span>
                                         </div>
                                     </div>
@@ -840,7 +840,7 @@ const Dashboard: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex flex-col gap-3">
-                                {stats.topCategories.slice(0, 5).map((category: any, index: number) => (
+                                {stats.topCategories.slice(0, 3).map((category: any, index: number) => (
                                     <div
                                         key={category.id}
                                         className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"

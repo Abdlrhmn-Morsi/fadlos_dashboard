@@ -129,10 +129,10 @@ export const fetchDashboardStats = async (user: any) => {
             }
 
             // Top Rated Products (Default for all employees)
-            promises.push(apiService.get('/products/store-products?sortBy=averageRating&sort=DESC&limit=5').then(res => ({ key: 'topProducts', val: (res as any).data || [] })).catch(() => ({ key: 'topProducts', val: [] })));
+            promises.push(apiService.get('/products/store-products?sortBy=averageRating&sort=DESC&limit=3').then(res => ({ key: 'topProducts', val: (res as any).data || [] })).catch(() => ({ key: 'topProducts', val: [] })));
 
             // Top Categories (Default for all employees)
-            promises.push(apiService.get('/categories/seller-categories?limit=5').then(res => ({ key: 'topCategories', val: (res as any).data || [] })).catch(() => ({ key: 'topCategories', val: [] })));
+            promises.push(apiService.get('/categories/seller-categories?limit=3').then(res => ({ key: 'topCategories', val: (res as any).data || [] })).catch(() => ({ key: 'topCategories', val: [] })));
 
             const results = await Promise.all(promises);
 
