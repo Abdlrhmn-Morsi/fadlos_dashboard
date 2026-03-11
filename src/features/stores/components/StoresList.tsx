@@ -11,7 +11,8 @@ import {
     XCircle,
     Clock,
     ShieldAlert,
-    Eye
+    Eye,
+    BadgeCheck
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { getStores, getStoreStatsSummary } from '../api/stores.api';
@@ -274,7 +275,10 @@ const StoresList = () => {
                                                         className="cursor-pointer"
                                                         onClick={() => navigate(`/stores/${store.id}`)}
                                                     >
-                                                        <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors hover:underline">{store.name}</div>
+                                                        <div className="flex items-center gap-1.5 group">
+                                                            <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors hover:underline">{store.name}</div>
+                                                            {store.isVerified && <BadgeCheck size={16} className="text-blue-500 fill-blue-500/10" />}
+                                                        </div>
                                                         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{isRTL ? store.businessType?.ar_name || store.businessType?.en_name : store.businessType?.en_name}</div>
                                                     </div>
                                                 </div>

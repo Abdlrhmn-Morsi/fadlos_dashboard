@@ -28,7 +28,9 @@
         "alreadyHired": "تم التوظيف مسبقاً",
         "hiringStatus": "حالة التوظيف",
         "driverVerification": "توثيق السائقين",
-        "select_options": "اختر..."
+        "select_options": "اختر...",
+        "verificationRequests": "طلبات التوثيق",
+        "storeVerification": "توثيق المتاجر"
     },
     "upgradeRequired": "لقد وصلت إلى الحد المسموح به {{feature}}. يرجى ترقية باقتك.",
     "errorCheckingLimits": "خطأ في التحقق من حدود الاشتراك",
@@ -130,6 +132,8 @@
     "addons": "الإضافات",
     "deliveryDrivers": "سائقي المتجر",
     "driverVerification": "توثيق السائقين",
+    "storeVerification": "توثيق المتاجر",
+    "verificationRequests": "طلبات التوثيق",
     "deliveryDashboard": "لوحة تحكم السائق",
     "analytics": "الإحصائيات",
     "settlements": "تحصيل المبالغ النقدية",

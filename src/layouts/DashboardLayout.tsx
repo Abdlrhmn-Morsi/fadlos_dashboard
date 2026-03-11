@@ -24,7 +24,9 @@ import {
   BarChart3,
   Tag,
   MessageSquare,
-  Crown
+  Crown,
+  ShieldCheck,
+  BadgeCheck
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -262,6 +264,7 @@ const DashboardLayout: React.FC = () => {
 
               <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />
               <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />
+              <SidebarItem to="/stores/verification" icon={ShieldCheck} label={t('storeVerification', 'Store Verification')} collapsed={collapsed} />
               <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />
               <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />
               <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />
@@ -459,8 +462,18 @@ const DashboardLayout: React.FC = () => {
             </button>
             <div className="flex items-center gap-3">
               {user?.store?.logo && (
-                <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 flex-shrink-0 bg-white">
-                  <img src={user.store.logo} alt="" className="w-full h-full object-contain" />
+                <div className="relative">
+                  <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 flex-shrink-0 bg-white">
+                    <img src={user.store.logo} alt="" className="w-full h-full object-contain" />
+                  </div>
+                  {user?.store?.isVerified && (
+                    <div className={clsx(
+                      "absolute -bottom-1 -right-1 bg-white dark:bg-slate-900 rounded-full p-0.5 shadow-lg border border-slate-100 dark:border-slate-800 animate-in zoom-in duration-500",
+                      isRTL ? "-right-1" : "-right-1" // Physical right is fine for bottom-right badge
+                    )}>
+                      <BadgeCheck size={14} className="text-emerald-500" />
+                    </div>
+                  )}
                 </div>
               )}
               <h1 className="text-xl font-bold text-slate-900 dark:text-slate-100 hidden sm:block">
@@ -510,7 +523,7 @@ const DashboardLayout: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative z-10 custom-scrollbar transition-colors">
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative custom-scrollbar transition-colors">
           <Outlet />
         </main>
       </div>

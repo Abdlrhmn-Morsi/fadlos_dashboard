@@ -13,6 +13,7 @@ import Cities from './features/cities/Cities';
 import Towns from './features/towns/Towns';
 import BusinessTypes from './features/business-types/BusinessTypes';
 import BusinessCategories from './features/store-categories/BusinessCategories';
+import StoreVerificationRequests from './features/stores/StoreVerificationRequests';
 import ProductList from './features/products/ProductList';
 import ProductForm from './features/products/ProductForm';
 import ProductDetail from './features/products/ProductDetail';
@@ -151,6 +152,7 @@ const AppContent = () => {
             <Route path="business-categories" element={<BusinessCategories />} />
             <Route path="reported-reviews" element={<ReportedReviewList />} />
             <Route path="drivers/verification" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DriverVerificationPage /></PermissionGate>} />
+            <Route path="stores/verification" element={<PermissionGate permission={Permissions.STORE_UPDATE}><StoreVerificationRequests /></PermissionGate>} />
             <Route path="plans-management" element={
               user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
             } />

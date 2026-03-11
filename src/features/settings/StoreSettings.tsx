@@ -29,11 +29,14 @@ import {
     Users,
     Layout,
     ChevronRight,
-    AtSign
+    AtSign,
+    ShieldCheck
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { getMyStore, updateStore } from '../stores/api/stores.api';
+import { getVerificationStatus, submitVerification } from '../stores/api/stores.verification.api';
+import { StoreVerificationStatus } from '../stores/models/store.verification.model';
 import { getBusinessTypes } from '../business-types/api/business-types.api';
 import { getBusinessCategories } from '../store-categories/api/business-categories.api';
 import { toast } from '../../utils/toast';
@@ -74,11 +77,21 @@ const StoreSettings = () => {
         { id: 'contact', label: t('contact'), icon: Phone, desc: t('contactDesc', 'Phones, email and social') },
         { id: 'availability', label: t('availability'), icon: Clock, desc: t('availabilityDesc', 'Hours and order rules') },
         { id: 'management', label: t('management'), icon: Users, desc: t('managementDesc', 'Hiring and reviews') },
+        { id: 'verification', label: t('verification'), icon: ShieldCheck, desc: t('verificationDesc', 'Store identity validation') },
     ] as const;
     const canViewStore = hasPermission(Permissions.STORE_VIEW);
     const canUpdateStore = hasPermission(Permissions.STORE_UPDATE);
     const [loadingCategories, setLoadingCategories] = useState(false);
-    const [activeTab, setActiveTab] = useState<'branding' | 'business' | 'contact' | 'availability' | 'management'>('branding');
+    const [activeTab, setActiveTab] = useState<'branding' | 'business' | 'contact' | 'availability' | 'management' | 'verification'>('branding');
+    const [verificationData, setVerificationData] = useState<any>(null);
+    const [submittingVerification, setSubmittingVerification] = useState(false);
+    const [verificationForm, setVerificationForm] = useState({
+        commercialRegisterNumber: '',
+        commercialRegisterPhoto: null as File | null
+    });
+    const verificationPhotoInputRef = useRef<HTMLInputElement>(null);
+    const [verificationPhotoPreview, setVerificationPhotoPreview] = useState<string | null>(null);
+    const [justSubmitted, setJustSubmitted] = useState(false);
 
     // Form states
     const [formData, setFormData] = useState({
@@ -113,15 +126,26 @@ const StoreSettings = () => {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const [store, bTypes, allCategories] = await Promise.all([
+            const [store, bTypes, vData] = await Promise.all([
                 getMyStore(),
                 getBusinessTypes(),
-                getMyStore().then(store => store.businessType?.id ? getBusinessCategories(store.businessType.id) : [])
+                getVerificationStatus()
             ]);
+
+            const allCategories = store.businessType?.id ? await getBusinessCategories(store.businessType.id) : [];
 
             setStoreData(store);
             setBusinessTypes(bTypes);
+            setVerificationData(vData.verification);
             setAvailableCategories(allCategories);
+
+            if (vData.verification) {
+                setVerificationForm(prev => ({
+                    ...prev,
+                    commercialRegisterNumber: vData.verification.commercialRegisterNumber
+                }));
+                setVerificationPhotoPreview(vData.verification.commercialRegisterPhoto);
+            }
 
             setFormData({
                 nameAr: store.nameAr || '',
@@ -184,6 +208,13 @@ const StoreSettings = () => {
 
         fetchCategories();
     }, [formData.businessTypeId]);
+
+    // Reset justSubmitted when switching tabs
+    useEffect(() => {
+        if (activeTab !== 'verification') {
+            setJustSubmitted(false);
+        }
+    }, [activeTab]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value, type } = e.target;
@@ -377,6 +408,39 @@ const StoreSettings = () => {
     }
 
     const isReadOnly = !canUpdateStore;
+
+    const handleVerificationFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setVerificationForm(prev => ({ ...prev, commercialRegisterPhoto: file }));
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setVerificationPhotoPreview(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleSubmitVerification = async (e?: React.FormEvent | React.MouseEvent) => {
+        e?.preventDefault();
+        setSubmittingVerification(true);
+        try {
+            const formData = new FormData();
+            formData.append('commercialRegisterNumber', verificationForm.commercialRegisterNumber);
+            if (verificationForm.commercialRegisterPhoto) {
+                formData.append('commercialRegisterPhoto', verificationForm.commercialRegisterPhoto);
+            }
+
+            await submitVerification(formData);
+            toast.success(t('verificationSubmitted'));
+            setJustSubmitted(true);
+            fetchData();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('failedToSubmitVerification'));
+        } finally {
+            setSubmittingVerification(false);
+        }
+    };
 
     return (
         <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950/50 flex flex-col" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -1135,6 +1199,192 @@ const StoreSettings = () => {
                                                 </label>
                                             </div>
                                         </div>
+                                    </div>
+                                </section>
+                            </div>
+                        )}
+
+                        {activeTab === 'verification' && (
+                            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-8">
+                                <section className="bg-white dark:bg-slate-900 border-y sm:border border-slate-200/60 dark:border-slate-800/60 sm:rounded shadow-xl shadow-slate-200/20 dark:shadow-none overflow-hidden hover:shadow-2xl hover:shadow-primary/5 transition-all duration-500">
+                                    <div className="px-10 py-7 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm">
+                                        <div className="flex items-center gap-4">
+                                            <div className="p-2.5 bg-primary/10 rounded-lg">
+                                                <ShieldCheck size={24} className="text-primary" />
+                                            </div>
+                                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('storeVerification')}</h3>
+                                        </div>
+                                        {verificationData && (
+                                            <div className={clsx(
+                                                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                                                verificationData.status === StoreVerificationStatus.PENDING && "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-800",
+                                                verificationData.status === StoreVerificationStatus.APPROVED && "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800",
+                                                verificationData.status === StoreVerificationStatus.REJECTED && "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-800"
+                                            )}>
+                                                {t(`verificationStatus.${verificationData.status}`)}
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="p-8">
+                                        {verificationData?.status === StoreVerificationStatus.APPROVED ? (
+                                            <div className="flex flex-col items-center justify-center py-12 gap-6">
+                                                <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in">
+                                                    <CheckCircle size={48} />
+                                                </div>
+                                                <div className="text-center">
+                                                    <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('storeVerifiedSuccessfully')}</h4>
+                                                    <p className="text-slate-500 text-sm mt-2 max-w-sm">{t('verificationApprovedMessage', 'Your store is now verified and has been granted the verified badge.')}</p>
+                                                </div>
+                                                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-800">
+                                                    <div className="flex justify-between items-center text-sm">
+                                                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{t('crNumber')}</span>
+                                                        <span className="font-black text-slate-700 dark:text-slate-200">{verificationData.commercialRegisterNumber}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                         ) : verificationData?.status === StoreVerificationStatus.PENDING ? (
+                                            <div className="flex flex-col items-center justify-center py-12 gap-6">
+                                                <div className="w-24 h-24 bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 rounded-full flex items-center justify-center shadow-xl shadow-amber-200/20 dark:shadow-none animate-in zoom-in duration-700">
+                                                    {justSubmitted ? (
+                                                        <CheckCircle size={56} className="text-emerald-500 animate-in fade-in zoom-in" />
+                                                    ) : (
+                                                        <Clock size={56} className="animate-spin-slow" />
+                                                    )}
+                                                </div>
+                                                <div className="text-center space-y-3">
+                                                    <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                                        {justSubmitted ? t('verificationSubmittedTitle') : t('verificationInReview')}
+                                                    </h4>
+                                                    <p className="text-slate-500 text-sm font-medium mt-2 max-w-sm mx-auto text-balance leading-relaxed">
+                                                        {justSubmitted ? t('verificationSubmittedDesc') : t('verificationPendingMessage')}
+                                                    </p>
+                                                </div>
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-6">
+                                                    <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/60 shadow-sm">
+                                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ps-1">{t('crNumber')}</label>
+                                                        <div className="font-black text-slate-800 dark:text-slate-200 text-lg tracking-tight">{verificationData.commercialRegisterNumber}</div>
+                                                    </div>
+                                                    {verificationData.commercialRegisterPhoto && (
+                                                        <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/60 shadow-sm flex flex-col justify-center">
+                                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ps-1">{t('submittedDocument')}</label>
+                                                            <a href={verificationData.commercialRegisterPhoto} target="_blank" rel="noopener noreferrer" className="text-primary font-bold text-sm hover:underline flex items-center gap-2 group/doc">
+                                                                <ImageIcon size={18} className="group-hover:scale-110 transition-transform" /> {t('viewDocument')}
+                                                            </a>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ) : (
+                                            <div className="space-y-10 animate-in fade-in duration-1000">
+                                                {verificationData?.status === StoreVerificationStatus.REJECTED && (
+                                                   <div className="bg-gradient-to-br from-rose-50 to-white dark:from-rose-500/10 dark:to-slate-900 border border-rose-200 dark:border-rose-900/50 rounded-2xl p-8 flex flex-col sm:flex-row items-center gap-8 shadow-lg shadow-rose-200/10 active:scale-[0.99] transition-transform">
+                                                       <div className="p-5 bg-rose-100 dark:bg-rose-900/40 rounded-2xl text-rose-600 dark:text-rose-400 shadow-sm">
+                                                           <AlertTriangle size={36} />
+                                                       </div>
+                                                       <div className="flex-1 text-center sm:text-start space-y-2">
+                                                           <h4 className="font-black text-rose-900 dark:text-rose-300 uppercase tracking-tight text-lg">{t('verificationRejected')}</h4>
+                                                           <div className="bg-white/60 dark:bg-black/20 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30">
+                                                               <p className="text-rose-700 dark:text-rose-400/90 text-sm font-bold leading-relaxed">
+                                                                   {verificationData.rejectionReason || t('rejectionNoReason')}
+                                                               </p>
+                                                           </div>
+                                                       </div>
+                                                   </div>
+                                                )}
+
+                                                <div className="space-y-3 pt-4">
+                                                    <div className="flex items-center gap-3">
+                                                       <div className="p-1.5 bg-primary/10 rounded-lg">
+                                                          <ShieldCheck size={18} className="text-primary" />
+                                                       </div>
+                                                       <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-[0.1em] text-sm">
+                                                          {verificationData?.status === StoreVerificationStatus.REJECTED ? t('resubmitHeader') : t('verificationSubmission')}
+                                                       </h4>
+                                                    </div>
+                                                    <p className="text-slate-500 text-xs font-medium leading-relaxed max-w-2xl ps-10 opacity-80 italic">
+                                                       {verificationData?.status === StoreVerificationStatus.REJECTED 
+                                                          ? t('verificationRejectedResubmitDesc', 'Please address the reasons above and update your information for re-verification.')
+                                                          : t('verificationSubmissionDesc')}
+                                                    </p>
+                                                </div>
+
+                                                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                                                    <div className="space-y-6">
+                                                        <div className="space-y-4">
+                                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1 flex items-center gap-2">
+                                                                <Briefcase size={14} className="text-primary" /> {t('crNumberLabel', 'Commercial Register Number')}
+                                                            </label>
+                                                            <input
+                                                                type="text"
+                                                                required
+                                                                value={verificationForm.commercialRegisterNumber}
+                                                                onChange={(e) => setVerificationForm({...verificationForm, commercialRegisterNumber: e.target.value})}
+                                                                placeholder="e.g. 1010123456"
+                                                                className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 placeholder:opacity-30"
+                                                            />
+                                                        </div>
+
+                                                        <div className="pt-4 flex flex-col gap-4">
+                                                            <button
+                                                                type="button"
+                                                                onClick={() => handleSubmitVerification()}
+                                                                disabled={submittingVerification || !verificationForm.commercialRegisterNumber || (!verificationForm.commercialRegisterPhoto && !verificationData)}
+                                                                className="w-full flex items-center justify-center gap-4 px-8 py-5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-black uppercase tracking-widest text-xs rounded-xl shadow-2xl hover:bg-primary dark:hover:bg-primary-focus hover:text-white transition-all transform hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
+                                                            >
+                                                                {submittingVerification ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} className="group-hover:rotate-6 transition-transform" />}
+                                                                {verificationData ? t('reSubmitVerification') : t('submitForVerification')}
+                                                            </button>
+                                                            <p className="text-slate-400 text-[10px] italic text-center font-medium leading-relaxed px-6">
+                                                                {t('verificationAcknowledge', 'By submitting, you certify that all information provided is accurate and legitimate.')}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="space-y-4">
+                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1 flex items-center gap-2">
+                                                            <Camera size={14} className="text-secondary" /> {t('crPhotoLabel', 'Commercial Register Photo')}
+                                                        </label>
+                                                        <div
+                                                            onClick={() => verificationPhotoInputRef.current?.click()}
+                                                            className={clsx(
+                                                                "relative w-full aspect-[4/3] rounded-2xl border-2 border-dashed transition-all cursor-pointer group flex flex-col items-center justify-center overflow-hidden",
+                                                                verificationPhotoPreview ? "border-primary/50 bg-slate-50 dark:bg-slate-800" : "border-slate-200 dark:border-slate-800 hover:border-primary/50 bg-slate-50/50 dark:bg-slate-800/20"
+                                                            )}
+                                                        >
+                                                            {verificationPhotoPreview ? (
+                                                                <>
+                                                                    <img src={verificationPhotoPreview} alt="Verification Preview" className="w-full h-full object-contain" />
+                                                                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
+                                                                        <div className="flex flex-col items-center gap-2 text-white scale-90 group-hover:scale-100 transition-transform">
+                                                                            <Camera size={24} />
+                                                                            <span className="font-black text-[10px] uppercase tracking-widest">{t('changeDocument')}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </>
+                                                            ) : (
+                                                                <div className="flex flex-col items-center gap-4 text-slate-300 group-hover:text-primary transition-colors">
+                                                                    <div className="p-6 bg-white dark:bg-slate-900 rounded-3xl shadow-lg group-hover:shadow-primary/10 transition-shadow">
+                                                                        <ImageIcon size={48} strokeWidth={1} />
+                                                                    </div>
+                                                                    <div className="text-center space-y-1">
+                                                                        <span className="font-black text-xs uppercase tracking-widest text-slate-500 group-hover:text-primary">{t('uploadPhoto')}</span>
+                                                                        <p className="text-[10px] font-bold opacity-60">JPG, PNG or PDF (Max 10MB)</p>
+                                                                    </div>
+                                                                </div>
+                                                            )}
+                                                            <input
+                                                                type="file"
+                                                                ref={verificationPhotoInputRef}
+                                                                className="hidden"
+                                                                accept="image/*,.pdf"
+                                                                onChange={handleVerificationFileChange}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        )}
                                     </div>
                                 </section>
                             </div>

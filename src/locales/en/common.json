@@ -28,7 +28,9 @@
         "alreadyHired": "Already Hired",
         "hiringStatus": "Hiring Status",
         "driverVerification": "Driver Verification",
-        "select_options": "Select options..."
+        "select_options": "Select options...",
+        "verificationRequests": "Verification Requests",
+        "storeVerification": "Store Verification"
     },
     "upgradeRequired": "You have reached your {{feature}} limit. Please upgrade your plan.",
     "errorCheckingLimits": "Error checking subscription limits",
@@ -127,6 +129,8 @@
     "addons": "Add-ons",
     "deliveryDrivers": "Store Drivers",
     "driverVerification": "Driver Verification",
+    "storeVerification": "Store Verification",
+    "verificationRequests": "Verification Requests",
     "deliveryDashboard": "Driver Dashboard",
     "analytics": "Analytics",
     "settlements": "Cash Settlement",
