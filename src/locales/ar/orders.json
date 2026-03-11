@@ -59,6 +59,7 @@
     "orderDelivered": "تم توصيل الطلب بنجاح",
     "searchDriverPlaceholder": "البحث باسم السائق، البريد الإلكتروني أو الهاتف...",
     "reassignDriver": "إعادة تعيين السائق",
+    "unassignDriver": "إلغاء تعيين السائق",
     "selectDriverMessage": "اختر سائقًا لتولي عملية التوصيل:",
     "driverStatusBusy": "مشغول",
     "driverStatusAvailable": "متاح",
@@ -103,5 +104,7 @@
     "pendingRevenue": "الأرباح المعلقة",
     "todayPendingRevenue": "الأرباح المعلقة اليوم",
     "totalPendingRevenue": "إجمالي الأرباح المعلقة",
-    "confirmedRevenue": "الأرباح المؤكدة"
+    "confirmedRevenue": "الأرباح المؤكدة",
+    "adjustSearch": "حاول تعديل البحث",
+    "showingResults": "عرض {{start}}-{{end}} من أصل {{total}} نتيجة"
 }

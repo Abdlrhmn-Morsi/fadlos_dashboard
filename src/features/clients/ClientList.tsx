@@ -168,7 +168,7 @@ const ClientList = () => {
         setSelectedOrder(null);
         try {
             setLoadingOrders(true);
-            const response: any = await clientsApi.getClientOrders(clientData.clientId);
+            const response: any = await clientsApi.getClientOrders(clientData.customerId);
             setClientOrders(response.data || response.orders || []);
         } catch (error) {
             console.error('Failed to fetch client orders', error);

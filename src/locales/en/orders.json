@@ -69,6 +69,7 @@
     "onTheWay": "On The Way",
     "activeTasks": "Active",
     "reassignDriver": "Reassign Driver",
+    "unassignDriver": "Unassign Driver",
     "statusHistory": "Status History",
     "cancellationReason": "Cancellation Reason",
     "cashSettlement": "Cash Settlement",
@@ -103,5 +104,7 @@
     "pendingRevenue": "Pending Revenue",
     "todayPendingRevenue": "Today's Pending Revenue",
     "totalPendingRevenue": "Total Pending Revenue",
-    "confirmedRevenue": "Confirmed Revenue"
+    "confirmedRevenue": "Confirmed Revenue",
+    "adjustSearch": "Try adjusting your search",
+    "showingResults": "Showing {{start}}-{{end}} of {{total}} results"
 }

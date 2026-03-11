@@ -75,6 +75,13 @@ export const ordersApi = {
     },
 
     /**
+     * Unassign a driver from an order
+     */
+    unassignDriver: async (id: string) => {
+        return apiService.patch(`/orders/${id}/unassign-driver`);
+    },
+
+    /**
      * Confirm delivery (Driver)
      */
     confirmDelivery: async (id: string, pin: string, proofImage?: File) => {
