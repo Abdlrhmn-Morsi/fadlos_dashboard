@@ -1330,7 +1330,7 @@ const ProductForm = () => {
                             <div className="space-y-4">
                                 <InputGroup label={t('price')} required>
                                     <div className="relative">
-                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500 start-3">$</span>
+                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-indigo-500 start-3">{t('common:currencySymbol')}</span>
                                         <input
                                             type="number"
                                             step="0.01"
@@ -1355,7 +1355,7 @@ const ProductForm = () => {
                                     subtitle={t('comparePriceSubtitle')}
                                 >
                                     <div className="relative group/price">
-                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 start-3">$</span>
+                                        <span className="absolute top-1/2 -translate-y-1/2 text-slate-500 start-3">{t('common:currencySymbol')}</span>
                                         <input
                                             type="number"
                                             step="0.01"

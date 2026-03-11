@@ -240,10 +240,10 @@ const PromoCodeList = () => {
                                                     <DollarSign size={14} className="text-emerald-500" />
                                                 )}
                                                 <span className="font-bold text-slate-700 dark:text-slate-200">
-                                                    {promo.type === 'percentage' ? `${promo.value}%` : `${Number(promo.value).toFixed(2)}$`}
+                                                    {promo.type === 'percentage' ? `${promo.value}%` : `${Number(promo.value).toFixed(2)} ${t('common:currencySymbol')}`}
                                                 </span>
                                             </div>
-                                            <span className="text-[10px] text-slate-400 block">{t('minOrder')}: {Number(promo.minOrderAmount || 0)}$</span>
+                                            <span className="text-[10px] text-slate-400 block">{t('minOrder')}: {Number(promo.minOrderAmount || 0)} {t('common:currencySymbol')}</span>
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="space-y-1">

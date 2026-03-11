@@ -40,7 +40,7 @@
     "discountType": "Discount Type",
     "discountValue": "Discount Value",
     "percentage": "Percentage (%)",
-    "fixedAmount": "Fixed Amount ($)",
+    "fixedAmount": "Fixed Amount ({{currency}})",
     "minOrderAmount": "Minimum Order Amount",
     "minOrderAmountSubtitle": "Only applies if order total is above this.",
     "maxDiscountAmount": "Max Discount Amount",

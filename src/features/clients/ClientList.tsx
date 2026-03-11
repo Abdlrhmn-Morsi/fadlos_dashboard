@@ -403,9 +403,9 @@ const ClientList = () => {
                                             <td className="px-6 py-5">
                                                 <div className="flex flex-col">
                                                     <span className="text-primary font-black text-lg tracking-tight">
-                                                        {Number(stats?.totalSpent || 0).toFixed(2)}$
+                                                        {Number(stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}
                                                     </span>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">{t('avg')} {Number(stats?.averageOrderValue || 0).toFixed(2)}$</span>
+                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">{t('avg')} {Number(stats?.averageOrderValue || 0).toFixed(2)} {t('common:currencySymbol')}</span>
                                                 </div>
                                             </td>
 
@@ -507,7 +507,7 @@ const ClientList = () => {
                                                     </div>
                                                 </div>
                                                 <div className={clsx(isRTL ? "text-left" : "text-right")}>
-                                                    <p className="text-lg font-black text-slate-900 dark:text-white leading-tight">{Number(order.total).toFixed(2)}$</p>
+                                                    <p className="text-lg font-black text-slate-900 dark:text-white leading-tight">{Number(order.total).toFixed(2)} {t('common:currencySymbol')}</p>
                                                     <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{t('orders:itemsCount', { count: order.items?.length || 0 })}</p>
                                                 </div>
                                             </div>
@@ -592,9 +592,9 @@ const ClientList = () => {
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex justify-between items-start">
                                                                 <p className="font-bold text-slate-900 dark:text-white text-sm truncate uppercase tracking-tighter">{item.productName}</p>
-                                                                <p className="font-black text-slate-900 dark:text-white text-sm tracking-tighter">{Number(item.price * item.quantity).toFixed(2)}$</p>
+                                                                <p className="font-black text-slate-900 dark:text-white text-sm tracking-tighter">{Number(item.price * item.quantity).toFixed(2)} {t('common:currencySymbol')}</p>
                                                             </div>
-                                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">{t('qty')}: {item.quantity} × {Number(item.price).toFixed(2)}$</p>
+                                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">{t('qty')}: {item.quantity} × {Number(item.price).toFixed(2)} {t('common:currencySymbol')}</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -605,23 +605,23 @@ const ClientList = () => {
                                         <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
                                             <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tighter">
                                                 <span>{t('subtotal')}</span>
-                                                <span className="text-slate-900 dark:text-white">{Number(selectedOrder.subtotal).toFixed(2)}$</span>
+                                                <span className="text-slate-900 dark:text-white">{Number(selectedOrder.subtotal).toFixed(2)} {t('common:currencySymbol')}</span>
                                             </div>
                                             {Number(selectedOrder.promoDiscount) > 0 && (
                                                 <div className="flex justify-between text-xs font-bold text-emerald-500 uppercase tracking-tighter">
                                                     <span>{t('discount')}</span>
-                                                    <span>-{Number(selectedOrder.promoDiscount).toFixed(2)}$</span>
+                                                    <span>-{Number(selectedOrder.promoDiscount).toFixed(2)} {t('common:currencySymbol')}</span>
                                                 </div>
                                             )}
                                             {Number(selectedOrder.deliveryFee) > 0 && (
                                                 <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tighter">
                                                     <span>{t('delivery')}</span>
-                                                    <span className="text-slate-900 dark:text-white">+{Number(selectedOrder.deliveryFee).toFixed(2)}$</span>
+                                                    <span className="text-slate-900 dark:text-white">+{Number(selectedOrder.deliveryFee).toFixed(2)} {t('common:currencySymbol')}</span>
                                                 </div>
                                             )}
                                             <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
                                                 <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.1em]">{t('totalPaid')}</span>
-                                                <span className="text-2xl font-black text-primary tracking-tighter">{Number(selectedOrder.total).toFixed(2)}$</span>
+                                                <span className="text-2xl font-black text-primary tracking-tighter">{Number(selectedOrder.total).toFixed(2)} {t('common:currencySymbol')}</span>
                                             </div>
                                         </div>
 
@@ -708,7 +708,7 @@ const ClientList = () => {
                                 <div className="grid grid-cols-2 gap-4">
                                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('lifetimeValue')}</p>
-                                        <p className="text-xl font-black text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)}$</p>
+                                        <p className="text-xl font-black text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}</p>
                                     </div>
                                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('totalPurchases')}</p>

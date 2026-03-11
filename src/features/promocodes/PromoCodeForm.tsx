@@ -477,7 +477,7 @@ const PromoCodeForm = () => {
                                         onChange={e => setFormData({ ...formData, type: e.target.value })}
                                     >
                                         <option value="percentage">{t('percentage')}</option>
-                                        <option value="fixed_amount">{t('fixedAmount')}</option>
+                                        <option value="fixed_amount">{t('fixedAmount', { currency: t('common:currencySymbol') })}</option>
                                     </select>
                                 </InputGroup>
 

@@ -40,7 +40,7 @@
     "discountType": "نوع الخصم",
     "discountValue": "قيمة الخصم",
     "percentage": "نسبة مئوية (%)",
-    "fixedAmount": "مبلغ ثابت ($)",
+    "fixedAmount": "مبلغ ثابت ({{currency}})",
     "minOrderAmount": "الحد الأدنى لمبلغ الطلب",
     "minOrderAmountSubtitle": "ينطبق فقط إذا كان إجمالي الطلب أعلى من هذا.",
     "maxDiscountAmount": "أقصى مبلغ للخصم",

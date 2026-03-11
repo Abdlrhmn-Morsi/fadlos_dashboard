@@ -222,13 +222,13 @@ const PlansManagement: React.FC = () => {
                                             isPremium ? "text-slate-400" : "text-slate-400"
                                         )}>{t('admin.monthlyPrice')}</label>
                                         <div className="relative">
-                                            <span className={clsx("absolute left-4 top-1/2 -translate-y-1/2 font-bold", isPremium ? "text-slate-500" : "text-slate-400")}>$</span>
+                                            <span className={clsx("absolute start-4 top-1/2 -translate-y-1/2 font-bold", isPremium ? "text-slate-500" : "text-slate-400")}>{t('common:currencySymbol')}</span>
                                             <input
                                                 type="number"
                                                 value={plan.priceMonthly}
                                                 onChange={(e) => setPlans(plans.map(p => p.id === plan.id ? { ...p, priceMonthly: parseFloat(e.target.value) } : p))}
                                                 className={clsx(
-                                                    "w-full border-2 rounded-2xl py-3 pl-8 pr-4 font-black transition-all outline-none",
+                                                    "w-full border-2 rounded-2xl py-3 ps-10 pe-4 font-black transition-all outline-none",
                                                     isPremium ? "bg-slate-800/50 border-slate-700 text-white focus:border-white" : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:border-primary"
                                                 )}
                                             />
@@ -241,13 +241,13 @@ const PlansManagement: React.FC = () => {
                                             isPremium ? "text-slate-400" : "text-slate-400"
                                         )}>{t('admin.yearlyPrice')}</label>
                                         <div className="relative">
-                                            <span className={clsx("absolute left-4 top-1/2 -translate-y-1/2 font-bold", isPremium ? "text-slate-500" : "text-slate-400")}>$</span>
+                                            <span className={clsx("absolute start-4 top-1/2 -translate-y-1/2 font-bold", isPremium ? "text-slate-500" : "text-slate-400")}>{t('common:currencySymbol')}</span>
                                             <input
                                                 type="number"
                                                 value={plan.priceYearly}
                                                 onChange={(e) => setPlans(plans.map(p => p.id === plan.id ? { ...p, priceYearly: parseFloat(e.target.value) } : p))}
                                                 className={clsx(
-                                                    "w-full border-2 rounded-2xl py-3 pl-8 pr-4 font-black transition-all outline-none",
+                                                    "w-full border-2 rounded-2xl py-3 ps-10 pe-4 font-black transition-all outline-none",
                                                     isPremium ? "bg-slate-800/50 border-slate-700 text-white focus:border-white" : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:border-primary"
                                                 )}
                                             />
