@@ -37,6 +37,7 @@ export enum Permissions {
     ORDERS_VIEW = 'orders.view',
     ORDERS_UPDATE = 'orders.update',
     ORDERS_CANCEL = 'orders.cancel',
+    ORDERS_ASSIGN_DRIVER = 'orders.assign_driver',
 
     // Analytics
     ANALYTICS_VIEW = 'analytics.view',

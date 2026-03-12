@@ -391,6 +391,7 @@
     "activate": "Activate",
     "leaveBlankToKeepCurrent": "Leave blank to keep current",
     "assignToBranch": "Assign to Branch",
+    "branch": "Branch",
     "allBranches": "All Branches (Super Access)",
     "branchAssignmentDesc": "Leave empty to allow employee to manage all branches",
     "branchOrderManager": "Branch Order Manager",
@@ -495,11 +496,15 @@
             },
             "update": {
                 "name": "Update Order Status",
-                "description": "• Change order status (Preparing, Ready, etc.)\n• Assign store drivers\n• Update fulfillment notes"
+                "description": "• Change order status (Preparing, Ready, etc.)"
             },
             "cancel": {
                 "name": "Cancel Orders",
-                "description": "• Cancel customer orders\n• Process order rejections"
+                "description": "• Cancel customer orders\n• Return customer orders\n• Process order rejections"
+            },
+            "assign_driver": {
+                "name": "Assign Delivery Driver",
+                "description": "• Assign orders to drivers\n• Reassign or unassign drivers from orders"
             }
         },
         "analytics": {

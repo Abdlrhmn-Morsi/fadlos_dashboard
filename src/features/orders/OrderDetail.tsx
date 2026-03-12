@@ -922,7 +922,7 @@ const OrderDetail = () => {
                         )}
 
                         {/* Logistics Section */}
-                        {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+                        {((user?.role === UserRole.STORE_OWNER) || (user?.role === UserRole.EMPLOYEE && hasPermission('orders.assign_driver'))) && (
                             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 p-6">
                                 <h3 className="font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-2">
                                     <Truck className="text-indigo-500" size={20} />

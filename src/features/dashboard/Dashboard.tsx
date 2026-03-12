@@ -155,9 +155,9 @@ const Dashboard: React.FC = () => {
                     }
                 }
 
-                // Fetch subscription usage for store owners
-                if (user?.role !== UserRole.STORE_OWNER && user?.role !== UserRole.EMPLOYEE) {
-                    // Skip for admin roles
+                // Fetch subscription usage for store owners only
+                if (user?.role !== UserRole.STORE_OWNER) {
+                    // Skip for non-store-owner roles
                 } else {
                     try {
                         const subCacheKey = 'subscription-usage';
@@ -636,7 +636,26 @@ const Dashboard: React.FC = () => {
             {renderStatusBanner()}
             {renderGracePeriodBanner()}
 
-
+            {user?.role === UserRole.EMPLOYEE && user?.profile?.employee?.branch && (
+                <div className={clsx(
+                    "bg-primary/10 border border-primary/20 rounded-lg p-4 flex items-center gap-3",
+                    isRTL && "flex-row-reverse"
+                )}>
+                    <div className="bg-primary/20 p-2 rounded-full text-primary">
+                        <Store size={20} />
+                    </div>
+                    <div className={clsx("flex-1", isRTL ? "text-right" : "text-left")}>
+                        <p className="text-xs font-bold text-primary/80 uppercase tracking-widest mb-0.5">
+                            {t('common:branch')}
+                        </p>
+                        <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                            {isRTL
+                                ? [user.profile.employee.branch.town?.arName || user.profile.employee.branch.town?.enName, user.profile.employee.branch.place?.arName || user.profile.employee.branch.place?.enName, user.profile.employee.branch.addressAr || user.profile.employee.branch.addressEn].filter(Boolean).join(' - ')
+                                : [user.profile.employee.branch.town?.enName || user.profile.employee.branch.town?.arName, user.profile.employee.branch.place?.enName || user.profile.employee.branch.place?.arName, user.profile.employee.branch.addressEn || user.profile.employee.branch.addressAr].filter(Boolean).join(' - ')}
+                        </p>
+                    </div>
+                </div>
+            )}
 
             {/* Main Content Grid: Stats, Summary, Best Deal */}
             <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
@@ -953,7 +972,7 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* Subscription & Management Section - Moved to bottom */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
+            {user?.role === UserRole.STORE_OWNER && (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-stretch pt-4">
                     {/* My Plan Card */}
                     {subscription && (() => {

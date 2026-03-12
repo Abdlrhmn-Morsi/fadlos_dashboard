@@ -10,12 +10,15 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useCache } from '../../contexts/CacheContext';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
+import { useAuth } from '../../contexts/AuthContext';
+import { UserRole } from '../../types/user-role';
 
 const OrderList = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
     const { getCache, setCache } = useCache();
+    const { user } = useAuth();
     const [orders, setOrders] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [statusFilter, setStatusFilter] = useState('');
@@ -299,26 +302,28 @@ const OrderList = () => {
                             onChange={(e) => setCustomerNameFilter(e.target.value)}
                         />
                     </div>
-                    <div className="relative">
-                        <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
-                        <select
-                            className={clsx(
-                                "pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none w-48",
-                                isRTL && "text-right"
-                            )}
-                            value={branchFilter}
-                            onChange={(e) => setBranchFilter(e.target.value)}
-                        >
-                            <option value="">{t('allBranches')}</option>
-                            {Array.isArray(branches) && branches.map(branch => (
-                                <option key={branch.id} value={branch.id}>
-                                    {isRTL
-                                        ? [branch.town?.arName || branch.town?.enName, branch.place?.arName || branch.place?.enName, branch.addressAr || branch.addressEn].filter(Boolean).join(' - ')
-                                        : [branch.town?.enName || branch.town?.arName, branch.place?.enName || branch.place?.arName, branch.addressEn || branch.addressAr].filter(Boolean).join(' - ')}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
+                    {!(user?.role === UserRole.EMPLOYEE && (user?.profile?.employee?.branchId || (user?.employeeRole as any)?.branchId)) && (
+                        <div className="relative">
+                            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                            <select
+                                className={clsx(
+                                    "pl-10 pr-4 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded focus:ring-primary outline-none w-48",
+                                    isRTL && "text-right"
+                                )}
+                                value={branchFilter}
+                                onChange={(e) => setBranchFilter(e.target.value)}
+                            >
+                                <option value="">{t('allBranches')}</option>
+                                {Array.isArray(branches) && branches.map(branch => (
+                                    <option key={branch.id} value={branch.id}>
+                                        {isRTL
+                                            ? [branch.town?.arName || branch.town?.enName, branch.place?.arName || branch.place?.enName, branch.addressAr || branch.addressEn].filter(Boolean).join(' - ')
+                                            : [branch.town?.enName || branch.town?.arName, branch.place?.enName || branch.place?.arName, branch.addressEn || branch.addressAr].filter(Boolean).join(' - ')}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    )}
                     <div className="relative">
                         <input
                             type="date"

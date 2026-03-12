@@ -20,6 +20,7 @@ interface User {
         name: string;
         permissions: string[];
     };
+    profile?: any;
     subscription?: {
         plan: string;
         status: string | null;

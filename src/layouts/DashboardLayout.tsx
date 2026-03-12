@@ -362,12 +362,17 @@ const DashboardLayout: React.FC = () => {
                   </>
                 )}
 
-              {!collapsed && (
-                <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                )}>
-                  {t('team')}
-                </div>
+              {(hasPermission(Permissions.EMPLOYEES_VIEW) || hasPermission(Permissions.ROLES_MANAGE) || hasPermission(Permissions.DELIVERY_DRIVERS_VIEW)) && (
+                <>
+                  {!collapsed && (
+                    <div className={clsx(
+                      "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
+                    )}>
+                      {t('team')}
+                    </div>
+                  )}
+                  {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+                </>
               )}
               {hasPermission(Permissions.EMPLOYEES_VIEW) && (
                 <SidebarItem to="/employees" icon={Users} label={t('employees')} collapsed={collapsed} />
@@ -379,18 +384,22 @@ const DashboardLayout: React.FC = () => {
                 <SidebarItem to="/delivery-drivers" icon={Truck} label={t('deliveryDrivers')} collapsed={collapsed} />
               )}
 
-              {!collapsed && (
-                <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                )}>
-                  {t('subscriptions:title')}
-                </div>
-              )}
-              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+              {user?.role === UserRole.STORE_OWNER && (
+                <>
+                  {!collapsed && (
+                    <div className={clsx(
+                      "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
+                    )}>
+                      {t('subscriptions:title')}
+                    </div>
+                  )}
+                  {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-              <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:currentPlan')} collapsed={collapsed} />
-              <SidebarItem to="/billing-history" icon={DollarSign} label={t('subscriptions:billingHistory.title')} collapsed={collapsed} />
-              <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
+                  <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:currentPlan')} collapsed={collapsed} />
+                  <SidebarItem to="/billing-history" icon={DollarSign} label={t('subscriptions:billingHistory.title')} collapsed={collapsed} />
+                  <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
+                </>
+              )}
             </>
           )}
 

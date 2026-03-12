@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Users, Power, PowerOff, ShieldAlert } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Users, Power, PowerOff, ShieldAlert, MapPin } from 'lucide-react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { EmployeesService } from '../api/employees.api';
@@ -241,6 +241,7 @@ const EmployeesList = () => {
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('employee', { defaultValue: 'Employee' })}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('role', { defaultValue: 'Role' })}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('branch', { defaultValue: 'Branch' })}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('contact', { defaultValue: 'Contact' })}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
                                 <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>{t('actions')}</th>
@@ -252,6 +253,7 @@ const EmployeesList = () => {
                                     <tr key={i} className="animate-pulse">
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-28"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-40"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
                                         <td className="px-6 py-4"></td>
@@ -259,7 +261,7 @@ const EmployeesList = () => {
                                 ))
                             ) : employees.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center">
+                                    <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
                                             <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full mb-4">
                                                 <Users size={48} strokeWidth={1} className="text-slate-300 dark:text-slate-600" />
@@ -300,6 +302,22 @@ const EmployeesList = () => {
                                             <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400">
                                                 {emp.employeeRole?.name || t(emp.role)}
                                             </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            {(emp as any).branch ? (
+                                                <div className="flex items-center gap-1.5 text-sm text-slate-600 dark:text-slate-400">
+                                                    <MapPin size={14} className="text-indigo-400 flex-shrink-0" />
+                                                    <span className="text-sm leading-snug">
+                                                        {isRTL
+                                                            ? [(emp as any).branch?.town?.arName || (emp as any).branch?.town?.enName, (emp as any).branch?.place?.arName || (emp as any).branch?.place?.enName, (emp as any).branch?.addressAr || (emp as any).branch?.addressEn].filter(Boolean).join(' - ')
+                                                            : [(emp as any).branch?.town?.enName || (emp as any).branch?.town?.arName, (emp as any).branch?.place?.enName || (emp as any).branch?.place?.arName, (emp as any).branch?.addressEn || (emp as any).branch?.addressAr].filter(Boolean).join(' - ')}
+                                                    </span>
+                                                </div>
+                                            ) : (
+                                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400">
+                                                    {t('allBranches', { defaultValue: 'All Branches' })}
+                                                </span>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
                                             <div className="flex flex-col gap-1">

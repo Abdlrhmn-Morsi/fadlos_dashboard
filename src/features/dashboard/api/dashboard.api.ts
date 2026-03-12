@@ -59,7 +59,16 @@ export const fetchDashboardStats = async (user: any) => {
             // 1. Order Stats (Requires orders.view OR analytics.view)
             if (hasPerm(Permissions.ORDERS_VIEW) || hasPerm(Permissions.ANALYTICS_VIEW)) {
                 try {
-                    const basicStats = await apiService.get('/orders/stats/basic');
+                    let basicStatsUrl = '/orders/stats/basic';
+                    if (userRole === UserRole.EMPLOYEE && user.employeeRole?.branchId) {
+                        basicStatsUrl += `?branchId=${user.employeeRole.branchId}`;
+                    } else if (userRole === UserRole.EMPLOYEE && user.branchId) {
+                        basicStatsUrl += `?branchId=${user.branchId}`;
+                    } else if (userRole === UserRole.EMPLOYEE && user.profile?.employee?.branchId) {
+                        basicStatsUrl += `?branchId=${user.profile.employee.branchId}`;
+                    }
+                    
+                    const basicStats = await apiService.get(basicStatsUrl);
                     const data = basicStats.data || basicStats;
 
                     stats.totalRevenue = data.totalRevenue || 0;
