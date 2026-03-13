@@ -16,6 +16,13 @@ export const clientsApi = {
      */
     getClientOrders: async (clientId: string, params?: any) => {
         return apiService.get(`/store/clients/${clientId}/orders`, { params });
+    },
+
+    /**
+     * Sync/recalculate all client stats
+     */
+    syncClientStats: async () => {
+        return apiService.post('/store/clients/sync-stats');
     }
 };
 

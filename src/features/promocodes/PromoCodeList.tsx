@@ -14,10 +14,11 @@ import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
+import StatusModal from '../../components/common/StatusModal';
 
 const PromoCodeList = () => {
     const { t } = useTranslation(['promocodes', 'common']);
-    const { isRTL } = useLanguage();
+    const { isRTL, language } = useLanguage();
     const { hasPermission } = useAuth();
     const { getCache, setCache, invalidateCache } = useCache();
     const navigate = useNavigate();
@@ -29,6 +30,8 @@ const PromoCodeList = () => {
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [totalItems, setTotalItems] = useState(0);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [promoToDelete, setPromoToDelete] = useState<string | null>(null);
 
     // Debounce search term
     useEffect(() => {
@@ -91,32 +94,41 @@ const PromoCodeList = () => {
 
             // Invalidate cache
             invalidateCache('promocodes');
-        } catch (error) {
+        } catch (error: any) {
             console.error('Failed to toggle status', error);
-            toast.error(t('common:errorUpdatingData'));
+            const message = error.response?.data?.message || t('common:errorUpdatingStatus');
+            const errorMsgKey = Array.isArray(message) ? message[0] : message;
+            toast.error(t(`common:${errorMsgKey}`, { defaultValue: t('common:errorUpdatingStatus') }));
         }
     };
 
-    const handleDelete = async (id: string) => {
-        if (window.confirm(t('deleteConfirmation'))) {
-            try {
-                await promoCodesApi.deletePromoCode(id);
-                setPromoCodes(prev => prev.filter(p => p.id !== id));
-                toast.success(t('common:success'));
+    const confirmDelete = (id: string) => {
+        setPromoToDelete(id);
+        setIsDeleteModalOpen(true);
+    };
 
-                // Invalidate cache
-                invalidateCache('promocodes');
+    const handleDelete = async () => {
+        if (!promoToDelete) return;
+        
+        try {
+            await promoCodesApi.deletePromoCode(promoToDelete);
+            setPromoCodes(prev => prev.filter(p => p.id !== promoToDelete));
+            toast.success(t('common:success'));
 
-                // If we're on a page and delete the last item, we should probably go back a page
-                if (promoCodes.length === 1 && page > 1) {
-                    setPage(page - 1);
-                } else {
-                    fetchPromoCodes(); // Refresh data to get next item from next page if available
-                }
-            } catch (error) {
-                console.error('Failed to delete promo code', error);
-                toast.error(t('common:errorUpdatingData'));
+            // Invalidate cache
+            invalidateCache('promocodes');
+
+            // If we're on a page and delete the last item, we should probably go back a page
+            if (promoCodes.length === 1 && page > 1) {
+                setPage(page - 1);
+            } else {
+                fetchPromoCodes(); // Refresh data to get next item from next page if available
             }
+        } catch (error) {
+            console.error('Failed to delete promo code', error);
+            toast.error(t('common:errorUpdatingData'));
+        } finally {
+            setPromoToDelete(null);
         }
     };
 
@@ -221,7 +233,7 @@ const PromoCodeList = () => {
                                                     </div>
                                                     <div className="flex items-center gap-2 mt-0.5">
                                                         <span className="text-[10px] text-slate-400 block uppercase font-bold truncate max-w-[150px]">
-                                                            {promo.description || t('common:noDescription')}
+                                                            {language === 'ar' ? (promo.descriptionAr || promo.description) : (promo.descriptionEn || promo.description)}
                                                         </span>
                                                         {promo.ruleType && promo.ruleType !== 'none' && (
                                                             <span className="text-[9px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-1 rounded border border-slate-200 dark:border-slate-700">
@@ -299,7 +311,7 @@ const PromoCodeList = () => {
                                                 )}
                                                 {hasPermission(Permissions.PROMO_CODES_DELETE) && (
                                                     <button
-                                                        onClick={() => handleDelete(promo.id)}
+                                                        onClick={() => confirmDelete(promo.id)}
                                                         className="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
                                                         title={t('delete')}
                                                     >
@@ -334,6 +346,20 @@ const PromoCodeList = () => {
                     </div>
                 </div>
             </div>
+
+            <StatusModal
+                isOpen={isDeleteModalOpen}
+                onClose={() => {
+                    setIsDeleteModalOpen(false);
+                    setPromoToDelete(null);
+                }}
+                type="confirm"
+                title={t('deleteConfirmationTitle')}
+                message={t('deleteConfirmationMessage')}
+                onConfirm={handleDelete}
+                confirmText={t('delete')}
+                cancelText={t('common:cancel')}
+            />
         </div>
     );
 };

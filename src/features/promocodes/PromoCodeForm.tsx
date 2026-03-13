@@ -202,9 +202,7 @@ const PromoCodeForm = () => {
             };
 
             if (isEditMode) {
-                // Remove 'code' from payload for updates, as it's not allowed in UpdatePromoCodeDto
-                const { code, ...updatePayload } = payload;
-                await promoCodesApi.updatePromoCode(id!, updatePayload);
+                await promoCodesApi.updatePromoCode(id!, payload);
                 toast.success(t('common:success'));
             } else {
                 await promoCodesApi.createPromoCode(payload);

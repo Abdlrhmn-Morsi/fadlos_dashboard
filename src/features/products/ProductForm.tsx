@@ -427,35 +427,48 @@ const ProductForm = () => {
             // BUT: If I reuse `productsApi`, it uses `axios`. `axios` handles FormData.
 
             // Let's try appending indices.
-            formData.variants.forEach((variant, vIdx) => {
-                data.append(`variants[${vIdx}][name]`, variant.name);
-                data.append(`variants[${vIdx}][nameAr]`, variant.nameAr);
-                data.append(`variants[${vIdx}][isColor]`, String(variant.isColor));
-                data.append(`variants[${vIdx}][isRequired]`, String(variant.isRequired));
-                data.append(`variants[${vIdx}][sortOrder]`, variant.sortOrder);
-                if (variant.id) data.append(`variants[${vIdx}][id]`, variant.id);
-
-                variant.values.forEach((val, valIdx) => {
-                    data.append(`variants[${vIdx}][values][${valIdx}][value]`, val.value);
-                    data.append(`variants[${vIdx}][values][${valIdx}][valueAr]`, val.valueAr);
-                    if (val.hex) data.append(`variants[${vIdx}][values][${valIdx}][hex]`, val.hex);
-                    data.append(`variants[${vIdx}][values][${valIdx}][price]`, val.price);
-                    data.append(`variants[${vIdx}][values][${valIdx}][sortOrder]`, val.sortOrder);
-                    data.append(`variants[${vIdx}][values][${valIdx}][inventory]`, val.inventory);
-                    data.append(`variants[${vIdx}][values][${valIdx}][trackInventory]`, String(val.trackInventory));
-                    if (val.id) data.append(`variants[${vIdx}][values][${valIdx}][id]`, val.id);
-                });
-            });
-
             // Append related product IDs
-            formData.relatedProductIds.forEach((prodId, idx) => {
-                data.append(`relatedProductIds[${idx}]`, prodId);
-            });
+            if (formData.relatedProductIds.length === 0) {
+                data.append('relatedProductIds', '');
+            } else {
+                formData.relatedProductIds.forEach((prodId, idx) => {
+                    data.append(`relatedProductIds[${idx}]`, prodId);
+                });
+            }
 
             // Append addon IDs
-            formData.addonIds.forEach((addonId, idx) => {
-                data.append(`addonIds[${idx}]`, addonId);
-            });
+            if (formData.addonIds.length === 0) {
+                data.append('addonIds', '');
+            } else {
+                formData.addonIds.forEach((addonId, idx) => {
+                    data.append(`addonIds[${idx}]`, addonId);
+                });
+            }
+
+            // Append variants
+            if (formData.variants.length === 0) {
+                data.append('variants', '');
+            } else {
+                formData.variants.forEach((variant, vIdx) => {
+                    data.append(`variants[${vIdx}][name]`, variant.name);
+                    data.append(`variants[${vIdx}][nameAr]`, variant.nameAr);
+                    data.append(`variants[${vIdx}][isColor]`, String(variant.isColor));
+                    data.append(`variants[${vIdx}][isRequired]`, String(variant.isRequired));
+                    data.append(`variants[${vIdx}][sortOrder]`, variant.sortOrder);
+                    if (variant.id) data.append(`variants[${vIdx}][id]`, variant.id);
+
+                    variant.values.forEach((val, valIdx) => {
+                        data.append(`variants[${vIdx}][values][${valIdx}][value]`, val.value);
+                        data.append(`variants[${vIdx}][values][${valIdx}][valueAr]`, val.valueAr);
+                        if (val.hex) data.append(`variants[${vIdx}][values][${valIdx}][hex]`, val.hex);
+                        data.append(`variants[${vIdx}][values][${valIdx}][price]`, val.price);
+                        data.append(`variants[${vIdx}][values][${valIdx}][sortOrder]`, val.sortOrder);
+                        data.append(`variants[${vIdx}][values][${valIdx}][inventory]`, val.inventory);
+                        data.append(`variants[${vIdx}][values][${valIdx}][trackInventory]`, String(val.trackInventory));
+                        if (val.id) data.append(`variants[${vIdx}][values][${valIdx}][id]`, val.id);
+                    });
+                });
+            }
 
 
             // Append cover image

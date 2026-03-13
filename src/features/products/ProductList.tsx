@@ -331,7 +331,7 @@ const ProductList = () => {
                                     <tr key={product.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200">
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-4">
-                                                <div className="relative">
+                                                <div className="relative flex-shrink-0">
                                                     {product.coverImage ? (
                                                         <ImageWithFallback src={product.coverImage} alt={product.name} className="w-16 h-16 rounded-lg object-cover border border-slate-100 dark:border-slate-700 shadow-sm group-hover:scale-105 transition-transform duration-200" />
                                                     ) : (

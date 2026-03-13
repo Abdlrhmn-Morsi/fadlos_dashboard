@@ -213,6 +213,12 @@
         "targetFirstNOrdersDesc": "Highest number of orders",
         "targetLastNOrders": "Least Active",
         "targetLastNOrdersDesc": "Lowest number of orders",
+        "targetFirstNDelivered": "Most Delivered",
+        "targetFirstNDeliveredDesc": "Highest delivered orders",
+        "targetLastNDelivered": "Least Delivered",
+        "targetLastNDeliveredDesc": "Lowest delivered orders",
+        "firstNDeliveredHint": "Top {{count}} clients by delivered orders",
+        "lastNDeliveredHint": "Lowest {{count}} clients by delivered orders",
         "history": "History",
         "historyDesc": "View sent promotions",
         "promotionAdHistory": "Promotion History",
@@ -260,7 +266,9 @@
             "highest_lifetime_value": "Highest lifetime value",
             "lowest_lifetime_value": "Lowest lifetime value",
             "highest_orders": "Highest number of orders",
-            "lowest_orders": "Lowest number of orders"
+            "lowest_orders": "Lowest number of orders",
+            "most_delivered": "Most delivered orders",
+            "least_delivered": "Least delivered orders"
         },
         "date": "Date",
         "message_header": "Message",

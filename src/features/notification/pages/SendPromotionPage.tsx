@@ -23,7 +23,7 @@ import toast from 'react-hot-toast';
 
 import clientsApi from '../../clients/api/clients.api';
 
-type TargetMode = 'all' | 'first_n' | 'last_n' | 'individual' | 'first_n_spent' | 'last_n_spent' | 'first_n_orders' | 'last_n_orders';
+type TargetMode = 'all' | 'first_n' | 'last_n' | 'individual' | 'first_n_spent' | 'last_n_spent' | 'first_n_orders' | 'last_n_orders' | 'first_n_delivered' | 'last_n_delivered';
 
 const SendPromotionPage: React.FC = () => {
     const { t } = useTranslation(['subscriptions', 'common']);
@@ -255,6 +255,21 @@ const SendPromotionPage: React.FC = () => {
                     setLoading(false);
                     return;
                 }
+            } else if (targetMode === 'first_n_delivered' || targetMode === 'last_n_delivered') {
+                if (!storeId) return;
+                const order = targetMode === 'first_n_delivered' ? 'DESC' : 'ASC';
+                const res: any = await clientsApi.getStoreClients({
+                    page: 1,
+                    limit: selectCount,
+                    sortBy: 'deliveredOrders',
+                    order,
+                });
+                targetIds = (res.data || []).map((c: any) => c.clientId);
+                if (!targetIds.length) {
+                    toast.error(t('promotions.noTargets', 'No clients found'));
+                    setLoading(false);
+                    return;
+                }
             } else if (targetMode === 'individual') {
                 if (selectedIds.length === 0) {
                     toast.error(t('promotions.noTargets', 'Select at least one user'));
@@ -317,6 +332,18 @@ const SendPromotionPage: React.FC = () => {
             icon: ArrowDown,
             label: t('promotions.targetLastNOrders', 'Least Active'),
             desc: t('promotions.targetLastNOrdersDesc', 'Lowest number of orders'),
+        },
+        {
+            key: 'first_n_delivered',
+            icon: ArrowUp,
+            label: t('promotions.targetFirstNDelivered', 'Most Delivered'),
+            desc: t('promotions.targetFirstNDeliveredDesc', 'Highest delivered orders'),
+        },
+        {
+            key: 'last_n_delivered',
+            icon: ArrowDown,
+            label: t('promotions.targetLastNDelivered', 'Least Delivered'),
+            desc: t('promotions.targetLastNDeliveredDesc', 'Lowest delivered orders'),
         },
         {
             key: 'individual',
@@ -478,7 +505,7 @@ const SendPromotionPage: React.FC = () => {
                 </div>
 
                 {/* Count Input for First N / Last N */}
-                {['first_n', 'last_n', 'first_n_spent', 'last_n_spent', 'first_n_orders', 'last_n_orders'].includes(targetMode) && (
+                {['first_n', 'last_n', 'first_n_spent', 'last_n_spent', 'first_n_orders', 'last_n_orders', 'first_n_delivered', 'last_n_delivered'].includes(targetMode) && (
                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
                         <label className="text-xs font-black text-slate-500 uppercase tracking-widest">
                             {source === 'clients' ? t('promotions.selectCountClients', 'Number of clients') : t('promotions.selectCount', 'Number of followers')}
@@ -499,6 +526,8 @@ const SendPromotionPage: React.FC = () => {
                                 {targetMode === 'last_n_spent' && t('promotions.lastNSpentHint', 'Lowest {{count}} spenders', { count: selectCount })}
                                 {targetMode === 'first_n_orders' && t('promotions.firstNOrdersHint', 'Top {{count}} most active clients', { count: selectCount })}
                                 {targetMode === 'last_n_orders' && t('promotions.lastNOrdersHint', 'Lowest {{count}} least active clients', { count: selectCount })}
+                                {targetMode === 'first_n_delivered' && t('promotions.firstNDeliveredHint', 'Top {{count}} clients by delivered orders', { count: selectCount })}
+                                {targetMode === 'last_n_delivered' && t('promotions.lastNDeliveredHint', 'Lowest {{count}} clients by delivered orders', { count: selectCount })}
                             </p>
                         </div>
                     </div>

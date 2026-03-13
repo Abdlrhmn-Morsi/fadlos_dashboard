@@ -4,7 +4,7 @@ import {
     User, ShoppingBag, DollarSign, Calendar,
     Search, ArrowUpDown, ChevronRight, X,
     Loader2, TrendingUp, TrendingDown,
-    Clock, Package, ArrowLeft, Phone, MapPin, Eye, Mail
+    Clock, Package, ArrowLeft, Phone, MapPin, Eye, Mail, RefreshCw
 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -55,6 +55,7 @@ const ClientList = () => {
     const [viewMode, setViewMode] = useState<'list' | 'detail'>('list');
     const [selectedOrder, setSelectedOrder] = useState<any>(null);
     const [loadingOrderDetail, setLoadingOrderDetail] = useState(false);
+    const [syncing, setSyncing] = useState(false);
 
     // Search Debounce
     useEffect(() => {
@@ -262,19 +263,38 @@ const ClientList = () => {
                 </form>
 
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={async () => {
+                            try {
+                                setSyncing(true);
+                                await clientsApi.syncClientStats();
+                                toast.success(t('statsSynced'));
+                                fetchClients();
+                            } catch (error) {
+                                toast.error(t('common:errorFetchingData'));
+                            } finally {
+                                setSyncing(false);
+                            }
+                        }}
+                        disabled={syncing}
+                        className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-emerald-400 transition-all shadow-sm hover:shadow text-emerald-600 font-bold text-xs uppercase disabled:opacity-50 whitespace-nowrap"
+                    >
+                        <RefreshCw size={16} className={syncing ? 'animate-spin' : ''} />
+                        {t('syncStats')}
+                    </button>
                     {hasPermission(Permissions.PROMOTION_ADS_VIEW) && (
                         <button
                             onClick={() => navigate('/promotions/history')}
-                            className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary/50 transition-all shadow-sm hover:shadow text-primary font-bold text-xs uppercase"
+                            className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl hover:border-primary/50 transition-all shadow-sm hover:shadow text-primary font-bold text-xs uppercase whitespace-nowrap"
                         >
                             <Clock size={16} />
-                            <span className="hidden sm:inline">{t('subscriptions:promotions.history')}</span>
+                            {t('subscriptions:promotions.history')}
                         </button>
                     )}
                     {hasPermission(Permissions.PROMOTION_ADS_SEND) && (
                         <button
                             onClick={() => navigate('/send-promotion?source=clients')}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap"
                         >
                             <Megaphone size={16} />
                             {t('subscriptions:promotions.send')}
@@ -317,6 +337,22 @@ const ClientList = () => {
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalOrders' ? "text-white/70" : "text-slate-400")}>{t('mostActive')}</p>
                     <p className="text-sm font-black">{t('sortByTotalOrders')}</p>
                 </button>
+
+                <button
+                    onClick={() => toggleSort('deliveredOrders')}
+                    className={clsx(
+                        "p-4 rounded-xl border transition-all group",
+                        isRTL ? "text-right" : "text-left",
+                        sortBy === 'deliveredOrders' ? "bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-200" : "bg-white dark:bg-slate-900 border-slate-100 dark:border-slate-800 hover:border-emerald-400"
+                    )}
+                >
+                    <div className="flex justify-between items-start mb-2">
+                        <Package size={20} className={sortBy === 'deliveredOrders' ? "text-white/80" : "text-emerald-500"} />
+                        {sortBy === 'deliveredOrders' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
+                    </div>
+                    <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'deliveredOrders' ? "text-white/70" : "text-slate-400")}>{t('mostDelivered')}</p>
+                    <p className="text-sm font-black">{t('sortByDeliveredOrders')}</p>
+                </button>
             </div>
 
             {/* Table */}
@@ -332,12 +368,15 @@ const ClientList = () => {
                                     </button>
                                 </th>
                                 <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('clientSince')}</th>
-                                <th className="px-6 py-4">
+                                 <th className="px-6 py-4">
                                     <button onClick={() => toggleSort('totalOrders')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
                                         {t('totalOrders')}
                                         <ArrowUpDown size={14} className={clsx("transition-opacity", sortBy === 'totalOrders' ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100")} />
                                     </button>
                                 </th>
+                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('deliveredOrders')}</th>
+                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('cancelledOrders')}</th>
+                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('returnedOrders')}</th>
                                 <th className="px-6 py-4">
                                     <button onClick={() => toggleSort('totalSpent')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
                                         {t('totalSpent')}
@@ -350,7 +389,7 @@ const ClientList = () => {
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {loading ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center">
+                                    <td colSpan={7} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center gap-2">
                                             <Loader2 size={32} className="text-primary animate-spin" />
                                             <span className="text-sm text-slate-400 font-bold uppercase tracking-widest">{t('syncingClients')}</span>
@@ -359,7 +398,7 @@ const ClientList = () => {
                                 </tr>
                             ) : clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-tighter">{t('noClientsMatch')}</td>
+                                    <td colSpan={7} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-tighter">{t('noClientsMatch')}</td>
                                 </tr>
                             ) : (
                                 clients.map((item) => {
@@ -398,6 +437,24 @@ const ClientList = () => {
                                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 transition-colors">
                                                     <ShoppingBag size={14} className="text-slate-400 group-hover:text-indigo-500" />
                                                     <span className="font-black text-slate-900 dark:text-white">{stats?.totalOrders || 0}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg">
+                                                    <Package size={14} className="text-emerald-500" />
+                                                    <span className="font-black text-emerald-700 dark:text-emerald-400">{stats?.deliveredOrders || 0}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-50 dark:bg-rose-900/10 rounded-lg">
+                                                    <X size={14} className="text-rose-500" />
+                                                    <span className="font-black text-rose-700 dark:text-rose-400">{stats?.cancelledOrders || 0}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
+                                                    <ArrowLeft size={14} className="text-amber-500" />
+                                                    <span className="font-black text-amber-700 dark:text-amber-400">{stats?.returnedOrders || 0}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
@@ -702,21 +759,33 @@ const ClientList = () => {
                             )}
                         </div>
 
-                        {/* Panel Footer */}
-                        {viewMode === 'list' && (
+                        {/* Panel Footer */}                         {viewMode === 'list' && (
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                                <div className="grid grid-cols-5 gap-2">
+                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
                                         <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('lifetimeValue')}</p>
-                                        <p className="text-xl font-black text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}</p>
+                                        <p className="text-lg font-black text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}</p>
                                     </div>
-                                    <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('totalPurchases')}</p>
-                                        <p className="text-xl font-black text-slate-900 dark:text-white uppercase">{selectedClient?.stats?.totalOrders || 0}</p>
+                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('totalOrders')}</p>
+                                        <p className="text-lg font-black text-slate-900 dark:text-white uppercase">{selectedClient?.stats?.totalOrders || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('deliveredOrders')}</p>
+                                        <p className="text-lg font-black text-emerald-600 dark:text-emerald-400 uppercase">{selectedClient?.stats?.deliveredOrders || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('cancelledOrders')}</p>
+                                        <p className="text-lg font-black text-rose-600 dark:text-rose-400 uppercase">{selectedClient?.stats?.cancelledOrders || 0}</p>
+                                    </div>
+                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('returnedOrders')}</p>
+                                        <p className="text-lg font-black text-amber-600 dark:text-amber-400 uppercase">{selectedClient?.stats?.returnedOrders || 0}</p>
                                     </div>
                                 </div>
                             </div>
                         )}
+
                         {viewMode === 'detail' && selectedOrder && (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.CLIENTS_VIEW)) && user?.role !== UserRole.EMPLOYEE && (
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                 <button

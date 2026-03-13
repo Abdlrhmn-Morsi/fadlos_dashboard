@@ -213,6 +213,12 @@
         "targetFirstNOrdersDesc": "أعلى عدد من الطلبات",
         "targetLastNOrders": "الأقل نشاطًا",
         "targetLastNOrdersDesc": "أقل عدد من الطلبات",
+        "targetFirstNDelivered": "الأكثر تسليماً",
+        "targetFirstNDeliveredDesc": "أعلى عدد طلبات مسلمة",
+        "targetLastNDelivered": "الأقل تسليماً",
+        "targetLastNDeliveredDesc": "أقل عدد طلبات مسلمة",
+        "firstNDeliveredHint": "أعلى {{count}} عميل حسب الطلبات المسلمة",
+        "lastNDeliveredHint": "أقل {{count}} عميل حسب الطلبات المسلمة",
         "history": "السجل",
         "historyDesc": "عرض الإعلانات المرسلة",
         "promotionAdHistory": "سجل الإعلانات الترويجية",
@@ -260,7 +266,9 @@
             "highest_lifetime_value": "أعلى قيمة شرائية",
             "lowest_lifetime_value": "أقل قيمة شرائية",
             "highest_orders": "أعلى عدد طلبات",
-            "lowest_orders": "أقل عدد طلبات"
+            "lowest_orders": "أقل عدد طلبات",
+            "most_delivered": "أكثر الطلبات تسليماً",
+            "least_delivered": "أقل الطلبات تسليماً"
         },
         "date": "التاريخ",
         "message_header": "الرسالة",

@@ -3,14 +3,15 @@ import { getMySubscriptionUsage, SubscriptionUsage } from '../features/subscript
 import { useAuth } from '../contexts/AuthContext';
 import { UserRole } from '../types/user-role';
 import { PlanFeature } from '../types/plan-feature';
+import { Permissions } from '../types/permissions';
 
 export const useSubscription = () => {
-    const { user } = useAuth();
+    const { user, hasPermission } = useAuth();
     const [usage, setUsage] = useState<SubscriptionUsage | null>(null);
     const [loading, setLoading] = useState(true);
 
     const fetchUsage = async () => {
-        if (!user || (user.role !== UserRole.STORE_OWNER && user.role !== UserRole.EMPLOYEE)) {
+        if (!user || !hasPermission(Permissions.STORE_VIEW)) {
             setLoading(false);
             return;
         }
