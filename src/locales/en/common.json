@@ -266,6 +266,7 @@
     "appUpdates": "App Updates",
     "manageAppUpdatesDesc": "Manage minimum versions, blocked updates, and maintenance mode",
     "deliveryAreas": "Delivery Areas",
+    "Delivery Areas": "Delivery Areas",
     "branches": "Branches",
     "storeSettings": "Store Settings",
     "profileSettings": "Profile Settings",
@@ -623,6 +624,16 @@
             "send": {
                 "name": "Send Promotion Ads",
                 "description": "• Send push notification ads to followers and clients"
+            }
+        },
+        "delivery_areas": {
+            "view": {
+                "name": "View Delivery Areas",
+                "description": "• Access the delivery areas list\n• View delivery fees and minimums"
+            },
+            "update": {
+                "name": "Manage Delivery Areas",
+                "description": "• Add/Remove towns to delivery zones\n• Edit delivery fees and minimum order amounts\n• Reset all delivery configurations"
             }
         }
     },

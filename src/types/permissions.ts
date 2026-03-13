@@ -79,6 +79,10 @@ export enum Permissions {
     // Promotion Ads
     PROMOTION_ADS_VIEW = 'promotion_ads.view',
     PROMOTION_ADS_SEND = 'promotion_ads.send',
+
+    // Delivery Areas
+    DELIVERY_AREAS_VIEW = 'delivery_areas.view',
+    DELIVERY_AREAS_UPDATE = 'delivery_areas.update',
 }
 
 export interface PermissionGroup {

@@ -29,10 +29,13 @@ import {
 import { toast } from '../../../utils/toast';
 import StatusModal from '../../../components/common/StatusModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { useAuth } from '../../../contexts/AuthContext';
+import { Permissions } from '../../../types/permissions';
 
 const DeliveryAreas = () => {
     const { t, i18n } = useTranslation(['stores', 'common']);
     const { isRTL } = useLanguage();
+    const { hasPermission } = useAuth();
     const { getCache, setCache, invalidateCache } = useCache();
     const [loading, setLoading] = useState(true);
     const [cities, setCities] = useState<any[]>([]);
@@ -158,6 +161,7 @@ const DeliveryAreas = () => {
     }
 
     const currentLng = i18n.language;
+    const canUpdate = hasPermission(Permissions.DELIVERY_AREAS_UPDATE);
 
     // Get unique towns for filtering
     const uniqueTowns = Array.from(new Set(deliveryAreas.map(area => area.place?.town?.id)))
@@ -184,59 +188,60 @@ const DeliveryAreas = () => {
     return (
         <div className="space-y-8">
             {/* Add New Delivery Area Section */}
-            {/* Add New Delivery Area Section */}
-            <div className="bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col">
-                <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
-                    <Plus size={14} className="text-primary" />
-                    {t('addDeliveryCity')}
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('common:city')}</label>
-                        <select
-                            value={selectedCityId}
-                            onChange={(e) => setSelectedCityId(e.target.value)}
-                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors"
-                        >
-                            <option value="">{t('selectCity')}</option>
-                            {cities.map(city => (
-                                <option key={city.id} value={city.id}>
-                                    {currentLng.startsWith('ar') ? city.arName : city.enName}
-                                </option>
-                            ))}
-                        </select>
-                    </div>
-                    <div className="space-y-1">
-                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('defaultPrice')}</label>
-                        <div className="relative">
-                            <input
-                                type="number"
-                                value={defaultPrice}
-                                onChange={(e) => setDefaultPrice(Number(e.target.value))}
-                                className={clsx(
-                                    "w-full py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors ps-8 pe-4"
-                                )}
-                                min="0"
-                            />
-                            <DollarSign size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold start-3" />
+            {canUpdate && (
+                <div className="bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col">
+                    <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
+                        <Plus size={14} className="text-primary" />
+                        {t('addDeliveryCity')}
+                    </h4>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('common:city')}</label>
+                            <select
+                                value={selectedCityId}
+                                onChange={(e) => setSelectedCityId(e.target.value)}
+                                className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors"
+                            >
+                                <option value="">{t('selectCity')}</option>
+                                {cities.map(city => (
+                                    <option key={city.id} value={city.id}>
+                                        {currentLng.startsWith('ar') ? city.arName : city.enName}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-1">
+                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('defaultPrice')}</label>
+                            <div className="relative">
+                                <input
+                                    type="number"
+                                    value={defaultPrice}
+                                    onChange={(e) => setDefaultPrice(Number(e.target.value))}
+                                    className={clsx(
+                                        "w-full py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors ps-8 pe-4"
+                                    )}
+                                    min="0"
+                                />
+                                <DollarSign size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold start-3" />
+                            </div>
+                        </div>
+                        <div className="flex items-end">
+                            <button
+                                type="button"
+                                onClick={handleAssignCity}
+                                disabled={!selectedCityId || saving}
+                                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+                            >
+                                {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
+                                {t('addArea')}
+                            </button>
                         </div>
                     </div>
-                    <div className="flex items-end">
-                        <button
-                            type="button"
-                            onClick={handleAssignCity}
-                            disabled={!selectedCityId || saving}
-                            className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
-                        >
-                            {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                            {t('addArea')}
-                        </button>
-                    </div>
+                    <p className="mt-4 text-[10px] text-slate-500 font-medium">
+                        {t('addAreaNote')}
+                    </p>
                 </div>
-                <p className="mt-4 text-[10px] text-slate-500 font-medium">
-                    {t('addAreaNote')}
-                </p>
-            </div>
+            )}
 
             {/* List of Delivery Areas */}
             <div className="space-y-4">
@@ -284,15 +289,17 @@ const DeliveryAreas = () => {
                         </div>
 
                         {/* Reset All Button */}
-                        <button
-                            type="button"
-                            onClick={() => setShowResetConfirm(true)}
-                            disabled={deliveryAreas.length === 0}
-                            className="flex items-center gap-2 px-4 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-bold text-[10px] uppercase tracking-widest disabled:opacity-30"
-                        >
-                            <RotateCcw size={14} />
-                            {t('resetAll')}
-                        </button>
+                        {canUpdate && (
+                            <button
+                                type="button"
+                                onClick={() => setShowResetConfirm(true)}
+                                disabled={deliveryAreas.length === 0}
+                                className="flex items-center gap-2 px-4 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-bold text-[10px] uppercase tracking-widest disabled:opacity-30"
+                            >
+                                <RotateCcw size={14} />
+                                {t('resetAll')}
+                            </button>
+                        )}
 
                         <button
                             type="button"
@@ -315,50 +322,74 @@ const DeliveryAreas = () => {
                         <p className="font-bold text-xs uppercase tracking-widest">{t('noAreasFoundForTown')}</p>
                     </div>
                 ) : (
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {filteredAreas.map((area) => (
-                            <div
-                                key={area.id}
-                                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between hover:border-primary/50 transition-all shadow-sm"
-                            >
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2">
-                                        <MapPin size={14} className="text-primary" />
-                                        <span className="font-black text-slate-900 dark:text-slate-100 text-sm italic">
-                                            {currentLng.startsWith('ar') ? area.place?.arName : area.place?.enName}
+                    <div className="space-y-8">
+                        {uniqueTowns
+                            .map(town => ({
+                                ...town,
+                                areas: filteredAreas.filter(a => a.place?.town?.id === town.id)
+                            }))
+                            .filter(group => group.areas.length > 0)
+                            .map((group) => (
+                                <div key={group.id} className="space-y-4">
+                                    <div className="flex items-center gap-3 pb-3 border-b-2 border-slate-200 dark:border-slate-800">
+                                        <h5 className="font-black text-slate-900 dark:text-slate-100 text-base uppercase tracking-widest">
+                                            {currentLng.startsWith('ar') ? group.arName : group.enName}
+                                        </h5>
+                                        <span className="text-sm font-black px-3 py-1 bg-primary text-white rounded-none shadow-sm">
+                                            {group.areas.length}
                                         </span>
                                     </div>
-                                    <div className="text-[10px] text-slate-500 font-bold uppercase tracking-tight">
-                                        {currentLng.startsWith('ar') ? area.place?.town?.arName : area.place?.town?.enName}
-                                    </div>
-                                </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                        {group.areas.map((area) => (
+                                            <div
+                                                key={area.id}
+                                                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between hover:border-primary/50 transition-all shadow-sm"
+                                            >
+                                                <div className="space-y-1">
+                                                    <div className="flex items-center gap-2">
+                                                        <MapPin size={14} className="text-primary" />
+                                                        <span className="font-black text-slate-900 dark:text-slate-100 text-sm italic">
+                                                            {currentLng.startsWith('ar') ? area.place?.arName : area.place?.enName}
+                                                        </span>
+                                                    </div>
+                                                </div>
 
-                                <div className="flex items-center gap-3">
-                                    <div className="relative w-24">
-                                        <input
-                                            type="number"
-                                            defaultValue={area.price}
-                                            onBlur={(e) => {
-                                                const newPrice = Number(e.target.value);
-                                                if (newPrice !== area.price) {
-                                                    handleUpdatePrice(area.id, newPrice);
-                                                }
-                                            }}
-                                            className="w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors ps-6 pe-2"
-                                        />
-                                        <DollarSign size={10} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-2" />
+                                                <div className="flex items-center gap-3">
+                                                    <div className="relative w-24">
+                                                        <input
+                                                            type="number"
+                                                            readOnly={!canUpdate}
+                                                            defaultValue={area.price}
+                                                            onBlur={(e) => {
+                                                                if (!canUpdate) return;
+                                                                const newPrice = Number(e.target.value);
+                                                                if (newPrice !== area.price) {
+                                                                    handleUpdatePrice(area.id, newPrice);
+                                                                }
+                                                            }}
+                                                            className={clsx(
+                                                                "w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors ps-6 pe-2",
+                                                                !canUpdate && "opacity-60 cursor-not-allowed"
+                                                            )}
+                                                        />
+                                                        <DollarSign size={10} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-2" />
+                                                    </div>
+                                                    {canUpdate && (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => handleRemoveArea(area.id)}
+                                                            className="p-2 text-slate-300 hover:text-red-500 transition-colors"
+                                                            title={t('common:delete')}
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveArea(area.id)}
-                                        className="p-2 text-slate-300 hover:text-red-500 transition-colors"
-                                        title={t('common:delete')}
-                                    >
-                                        <Trash2 size={16} />
-                                    </button>
                                 </div>
-                            </div>
-                        ))}
+                            ))}
                     </div>
                 )}
             </div>

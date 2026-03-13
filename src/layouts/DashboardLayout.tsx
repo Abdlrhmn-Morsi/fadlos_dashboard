@@ -415,10 +415,14 @@ const DashboardLayout: React.FC = () => {
               )}
               {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-              {hasPermission(Permissions.SETTINGS_VIEW) && user?.role !== UserRole.SUPER_ADMIN && (
+              {user?.role !== UserRole.SUPER_ADMIN && (
                 <>
-                  <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
-                  <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
+                  {hasPermission(Permissions.SETTINGS_VIEW) && (
+                    <SidebarItem to="/branches" icon={MapPin} label={t('branches')} collapsed={collapsed} />
+                  )}
+                  {(hasPermission(Permissions.SETTINGS_VIEW) || hasPermission(Permissions.DELIVERY_AREAS_VIEW)) && (
+                    <SidebarItem to="/delivery-areas" icon={Truck} label={t('deliveryAreas')} collapsed={collapsed} />
+                  )}
                 </>
               )}
               {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN ||
