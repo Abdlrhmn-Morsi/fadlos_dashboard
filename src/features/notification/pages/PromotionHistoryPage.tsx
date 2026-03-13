@@ -148,6 +148,10 @@ const PromotionHistoryPage: React.FC = () => {
             criteriaLabel = t('promotions.targetTypes.highest_orders', 'Highest number of orders');
         } else if (val.includes('least_active') || val.includes('last_n_orders')) {
             criteriaLabel = t('promotions.targetTypes.lowest_orders', 'Lowest number of orders');
+        } else if (val.includes('most_delivered') || val.includes('first_n_delivered')) {
+            criteriaLabel = t('promotions.targetTypes.most_delivered', 'Most delivered orders');
+        } else if (val.includes('least_delivered') || val.includes('last_n_delivered')) {
+            criteriaLabel = t('promotions.targetTypes.least_delivered', 'Least delivered orders');
         } else if (val.includes('earliest') || val.includes('first_n')) {
             criteriaLabel = t('promotions.targetTypes.earliest', 'Earliest followers');
         } else if (val.includes('recent') || val.includes('last_n')) {

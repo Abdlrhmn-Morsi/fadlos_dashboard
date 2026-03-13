@@ -31,6 +31,7 @@ export interface PromotionCredits {
 
 export interface FollowerItem {
     id: string;
+    userId: string;
     name: string;
     username?: string;
     email?: string;

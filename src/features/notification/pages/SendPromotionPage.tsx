@@ -125,6 +125,7 @@ const SendPromotionPage: React.FC = () => {
                 });
                 const newData = (res.data || []).map((c: any) => ({
                     id: c.clientId,
+                    userId: c.client?.userId || c.userId, // Ensure userId is captured
                     name: c.client?.name,
                     username: c.client?.username,
                     email: c.client?.email,
@@ -183,9 +184,9 @@ const SendPromotionPage: React.FC = () => {
         }
     };
 
-    const toggleFollower = (id: string) => {
+    const toggleFollower = (userId: string) => {
         setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            prev.includes(userId) ? prev.filter((x) => x !== userId) : [...prev, userId]
         );
     };
 
@@ -219,7 +220,7 @@ const SendPromotionPage: React.FC = () => {
                     limit: selectCount,
                     order,
                 });
-                targetIds = res.data.map((f) => f.id);
+                targetIds = res.data.map((f) => f.userId);
                 if (!targetIds.length) {
                     toast.error(t('promotions.noTargets', 'No followers found'));
                     setLoading(false);
@@ -234,7 +235,7 @@ const SendPromotionPage: React.FC = () => {
                     sortBy: 'totalSpent',
                     order,
                 });
-                targetIds = (res.data || []).map((c: any) => c.clientId);
+                targetIds = (res.data || []).map((c: any) => c.client?.userId || c.userId);
                 if (!targetIds.length) {
                     toast.error(t('promotions.noTargets', 'No clients found'));
                     setLoading(false);
@@ -249,7 +250,7 @@ const SendPromotionPage: React.FC = () => {
                     sortBy: 'totalOrders',
                     order,
                 });
-                targetIds = (res.data || []).map((c: any) => c.clientId);
+                targetIds = (res.data || []).map((c: any) => c.client?.userId || c.userId);
                 if (!targetIds.length) {
                     toast.error(t('promotions.noTargets', 'No clients found'));
                     setLoading(false);
@@ -264,7 +265,7 @@ const SendPromotionPage: React.FC = () => {
                     sortBy: 'deliveredOrders',
                     order,
                 });
-                targetIds = (res.data || []).map((c: any) => c.clientId);
+                targetIds = (res.data || []).map((c: any) => c.client?.userId || c.userId);
                 if (!targetIds.length) {
                     toast.error(t('promotions.noTargets', 'No clients found'));
                     setLoading(false);
@@ -580,25 +581,24 @@ const SendPromotionPage: React.FC = () => {
                             ) : (
                                 <>
                                     {followers.map((follower) => {
-                                        const isSelected = selectedIds.includes(follower.id);
                                         return (
                                             <button
                                                 key={follower.id}
-                                                onClick={() => toggleFollower(follower.id)}
+                                                onClick={() => toggleFollower(follower.userId)}
                                                 className={clsx(
                                                     "w-full flex items-center gap-3 p-3 px-4 transition-all",
-                                                    isSelected
+                                                    selectedIds.includes(follower.userId)
                                                         ? "bg-primary/5"
                                                         : "hover:bg-slate-50 dark:hover:bg-slate-800/50"
                                                 )}
                                             >
                                                 <div className={clsx(
                                                     "w-5 h-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-all",
-                                                    isSelected
+                                                    selectedIds.includes(follower.userId)
                                                         ? "bg-primary border-primary"
                                                         : "border-slate-200 dark:border-slate-700"
                                                 )}>
-                                                    {isSelected && <Check size={12} className="text-white" />}
+                                                    {selectedIds.includes(follower.userId) && <Check size={12} className="text-white" />}
                                                 </div>
                                                 <div className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden shrink-0">
                                                     {follower.profileImage ? (
