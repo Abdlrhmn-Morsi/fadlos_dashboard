@@ -61,6 +61,8 @@
     "noAreasFoundForTown": "No delivery areas found for this town.",
     "resetDeliveryAreas": "Reset Delivery Areas",
     "resetDeliveryAreasMessage": "Are you sure you want to remove all delivery areas? This action cannot be undone.",
+    "selectPlaces": "Select Places",
+    "noPlacesFound": "No places found for this city.",
     "socialMedia": "Social Media",
     "platforms": "Platforms",
     "addPlatform": "Add Platform",

@@ -56,7 +56,7 @@ export const toggleTownStatus = async (id: string, isActive: boolean) => {
 };
 
 // Delivery Area Management
-export const assignTownToStore = async (dto: { townId: string; defaultPrice: number; storeId?: string }) => {
+export const assignTownToStore = async (dto: { townId: string; defaultPrice: number; placeIds?: string[]; storeId?: string }) => {
     try {
         return await apiService.post('/towns/delivery-areas/bulk', dto);
     } catch (error) {

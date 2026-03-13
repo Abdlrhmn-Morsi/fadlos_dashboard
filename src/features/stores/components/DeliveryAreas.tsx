@@ -24,7 +24,8 @@ import {
     getMyStoreDeliveryAreas,
     updateDeliveryArea,
     removeDeliveryArea,
-    resetMyStoreDeliveryAreas
+    resetMyStoreDeliveryAreas,
+    getPlacesByTown
 } from '../../towns/api/towns.api';
 import { toast } from '../../../utils/toast';
 import StatusModal from '../../../components/common/StatusModal';
@@ -43,6 +44,9 @@ const DeliveryAreas = () => {
     const [selectedCityId, setSelectedCityId] = useState<string>('');
     const [defaultPrice, setDefaultPrice] = useState<number>(0);
     const [saving, setSaving] = useState(false);
+    const [places, setPlaces] = useState<any[]>([]);
+    const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
+    const [fetchingPlaces, setFetchingPlaces] = useState(false);
 
     // Enhancement states
     const [filterTownId, setFilterTownId] = useState<string>('all');
@@ -90,13 +94,36 @@ const DeliveryAreas = () => {
         fetchData();
     }, []);
 
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            if (!selectedCityId) {
+                setPlaces([]);
+                setSelectedPlaceIds([]);
+                return;
+            }
+            setFetchingPlaces(true);
+            try {
+                const data = await getPlacesByTown(selectedCityId);
+                setPlaces(data);
+                // Initially select all places
+                setSelectedPlaceIds(data.map((p: any) => p.id));
+            } catch (error) {
+                console.error('Failed to fetch places:', error);
+            } finally {
+                setFetchingPlaces(false);
+            }
+        };
+        fetchPlaces();
+    }, [selectedCityId]);
+
     const handleAssignCity = async () => {
         if (!selectedCityId) return;
         setSaving(true);
         try {
             await assignTownToStore({
                 townId: selectedCityId,
-                defaultPrice: defaultPrice
+                defaultPrice: defaultPrice,
+                placeIds: selectedPlaceIds
             });
             toast.success(t('common:success'));
             // Invalidate cache after adding new delivery area
@@ -104,6 +131,8 @@ const DeliveryAreas = () => {
             fetchData(true);
             setSelectedCityId('');
             setDefaultPrice(0);
+            setSelectedPlaceIds([]);
+            setPlaces([]);
         } catch (error) {
             console.error('Failed to assign city:', error);
             toast.error(t('common:errorUpdatingData'));
@@ -229,7 +258,7 @@ const DeliveryAreas = () => {
                             <button
                                 type="button"
                                 onClick={handleAssignCity}
-                                disabled={!selectedCityId || saving}
+                                disabled={!selectedCityId || saving || selectedPlaceIds.length === 0}
                                 className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
                             >
                                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
@@ -237,6 +266,77 @@ const DeliveryAreas = () => {
                             </button>
                         </div>
                     </div>
+
+                    {/* Places Selection */}
+                    {selectedCityId && (
+                        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
+                            <div className="flex items-center justify-between mb-4">
+                                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                                    {t('selectPlaces')} ({selectedPlaceIds.length}/{places.length})
+                                </h5>
+                                <div className="flex gap-4">
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedPlaceIds(places.map(p => p.id))}
+                                        className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                                    >
+                                        {t('common:selectAll')}
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => setSelectedPlaceIds([])}
+                                        className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:underline"
+                                    >
+                                        {t('common:deselectAll')}
+                                    </button>
+                                </div>
+                            </div>
+
+                            {fetchingPlaces ? (
+                                <div className="flex justify-center py-4">
+                                    <Loader2 size={24} className="animate-spin text-slate-300" />
+                                </div>
+                            ) : places.length === 0 ? (
+                                <p className="text-xs text-slate-500 italic py-2">{t('noPlacesFound')}</p>
+                            ) : (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[200px] overflow-y-auto p-1 custom-scrollbar">
+                                    {places.map((place) => {
+                                        const isSelected = selectedPlaceIds.includes(place.id);
+                                        return (
+                                            <button
+                                                key={place.id}
+                                                type="button"
+                                                onClick={() => {
+                                                    if (isSelected) {
+                                                        setSelectedPlaceIds(prev => prev.filter(id => id !== place.id));
+                                                    } else {
+                                                        setSelectedPlaceIds(prev => [...prev, place.id]);
+                                                    }
+                                                }}
+                                                className={clsx(
+                                                    "flex items-center gap-2 p-2 border transition-all text-start",
+                                                    isSelected
+                                                        ? "bg-primary/5 border-primary text-primary"
+                                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300"
+                                                )}
+                                            >
+                                                <div className={clsx(
+                                                    "w-3 h-3 border flex items-center justify-center transition-colors",
+                                                    isSelected ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"
+                                                )}>
+                                                    {isSelected && <Plus size={10} className="text-white" />}
+                                                </div>
+                                                <span className="text-[11px] font-bold truncate">
+                                                    {currentLng.startsWith('ar') ? place.arName : place.enName}
+                                                </span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            )}
+                        </div>
+                    )}
+
                     <p className="mt-4 text-[10px] text-slate-500 font-medium">
                         {t('addAreaNote')}
                     </p>

@@ -61,6 +61,8 @@
     "noAreasFoundForTown": "لم يتم العثور على مناطق توصيل لهذا الموقع.",
     "resetDeliveryAreas": "إعادة تعيين مناطق التوصيل",
     "resetDeliveryAreasMessage": "هل أنت متأكد من رغبتك في إزالة جميع مناطق التوصيل؟ لا يمكن التراجع عن هذا الإجراء.",
+    "selectPlaces": "اختر المناطق",
+    "noPlacesFound": "لم يتم العثور على مناطق لهذه المدينة.",
     "socialMedia": "وسائل التواصل الاجتماعي",
     "platforms": "المنصات",
     "addPlatform": "إضافة منصة",
