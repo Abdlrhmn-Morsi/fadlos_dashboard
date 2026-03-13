@@ -162,9 +162,21 @@ const AppContent = () => {
             <Route path="settings" element={<Settings />} />
             <Route path="app-updates" element={<AppUpdateSettings />} />
             <Route path="app-version-history" element={<AppVersionHistory />} />
-            <Route path="subscription" element={<PermissionGate permission={Permissions.STORE_VIEW}><SubscriptionPage /></PermissionGate>} />
-            <Route path="billing-history" element={<PermissionGate permission={Permissions.STORE_VIEW}><BillingHistory /></PermissionGate>} />
-            <Route path="usage" element={<PermissionGate permission={Permissions.STORE_VIEW}><UsagePage /></PermissionGate>} />
+            <Route path="subscription" element={
+              (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN)
+                ? <SubscriptionPage />
+                : <Navigate to="/" replace />
+            } />
+            <Route path="billing-history" element={
+              (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN)
+                ? <BillingHistory />
+                : <Navigate to="/" replace />
+            } />
+            <Route path="usage" element={
+              (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN)
+                ? <UsagePage />
+                : <Navigate to="/" replace />
+            } />
             <Route path="send-promotion" element={<SendPromotionPage />} />
             <Route path="promotions/history" element={<PromotionHistoryPage />} />
 

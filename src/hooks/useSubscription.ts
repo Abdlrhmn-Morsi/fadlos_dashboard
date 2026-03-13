@@ -10,7 +10,7 @@ export const useSubscription = () => {
     const [loading, setLoading] = useState(true);
 
     const fetchUsage = async () => {
-        if (!user || user.role !== UserRole.STORE_OWNER) {
+        if (!user || (user.role !== UserRole.STORE_OWNER && user.role !== UserRole.EMPLOYEE)) {
             setLoading(false);
             return;
         }
