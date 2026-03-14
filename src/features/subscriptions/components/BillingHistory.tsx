@@ -203,7 +203,7 @@ const BillingHistory: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className="text-sm font-black text-slate-900 dark:text-white">
-                                                {Number(item.amount).toFixed(2)} {item.currency}
+                                                {Number(item.amount).toFixed(2)} {t('subscriptions:currencySymbol')}
                                             </div>
                                             {item.paddleTransactionId && (
                                                 <div className="text-[10px] text-slate-400 font-medium group-hover:text-primary transition-colors truncate max-w-[120px]">

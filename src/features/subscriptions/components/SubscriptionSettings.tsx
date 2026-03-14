@@ -246,7 +246,7 @@ const SubscriptionSettings = () => {
                                             {billingCycle === 'yearly' ? (plan.pricing.yearly / 12).toFixed(2).replace(/\.00$/, '') : plan.pricing.monthly}
                                         </span>
                                         <span className={clsx("text-sm font-bold opacity-70", isMax ? "text-slate-400" : "text-slate-500 uppercase")}>
-                                            {t('common:currencySymbol')}/{t('subscriptions:monthly')}
+                                            {t('subscriptions:currencySymbol')}/{t('subscriptions:monthly')}
                                         </span>
                                     </div>
                                     {billingCycle === 'yearly' && plan.pricing.monthly > 0 && (
