@@ -45,6 +45,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { Permissions } from '../../types/permissions';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { UserRole } from '../../types/user-role';
 
 
 
@@ -68,7 +69,7 @@ const StoreSettings = () => {
     const [storeData, setStoreData] = useState<any>(null);
     const [businessTypes, setBusinessTypes] = useState<any[]>([]);
     const [availableCategories, setAvailableCategories] = useState<any[]>([]);
-    const { hasPermission } = useAuth();
+    const { user, hasPermission } = useAuth();
     const navigate = useNavigate();
 
     const TABS = [
@@ -77,8 +78,10 @@ const StoreSettings = () => {
         { id: 'contact', label: t('contact'), icon: Phone, desc: t('contactDesc', 'Phones, email and social') },
         { id: 'availability', label: t('availability'), icon: Clock, desc: t('availabilityDesc', 'Hours and order rules') },
         { id: 'management', label: t('management'), icon: Users, desc: t('managementDesc', 'Hiring and reviews') },
-        { id: 'verification', label: t('verification'), icon: ShieldCheck, desc: t('verificationDesc', 'Store identity validation') },
-    ] as const;
+        ...(user?.role === UserRole.STORE_OWNER ? [
+            { id: 'verification', label: t('verification'), icon: ShieldCheck, desc: t('verificationDesc', 'Store identity validation') }
+        ] : []),
+    ];
     const canViewStore = hasPermission(Permissions.STORE_VIEW);
     const canUpdateStore = hasPermission(Permissions.STORE_UPDATE);
     const [loadingCategories, setLoadingCategories] = useState(false);
@@ -129,7 +132,7 @@ const StoreSettings = () => {
             const [store, bTypes, vData] = await Promise.all([
                 getMyStore(),
                 getBusinessTypes(),
-                getVerificationStatus()
+                user?.role === UserRole.STORE_OWNER ? getVerificationStatus() : Promise.resolve({ verification: null })
             ]);
 
             const allCategories = store.businessType?.id ? await getBusinessCategories(store.businessType.id) : [];
