@@ -206,6 +206,7 @@ const Dashboard: React.FC = () => {
     );
 
     const renderStatusBanner = () => {
+        if (user?.role !== UserRole.STORE_OWNER) return null;
         if (!storeDetails || storeDetails.status?.toUpperCase() === 'ACTIVE') return null;
         if (!hasPermission('store.view')) return null;
 
