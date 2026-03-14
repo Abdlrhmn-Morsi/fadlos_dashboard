@@ -33,6 +33,7 @@ export interface DashboardStats {
     totalHiredDrivers?: number;
     topRatedProducts?: any[];
     topCategories?: any[];
+    topAddons?: any[];
     incomingRequests?: any[];
     sentInvitations?: any[];
     averageRating?: number;

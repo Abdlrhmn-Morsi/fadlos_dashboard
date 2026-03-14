@@ -30,6 +30,7 @@ export const fetchDashboardStats = async (user: any) => {
             totalTowns: 0,
             topRatedProducts: [],
             topCategories: [],
+            topAddons: [],
             incomingRequests: [],
             sentInvitations: [],
             averageRating: 0,
@@ -146,6 +147,9 @@ export const fetchDashboardStats = async (user: any) => {
             // Top Categories (Default for all employees)
             promises.push(apiService.get('/categories/seller-categories?limit=3').then(res => ({ key: 'topCategories', val: (res as any).data || [] })).catch(() => ({ key: 'topCategories', val: [] })));
 
+            // Top Add-ons (Default for all employees)
+            promises.push(apiService.get('/addons?limit=3').then(res => ({ key: 'topAddons', val: (res as any).data || [] })).catch(() => ({ key: 'topAddons', val: [] })));
+
             const results = await Promise.all(promises);
 
             results.forEach((res: any) => {
@@ -170,6 +174,7 @@ export const fetchDashboardStats = async (user: any) => {
                 if (res.key === 'hired-drivers') stats.totalHiredDrivers = res.val;
                 if (res.key === 'topProducts') stats.topRatedProducts = res.val;
                 if (res.key === 'topCategories') stats.topCategories = res.val;
+                if (res.key === 'topAddons') stats.topAddons = res.val;
             });
         }
 

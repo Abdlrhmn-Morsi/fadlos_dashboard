@@ -660,157 +660,170 @@ const Dashboard: React.FC = () => {
             )}
 
             {/* Main Content Grid: Stats, Summary, Best Deal */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                {/* Left Columns: Stat Cards Grid */}
-                <div className="lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {(() => {
-                        const allCards = [
-                            // Primary Metrics (Revenue & Orders)
-                            {
-                                id: 'todayRevenue',
-                                cond: hasPermission('analytics.view'),
-                                title: t('todayRevenue'),
-                                value: `${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
-                                icon: Zap,
-                                color: 'emerald'
-                            },
-                            {
-                                id: 'todayPendingRevenue',
-                                cond: hasPermission('analytics.view'),
-                                title: t('orders:todayPendingRevenue'),
-                                value: `${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
-                                icon: Clock,
-                                color: 'amber'
-                            },
-                            {
-                                id: 'todayOrders',
-                                cond: hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view'),
-                                title: t('todayOrders'),
-                                value: stats.todayOrders || 0,
-                                icon: Activity,
-                                color: 'blue'
-                            },
-                            {
-                                id: 'totalRevenue',
-                                cond: hasPermission('analytics.view'),
-                                title: t('totalRevenue'),
-                                value: `${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
-                                icon: DollarSign,
-                                color: 'emerald'
-                            },
-                            {
-                                id: 'totalPendingRevenue',
-                                cond: hasPermission('analytics.view'),
-                                title: t('orders:totalPendingRevenue'),
-                                value: `${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
-                                icon: Clock,
-                                color: 'amber'
-                            },
-                            {
-                                id: 'totalOrders',
-                                cond: hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view'),
-                                title: t('totalOrders'),
-                                value: stats.totalOrders || 0,
-                                icon: ShoppingBag,
-                                color: 'orange'
-                            },
-                            // Fallback Metrics
-                            {
-                                id: 'products',
-                                cond: true,
-                                title: t('totalProducts'),
-                                value: stats.totalProducts || 0,
-                                icon: Store,
-                                color: 'indigo'
-                            },
-                            {
-                                id: 'categories',
-                                cond: true,
-                                title: t('topCategories'),
-                                value: stats.totalCategories || 0,
-                                icon: Layers,
-                                color: 'violet'
-                            },
-                            {
-                                id: 'addons',
-                                cond: true,
-                                title: t('totalAddons'),
-                                value: stats.totalAddons || 0,
-                                icon: Zap,
-                                color: 'blue'
-                            },
-                            {
-                                id: 'drivers',
-                                cond: hasPermission('delivery_drivers.view'),
-                                title: t('totalDrivers'),
-                                value: stats.totalDrivers || 0,
-                                icon: Truck,
-                                color: 'orange'
-                            },
-                            {
-                                id: 'clients',
-                                cond: hasPermission('clients.view'),
-                                title: t('totalClients'),
-                                value: stats.totalClients || 0,
-                                icon: Users,
-                                color: 'emerald'
-                            },
-                            {
-                                id: 'followers',
-                                cond: hasPermission('store.view'),
-                                title: t('totalFollowers'),
-                                value: stats.totalFollowers || 0,
-                                icon: Heart,
-                                color: 'rose'
-                            }
-                        ];
+            {(() => {
+                const showOrderSummary = hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view');
+                
+                return (
+                    <div className={clsx(
+                        "grid gap-8",
+                        showOrderSummary ? "grid-cols-1 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"
+                    )}>
+                        {/* Left Columns: Stat Cards Grid */}
+                        <div className={clsx(
+                            "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
+                            showOrderSummary ? "lg:col-span-2 xl:col-span-3" : "w-full"
+                        )}>
+                            {(() => {
+                                const allCards = [
+                                    // Primary Metrics (Revenue & Orders)
+                                    {
+                                        id: 'todayRevenue',
+                                        cond: hasPermission('analytics.view'),
+                                        title: t('todayRevenue'),
+                                        value: `${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                        icon: Zap,
+                                        color: 'emerald'
+                                    },
+                                    {
+                                        id: 'todayPendingRevenue',
+                                        cond: hasPermission('analytics.view'),
+                                        title: t('orders:todayPendingRevenue'),
+                                        value: `${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                        icon: Clock,
+                                        color: 'amber'
+                                    },
+                                    {
+                                        id: 'todayOrders',
+                                        cond: hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view'),
+                                        title: t('todayOrders'),
+                                        value: stats.todayOrders || 0,
+                                        icon: Activity,
+                                        color: 'blue'
+                                    },
+                                    {
+                                        id: 'totalRevenue',
+                                        cond: hasPermission('analytics.view'),
+                                        title: t('totalRevenue'),
+                                        value: `${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                        icon: DollarSign,
+                                        color: 'emerald'
+                                    },
+                                    {
+                                        id: 'totalPendingRevenue',
+                                        cond: hasPermission('analytics.view'),
+                                        title: t('orders:totalPendingRevenue'),
+                                        value: `${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                        icon: Clock,
+                                        color: 'amber'
+                                    },
+                                    {
+                                        id: 'totalOrders',
+                                        cond: hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view'),
+                                        title: t('totalOrders'),
+                                        value: stats.totalOrders || 0,
+                                        icon: ShoppingBag,
+                                        color: 'orange'
+                                    },
+                                    // Fallback Metrics
+                                    {
+                                        id: 'products',
+                                        cond: true,
+                                        title: t('totalProducts'),
+                                        value: stats.totalProducts || 0,
+                                        icon: Store,
+                                        color: 'indigo'
+                                    },
+                                    {
+                                        id: 'categories',
+                                        cond: true,
+                                        title: t('topCategories'),
+                                        value: stats.totalCategories || 0,
+                                        icon: Layers,
+                                        color: 'violet'
+                                    },
+                                    {
+                                        id: 'addons',
+                                        cond: true,
+                                        title: t('totalAddons'),
+                                        value: stats.totalAddons || 0,
+                                        icon: Zap,
+                                        color: 'blue'
+                                    },
+                                    {
+                                        id: 'drivers',
+                                        cond: hasPermission('delivery_drivers.view'),
+                                        title: t('totalDrivers'),
+                                        value: stats.totalDrivers || 0,
+                                        icon: Truck,
+                                        color: 'orange'
+                                    },
+                                    {
+                                        id: 'clients',
+                                        cond: hasPermission('clients.view'),
+                                        title: t('totalClients'),
+                                        value: stats.totalClients || 0,
+                                        icon: Users,
+                                        color: 'emerald'
+                                    },
+                                    {
+                                        id: 'followers',
+                                        cond: hasPermission('store.view'),
+                                        title: t('totalFollowers'),
+                                        value: stats.totalFollowers || 0,
+                                        icon: Heart,
+                                        color: 'rose'
+                                    }
+                                ];
 
-                        // Filter by permission and take the first 6
-                        const visibleCards = allCards.filter(card => card.cond).slice(0, 6);
+                                // Filter by permission and take the first 6
+                                const visibleCards = allCards.filter(card => card.cond).slice(0, 6);
 
-                        return visibleCards.map((card) => (
-                            <StatCard
-                                key={card.id}
-                                title={card.title}
-                                value={card.value}
-                                icon={card.icon}
-                                color={card.color}
-                            />
-                        ));
-                    })()}
-                </div>
-
-                {/* Right Column: Summary */}
-                <div className="flex flex-col gap-8">
-
-                    {/* Order Summary Card */}
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
-                        <div className="flex items-center justify-between mb-6">
-                            <h3 className="font-black text-slate-900 dark:text-white tracking-tight">{t('dashboard:orderSummary') || "Order Summary"}</h3>
-                            <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full">
-                                {t('common:this_month') || "This Month"}
-                            </div>
+                                return visibleCards.map((card) => (
+                                    <StatCard
+                                        key={card.id}
+                                        title={card.title}
+                                        value={card.value}
+                                        icon={card.icon}
+                                        color={card.color}
+                                    />
+                                ));
+                            })()}
                         </div>
-                        <div className="space-y-4">
-                            {[
-                                { label: t('common:pending') || "Pending", value: stats.pendingOrders || stats.statusCounts?.pending || 0, bg: "bg-amber-500" },
-                                { label: t('common:confirmed') || "Confirmed", value: stats.statusCounts?.confirmed || 0, bg: "bg-blue-500" },
-                                { label: t('orders:onTheWay') || "On The Way", value: stats.statusCounts?.out_for_delivery || 0, bg: "bg-indigo-500" },
-                                { label: t('common:delivered') || "Delivered", value: stats.statusCounts?.delivered || 0, bg: "bg-emerald-500" },
-                                { label: t('common:cancelled') || "Cancelled", value: stats.statusCounts?.cancelled || 0, bg: "bg-rose-500" },
-                            ].map((item, idx) => (
-                                <div key={idx} className="flex items-center justify-between group">
-                                    <div className="flex items-center gap-3">
-                                        <div className={clsx("w-2 h-2 rounded-full", item.bg)} />
-                                        <span className="text-sm font-bold text-slate-500 dark:text-slate-400">{item.label}</span>
+
+                        {/* Right Column: Summary */}
+                        {showOrderSummary && (
+                            <div className="flex flex-col gap-8">
+                                {/* Order Summary Card */}
+                                <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <h3 className="font-black text-slate-900 dark:text-white tracking-tight">{t('dashboard:orderSummary') || "Order Summary"}</h3>
+                                        <div className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50 dark:bg-slate-800 px-3 py-1 rounded-full">
+                                            {t('common:this_month') || "This Month"}
+                                        </div>
                                     </div>
-                                    <span className={clsx("text-sm font-black tracking-tight", isDark ? "text-slate-200" : "text-slate-900")}>{item.value}</span>
+                                    <div className="space-y-4">
+                                        {[
+                                            { label: t('common:pending') || "Pending", value: stats.pendingOrders || stats.statusCounts?.pending || 0, bg: "bg-amber-500" },
+                                            { label: t('common:confirmed') || "Confirmed", value: stats.statusCounts?.confirmed || 0, bg: "bg-blue-500" },
+                                            { label: t('orders:onTheWay') || "On The Way", value: stats.statusCounts?.out_for_delivery || 0, bg: "bg-indigo-500" },
+                                            { label: t('common:delivered') || "Delivered", value: stats.statusCounts?.delivered || 0, bg: "bg-emerald-500" },
+                                            { label: t('common:cancelled') || "Cancelled", value: stats.statusCounts?.cancelled || 0, bg: "bg-rose-500" },
+                                        ].map((item, idx) => (
+                                            <div key={idx} className="flex items-center justify-between group">
+                                                <div className="flex items-center gap-3">
+                                                    <div className={clsx("w-2 h-2 rounded-full", item.bg)} />
+                                                    <span className="text-sm font-bold text-slate-500 dark:text-slate-400">{item.label}</span>
+                                                </div>
+                                                <span className={clsx("text-sm font-black tracking-tight", isDark ? "text-slate-200" : "text-slate-900")}>{item.value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
-                            ))}
-                        </div>
+                            </div>
+                        )}
                     </div>
-                </div>
-            </div>
+                );
+            })()}
 
 
             {/* Phase 2: Super Admin Sections */}
@@ -819,134 +832,195 @@ const Dashboard: React.FC = () => {
             {renderTopPerformingStores()}
 
 
-            {/* Lists Section: Top Rated Products & Top Categories */}
-            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Top Rated Products */}
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
-                                {t('topRatedProducts')}
-                            </h3>
-                            {stats.topRatedProducts && stats.topRatedProducts.length > 0 && (
-                                <button
-                                    onClick={() => navigate('/products')}
-                                    className="text-primary text-sm font-bold hover:underline"
-                                >
-                                    {t('common:viewAll')}
-                                </button>
-                            )}
-                        </div>
-
-                        {!stats.topRatedProducts || stats.topRatedProducts.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
-                                <ShoppingBag size={48} className="text-slate-200 mb-4" />
-                                <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-3">
-                                {stats.topRatedProducts.slice(0, 3).map((product: any, index: number) => (
-                                    <div
-                                        key={product.id}
-                                        className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
-                                        onClick={() => navigate(`/products/${product.id}`)}
+            {/* Lists Section: Top Rated Products, Top Categories & Top Add-ons */}
+            {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (() => {
+                const showOrderSummary = hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view');
+                
+                return (
+                    <div className={clsx(
+                        "grid gap-8",
+                        showOrderSummary ? "grid-cols-1 lg:grid-cols-2" : "grid-cols-1"
+                    )}>
+                        {/* Top Rated Products */}
+                        <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
+                                    {t('topRatedProducts')}
+                                </h3>
+                                {stats?.topRatedProducts && stats.topRatedProducts.length > 0 && (
+                                    <button
+                                        onClick={() => navigate('/products')}
+                                        className="text-primary text-sm font-bold hover:underline"
                                     >
-                                        <div className="w-16 h-16 rounded overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                                            {product.coverImage ? (
-                                                <img
-                                                    src={product.coverImage}
-                                                    alt={product.name}
-                                                    className="w-full h-full object-cover transition-transform group-hover:scale-110"
-                                                />
-                                            ) : (
-                                                <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                    <ShoppingBag size={24} strokeWidth={1.5} />
-                                                </div>
-                                            )}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
-                                                {isRTL ? product.nameAr || product.name : product.name}
-                                            </h4>
-                                            <div className={clsx("flex items-center gap-2 mt-1", isRTL && "flex-row-reverse justify-end")}>
-                                                <div className="flex items-center gap-0.5">
-                                                    <Star size={12} className="fill-amber-400 text-amber-400" />
-                                                    <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
-                                                        {Number(product.averageRating || 0).toFixed(1)}
+                                        {t('common:viewAll')}
+                                    </button>
+                                )}
+                            </div>
+
+                            {!stats?.topRatedProducts || stats.topRatedProducts.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
+                                    <ShoppingBag size={48} className="text-slate-200 mb-4" />
+                                    <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    {stats.topRatedProducts?.slice(0, 3).map((product: any, index: number) => (
+                                        <div
+                                            key={product.id}
+                                            className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                                            onClick={() => navigate(`/products/${product.id}`)}
+                                        >
+                                            <div className="w-16 h-16 rounded overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                                {product.coverImage ? (
+                                                    <img
+                                                        src={product.coverImage}
+                                                        alt={product.name}
+                                                        className="w-full h-full object-cover transition-transform group-hover:scale-110"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                        <ShoppingBag size={24} strokeWidth={1.5} />
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
+                                                    {isRTL ? product.nameAr || product.name : product.name}
+                                                </h4>
+                                                <div className={clsx("flex items-center gap-2 mt-1", isRTL && "flex-row-reverse justify-end")}>
+                                                    <div className="flex items-center gap-0.5">
+                                                        <Star size={12} className="fill-amber-400 text-amber-400" />
+                                                        <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                                                            {Number(product.averageRating || 0).toFixed(1)}
+                                                        </span>
+                                                    </div>
+                                                    <span className="text-xs font-medium text-slate-400">
+                                                        ({product.totalReviews || 0} {t('common:reviews')})
                                                     </span>
                                                 </div>
-                                                <span className="text-[10px] text-slate-400 font-medium">
-                                                    ({product.totalReviews || 0} {t('common:reviews')})
+                                            </div>
+                                            <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
+                                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                                                    #{index + 1}
+                                                </span>
+                                                <span className="text-xs font-bold text-primary">
+                                                    {product.unitsSold || 0} {t('common:unitsSold') || 'Units Sold'}
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
-                                            <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
-                                                #{index + 1}
-                                            </span>
-                                            <span className="text-xs font-bold text-primary">
-                                                {product.unitsSold || 0} {t('common:unitsSold') || 'Units Sold'}
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        )}
-                    </div>
-
-                    {/* Top Categories */}
-                    <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
-                        <div className="flex items-center justify-between mb-8">
-                            <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
-                                {t('topCategories')}
-                            </h3>
-                            {stats.topCategories && stats.topCategories.length > 0 && (
-                                <button
-                                    onClick={() => navigate('/categories')}
-                                    className="text-primary text-sm font-bold hover:underline"
-                                >
-                                    {t('common:viewAll')}
-                                </button>
+                                    ))}
+                                </div>
                             )}
                         </div>
 
-                        {!stats.topCategories || stats.topCategories.length === 0 ? (
-                            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
-                                <Layers size={48} className="text-slate-200 mb-4" />
-                                <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
-                            </div>
-                        ) : (
-                            <div className="flex flex-col gap-3">
-                                {stats.topCategories.slice(0, 3).map((category: any, index: number) => (
-                                    <div
-                                        key={category.id}
-                                        className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                        {/* Top Categories */}
+                        <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
+                            <div className="flex items-center justify-between mb-8">
+                                <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
+                                    {t('topCategories')}
+                                </h3>
+                                {stats?.topCategories && stats.topCategories.length > 0 && (
+                                    <button
                                         onClick={() => navigate('/categories')}
+                                        className="text-primary text-sm font-bold hover:underline"
                                     >
-                                        <div className="w-16 h-16 rounded bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary shrink-0 transition-transform group-hover:rotate-6">
-                                            <Layers size={28} strokeWidth={1.5} />
+                                        {t('common:viewAll')}
+                                    </button>
+                                )}
+                            </div>
+
+                            {!stats?.topCategories || stats.topCategories.length === 0 ? (
+                                <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
+                                    <Layers size={48} className="text-slate-200 mb-4" />
+                                    <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-3">
+                                    {stats.topCategories?.slice(0, 3).map((category: any, index: number) => (
+                                        <div
+                                            key={category.id}
+                                            className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                                            onClick={() => navigate('/categories')}
+                                        >
+                                            <div className="w-16 h-16 rounded bg-primary/10 dark:bg-primary/20 flex items-center justify-center text-primary shrink-0 transition-transform group-hover:rotate-6">
+                                                <Layers size={28} strokeWidth={1.5} />
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
+                                                    {isRTL ? category.nameAr || category.name : category.name}
+                                                </h4>
+                                                <p className={clsx("text-xs text-slate-500 mt-0.5 font-medium", isRTL ? "text-right" : "text-left")}>
+                                                    {category.productCount || 0} {t('common:products') || 'Products'}
+                                                </p>
+                                            </div>
+                                            <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
+                                                <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">
+                                                    #{index + 1}
+                                                </span>
+                                                <ChevronRight size={18} className={clsx("text-slate-300 group-hover:text-primary transition-colors", isRTL && "rotate-180")} />
+                                            </div>
                                         </div>
-                                        <div className="flex-1 min-w-0">
-                                            <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
-                                                {isRTL ? category.nameAr || category.name : category.name}
-                                            </h4>
-                                            <p className={clsx("text-xs text-slate-500 mt-0.5 font-medium", isRTL ? "text-right" : "text-left")}>
-                                                {category.productCount || 0} {t('common:products') || 'Products'}
-                                            </p>
-                                        </div>
-                                        <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
-                                            <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">
-                                                #{index + 1}
-                                            </span>
-                                            <ChevronRight size={18} className={clsx("text-slate-300 group-hover:text-primary transition-colors", isRTL && "rotate-180")} />
-                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Top Add-ons (Full width when order summary hidden) */}
+                        {!showOrderSummary && (
+                            <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-colors">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h3 className={clsx("text-xl font-black text-slate-900 dark:text-slate-100 tracking-tight", isRTL && "text-right")}>
+                                        {t('topAddons') || 'Top Add-ons'}
+                                    </h3>
+                                    {stats?.topAddons && stats.topAddons.length > 0 && (
+                                        <button
+                                            onClick={() => navigate('/addons')}
+                                            className="text-primary text-sm font-bold hover:underline"
+                                        >
+                                            {t('common:viewAll')}
+                                        </button>
+                                    )}
+                                </div>
+
+                                {!stats?.topAddons || stats.topAddons.length === 0 ? (
+                                    <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-100 dark:border-slate-800 rounded bg-slate-50/50 dark:bg-slate-900/50">
+                                        <Zap size={48} className="text-slate-200 mb-4" />
+                                        <p className="text-slate-400 text-sm font-medium">{t('common:noResults')}</p>
                                     </div>
-                                ))}
+                                ) : (
+                                    <div className="flex flex-col gap-3">
+                                        {stats.topAddons?.slice(0, 3).map((addon: any, index: number) => (
+                                            <div
+                                                key={addon.id}
+                                                className="group flex items-center gap-4 bg-white dark:bg-slate-900 p-3 rounded border border-slate-100 dark:border-slate-800 transition-all hover:shadow-lg hover:-translate-y-0.5 cursor-pointer"
+                                                onClick={() => navigate('/addons')}
+                                            >
+                                                <div className="w-16 h-16 rounded bg-blue-500/10 dark:bg-blue-500/20 flex items-center justify-center text-blue-500 shrink-0 transition-transform group-hover:rotate-6">
+                                                    <Zap size={28} strokeWidth={1.5} />
+                                                </div>
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className={clsx("font-bold text-slate-900 dark:text-slate-100 truncate", isRTL ? "text-right" : "text-left")}>
+                                                        {isRTL ? addon.nameAr || addon.name : addon.name}
+                                                    </h4>
+                                                    <p className={clsx("text-xs text-slate-500 mt-0.5 font-medium", isRTL ? "text-right" : "text-left")}>
+                                                        {addon.price ? `${addon.price.toLocaleString()} ${t('common:currencySymbol')}` : t('common:free')}
+                                                    </p>
+                                                </div>
+                                                <div className={clsx("text-right", isRTL ? "pl-2" : "pr-2")}>
+                                                    <span className="text-[10px] font-black text-slate-300 uppercase tracking-widest block mb-1">
+                                                        #{index + 1}
+                                                    </span>
+                                                    <ChevronRight size={18} className={clsx("text-slate-300 group-hover:text-primary transition-colors", isRTL && "rotate-180")} />
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         )}
                     </div>
-                </div>
-            )}
+                );
+            })()}
 
             {/* Revenue Performance section */}
             {hasPermission('analytics.view') && user?.role !== UserRole.SUPER_ADMIN && (
