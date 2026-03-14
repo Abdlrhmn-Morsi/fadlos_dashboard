@@ -51,6 +51,8 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, color }) 
         orange: 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400',
         violet: 'bg-violet-50 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400',
         indigo: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400',
+        rose: 'bg-rose-50 text-rose-600 dark:bg-rose-900/20 dark:text-rose-400',
+        sky: 'bg-sky-50 text-sky-600 dark:bg-sky-900/20 dark:text-sky-400',
     };
 
     const colorClass = colorVariants[color] || colorVariants.blue;
@@ -661,65 +663,121 @@ const Dashboard: React.FC = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {/* Left Columns: Stat Cards Grid */}
                 <div className="lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                    {/* Today's Revenue */}
-                    {hasPermission('analytics.view') && (
-                        <StatCard
-                            title={t('todayRevenue')}
-                            value={`${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                            icon={Zap}
-                            color="emerald"
-                        />
-                    )}
+                    {(() => {
+                        const allCards = [
+                            // Primary Metrics (Revenue & Orders)
+                            {
+                                id: 'todayRevenue',
+                                cond: hasPermission('analytics.view'),
+                                title: t('todayRevenue'),
+                                value: `${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                icon: Zap,
+                                color: 'emerald'
+                            },
+                            {
+                                id: 'todayPendingRevenue',
+                                cond: hasPermission('analytics.view'),
+                                title: t('orders:todayPendingRevenue'),
+                                value: `${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                icon: Clock,
+                                color: 'amber'
+                            },
+                            {
+                                id: 'todayOrders',
+                                cond: hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view'),
+                                title: t('todayOrders'),
+                                value: stats.todayOrders || 0,
+                                icon: Activity,
+                                color: 'blue'
+                            },
+                            {
+                                id: 'totalRevenue',
+                                cond: hasPermission('analytics.view'),
+                                title: t('totalRevenue'),
+                                value: `${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                icon: DollarSign,
+                                color: 'emerald'
+                            },
+                            {
+                                id: 'totalPendingRevenue',
+                                cond: hasPermission('analytics.view'),
+                                title: t('orders:totalPendingRevenue'),
+                                value: `${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`,
+                                icon: Clock,
+                                color: 'amber'
+                            },
+                            {
+                                id: 'totalOrders',
+                                cond: hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view'),
+                                title: t('totalOrders'),
+                                value: stats.totalOrders || 0,
+                                icon: ShoppingBag,
+                                color: 'orange'
+                            },
+                            // Fallback Metrics
+                            {
+                                id: 'products',
+                                cond: true,
+                                title: t('totalProducts'),
+                                value: stats.totalProducts || 0,
+                                icon: Store,
+                                color: 'indigo'
+                            },
+                            {
+                                id: 'categories',
+                                cond: true,
+                                title: t('topCategories'),
+                                value: stats.totalCategories || 0,
+                                icon: Layers,
+                                color: 'violet'
+                            },
+                            {
+                                id: 'addons',
+                                cond: true,
+                                title: t('totalAddons'),
+                                value: stats.totalAddons || 0,
+                                icon: Zap,
+                                color: 'blue'
+                            },
+                            {
+                                id: 'drivers',
+                                cond: hasPermission('delivery_drivers.view'),
+                                title: t('totalDrivers'),
+                                value: stats.totalDrivers || 0,
+                                icon: Truck,
+                                color: 'orange'
+                            },
+                            {
+                                id: 'clients',
+                                cond: hasPermission('clients.view'),
+                                title: t('totalClients'),
+                                value: stats.totalClients || 0,
+                                icon: Users,
+                                color: 'emerald'
+                            },
+                            {
+                                id: 'followers',
+                                cond: hasPermission('store.view'),
+                                title: t('totalFollowers'),
+                                value: stats.totalFollowers || 0,
+                                icon: Heart,
+                                color: 'rose'
+                            }
+                        ];
 
-                    {/* Today's Pending Revenue */}
-                    {hasPermission('analytics.view') && (
-                        <StatCard
-                            title={t('orders:todayPendingRevenue')}
-                            value={`${(stats.todayPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                            icon={Clock}
-                            color="amber"
-                        />
-                    )}
+                        // Filter by permission and take the first 6
+                        const visibleCards = allCards.filter(card => card.cond).slice(0, 6);
 
-                    {/* Today's Orders */}
-                    {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
-                        <StatCard
-                            title={t('todayOrders')}
-                            value={stats.todayOrders || 0}
-                            icon={Activity}
-                            color="blue"
-                        />
-                    )}
-
-                    {/* Total Revenue */}
-                    {hasPermission('analytics.view') && (
-                        <StatCard
-                            title={t('totalRevenue')}
-                            value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                            icon={DollarSign}
-                            color="emerald"
-                        />
-                    )}
-
-                    {/* Total Pending Revenue */}
-                    {hasPermission('analytics.view') && (
-                        <StatCard
-                            title={t('orders:totalPendingRevenue')}
-                            value={`${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
-                            icon={Clock}
-                            color="amber"
-                        />
-                    )}
-
-                    {/* Total Orders */}
-                    {(hasPermission('orders.view') || hasPermission('orders.update') || hasPermission('analytics.view')) && (
-                        <StatCard
-                            title={t('totalOrders')}
-                            value={stats.totalOrders || 0}
-                            icon={ShoppingBag}
-                            color="orange"
-                        />
-                    )}
+                        return visibleCards.map((card) => (
+                            <StatCard
+                                key={card.id}
+                                title={card.title}
+                                value={card.value}
+                                icon={card.icon}
+                                color={card.color}
+                            />
+                        ));
+                    })()}
                 </div>
 
                 {/* Right Column: Summary */}

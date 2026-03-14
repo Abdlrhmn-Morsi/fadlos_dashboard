@@ -109,6 +109,9 @@ export const fetchDashboardStats = async (user: any) => {
             // Categories count (Default for all employees)
             promises.push(apiService.get('/categories/seller-categories?limit=1').then(res => ({ key: 'categories', val: res.meta?.total || 0 })).catch(() => ({ key: 'categories', val: 0 })));
 
+            // Add-ons count (Default for all employees)
+            promises.push(apiService.get('/addons?limit=1').then(res => ({ key: 'addons', val: res.meta?.total || 0 })).catch(() => ({ key: 'addons', val: 0 })));
+
             // Drivers count (delivery_drivers.view)
             if (hasPerm(Permissions.DELIVERY_DRIVERS_VIEW)) {
                 promises.push(apiService.get('/delivery-drivers/store-drivers?limit=1').then(res => ({ key: 'drivers', val: res.meta?.total || 0 })).catch(() => ({ key: 'drivers', val: 0 })));
@@ -149,12 +152,13 @@ export const fetchDashboardStats = async (user: any) => {
                 if (res.key === 'products') stats.totalProducts = res.val;
                 if (res.key === 'clients') stats.totalClients = res.val;
                 if (res.key === 'categories') stats.totalCategories = res.val;
+                if (res.key === 'addons') stats.totalAddons = res.val;
                 if (res.key === 'drivers') stats.totalDrivers = res.val;
                 if (res.key === 'rating') {
                     stats.averageRating = res.val;
                     if (res.extra) {
+                        stats.totalFollowers = res.extra.followersCount || 0;
                         stats.pendingHiringRequests = stats.pendingHiringRequests || 0; // Backup
-                        // The store object itself might have some indicators, but we use the specific counts
                     }
                 }
                 if (res.key === 'hiring-requests-full') {

@@ -27,6 +27,7 @@ export interface DashboardStats {
     totalFollowers?: number;
     totalReviews?: number;
     totalCategories?: number;
+    totalAddons?: number;
     totalDrivers?: number;
     pendingHiringRequests?: number;
     totalHiredDrivers?: number;
