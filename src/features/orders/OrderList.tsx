@@ -20,7 +20,7 @@ const OrderList = () => {
     const { getCache, setCache } = useCache();
     const { user } = useAuth();
     const [orders, setOrders] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
     const [branchFilter, setBranchFilter] = useState('');
     const [branches, setBranches] = useState<any[]>([]);
@@ -54,8 +54,10 @@ const OrderList = () => {
                 if (cachedData.meta) {
                     setTotalPages(cachedData.meta.totalPages || 1);
                 }
+                setLoading(false);
             } else if (Array.isArray(cachedData)) {
                 setOrders(cachedData);
+                setLoading(false);
             }
         }
     }, []);
@@ -83,6 +85,7 @@ const OrderList = () => {
     };
 
     useEffect(() => {
+        setLoading(true);
         const timer = setTimeout(() => {
             fetchOrders();
         }, 500);
@@ -134,6 +137,7 @@ const OrderList = () => {
                     setOrders(cachedData);
                 }
                 // Don't show loading if we have cached data
+                setLoading(false);
                 return;
             }
 
