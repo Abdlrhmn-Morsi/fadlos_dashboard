@@ -86,10 +86,23 @@ const OrderDetail = () => {
     const fetchOrder = async () => {
         try {
             if (!id) return;
-            setLoading(true);
+            
+            // Check cache first to avoid flicker
+            const cachedOrder = getCache<any>(`order-${id}`);
+            if (cachedOrder) {
+                setOrder(cachedOrder);
+                setNewStatus(cachedOrder.status);
+                // Don't return, still fetch fresh data in background
+                setLoading(false);
+            } else {
+                setLoading(true);
+            }
+
             const data: any = await ordersApi.getOrder(id);
             setOrder(data);
             setNewStatus(data.status);
+            // Cache with persistence
+            setCache(`order-${id}`, data, undefined, true);
         } catch (error) {
             console.error('Failed to fetch order', error);
         } finally {
@@ -192,17 +205,22 @@ const OrderDetail = () => {
 
             // Update local state and cache
             const oldStatus = order.status;
-            setOrder({ ...order, status: status });
+            const updatedOrder = { ...order, status: status };
+            setOrder(updatedOrder);
 
-            updateCacheItem('orders', id!, (o: any) => ({ ...o, status }));
+            // Update order detail cache
+            setCache(`order-${id}`, updatedOrder, undefined, true);
 
-            // Optional: Update status counts
+            // Update list cache
+            updateCacheItem('orders', id!, (o: any) => ({ ...o, status }), 'id', true);
+
+            // Update status counts
             const cachedCounts = getCache<Record<string, number>>('order-status-counts');
             if (cachedCounts) {
                 const updatedCounts = { ...cachedCounts };
                 if (updatedCounts[oldStatus]) updatedCounts[oldStatus] = Math.max(0, updatedCounts[oldStatus] - 1);
                 updatedCounts[status] = (updatedCounts[status] || 0) + 1;
-                setCache('order-status-counts', updatedCounts);
+                setCache('order-status-counts', updatedCounts, undefined, true);
             }
 
             fetchOrder(); // Full refresh to be safe
@@ -233,8 +251,15 @@ const OrderDetail = () => {
             await ordersApi.updateOrderStatus(id!, status);
             
             // Set local status immediately for UI response
-            setOrder({ ...order, status: status });
+            const updatedOrder = { ...order, status: status };
+            setOrder(updatedOrder);
             setStatusModal({ isOpen: false, status: '' });
+
+            // Update order detail cache
+            setCache(`order-${id}`, updatedOrder, undefined, true);
+
+            // Update list cache
+            updateCacheItem('orders', id!, (o: any) => ({ ...o, status }), 'id', true);
 
             // Update status counts cache
             const cachedCounts = getCache<Record<string, number>>('order-status-counts');
@@ -244,7 +269,7 @@ const OrderDetail = () => {
                     updatedCounts[oldStatus] = Math.max(0, updatedCounts[oldStatus] - 1);
                 }
                 updatedCounts[status] = (updatedCounts[status] || 0) + 1;
-                setCache('order-status-counts', updatedCounts);
+                setCache('order-status-counts', updatedCounts, undefined, true);
             }
 
             // Invalidate dashboard cache to refresh stats
@@ -274,7 +299,7 @@ const OrderDetail = () => {
             updateCacheItem('orders', id!, (order: any) => ({
                 ...order,
                 status: OrderStatus.CANCELLED
-            }));
+            }), 'id', true);
 
             // Update status counts cache
             const cachedCounts = getCache<Record<string, number>>('order-status-counts');
@@ -286,7 +311,7 @@ const OrderDetail = () => {
                 }
                 // Increase cancelled count
                 updatedCounts[OrderStatus.CANCELLED] = (updatedCounts[OrderStatus.CANCELLED] || 0) + 1;
-                setCache('order-status-counts', updatedCounts);
+                setCache('order-status-counts', updatedCounts, undefined, true);
             }
 
             // Invalidate dashboard cache to refresh stats
@@ -309,7 +334,7 @@ const OrderDetail = () => {
             updateCacheItem('orders', id!, (order: any) => ({
                 ...order,
                 status: OrderStatus.RETURNED
-            }));
+            }), 'id', true);
 
             // Invalidate dashboard cache to refresh stats
             invalidateCache('dashboard-stats');
@@ -333,7 +358,7 @@ const OrderDetail = () => {
             updateCacheItem('orders', id!, (order: any) => ({
                 ...order,
                 status: OrderStatus.RETURNED
-            }));
+            }), 'id', true);
 
             invalidateCache('dashboard-stats');
             window.location.reload();
@@ -355,7 +380,7 @@ const OrderDetail = () => {
                 status: OrderStatus.PENDING,
                 driverId: null,
                 driver: null
-            }));
+            }), 'id', true);
 
             invalidateCache('dashboard-stats');
             window.location.reload();

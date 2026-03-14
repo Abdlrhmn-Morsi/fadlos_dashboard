@@ -36,32 +36,7 @@ const OrderList = () => {
     const [customerNameFilter, setCustomerNameFilter] = useState('');
     const [statusCounts, setStatusCounts] = useState<Record<string, number>>({});
 
-    // Load cached data immediately on mount
-    useEffect(() => {
-        const params: any = { page, limit };
-        if (statusFilter) params.status = statusFilter;
-        if (orderNumberFilter) params.orderNumber = orderNumberFilter;
-        if (customerNameFilter) params.customerName = customerNameFilter;
-        if (dateFilter) {
-            params.startDate = `${dateFilter}T00:00:00`;
-            params.endDate = `${dateFilter}T23:59:59`;
-        }
-
-        const cachedData = getCache<any>('orders', params);
-        if (cachedData) {
-            if (cachedData.data && Array.isArray(cachedData.data)) {
-                setOrders(cachedData.data);
-                if (cachedData.meta) {
-                    setTotalPages(cachedData.meta.totalPages || 1);
-                }
-                setLoading(false);
-            } else if (Array.isArray(cachedData)) {
-                setOrders(cachedData);
-                setLoading(false);
-            }
-        }
-    }, []);
-
+    // Load status counts once or from cache
     useEffect(() => {
         fetchStatusCounts();
     }, []);
@@ -72,20 +47,44 @@ const OrderList = () => {
             const cachedCounts = getCache<Record<string, number>>('order-status-counts');
             if (cachedCounts) {
                 setStatusCounts(cachedCounts);
-                return;
+                // Still refresh in background
             }
 
             const counts: any = await ordersApi.getStatusCounts();
             setStatusCounts(counts);
-            // Cache the status counts
-            setCache('order-status-counts', counts);
+            // Cache the status counts with persistence
+            setCache('order-status-counts', counts, undefined, true);
         } catch (error) {
             console.error('Failed to fetch status counts', error);
         }
     };
 
+    // Main effect for fetching orders and handling loading/caching
     useEffect(() => {
-        setLoading(true);
+        const params: any = { page, limit };
+        if (statusFilter) params.status = statusFilter;
+        if (branchFilter) params.branchId = branchFilter;
+        if (orderNumberFilter) params.orderNumber = orderNumberFilter;
+        if (customerNameFilter) params.customerName = customerNameFilter;
+        if (dateFilter) {
+            params.startDate = `${dateFilter}T00:00:00`;
+            params.endDate = `${dateFilter}T23:59:59`;
+        }
+
+        // Check cache FIRST to prevent flicker
+        const cachedData = getCache<any>('orders', params);
+        if (cachedData) {
+            if (cachedData.data && Array.isArray(cachedData.data)) {
+                setOrders(cachedData.data);
+                if (cachedData.meta) setTotalPages(cachedData.meta.totalPages || 1);
+            } else if (Array.isArray(cachedData)) {
+                setOrders(cachedData);
+            }
+            setLoading(false);
+        } else {
+            setLoading(true);
+        }
+
         const timer = setTimeout(() => {
             fetchOrders();
         }, 500);
@@ -107,7 +106,7 @@ const OrderList = () => {
     // Reset to page 1 when filter changes
     useEffect(() => {
         setPage(1);
-    }, [statusFilter]);
+    }, [statusFilter, orderNumberFilter, customerNameFilter, dateFilter, branchFilter]);
 
     const fetchOrders = async () => {
         try {
@@ -124,55 +123,33 @@ const OrderList = () => {
                 params.endDate = `${dateFilter}T23:59:59`;
             }
 
-            // Check cache first
-            const cacheKey = 'orders';
-            const cachedData = getCache<any>(cacheKey, params);
-            if (cachedData) {
-                if (cachedData.data && Array.isArray(cachedData.data)) {
-                    setOrders(cachedData.data);
-                    if (cachedData.meta) {
-                        setTotalPages(cachedData.meta.totalPages || 1);
-                    }
-                } else if (Array.isArray(cachedData)) {
-                    setOrders(cachedData);
-                }
-                // Don't show loading if we have cached data
-                setLoading(false);
-                return;
-            }
-
-            // Only show loading if we need to fetch from API
-            setLoading(true);
-
             const response: any = await ordersApi.getOrders(params);
-            console.log('Orders API Response:', response);
 
             // Handle paginated response { data: [...], meta: {...} } or plain array
+            let normalizedOrders = [];
+            let total = 1;
+
             if (response && typeof response === 'object' && 'data' in response && Array.isArray(response.data)) {
-                setOrders(response.data);
-                if (response.meta) {
-                    setTotalPages(response.meta.totalPages || 1);
-                }
-                // Cache the response
-                setCache(cacheKey, response, params);
+                normalizedOrders = response.data;
+                total = response.meta?.totalPages || 1;
             } else if (response && typeof response === 'object' && 'orders' in response && Array.isArray(response.orders)) {
-                setOrders(response.orders);
-                if (response.pagination) {
-                    setTotalPages(response.pagination.totalPages || 1);
-                }
-                // Cache the response
-                setCache(cacheKey, response, params);
+                normalizedOrders = response.orders;
+                total = response.pagination?.totalPages || 1;
             } else if (Array.isArray(response)) {
-                setOrders(response);
-                // Cache the response
-                setCache(cacheKey, response, params);
-            } else {
-                console.warn('Unexpected response format:', response);
-                setOrders([]);
+                normalizedOrders = response;
             }
+
+            setOrders(normalizedOrders);
+            setTotalPages(total);
+            
+            // Cache with persistence
+            setCache('orders', response, params, true);
         } catch (error) {
             console.error('Failed to fetch orders', error);
-            setOrders([]);
+            // Only clear orders if we don't have cached data already showing
+            if (!getCache('orders', { page, limit, status: statusFilter, branchId: branchFilter, orderNumber: orderNumberFilter, customerName: customerNameFilter, startDate: dateFilter ? `${dateFilter}T00:00:00` : undefined, endDate: dateFilter ? `${dateFilter}T23:59:59` : undefined })) {
+                setOrders([]);
+            }
         } finally {
             setLoading(false);
         }

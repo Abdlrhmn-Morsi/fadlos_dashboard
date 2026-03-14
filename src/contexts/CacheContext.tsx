@@ -1,21 +1,25 @@
-import React, { createContext, useContext, useState, useCallback, ReactNode, useRef, useMemo } from 'react';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useRef, useMemo, useEffect } from 'react';
 
 interface CacheEntry<T = any> {
     data: T;
     timestamp: number;
     params?: Record<string, any>;
+    persist?: boolean;
 }
 
 interface CacheContextType {
     getCache: <T = any>(key: string, params?: Record<string, any>) => T | null;
-    setCache: <T = any>(key: string, data: T, params?: Record<string, any>) => void;
+    setCache: <T = any>(key: string, data: T, params?: Record<string, any>, persist?: boolean) => void;
     invalidateCache: (key: string | string[]) => void;
     clearAllCache: () => void;
     hasCache: (key: string, params?: Record<string, any>) => boolean;
-    updateCacheItem: <T = any>(key: string, itemId: string, updater: (item: T) => T, idField?: string) => void;
+    updateCacheItem: <T = any>(key: string, itemId: string, updater: (item: T) => T, idField?: string, persist?: boolean) => void;
 }
 
 const CacheContext = createContext<CacheContextType | undefined>(undefined);
+
+const PERSIST_KEY = 'fadlos-admin-cache';
+const CACHE_EXPIRY = 24 * 60 * 60 * 1000; // 24 hours
 
 interface CacheProviderProps {
     children: ReactNode;
@@ -23,10 +27,44 @@ interface CacheProviderProps {
 
 export const CacheProvider: React.FC<CacheProviderProps> = ({ children }) => {
     const cacheRef = useRef<Map<string, CacheEntry>>(new Map());
-    // We still use a small state just to trigger re-renders if needed, 
-    // but the functions will depend on the Ref.
     const [, setTick] = useState(0);
     const forceUpdate = useCallback(() => setTick(tick => tick + 1), []);
+
+    // Load persisted cache on mount
+    useEffect(() => {
+        try {
+            const savedCache = localStorage.getItem(PERSIST_KEY);
+            if (savedCache) {
+                const parsed = JSON.parse(savedCache);
+                const now = Date.now();
+                
+                Object.entries(parsed).forEach(([key, entry]: [string, any]) => {
+                    // Only load if not expired
+                    if (now - entry.timestamp < CACHE_EXPIRY) {
+                        cacheRef.current.set(key, entry);
+                    }
+                });
+                forceUpdate();
+            }
+        } catch (e) {
+            console.error('Failed to load cache from localStorage', e);
+        }
+    }, [forceUpdate]);
+
+    // Save persisted items to localStorage
+    const saveToLocalStorage = useCallback(() => {
+        try {
+            const persistable: Record<string, CacheEntry> = {};
+            cacheRef.current.forEach((value, key) => {
+                if (value.persist) {
+                    persistable[key] = value;
+                }
+            });
+            localStorage.setItem(PERSIST_KEY, JSON.stringify(persistable));
+        } catch (e) {
+            console.error('Failed to save cache to localStorage', e);
+        }
+    }, []);
 
     // Generate a unique cache key based on the key and params
     const generateCacheKey = useCallback((key: string, params?: Record<string, any>): string => {
@@ -55,36 +93,42 @@ export const CacheProvider: React.FC<CacheProviderProps> = ({ children }) => {
     }, [generateCacheKey]);
 
     // Set cache data
-    const setCache = useCallback(<T = any>(key: string, data: T, params?: Record<string, any>): void => {
+    const setCache = useCallback(<T = any>(key: string, data: T, params?: Record<string, any>, persist: boolean = false): void => {
         const cacheKey = generateCacheKey(key, params);
         cacheRef.current.set(cacheKey, {
             data,
             timestamp: Date.now(),
-            params
+            params,
+            persist
         });
-        // We don't always need to force update for cache writes, 
-        // but some components might expect it. 
-        // For stability, we skip forceUpdate here unless specifically needed.
-    }, [generateCacheKey]);
+        
+        if (persist) saveToLocalStorage();
+    }, [generateCacheKey, saveToLocalStorage]);
 
     // Invalidate cache by key(s)
     const invalidateCache = useCallback((key: string | string[]): void => {
         const keys = Array.isArray(key) ? key : [key];
+        let changed = false;
 
-        // Remove all cache entries that match the key pattern
         keys.forEach(k => {
             Array.from(cacheRef.current.keys()).forEach((cacheKey: string) => {
                 if (cacheKey === k || cacheKey.startsWith(`${k}:`)) {
                     cacheRef.current.delete(cacheKey);
+                    changed = true;
                 }
             });
         });
-        forceUpdate();
-    }, [forceUpdate]);
+        
+        if (changed) {
+            saveToLocalStorage();
+            forceUpdate();
+        }
+    }, [forceUpdate, saveToLocalStorage]);
 
     // Clear all cache
     const clearAllCache = useCallback((): void => {
         cacheRef.current.clear();
+        localStorage.removeItem(PERSIST_KEY);
         forceUpdate();
     }, [forceUpdate]);
 
@@ -99,7 +143,8 @@ export const CacheProvider: React.FC<CacheProviderProps> = ({ children }) => {
         key: string,
         itemId: string,
         updater: (item: T) => T,
-        idField: string = 'id'
+        idField: string = 'id',
+        persist?: boolean
     ): void => {
         let updatedGlobal = false;
         Array.from(cacheRef.current.keys()).forEach((cacheKey: string) => {
@@ -131,14 +176,18 @@ export const CacheProvider: React.FC<CacheProviderProps> = ({ children }) => {
                     cacheRef.current.set(cacheKey, {
                         ...entry,
                         data: newData,
-                        timestamp: Date.now()
+                        timestamp: Date.now(),
+                        persist: persist !== undefined ? persist : entry.persist
                     });
                     updatedGlobal = true;
                 }
             }
         });
-        if (updatedGlobal) forceUpdate();
-    }, [forceUpdate]);
+        if (updatedGlobal) {
+            saveToLocalStorage();
+            forceUpdate();
+        }
+    }, [forceUpdate, saveToLocalStorage]);
 
     const value = useMemo(() => ({
         getCache,
