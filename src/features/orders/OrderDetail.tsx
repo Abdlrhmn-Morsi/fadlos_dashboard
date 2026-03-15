@@ -977,10 +977,15 @@ const OrderDetail = () => {
                                                  <div className="min-w-0 flex-1">
                                                      <div className="flex items-center gap-2 mb-1">
                                                          <p className="font-black text-lg text-slate-900 dark:text-white truncate">{order.driver.name}</p>
-                                                         {order.driver.verificationStatus === 'VERIFIED' && (
-                                                             <div className="flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 px-2 py-0.5 rounded-lg shadow-sm">
-                                                                 <BadgeCheck size={11} />
-                                                                 {t('orders:verified', 'Verified')}
+                                                         {order.driver.verificationStatus && (
+                                                             <div className={clsx(
+                                                                 "flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm whitespace-nowrap",
+                                                                 order.driver.verificationStatus === 'VERIFIED'
+                                                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                                     : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                                             )}>
+                                                                 {order.driver.verificationStatus === 'VERIFIED' ? <BadgeCheck size={11} /> : <Clock size={11} />}
+                                                                 {t(`common:verificationStatuses.${order.driver.verificationStatus}`, order.driver.verificationStatus) as string}
                                                              </div>
                                                          )}
                                                      </div>
@@ -1387,8 +1392,13 @@ const OrderDetail = () => {
                                                                     {t('orders:verified', 'Verified')}
                                                                 </div>
                                                             ) : (
-                                                                <div className="px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider bg-slate-200 text-slate-500 dark:bg-slate-700">
-                                                                    {driver.deliveryProfile?.verificationStatus || 'Unknown'}
+                                                                <div className={clsx(
+                                                                    "px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider whitespace-nowrap",
+                                                                    driver.deliveryProfile?.verificationStatus === 'VERIFIED'
+                                                                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                                        : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                                                )}>
+                                                                    {t(`common:verificationStatuses.${driver.deliveryProfile?.verificationStatus || 'UNKNOWN'}`, driver.deliveryProfile?.verificationStatus || 'Unknown') as string}
                                                                 </div>
                                                             )}
                                                         </div>
