@@ -243,8 +243,11 @@ const DriverDetail: React.FC = () => {
                 return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery.drivers.verification.rejected')}</span>;
             case 'PENDING':
                 return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.pending', 'Pending')}</span>;
+            case 'ACCEPTED':
+                return <span className={`${baseClass} bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50`}><CheckCircle size={12} strokeWidth={2.5} /> {t('verificationStatuses.ACCEPTED', 'Accepted')}</span>;
+            case 'REMOVED':
+                return <span className={`${baseClass} bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}><XCircle size={12} strokeWidth={2.5} /> {t('verificationStatuses.REMOVED', 'Removed')}</span>;
             case 'CANCELLED':
-                return <span className={`${baseClass} bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.cancelled', 'Cancelled')}</span>;
             case 'RESIGNATION_PENDING':
                 return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
             default:
@@ -341,7 +344,9 @@ const DriverDetail: React.FC = () => {
                                             "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border transition-all",
                                             driver.storeDriverStatus === 'ACCEPTED'
                                                 ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50"
-                                                : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50"
+                                                : (driver.storeDriverStatus === 'REMOVED' || driver.storeDriverStatus === 'REJECTED')
+                                                    ? "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50"
+                                                    : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50"
                                         )}>
                                             {t(`delivery.drivers.hiring_status.${driver.storeDriverStatus.toLowerCase()}`, driver.storeDriverStatus) as string}
                                         </span>

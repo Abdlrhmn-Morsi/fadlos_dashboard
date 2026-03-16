@@ -52,6 +52,9 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
     };
 
     const handleTabChange = (newView: 'active' | 'history' | 'resignations') => {
+        if (newView === view) return; // Already on this tab, do nothing
+        setDrivers([]);
+        setLoading(true);
         setSearchParams(prev => {
             prev.set('tab', newView);
             prev.delete('page'); // Always reset to page 1 on tab change

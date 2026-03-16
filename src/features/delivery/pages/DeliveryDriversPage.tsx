@@ -143,7 +143,11 @@ const DeliveryDriversPage = () => {
                 }
                 await respondToTransition(rejectingRequestId, false, rejectionReason);
             } else {
-                await respondToHiringRequest(rejectingRequestId, 'REJECTED');
+                if (!rejectionReason.trim()) {
+                    toast.error(t('rejection_reason_required', 'Rejection reason is required.'));
+                    return;
+                }
+                await respondToHiringRequest(rejectingRequestId, 'REJECTED', rejectionReason);
             }
             fetchIncomingRequests();
             fetchCounts();
@@ -350,7 +354,6 @@ const DeliveryDriversPage = () => {
                                 {t('delivery.drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
                             </p>
                             
-                            {activeActionRequest?.status === 'TRANSITION_OFFER' && (
                                 <div className="mb-4">
                                     <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
                                         {t('rejection_reason', 'Reason for rejection')} <span className="text-rose-500">*</span>
@@ -362,7 +365,6 @@ const DeliveryDriversPage = () => {
                                         className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-none h-24"
                                     />
                                 </div>
-                            )}
 
                             <div className="flex justify-end gap-3 mt-6">
                                 <button
@@ -377,7 +379,7 @@ const DeliveryDriversPage = () => {
                                 </button>
                                 <button
                                     onClick={confirmReject}
-                                    disabled={activeActionRequest?.status === 'TRANSITION_OFFER' && !rejectionReason.trim()}
+                                    disabled={!rejectionReason.trim()}
                                     className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                     {t('dashboard:reject', 'Reject')}

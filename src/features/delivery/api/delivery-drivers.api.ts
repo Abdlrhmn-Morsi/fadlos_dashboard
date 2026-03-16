@@ -194,10 +194,11 @@ export const updateStoreDriver = async (driverId: string, data: any) => {
     }
 };
 
-export const respondToHiringRequest = async (requestId: string, status: 'ACCEPTED' | 'REJECTED') => {
+export const respondToHiringRequest = async (requestId: string, status: 'ACCEPTED' | 'REJECTED', reason?: string) => {
     try {
-        const response = await apiService.patch(`/delivery-drivers/hiring-requests/${requestId}/respond`, { status });
+        const response = await apiService.patch(`/delivery-drivers/hiring-requests/${requestId}/respond`, { status, reason });
         return response;
+
     } catch (error) {
         throw error;
     }
