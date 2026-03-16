@@ -156,6 +156,7 @@ const DriverDetail: React.FC = () => {
         isOpen: boolean;
         type: 'CONVERT_TO_STORE_DRIVER' | 'CONVERT_TO_FREELANCER' | 'APPROVE_RESIGNATION' | 'REJECT_RESIGNATION' | null;
         notes?: string;
+        rejectionReason?: string;
     }>({ isOpen: false, type: null });
 
     const handleTransition = async () => {
@@ -174,7 +175,7 @@ const DriverDetail: React.FC = () => {
                 navigate(backUrl);
                 return;
             } else if (actionModal.type === 'REJECT_RESIGNATION') {
-                await respondToResignation(id, false);
+                await respondToResignation(id, false, actionModal.rejectionReason);
                 toast.success(t('delivery.drivers.resignation.rejected', 'Resignation rejected'));
             }
             
@@ -780,6 +781,21 @@ const DriverDetail: React.FC = () => {
                                 </div>
                             )}
 
+                            {actionModal.type === 'REJECT_RESIGNATION' && (
+                                <div className="space-y-2 mb-6">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                        <MessageSquare size={12} /> {t('rejection_reason', 'Reason for rejection')} <span className="text-rose-500">*</span>
+                                    </label>
+                                    <textarea
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px] text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all placeholder:text-slate-400"
+                                        rows={3}
+                                        placeholder={t('rejection_reason_placeholder', 'Please provide a reason...')}
+                                        value={actionModal.rejectionReason || ''}
+                                        onChange={(e) => setActionModal(prev => ({ ...prev, rejectionReason: e.target.value }))}
+                                    />
+                                </div>
+                            )}
+
                             <div className="flex gap-3">
                                 <button
                                     onClick={() => setActionModal({ isOpen: false, type: null })}
@@ -789,7 +805,7 @@ const DriverDetail: React.FC = () => {
                                 </button>
                                 <button
                                     onClick={handleTransition}
-                                    disabled={transitioning}
+                                    disabled={transitioning || (actionModal.type === 'REJECT_RESIGNATION' && !actionModal.rejectionReason?.trim())}
                                     className={clsx(
                                         "flex-1 px-4 py-2.5 text-white text-[10px] font-black uppercase tracking-widest rounded transition-all flex items-center justify-center gap-2",
                                         actionModal.type?.includes('REJECT') ? "bg-rose-600 hover:bg-rose-700" : "bg-indigo-600 hover:bg-indigo-700"

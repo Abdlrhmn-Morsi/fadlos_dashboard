@@ -14,7 +14,7 @@ import { Permissions } from '../../../types/permissions';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { getMySubscriptionUsage } from '../../subscriptions/api/subscriptions.api';
 
-const DeliveryDriversList = () => {
+const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: number, sent: number, resignations: number } }) => {
     const { getCache, setCache, updateCacheItem, invalidateCache } = useCache();
     const { user, hasPermission } = useAuth();
     const isSystemAdmin = user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN;
@@ -258,6 +258,7 @@ const DeliveryDriversList = () => {
         driverId: null as string | null,
         accept: false
     });
+    const [resignationRejectionReason, setResignationRejectionReason] = useState('');
 
     const handleResignationClick = (driverId: string, accept: boolean) => {
         setResignationModal({ isOpen: true, driverId, accept });
@@ -267,7 +268,11 @@ const DeliveryDriversList = () => {
         if (!resignationModal.driverId) return;
 
         try {
-            await respondToResignation(resignationModal.driverId, resignationModal.accept);
+            await respondToResignation(
+                resignationModal.driverId,
+                resignationModal.accept,
+                !resignationModal.accept ? resignationRejectionReason : undefined
+            );
             toast.success(resignationModal.accept ? t('delivery.drivers.resignation_accepted', 'Resignation accepted') : t('delivery.drivers.resignation_rejected', 'Resignation rejected'));
             invalidateCache(CACHE_KEY);
             fetchDrivers();
@@ -275,6 +280,7 @@ const DeliveryDriversList = () => {
             toast.error(error.response?.data?.message || t('common.error_occurred'));
         } finally {
             setResignationModal({ isOpen: false, driverId: null, accept: false });
+            setResignationRejectionReason('');
         }
     };
 
@@ -365,12 +371,16 @@ const DeliveryDriversList = () => {
                     <button
                         onClick={() => handleTabChange('resignations')}
                         className={clsx(
-                            "px-6 py-2 rounded-lg text-sm font-bold transition-all relative",
+                            "flex items-center gap-2 px-6 py-2 rounded-lg text-sm font-bold transition-all relative",
                             view === 'resignations' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
                         {t('delivery.drivers.resignations', 'Resignations')}
-                        {view !== 'resignations' && drivers.some(d => d.deliveryProfile?.hiringRequestStatus === 'RESIGNATION_PENDING') && (
+                        {view !== 'resignations' && pendingCounts?.resignations ? (
+                            <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full">
+                                {pendingCounts.resignations}
+                            </span>
+                        ) : view !== 'resignations' && drivers.some(d => d.deliveryProfile?.hiringRequestStatus === 'RESIGNATION_PENDING') && (
                             <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
                         )}
                     </button>
@@ -651,13 +661,58 @@ const DeliveryDriversList = () => {
                 message={t('delivery.drivers.remove_confirm_message', 'Are you sure you want to remove this driver from your store? This action cannot be undone.')}
             />
 
-            <ConfirmModal
-                isOpen={resignationModal.isOpen}
-                onCancel={() => setResignationModal({ isOpen: false, driverId: null, accept: false })}
-                onConfirm={confirmResignationResponse}
-                title={resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_title', 'Accept Resignation') : t('delivery.drivers.drivers.reject_resignation_title', 'Reject Resignation')}
-                message={resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_confirm') : t('delivery.drivers.drivers.reject_resignation_confirm')}
-            />
+            {resignationModal.isOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
+                        <div className="p-6">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                {resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_title', 'Accept Resignation') : t('delivery.drivers.drivers.reject_resignation_title', 'Reject Resignation')}
+                            </h3>
+                            <p className="text-sm text-slate-500 font-medium mb-4">
+                                {resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_confirm') : t('delivery.drivers.drivers.reject_resignation_confirm')}
+                            </p>
+
+                            {!resignationModal.accept && (
+                                <div className="mb-4">
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                        {t('rejection_reason', 'Reason for rejection')} <span className="text-rose-500">*</span>
+                                    </label>
+                                    <textarea
+                                        value={resignationRejectionReason}
+                                        onChange={(e) => setResignationRejectionReason(e.target.value)}
+                                        placeholder={t('rejection_reason_placeholder', 'Please provide a reason...')}
+                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-none h-24"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-3 mt-6">
+                                <button
+                                    onClick={() => {
+                                        setResignationModal({ isOpen: false, driverId: null, accept: false });
+                                        setResignationRejectionReason('');
+                                    }}
+                                    className="px-5 py-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-bold text-sm transition-colors"
+                                >
+                                    {t('common:cancel', 'Cancel')}
+                                </button>
+                                <button
+                                    onClick={confirmResignationResponse}
+                                    disabled={!resignationModal.accept && !resignationRejectionReason.trim()}
+                                    className={clsx(
+                                        "px-5 py-2.5 rounded-xl font-bold text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed",
+                                        resignationModal.accept
+                                            ? "bg-emerald-600 hover:bg-emerald-700 text-white"
+                                            : "bg-rose-600 hover:bg-rose-700 text-white"
+                                    )}
+                                >
+                                    {resignationModal.accept ? t('accept', 'Accept') : t('reject', 'Reject')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
         </div >
     );

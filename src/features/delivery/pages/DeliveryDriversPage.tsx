@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Truck, Globe, Clock, Plus } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { getSentHiringRequests, getReceivedHiringRequests, respondToHiringRequest, cancelHiringRequest, respondToTransition } from '../api/delivery-drivers.api';
+import { getSentHiringRequests, getReceivedHiringRequests, respondToHiringRequest, cancelHiringRequest, respondToTransition, getPendingCounts } from '../api/delivery-drivers.api';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Permissions } from '../../../types/permissions';
@@ -44,6 +44,23 @@ const DeliveryDriversPage = () => {
     const [rejectingRequestId, setRejectingRequestId] = useState<string | null>(null);
     const [acceptingRequestId, setAcceptingRequestId] = useState<string | null>(null);
     const [activeActionRequest, setActiveActionRequest] = useState<any | null>(null);
+
+    const [pendingCounts, setPendingCounts] = useState<{incoming: number, sent: number, resignations: number}>({
+        incoming: 0, sent: 0, resignations: 0
+    });
+
+    const fetchCounts = async () => {
+        try {
+            const counts = await getPendingCounts();
+            if (counts) setPendingCounts(counts);
+        } catch (error) {
+            console.error('Failed to fetch pending counts:', error);
+        }
+    };
+
+    useEffect(() => {
+        fetchCounts();
+    }, []);
 
     const fetchIncomingRequests = async (page: number = incomingRequestsData.page) => {
         setLoading(true);
@@ -104,6 +121,7 @@ const DeliveryDriversPage = () => {
             await cancelHiringRequest(cancellingRequestId);
             fetchIncomingRequests();
             fetchSentRequests();
+            fetchCounts();
         } catch (error) {
             console.error(`Failed to cancel hiring request:`, error);
         } finally {
@@ -112,22 +130,30 @@ const DeliveryDriversPage = () => {
         }
     };
 
+    const [rejectionReason, setRejectionReason] = useState<string>('');
+
     const confirmReject = async () => {
         if (!rejectingRequestId || !activeActionRequest) return;
         setLoading(true);
         try {
             if (activeActionRequest.status === 'TRANSITION_OFFER') {
-                await respondToTransition(rejectingRequestId, false);
+                if (!rejectionReason.trim()) {
+                    toast.error(t('rejection_reason_required', 'Rejection reason is required.'));
+                    return;
+                }
+                await respondToTransition(rejectingRequestId, false, rejectionReason);
             } else {
                 await respondToHiringRequest(rejectingRequestId, 'REJECTED');
             }
             fetchIncomingRequests();
+            fetchCounts();
         } catch (error) {
             console.error(`Failed to reject request:`, error);
         } finally {
             setLoading(false);
             setRejectingRequestId(null);
             setActiveActionRequest(null);
+            setRejectionReason('');
         }
     };
 
@@ -142,6 +168,7 @@ const DeliveryDriversPage = () => {
             }
             fetchIncomingRequests();
             fetchSentRequests();
+            fetchCounts();
         } catch (error) {
             console.error(`Failed to accept request:`, error);
         } finally {
@@ -194,7 +221,7 @@ const DeliveryDriversPage = () => {
                 <button
                     onClick={() => setActiveTab('incoming')}
                     className={clsx(
-                        "flex items-center gap-2 px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
+                        "flex items-center justify-center gap-2 px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
                         activeTab === 'incoming'
                             ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
                             : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -202,11 +229,16 @@ const DeliveryDriversPage = () => {
                 >
                     <Clock size={18} />
                     {t('dashboard:incomingRequests')}
+                    {pendingCounts.incoming > 0 && (
+                        <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full ml-1">
+                            {pendingCounts.incoming}
+                        </span>
+                    )}
                 </button>
                 <button
                     onClick={() => setActiveTab('sent')}
                     className={clsx(
-                        "flex items-center gap-2 px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
+                        "flex items-center justify-center gap-2 px-6 py-3 font-medium text-sm transition-colors border-b-2 whitespace-nowrap",
                         activeTab === 'sent'
                             ? "border-indigo-600 text-indigo-600 dark:text-indigo-400"
                             : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
@@ -214,6 +246,11 @@ const DeliveryDriversPage = () => {
                 >
                     <Globe size={18} />
                     {t('dashboard:sentInvitations')}
+                    {pendingCounts.sent > 0 && (
+                        <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full ml-1">
+                            {pendingCounts.sent}
+                        </span>
+                    )}
                 </button>
                 <button
                     onClick={() => setActiveTab('marketplace')}
@@ -229,7 +266,7 @@ const DeliveryDriversPage = () => {
                 </button>
             </div>
 
-            {activeTab === 'my-drivers' && <DeliveryDriversList />}
+            {activeTab === 'my-drivers' && <DeliveryDriversList pendingCounts={pendingCounts} />}
             {activeTab === 'incoming' && (
                 <>
                     <HiringRequestsList
@@ -302,13 +339,54 @@ const DeliveryDriversPage = () => {
                 onCancel={() => setCancellingRequestId(null)}
             />
 
-            <ConfirmModal
-                isOpen={!!rejectingRequestId}
-                title={t('delivery.drivers.reject_confirm_title', 'Reject Application')}
-                message={t('delivery.drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
-                onConfirm={confirmReject}
-                onCancel={() => setRejectingRequestId(null)}
-            />
+            {rejectingRequestId && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100">
+                        <div className="p-6">
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
+                                {t('delivery.drivers.reject_confirm_title', 'Reject Application')}
+                            </h3>
+                            <p className="text-sm text-slate-500 font-medium mb-4">
+                                {t('delivery.drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
+                            </p>
+                            
+                            {activeActionRequest?.status === 'TRANSITION_OFFER' && (
+                                <div className="mb-4">
+                                    <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+                                        {t('rejection_reason', 'Reason for rejection')} <span className="text-rose-500">*</span>
+                                    </label>
+                                    <textarea
+                                        value={rejectionReason}
+                                        onChange={(e) => setRejectionReason(e.target.value)}
+                                        placeholder={t('rejection_reason_placeholder', 'Please provide a reason...')}
+                                        className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-none h-24"
+                                    />
+                                </div>
+                            )}
+
+                            <div className="flex justify-end gap-3 mt-6">
+                                <button
+                                    onClick={() => {
+                                        setRejectingRequestId(null);
+                                        setActiveActionRequest(null);
+                                        setRejectionReason('');
+                                    }}
+                                    className="px-5 py-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-bold text-sm transition-colors"
+                                >
+                                    {t('common:cancel', 'Cancel')}
+                                </button>
+                                <button
+                                    onClick={confirmReject}
+                                    disabled={activeActionRequest?.status === 'TRANSITION_OFFER' && !rejectionReason.trim()}
+                                    className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {t('dashboard:reject', 'Reject')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             <ConfirmModal
                 isOpen={!!acceptingRequestId}

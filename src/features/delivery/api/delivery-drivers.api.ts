@@ -230,9 +230,9 @@ export const getReceivedHiringRequests = async (params?: { page?: number; limit?
     }
 };
 
-export const respondToResignation = async (deliveryId: string, accept: boolean) => {
+export const respondToResignation = async (deliveryId: string, accept: boolean, rejectionReason?: string) => {
     try {
-        const response = await apiService.patch(`/delivery-drivers/hire/requests/${deliveryId}/resignation`, { accept });
+        const response = await apiService.patch(`/delivery-drivers/hire/requests/${deliveryId}/resignation`, { accept, rejectionReason });
         return response.data || response;
     } catch (error) {
         throw error;
@@ -251,6 +251,15 @@ export const initiateTransition = async (data: { deliveryId?: string; storeId?: 
 export const respondToTransition = async (requestId: string, accept: boolean, rejectionReason?: string) => {
     try {
         const response = await apiService.patch(`/delivery-drivers/transitions/${requestId}/respond`, { accept, rejectionReason });
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getPendingCounts = async () => {
+    try {
+        const response = await apiService.get('/delivery-drivers/hiring-requests/pending-counts');
         return response.data || response;
     } catch (error) {
         throw error;
