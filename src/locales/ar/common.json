@@ -30,8 +30,11 @@
         "driverVerification": "توثيق السائقين",
         "select_options": "اختر...",
         "verificationRequests": "طلبات التوثيق",
-        "storeVerification": "توثيق المتاجر"
+        "storeVerification": "توثيق المتاجر",
+        "confirm": "تأكيد",
+        "cancel": "إلغاء"
     },
+    "transitionToFreelancerMsg": "يرغب سائق المتجر في أن يصبح عملاً حراً",
     "upgradeRequired": "لقد وصلت إلى الحد المسموح به {{feature}}. يرجى ترقية باقتك.",
     "errorCheckingLimits": "خطأ في التحقق من حدود الاشتراك",
     "addFirstProduct": "أضف منتجك الأول",
@@ -202,6 +205,8 @@
     "email": "البريد الإلكتروني",
     "phone": "رقم الهاتف",
     "actions": "الإجراءات",
+    "accept": "قبول",
+    "reject": "رفض",
     "remove": "إزالة",
     "confirmed": "مؤكد",
     "prepared": "تم التجهيز",
@@ -235,8 +240,6 @@
     "verificationError": "فشل تحديث حالة التوثيق",
     "approve_confirm_msg": "هل أنت متأكد أنك تريد توثيق هذا السائق؟ سيتمكن من البدء في قبول الطلبات على الفور.",
     "reject_confirm_msg": "يرجى تقديم سبب لرفض طلب هذا السائق.",
-    "approve": "قبول",
-    "reject": "رفض",
     "type": "النوع",
     "documents": "مستندات الهوية",
     "verificationStatuses": {
@@ -247,7 +250,17 @@
         "PENDING": "قيد الانتظار",
         "ACTIVE": "نشط",
         "ACCEPTED": "مقبول",
-        "REMOVED": "تمت الإزالة"
+        "REMOVED": "تمت الإزالة",
+        "RESIGNATION_PENDING": "طلب استقالة",
+        "resignationUpdateTitle": "تحديث الاستقالة",
+        "resignationAcceptedMessage": "تم قبول استقالتك من {{storeName}}.",
+        "resignationRejectedMessage": "تم رفض طلب استقالتك من {{storeName}}.",
+        "transitionOfferTitle": "عرض عمل",
+        "transitionOfferMessage": "يريد متجر {{storeName}} تعيينك كسائق خاص للمتجر.",
+        "driverResignationRequestTitle": "استقالة سائق",
+        "driverResignationRequestMessage": "أرسل السائق {{driverName}} طلباً للاستقالة.",
+        "driverTransitionRequestTitle": "طلب انتقال",
+        "driverTransitionRequestMessage": "دعاك متجر {{storeName}} لتصبح سائقاً للمتجر."
     },
     "driverTypes": {
         "STORE_DRIVER": "سائق متجر",
@@ -702,18 +715,38 @@
                 "cancel_hiring_failed": "فشل إلغاء طلب التوظيف",
                 "pending_freelancer_docs_msg": "ستكون مستندات الهوية مرئية بمجرد أن تصبح حالة طلب التوظيف مقبول.",
                 "accept_confirm_title": "الموافقة على الطلب",
-                "accept_confirm_message": "هل أنت متأكد من الموافقة على طلب انضمام هذا السائق؟ سيتم إضافته إلى قائمة سائقي متجرك."
+                "accept_confirm_message": "هل أنت متأكد من الموافقة على طلب انضمام هذا السائق؟ سيتم إضافته إلى قائمة سائقي متجرك.",
+                "accept_resignation_title": "قبول الاستقالة",
+                "accept_resignation_confirm": "هل أنت متأكد أنك تريد قبول استقالة هذا السائق؟",
+                "reject_resignation_title": "رفض الاستقالة",
+                "reject_resignation_confirm": "هل أنت متأكد أنك تريد رفض طلب استقالة هذا السائق؟"
+            },
+            "resignation": {
+                "request_received": "طلب استقالة"
+            },
+            "transition": {
+                "title": "إجراء التحويل",
+                "make_store_driver": "تحويل لسائق متجر",
+                "resend_store_driver_offer": "إعادة إرسال عرض سائق متجر",
+                "offer_pending": "العرض قيد الانتظار",
+                "make_store_driver_confirm": "هل أنت متأكد من رغبتك في دعوة هذا السائق ليصبح سائقاً للمتجر؟ سيكون حصرياً لمتجرك بمجرد قبوله.",
+                "convert_to_freelancer_confirm": "هل أنت متأكد من رغبتك في تحويل هذا السائق إلى سياق مستقل؟ سيكون قادراً على العمل مع متاجر أخرى.",
+                "offer_sent": "تم إرسال عرض سائق المتجر بنجاح",
+                "request_sent": "تم إرسال طلب التحول لسائق مستقل"
             },
             "hiring_status": {
                 "pending": "قيد الانتظار",
                 "accepted": "مقبول",
                 "rejected": "مرفوض",
-                "removed": "تمت الإزالة"
+                "removed": "تمت الإزالة",
+                "resignation_pending": "قيد الاستقالة",
+                "transition_offer": "عرض تحويل"
             },
             "status": {
                 "available": "متاح",
                 "busy": "مشغول"
             },
+            "resignations": "الاستقالات",
             "stats": {
                 "active_orders": "طلبات نشطة",
                 "on_the_way_orders": "في الطريق",
@@ -729,7 +762,12 @@
             "select_towns": "اختر المدن",
             "select_places": "اختر المناطق",
             "select_town_first": "يرجى اختيار مدينة أولاً",
-            "no_places_found": "لم يتم العثور على مناطق للمدن المختارة"
+            "no_places_found": "لم يتم العثور على مناطق للمدن المختارة",
+            "active_drivers": "النشطين",
+            "history": {
+                "title": "السجل",
+                "access_expires": "ينتهي الوصول خلال {{days}} يوم"
+            }
         }
     },
     "fields": {
@@ -749,9 +787,15 @@
         "vehicle": "المركبة",
         "avatar": "الصورة الشخصية",
         "active_orders": "الطلبات النشطة",
+        "resignation_reason": "سبب الاستقالة",
         "total_orders": "إجمالي الطلبات",
+        "notes": "ملاحظات",
+        "notes_placeholder": "أضف أي ملاحظات إضافية...",
         "maxOrdersPerDriver": "الحد الأقصى للطلبات لكل سائق"
     },
+    "cannotRemoveDriverWithActiveOrders": "لا يمكن إزالة السائق ولديه طلبات نشطة في متجرك.",
+    "cannotResignWithActiveOrders": "لا يمكنك الاستقالة ولديك طلبات نشطة.",
+    "driverNotAssociatedWithThisStore": "هذا السائق ليس مرتبطاً بمتجرك.",
     "vehicle_types": {
         "bicycle": "دراجة هوائية",
         "ebike": "دراجة كهربائية",

@@ -229,3 +229,30 @@ export const getReceivedHiringRequests = async (params?: { page?: number; limit?
         throw error;
     }
 };
+
+export const respondToResignation = async (deliveryId: string, accept: boolean) => {
+    try {
+        const response = await apiService.patch(`/delivery-drivers/hire/requests/${deliveryId}/resignation`, { accept });
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const initiateTransition = async (data: { deliveryId?: string; storeId?: string; type: 'TO_FREELANCER' | 'TO_STORE_DRIVER'; notes?: string }) => {
+    try {
+        const response = await apiService.post('/delivery-drivers/transitions/initiate', data);
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const respondToTransition = async (requestId: string, accept: boolean, rejectionReason?: string) => {
+    try {
+        const response = await apiService.patch(`/delivery-drivers/transitions/${requestId}/respond`, { accept, rejectionReason });
+        return response.data || response;
+    } catch (error) {
+        throw error;
+    }
+};

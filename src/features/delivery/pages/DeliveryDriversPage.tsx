@@ -1,16 +1,38 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { DeliveryDriversList, FreelancerMarketplace } from '../components';
 import { useTranslation } from 'react-i18next';
-import { Truck, Globe, Clock } from 'lucide-react';
+import { Truck, Globe, Clock, Plus } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
-import { getSentHiringRequests, getReceivedHiringRequests, respondToHiringRequest, cancelHiringRequest } from '../api/delivery-drivers.api';
+import { getSentHiringRequests, getReceivedHiringRequests, respondToHiringRequest, cancelHiringRequest, respondToTransition } from '../api/delivery-drivers.api';
+import { useAuth } from '../../../contexts/AuthContext';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
+import { Permissions } from '../../../types/permissions';
+import { getMySubscriptionUsage } from '../../subscriptions/api/subscriptions.api';
+import { toast } from '../../../utils/toast';
 
 const DeliveryDriversPage = () => {
     const { t } = useTranslation(['common', 'dashboard']);
     const { isRTL } = useLanguage();
-    const [activeTab, setActiveTab] = useState<'my-drivers' | 'incoming' | 'sent' | 'marketplace'>('my-drivers');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { hasPermission } = useAuth();
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    const mainTabParam = searchParams.get('mainTab');
+    const validTabs = ['my-drivers', 'incoming', 'sent', 'marketplace'];
+    const activeTab = mainTabParam && validTabs.includes(mainTabParam) 
+        ? mainTabParam as 'my-drivers' | 'incoming' | 'sent' | 'marketplace'
+        : 'my-drivers';
+
+    const setActiveTab = (tab: 'my-drivers' | 'incoming' | 'sent' | 'marketplace') => {
+        setSearchParams(prev => {
+            prev.set('mainTab', tab);
+            return prev;
+        }, { replace: true });
+    };
+
     const [incomingRequestsData, setIncomingRequestsData] = useState<{ requests: any[], totalPages: number, page: number }>({
         requests: [], totalPages: 1, page: 1
     });
@@ -21,6 +43,7 @@ const DeliveryDriversPage = () => {
     const [cancellingRequestId, setCancellingRequestId] = useState<string | null>(null);
     const [rejectingRequestId, setRejectingRequestId] = useState<string | null>(null);
     const [acceptingRequestId, setAcceptingRequestId] = useState<string | null>(null);
+    const [activeActionRequest, setActiveActionRequest] = useState<any | null>(null);
 
     const fetchIncomingRequests = async (page: number = incomingRequestsData.page) => {
         setLoading(true);
@@ -55,7 +78,9 @@ const DeliveryDriversPage = () => {
         else if (activeTab === 'sent') fetchSentRequests(1);
     }, [activeTab]);
 
-    const handleHiringAction = async (requestId: string, action: 'ACCEPT' | 'REJECT' | 'CANCEL') => {
+    const handleHiringAction = async (request: any, action: 'ACCEPT' | 'REJECT' | 'CANCEL') => {
+        const requestId = request.id;
+        setActiveActionRequest(request);
         if (action === 'CANCEL') {
             setCancellingRequestId(requestId);
             return;
@@ -88,37 +113,70 @@ const DeliveryDriversPage = () => {
     };
 
     const confirmReject = async () => {
-        if (!rejectingRequestId) return;
+        if (!rejectingRequestId || !activeActionRequest) return;
         setLoading(true);
         try {
-            await respondToHiringRequest(rejectingRequestId, 'REJECTED');
+            if (activeActionRequest.status === 'TRANSITION_OFFER') {
+                await respondToTransition(rejectingRequestId, false);
+            } else {
+                await respondToHiringRequest(rejectingRequestId, 'REJECTED');
+            }
             fetchIncomingRequests();
         } catch (error) {
-            console.error(`Failed to reject hiring request:`, error);
+            console.error(`Failed to reject request:`, error);
         } finally {
             setLoading(false);
             setRejectingRequestId(null);
+            setActiveActionRequest(null);
         }
     };
 
     const confirmAccept = async () => {
-        if (!acceptingRequestId) return;
+        if (!acceptingRequestId || !activeActionRequest) return;
         setLoading(true);
         try {
-            await respondToHiringRequest(acceptingRequestId, 'ACCEPTED');
+            if (activeActionRequest.status === 'TRANSITION_OFFER') {
+                await respondToTransition(acceptingRequestId, true);
+            } else {
+                await respondToHiringRequest(acceptingRequestId, 'ACCEPTED');
+            }
             fetchIncomingRequests();
             fetchSentRequests();
         } catch (error) {
-            console.error(`Failed to accept hiring request:`, error);
+            console.error(`Failed to accept request:`, error);
         } finally {
             setLoading(false);
             setAcceptingRequestId(null);
+            setActiveActionRequest(null);
         }
     };
 
     return (
         <div className="p-6 space-y-6">
-            <h1 className="text-2xl font-bold mb-4">{t('delivery.drivers.title', 'Store Drivers')}</h1>
+            <div className="flex items-center justify-between mb-4">
+                <h1 className="text-2xl font-bold">{t('delivery.drivers.title', 'Store Drivers')}</h1>
+                {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
+                    <button
+                        onClick={async () => {
+                            try {
+                                const usage = await getMySubscriptionUsage();
+                                // We need the current count of drivers. 
+                                // Since we don't have it here easily without fetching, 
+                                // we might want to just navigate or fetch briefly.
+                                // For now, let's just navigate and let the new page handle it or check again.
+                                // Alternatively, we can pass a callback to DeliveryDriversList.
+                                navigate('/delivery-drivers/new', { state: { from: location.pathname + location.search } });
+                            } catch (err) {
+                                navigate('/delivery-drivers/new', { state: { from: location.pathname + location.search } });
+                            }
+                        }}
+                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-all shadow-sm flex items-center gap-2"
+                    >
+                        <Plus size={18} />
+                        {t('delivery.drivers.add_new')}
+                    </button>
+                )}
+            </div>
 
             <div className="flex border-b border-slate-200 dark:border-slate-700 overflow-x-auto">
                 <button
@@ -263,7 +321,7 @@ const DeliveryDriversPage = () => {
     );
 };
 
-const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: any[], type: 'incoming' | 'sent', loading: boolean, onAction: (id: string, action: any) => void }) => {
+const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: any[], type: 'incoming' | 'sent', loading: boolean, onAction: (req: any, action: any) => void }) => {
     const { t } = useTranslation(['common', 'dashboard']);
     const { isRTL } = useLanguage();
 
@@ -279,90 +337,99 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
         <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-sm">
             <div className="overflow-x-auto">
                 <table className="w-full text-start border-collapse text-sm" dir={isRTL ? 'rtl' : 'ltr'}>
-                    <thead>
-                        <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider text-start">
-                            <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.name')}</th>
-                            <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common.hiringStatus')}</th>
-                            <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common.driverVerification')}</th>
-                            <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.date')}</th>
-                            <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('actions')}</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
-                        {requests.map((req) => {
-                            const avatarUrl = req.delivery?.avatarUrl || req.driver?.deliveryProfile?.avatarUrl;
-                            const driverName = req.delivery?.profile?.user?.name || req.driver?.name || 'Unknown';
-                            const driverUsername = req.delivery?.profile?.user?.username || req.driver?.username || 'unknown';
-                            const verificationStatus = req.delivery?.verificationStatus || req.driver?.deliveryProfile?.verificationStatus || 'Unknown';
-
-                            return (
-                                <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                                    <td className="px-6 py-4 text-start">
-                                        <div className="flex items-center gap-3 text-start">
-                                            <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100">
-                                                {avatarUrl ? (
-                                                    <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center text-slate-300">
-                                                        <Truck size={20} />
-                                                    </div>
-                                                )}
-                                            </div>
-                                            <div className="text-start">
-                                                <p className="font-bold text-slate-900 dark:text-white uppercase tracking-tight">{driverName}</p>
-                                                <p className="text-[10px] text-slate-500 lowercase">@{driverUsername}</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-4 text-start">
-                                        <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded">
-                                            {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-start">
-                                        <span className={clsx(
-                                            "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
-                                            verificationStatus === 'VERIFIED'
-                                                ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                                : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
-                                        )}>
-                                            {verificationStatus === 'VERIFIED' ? t('common.verified') : verificationStatus}
-                                        </span>
-                                    </td>
-                                    <td className="px-6 py-4 text-slate-500 text-start">
-                                        {new Date(req.updatedAt).toLocaleDateString()}
-                                    </td>
-                                    <td className="px-6 py-4 text-start">
-                                        <div className="flex justify-start gap-2 text-start">
-                                            {type === 'incoming' && req.status === 'PENDING' && (
-                                                <>
-                                                    <button
-                                                        onClick={() => onAction(req.id, 'ACCEPT')}
-                                                        className="px-3 py-1.5 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors rounded shadow-lg shadow-emerald-600/20"
-                                                    >
-                                                        {t('dashboard:approve')}
-                                                    </button>
-                                                    <button
-                                                        onClick={() => onAction(req.id, 'REJECT')}
-                                                        className="px-3 py-1.5 bg-rose-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-rose-700 transition-colors rounded shadow-lg shadow-rose-600/20"
-                                                    >
-                                                        {t('common:reject')}
-                                                    </button>
-                                                </>
-                                            )}
-                                            {type === 'sent' && req.status === 'PENDING' && (
-                                                <button
-                                                    onClick={() => onAction(req.id, 'CANCEL')}
-                                                    className="px-3 py-1.5 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-wider hover:bg-slate-300 transition-colors rounded"
-                                                >
-                                                    {t('dashboard:cancelInvitation')}
-                                                </button>
-                                            )}
-                                        </div>
-                                    </td>
+                            <thead>
+                                <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider text-start">
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.name')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common.hiringStatus')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.notes')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common.driverVerification')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.date')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start"></th>
                                 </tr>
-                            )
-                        })}
+                            </thead>
+                            <tbody className="divide-y divide-slate-200 dark:divide-slate-800">
+                                {requests.map((req) => {
+                                    const avatarUrl = req.delivery?.avatarUrl || req.driver?.deliveryProfile?.avatarUrl;
+                                    const driverName = req.delivery?.profile?.user?.name || req.driver?.name || 'Unknown';
+                                    const driverUsername = req.delivery?.profile?.user?.username || req.driver?.username || 'unknown';
+                                    const verificationStatus = req.delivery?.verificationStatus || req.driver?.deliveryProfile?.verificationStatus || 'Unknown';
+
+                                    return (
+                                        <tr key={req.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                                            <td className="px-6 py-4 text-start">
+                                                <div className="flex items-center gap-3 text-start">
+                                                    <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100">
+                                                        {avatarUrl ? (
+                                                            <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                        ) : (
+                                                            <div className="w-full h-full flex items-center justify-center text-slate-300">
+                                                                <Truck size={20} />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                    <div className="text-start">
+                                                        <p className="font-bold text-slate-900 dark:text-white uppercase tracking-tight">{driverName}</p>
+                                                        <p className="text-[10px] text-slate-500 lowercase">@{driverUsername}</p>
+
+                                                        <div className="mt-2 flex items-center gap-2">
+                                                            {type === 'incoming' && (req.status === 'PENDING' || req.status === 'TRANSITION_OFFER') && (
+                                                                <>
+                                                                    <button
+                                                                        onClick={() => onAction(req, 'ACCEPT')}
+                                                                        className="px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors rounded shadow-sm"
+                                                                    >
+                                                                        {t('dashboard:approve')}
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => onAction(req, 'REJECT')}
+                                                                        className="px-3 py-1 bg-rose-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-rose-700 transition-colors rounded shadow-sm"
+                                                                    >
+                                                                        {t('common:reject')}
+                                                                    </button>
+                                                                </>
+                                                            )}
+                                                            {type === 'sent' && (req.status === 'PENDING' || req.status === 'TRANSITION_OFFER') && (
+                                                                <button
+                                                                    onClick={() => onAction(req, 'CANCEL')}
+                                                                    className="px-3 py-1 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-wider hover:bg-slate-300 transition-colors rounded"
+                                                                >
+                                                                    {t('dashboard:cancelInvitation')}
+                                                                </button>
+                                                            )}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-start">
+                                                <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded">
+                                                    {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-start">
+                                                <div className="max-w-[300px] whitespace-pre-wrap text-slate-500 italic text-xs" title={req.notes}>
+                                                    {req.type === 'TO_FREELANCER' && req.initiatedBy === 'DRIVER' 
+                                                        ? t('transitionToFreelancerMsg') 
+                                                        : (req.notes || '-')}
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 text-start">
+                                                <span className={clsx(
+                                                    "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
+                                                    verificationStatus === 'VERIFIED'
+                                                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                        : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                                                )}>
+                                                    {verificationStatus === 'VERIFIED' ? t('common.verified') : verificationStatus}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 text-slate-500 text-start">
+                                                {new Date(req.updatedAt).toLocaleDateString()}
+                                            </td>
+                                            <td className="px-6 py-4 text-start">
+                                            </td>
+                                        </tr>
+                                    )
+                                })}
                     </tbody>
                 </table>
             </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link, useParams } from 'react-router-dom';
+import { useNavigate, Link, useParams, useLocation } from 'react-router-dom';
 import {
     ArrowLeft, Save, User, Mail, Phone, Lock, Upload,
     Image as ImageIcon, X, Bike, CreditCard, Camera, Info,
@@ -23,6 +23,8 @@ const DeliveryDriverForm = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const isEditMode = !!id;
+    const location = useLocation();
+    const backUrl = location.state?.from || '/delivery-drivers';
 
     const [submitting, setSubmitting] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -177,7 +179,7 @@ const DeliveryDriverForm = () => {
                 }
             } else {
                 toast.error(t('common.not_found', 'Driver not found'));
-                navigate('/delivery-drivers');
+                navigate(backUrl);
             }
         } catch (error) {
             console.error('Failed to fetch driver:', error);
@@ -242,7 +244,7 @@ const DeliveryDriverForm = () => {
             // Invalidate drivers cache
             invalidateCache('delivery_drivers');
 
-            navigate('/delivery-drivers');
+            navigate(backUrl);
         } catch (error: any) {
             console.error('Failed to save driver', error);
             const errorData = error.response?.data?.message;
@@ -316,7 +318,7 @@ const DeliveryDriverForm = () => {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="flex items-center gap-4">
                         <Link
-                            to="/delivery-drivers"
+                            to={backUrl}
                             className="p-2 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors shadow-sm"
                         >
                             <ArrowLeft size={20} className={clsx(isRTL && "rotate-180")} />

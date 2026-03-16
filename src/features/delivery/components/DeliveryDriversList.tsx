@@ -1,9 +1,9 @@
 import { Plus, Search, Truck, Clock, CheckCircle, XCircle, User, Trash2, Edit, Bike, Footprints, Package, ShieldCheck, ShieldAlert, Mail, Phone, X, Eye } from 'lucide-react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { getStoreDrivers, updateDriverStatus, removeDriver, toggleStoreDriverStatus } from '../api/delivery-drivers.api';
+import { getStoreDrivers, updateDriverStatus, removeDriver, toggleStoreDriverStatus, respondToResignation } from '../api/delivery-drivers.api';
 import { Pagination } from '../../../components/common/Pagination';
 import { toast } from '../../../utils/toast';
 import clsx from 'clsx';
@@ -23,11 +23,42 @@ const DeliveryDriversList = () => {
     const { isRTL } = useLanguage();
     const { t } = useTranslation('common');
     const navigate = useNavigate();
+    const location = useLocation();
     const [drivers, setDrivers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
-    const [page, setPage] = useState(1);
+    const [searchParams, setSearchParams] = useSearchParams();
+    
+    const tabParam = searchParams.get('tab');
+    const view = (tabParam === 'history' || tabParam === 'resignations') ? tabParam : 'active';
+    
+    const setView = (newView: 'active' | 'history' | 'resignations') => {
+        setSearchParams(prev => {
+            prev.set('tab', newView);
+            return prev;
+        }, { replace: true });
+    };
+
+    const pageParam = searchParams.get('page');
+    const page = pageParam ? parseInt(pageParam, 10) : 1;
+    
+    const setPage = (newPage: number) => {
+        setSearchParams(prev => {
+            if (newPage === 1) prev.delete('page');
+            else prev.set('page', newPage.toString());
+            return prev;
+        }, { replace: true });
+    };
+
+    const handleTabChange = (newView: 'active' | 'history' | 'resignations') => {
+        setSearchParams(prev => {
+            prev.set('tab', newView);
+            prev.delete('page'); // Always reset to page 1 on tab change
+            return prev;
+        }, { replace: true });
+    };
+
     const [meta, setMeta] = useState({
         total: 0,
         page: 1,
@@ -35,7 +66,6 @@ const DeliveryDriversList = () => {
         totalPages: 0,
         maxOrdersPerDriver: 5
     });
-
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -49,7 +79,8 @@ const DeliveryDriversList = () => {
         const params = {
             search: debouncedSearch,
             page,
-            limit: meta.limit
+            limit: meta.limit,
+            status: view === 'history' ? 'REMOVED' : view === 'resignations' ? 'RESIGNATION_PENDING' : 'ACCEPTED'
         };
 
         // Check cache first
@@ -88,7 +119,7 @@ const DeliveryDriversList = () => {
 
     useEffect(() => {
         fetchDrivers();
-    }, [debouncedSearch, page]);
+    }, [debouncedSearch, page, view]);
 
     const handleStatusToggle = async (driverId: string, currentStatus: string) => {
         if (currentStatus !== 'VERIFIED' && currentStatus !== 'UNDER_REVIEW') return;
@@ -211,11 +242,39 @@ const DeliveryDriversList = () => {
                 totalPages: Math.ceil((prev.total - 1) / prev.limit)
             }));
             toast.success(t('delivery.drivers.remove_success', 'Driver removed successfully'));
-        } catch (error) {
-            console.error('Failed to remove driver:', error);
-            toast.error(t('common.error', 'Failed to remove driver'));
+        } catch (error: any) {
+            console.error('Failed to remove driver error object:', error);
+            const messageKey = error?.response?.data?.message || 'common.error';
+            console.log('Extracted messageKey:', messageKey);
+            const fallback = t('common.error', 'Failed to remove driver');
+            toast.error(t(messageKey, fallback));
         } finally {
             setDeleteModal({ isOpen: false, driverId: null });
+        }
+    };
+
+    const [resignationModal, setResignationModal] = useState({
+        isOpen: false,
+        driverId: null as string | null,
+        accept: false
+    });
+
+    const handleResignationClick = (driverId: string, accept: boolean) => {
+        setResignationModal({ isOpen: true, driverId, accept });
+    };
+
+    const confirmResignationResponse = async () => {
+        if (!resignationModal.driverId) return;
+
+        try {
+            await respondToResignation(resignationModal.driverId, resignationModal.accept);
+            toast.success(resignationModal.accept ? t('delivery.drivers.resignation_accepted', 'Resignation accepted') : t('delivery.drivers.resignation_rejected', 'Resignation rejected'));
+            invalidateCache(CACHE_KEY);
+            fetchDrivers();
+        } catch (error: any) {
+            toast.error(error.response?.data?.message || t('common.error_occurred'));
+        } finally {
+            setResignationModal({ isOpen: false, driverId: null, accept: false });
         }
     };
 
@@ -234,6 +293,8 @@ const DeliveryDriversList = () => {
                 return <span {...toggleProps} className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors`}><Clock size={12} /> {t('verificationStatuses.UNDER_REVIEW', 'Under Review')}</span>;
             case 'PENDING':
                 return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('verificationStatuses.PENDING', 'Pending')}</span>;
+            case 'RESIGNATION_PENDING':
+                return <span className={`${baseClass} bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-800`}><Clock size={12} /> {t('delivery.drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
             case 'REJECTED':
                 return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('verificationStatuses.REJECTED', 'Rejected')}</span>;
             case 'REMOVED':
@@ -286,29 +347,46 @@ const DeliveryDriversList = () => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
                     </div>
-                    {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
-                        <button
-                            onClick={async (e) => {
-                                e.stopPropagation();
-                                try {
-                                    const usage = await getMySubscriptionUsage();
-                                    if (usage.limits.drivers !== -1 && usage.limits.drivers <= drivers.length) {
-                                        toast.error(t('common:upgradeRequired', { feature: t('common:deliveryDriversLimit') }));
-                                        return;
-                                    }
-                                    navigate('/delivery-drivers/new');
-                                } catch (err) {
-                                    toast.error(t('common:errorCheckingLimits'));
-                                }
-                            }}
-                            className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors shadow-sm flex items-center gap-2 justify-center"
-                        >
-                            <Plus size={18} />
-                            {t('delivery.drivers.add_new')}
-                        </button>
-                    )}
                 </div>
             </div>
+
+            {/* Tabs & Add Button Container */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-6">
+                <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-xl w-fit">
+                    <button
+                        onClick={() => handleTabChange('active')}
+                        className={clsx(
+                            "px-6 py-2 rounded-lg text-sm font-bold transition-all",
+                            view === 'active' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        )}
+                    >
+                        {t('delivery.drivers.active_drivers', 'Active')}
+                    </button>
+                    <button
+                        onClick={() => handleTabChange('resignations')}
+                        className={clsx(
+                            "px-6 py-2 rounded-lg text-sm font-bold transition-all relative",
+                            view === 'resignations' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        )}
+                    >
+                        {t('delivery.drivers.resignations', 'Resignations')}
+                        {view !== 'resignations' && drivers.some(d => d.deliveryProfile?.hiringRequestStatus === 'RESIGNATION_PENDING') && (
+                            <span className="absolute top-1 right-1 w-2 h-2 bg-rose-500 rounded-full" />
+                        )}
+                    </button>
+                    <button
+                        onClick={() => handleTabChange('history')}
+                        className={clsx(
+                            "px-6 py-2 rounded-lg text-sm font-bold transition-all",
+                            view === 'history' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                        )}
+                    >
+                        {t('delivery.drivers.history.title', 'History')}
+                    </button>
+                </div>
+
+            </div>
+
 
             {/* Summary Cards */}
             <div className="flex justify-start">
@@ -336,7 +414,12 @@ const DeliveryDriversList = () => {
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.type')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.contact')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('delivery.drivers.verification.title', 'Verification')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.hiring_status', 'Hiring Status')}</th>
+                                {view === 'active' && (
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.hiring_status', 'Hiring Status')}</th>
+                                )}
+                                {(view === 'history' || view === 'resignations') && (
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.resignation_reason', 'Reason')}</th>
+                                )}
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.active_orders', 'Active Orders')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('actions')}</th>
                             </tr>
@@ -356,7 +439,7 @@ const DeliveryDriversList = () => {
                                     <tr
                                         key={driver.id}
                                         className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
-                                        onClick={() => navigate(`/delivery-drivers/${driver.id}`)}
+                                        onClick={() => navigate(`/delivery-drivers/${driver.id}`, { state: { from: location.pathname + location.search } })}
                                     >
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             <div className="flex items-center gap-3">
@@ -382,10 +465,42 @@ const DeliveryDriversList = () => {
                                                         <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{driver.name}</span>
                                                     </div>
                                                     <span className="text-[10px] text-slate-500 lowercase font-medium">@{driver.username}</span>
-                                                    {(driver as any).isOverLimit && (
+                                                    {driver.isOverLimit && driver.storeDriverStatus === 'ACCEPTED' && (
                                                         <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
                                                             <ShieldAlert size={14} />
                                                             {t('common:notAvailableInPlan', { defaultValue: 'Not available in your current plan' })}
+                                                        </div>
+                                                    )}
+
+                                                    {driver.storeDriverStatus === 'RESIGNATION_PENDING' && (
+                                                        <div className="mt-2 space-y-2">
+                                                            {driver.resignationReason && (
+                                                                <p className="text-xs text-rose-600 dark:text-rose-400 bg-rose-50 dark:bg-rose-900/20 px-2 py-1 rounded border border-rose-100 dark:border-rose-800 italic">
+                                                                    "{driver.resignationReason}"
+                                                                </p>
+                                                            )}
+                                                            <div className="flex items-center gap-2">
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleResignationClick(driver.id, true);
+                                                                    }}
+                                                                    className="px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 rounded text-[10px] font-bold uppercase transition-colors flex items-center gap-1 shadow-sm"
+                                                                >
+                                                                    <CheckCircle size={12} />
+                                                                    {t('accept', 'Accept')}
+                                                                </button>
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        handleResignationClick(driver.id, false);
+                                                                    }}
+                                                                    className="px-3 py-1 bg-rose-600 text-white hover:bg-rose-700 rounded text-[10px] font-bold uppercase transition-colors flex items-center gap-1 shadow-sm"
+                                                                >
+                                                                    <XCircle size={12} />
+                                                                    {t('reject', 'Reject')}
+                                                                </button>
+                                                            </div>
                                                         </div>
                                                     )}
                                                 </div>
@@ -412,11 +527,35 @@ const DeliveryDriversList = () => {
                                                 {getStatusBadge(driver.deliveryProfile?.verificationStatus || 'UNVERIFIED', driver.id)}
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
-                                            <div className="flex flex-col gap-1.5 items-start">
-                                                {getStatusBadge(driver.deliveryProfile?.driverType === 'STORE_DRIVER' ? 'ACCEPTED' : driver.storeDriverStatus)}
-                                            </div>
-                                        </td>
+                                        {view === 'active' && (
+                                            <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
+                                                <div className="flex flex-col gap-1.5 items-start">
+                                                    {getStatusBadge(driver.deliveryProfile?.driverType === 'STORE_DRIVER' ? 'ACCEPTED' : driver.storeDriverStatus)}
+                                                </div>
+                                            </td>
+                                        )}
+                                        {(view === 'history' || view === 'resignations') && (
+                                            <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
+                                                <div className="flex flex-col gap-1">
+                                                    <span className="text-xs text-slate-600 dark:text-slate-400 italic">
+                                                        {driver.resignationReason || '-'}
+                                                    </span>
+                                                    {driver.resignationDate && (
+                                                        <span className="text-[10px] text-slate-400">
+                                                            {new Date(driver.resignationDate).toLocaleDateString()}
+                                                        </span>
+                                                    )}
+                                                    {view === 'history' && driver.removedAt && (
+                                                        <span className="text-[10px] text-rose-500 font-medium">
+                                                            {t('delivery.drivers.history.access_expires', {
+                                                                defaultValue: 'Access expires in {{days}} days',
+                                                                days: Math.max(0, 60 - Math.floor((new Date().getTime() - new Date(driver.removedAt).getTime()) / (1000 * 60 * 60 * 24)))
+                                                            })}
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </td>
+                                        )}
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             {(driver.storeDriverStatus === 'ACCEPTED' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') ? (
                                                 <div className="flex flex-col items-center gap-1">
@@ -435,43 +574,46 @@ const DeliveryDriversList = () => {
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             <div className="flex items-center justify-start gap-2">
-                                                {(driver.storeDriverStatus === 'ACCEPTED' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            navigate(`/delivery-drivers/${driver.id}`);
-                                                        }}
-                                                        className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                                                        title={t('actions.view', 'View')}
-                                                    >
-                                                        <Eye size={18} />
-                                                    </button>
-                                                )}
-                                                {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
-                                                    driver.storeDriverStatus === 'ACCEPTED' &&
-                                                    driver.deliveryProfile?.driverType !== 'FREELANCER' && (
-                                                        <button
-                                                            onClick={(e) => {
-                                                                e.stopPropagation();
-                                                                navigate(`/delivery-drivers/edit/${driver.id}`);
-                                                            }}
-                                                            className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
-                                                            title={t('actions.edit', 'Edit')}
-                                                        >
-                                                            <Edit size={18} />
-                                                        </button>
-                                                    )}
-                                                {hasPermission(Permissions.DELIVERY_DRIVERS_DELETE) && (
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            handleDeleteClick(driver.id);
-                                                        }}
-                                                        className="p-2 text-slate-400 hover:text-red-600 rounded transition-colors"
-                                                        title={t('actions.remove', 'Remove')}
-                                                    >
-                                                        <Trash2 size={18} />
-                                                    </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        navigate(`/delivery-drivers/${driver.id}`, { state: { from: location.pathname + location.search } });
+                                                    }}
+                                                    className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                                                    title={t('actions.view', 'View')}
+                                                >
+                                                    <Eye size={18} />
+                                                </button>
+
+                                                {view === 'active' && (
+                                                    <>
+                                                        {hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
+                                                            driver.storeDriverStatus === 'ACCEPTED' &&
+                                                            driver.deliveryProfile?.driverType !== 'FREELANCER' && (
+                                                                <button
+                                                                    onClick={(e) => {
+                                                                        e.stopPropagation();
+                                                                        navigate(`/delivery-drivers/edit/${driver.id}`, { state: { from: location.pathname + location.search } });
+                                                                    }}
+                                                                    className="p-2 text-slate-400 hover:text-indigo-600 rounded transition-colors"
+                                                                    title={t('actions.edit', 'Edit')}
+                                                                >
+                                                                    <Edit size={18} />
+                                                                </button>
+                                                            )}
+                                                        {hasPermission(Permissions.DELIVERY_DRIVERS_DELETE) && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    handleDeleteClick(driver.id);
+                                                                }}
+                                                                className="p-2 text-slate-400 hover:text-red-600 rounded transition-colors"
+                                                                title={t('actions.remove', 'Remove')}
+                                                            >
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        )}
+                                                    </>
                                                 )}
                                             </div>
                                         </td>
@@ -507,6 +649,14 @@ const DeliveryDriversList = () => {
                 onConfirm={confirmDelete}
                 title={t('delivery.drivers.remove_title', 'Remove Driver')}
                 message={t('delivery.drivers.remove_confirm_message', 'Are you sure you want to remove this driver from your store? This action cannot be undone.')}
+            />
+
+            <ConfirmModal
+                isOpen={resignationModal.isOpen}
+                onCancel={() => setResignationModal({ isOpen: false, driverId: null, accept: false })}
+                onConfirm={confirmResignationResponse}
+                title={resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_title', 'Accept Resignation') : t('delivery.drivers.drivers.reject_resignation_title', 'Reject Resignation')}
+                message={resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_confirm') : t('delivery.drivers.drivers.reject_resignation_confirm')}
             />
 
         </div >

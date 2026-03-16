@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
     ChevronLeft,
@@ -17,15 +17,29 @@ import {
     Edit,
     Calendar,
     ExternalLink,
-    Map
+    Map,
+    ArrowRightLeft,
+    UserMinus,
+    UserPlus,
+    MessageSquare,
+    ShieldAlert,
+    X
 } from 'lucide-react';
-import { getDriverById, adminToggleDriverBusy, adminToggleDriverAvailability, cancelHiringRequest } from '../api/delivery-drivers.api';
+import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { 
+    getDriverById, 
+    adminToggleDriverBusy, 
+    adminToggleDriverAvailability, 
+    cancelHiringRequest,
+    respondToResignation,
+    initiateTransition,
+    respondToTransition
+} from '../api/delivery-drivers.api';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { UserRole } from '../../../types/user-role';
 import { Permissions } from '../../../types/permissions';
 import { toast } from '../../../utils/toast';
-import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import clsx from 'clsx';
 
 // Modern Stat Card with Gradient Subtle Accent
@@ -88,6 +102,9 @@ const DriverDetail: React.FC = () => {
     const [toggling, setToggling] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
+    const location = useLocation();
+    const backUrl = location.state?.from || '/delivery-drivers';
+
     const isSystemAdmin = authUser?.role === UserRole.ADMIN || authUser?.role === UserRole.SUPER_ADMIN;
 
     // Store levels can only edit store drivers. System admins can edit both.
@@ -134,6 +151,44 @@ const DriverDetail: React.FC = () => {
 
     const [cancelling, setCancelling] = useState(false);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+    const [transitioning, setTransitioning] = useState(false);
+    const [actionModal, setActionModal] = useState<{
+        isOpen: boolean;
+        type: 'CONVERT_TO_STORE_DRIVER' | 'CONVERT_TO_FREELANCER' | 'APPROVE_RESIGNATION' | 'REJECT_RESIGNATION' | null;
+        notes?: string;
+    }>({ isOpen: false, type: null });
+
+    const handleTransition = async () => {
+        if (!id || !actionModal.type) return;
+        setTransitioning(true);
+        try {
+            if (actionModal.type === 'CONVERT_TO_STORE_DRIVER') {
+                await initiateTransition({ deliveryId: id, type: 'TO_STORE_DRIVER', notes: actionModal.notes });
+                toast.success(t('delivery.drivers.transition.offer_sent', 'Store driver offer sent successfully'));
+            } else if (actionModal.type === 'CONVERT_TO_FREELANCER') {
+                await initiateTransition({ deliveryId: id, type: 'TO_FREELANCER', notes: actionModal.notes });
+                toast.success(t('delivery.drivers.transition.request_sent', 'Request to become freelancer sent'));
+            } else if (actionModal.type === 'APPROVE_RESIGNATION') {
+                await respondToResignation(id, true);
+                toast.success(t('delivery.drivers.resignation.approved', 'Resignation approved'));
+                navigate(backUrl);
+                return;
+            } else if (actionModal.type === 'REJECT_RESIGNATION') {
+                await respondToResignation(id, false);
+                toast.success(t('delivery.drivers.resignation.rejected', 'Resignation rejected'));
+            }
+            
+            // Refresh driver data
+            const response: any = await getDriverById(id);
+            setDriver(response.data || response);
+        } catch (err: any) {
+            console.error("Transition action failed:", err);
+            toast.error(err.response?.data?.message || t('common.error'));
+        } finally {
+            setTransitioning(false);
+            setActionModal({ isOpen: false, type: null });
+        }
+    };
 
     const handleCancelHiringRequest = async () => {
         if (!driver?.storeDriverRequestId) return;
@@ -148,8 +203,8 @@ const DriverDetail: React.FC = () => {
         try {
             await cancelHiringRequest(driver.storeDriverRequestId);
             toast.success(t('delivery.drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
-            navigate('/delivery-drivers');
-        } catch (err) {
+            navigate(backUrl);
+        } catch (err: any) {
             console.error("Failed to cancel hiring request:", err);
             toast.error(t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request'));
         } finally {
@@ -189,12 +244,14 @@ const DriverDetail: React.FC = () => {
                 return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.pending', 'Pending')}</span>;
             case 'CANCELLED':
                 return <span className={`${baseClass} bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.cancelled', 'Cancelled')}</span>;
+            case 'RESIGNATION_PENDING':
+                return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
             default:
                 return <span className={`${baseClass} bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}>{status}</span>;
         }
     };
 
-    if (loading) return <LoadingSpinner />;
+    if (loading) return <LoadingSpinner fullHeight={false} />;
 
     if (error || !driver) {
         return (
@@ -204,7 +261,7 @@ const DriverDetail: React.FC = () => {
                 </div>
                 <div className="mt-6">
                     <button
-                        onClick={() => navigate('/delivery-drivers')}
+                        onClick={() => navigate(backUrl)}
                         className="flex items-center gap-2 mx-auto text-indigo-600 dark:text-indigo-400 font-bold uppercase tracking-wider text-sm hover:translate-x-[-4px] transition-transform duration-200"
                     >
                         <ChevronLeft size={18} className="rtl:rotate-180" /> {t('back')}
@@ -219,7 +276,7 @@ const DriverDetail: React.FC = () => {
             {/* Top Bar Navigation */}
             <div className="flex items-center justify-between">
                 <button
-                    onClick={() => navigate('/delivery-drivers')}
+                    onClick={() => navigate(backUrl)}
                     className="group flex items-center gap-2 text-slate-500 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 transition-colors"
                 >
                     <div className="p-2 bg-white dark:bg-slate-900 rounded-[4px] border border-slate-200 dark:border-slate-800 group-hover:border-indigo-300 dark:group-hover:border-indigo-800 shadow-sm transition-all">
@@ -230,7 +287,7 @@ const DriverDetail: React.FC = () => {
 
                 {canEdit && (
                     <button
-                        onClick={() => navigate(`/delivery-drivers/edit/${driver.id}`)}
+                        onClick={() => navigate(`/delivery-drivers/edit/${driver.id}`, { state: { from: backUrl } })}
                         className="flex items-center gap-2 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-[4px] shadow-sm shadow-indigo-200 dark:shadow-none transition-all text-sm active:scale-95"
                     >
                         <Edit size={16} />
@@ -302,7 +359,7 @@ const DriverDetail: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-[4px] border border-slate-100 dark:border-slate-700/50">
-                                    <SmartphoneIcon size={14} className="text-indigo-500" />
+                                    <Phone size={14} className="text-indigo-500" />
                                     <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest leading-none">
                                         {t('fields.phone')}
                                         <div className="text-xs text-slate-700 dark:text-slate-200 mt-0.5 font-bold">{driver.phone}</div>
@@ -314,11 +371,59 @@ const DriverDetail: React.FC = () => {
                                         disabled={cancelling}
                                         className="flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 rounded-[4px] border border-rose-100 dark:border-rose-900/30 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
                                     >
-                                        {cancelling ? <LoadingSpinner size="sm" /> : <XCircle size={14} />}
+                                        {cancelling ? <LoadingSpinner size="sm" fullHeight={false} /> : <XCircle size={14} />}
                                         {t('delivery.drivers.drivers.cancel_hiring', 'Cancel Application')}
                                     </button>
                                 )}
+                                {driver.deliveryProfile?.driverType === 'FREELANCER' && driver.storeDriverStatus === 'ACCEPTED' && (
+                                    <div className="flex flex-col gap-2">
+                                        <button
+                                            onClick={() => setActionModal({ isOpen: true, type: 'CONVERT_TO_STORE_DRIVER' })}
+                                            disabled={transitioning}
+                                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:text-indigo-400 rounded-[4px] border border-indigo-100 dark:border-indigo-900/30 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                                        >
+                                            {transitioning ? <LoadingSpinner size="sm" fullHeight={false} /> : <ArrowRightLeft size={14} />}
+                                            {driver.pendingTransition 
+                                                ? t('delivery.drivers.transition.resend_store_driver_offer', 'Resend Store Driver Offer')
+                                                : t('delivery.drivers.transition.make_store_driver', 'Make Store Driver')}
+                                        </button>
+                                        {driver.pendingTransition && (
+                                            <div className="text-[10px] text-indigo-500 font-bold flex items-center gap-1">
+                                                <Clock size={12} />
+                                                {t('delivery.drivers.transition.offer_pending', 'Offer Pending Response')}
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
                             </div>
+
+                            {driver.storeDriverStatus === 'RESIGNATION_PENDING' && (
+                                <div className="mt-6 p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-[4px] max-w-2xl">
+                                    <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 mb-3">
+                                        <ShieldAlert size={18} />
+                                        <span className="text-sm font-black uppercase tracking-wider">{t('delivery.drivers.resignation.request_received')}</span>
+                                    </div>
+                                    {driver.resignationReason && (
+                                        <div className="mb-4 p-3 bg-white/80 dark:bg-slate-900/80 rounded border border-rose-200/50 dark:border-rose-900/30 text-sm text-slate-700 dark:text-slate-300 italic border-s-4 border-s-rose-500">
+                                            "{driver.resignationReason}"
+                                        </div>
+                                    )}
+                                    <div className="flex flex-wrap items-center gap-3">
+                                        <button
+                                            onClick={() => setActionModal({ isOpen: true, type: 'APPROVE_RESIGNATION' })}
+                                            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest rounded transition-all shadow-md shadow-emerald-500/20 active:scale-95"
+                                        >
+                                            {t('accept')}
+                                        </button>
+                                        <button
+                                            onClick={() => setActionModal({ isOpen: true, type: 'REJECT_RESIGNATION' })}
+                                            className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black uppercase tracking-widest rounded transition-all shadow-md shadow-rose-500/20 active:scale-95"
+                                        >
+                                            {t('reject')}
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -482,6 +587,7 @@ const DriverDetail: React.FC = () => {
                             </a>
                         </div>
                     </div>
+
                 </div>
 
                 {/* Right Side: Verification Documents & Regions */}
@@ -638,6 +744,63 @@ const DriverDetail: React.FC = () => {
                     onConfirm={confirmCancelHiring}
                     onCancel={() => setIsCancelModalOpen(false)}
                 />
+            )}
+
+            {actionModal.isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[4px] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                <ArrowRightLeft size={16} className="text-indigo-500" />
+                                {actionModal.type?.includes('RESIGNATION') ? t('delivery.drivers.resignation.title', 'Resignation Action') : t('delivery.drivers.transition.title', 'Transition Action')}
+                            </h3>
+                            <button onClick={() => setActionModal({ isOpen: false, type: null })} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-4 leading-relaxed">
+                                {actionModal.type === 'CONVERT_TO_STORE_DRIVER' && t('delivery.drivers.transition.make_store_driver_confirm', 'Are you sure you want to invite this driver to become a Store Driver? They will be exclusive to your store once they accept.')}
+                                {actionModal.type === 'CONVERT_TO_FREELANCER' && t('delivery.drivers.transition.convert_to_freelancer_confirm', 'Are you sure you want to transition this store driver to freelancer status? They will be able to work with other stores.')}
+                                {actionModal.type === 'APPROVE_RESIGNATION' && t('delivery.drivers.drivers.accept_resignation_confirm')}
+                                {actionModal.type === 'REJECT_RESIGNATION' && t('delivery.drivers.drivers.reject_resignation_confirm')}
+                            </p>
+
+                            {(actionModal.type === 'CONVERT_TO_STORE_DRIVER' || actionModal.type === 'CONVERT_TO_FREELANCER') && (
+                                <div className="space-y-2 mb-6">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                        <MessageSquare size={12} /> {t('fields.notes', 'Notes')}
+                                    </label>
+                                    <textarea
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px] text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                                        rows={3}
+                                        placeholder={t('fields.notes_placeholder', 'Add any additional notes...')}
+                                        onChange={(e) => setActionModal(prev => ({ ...prev, notes: e.target.value }))}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="flex gap-3">
+                                <button
+                                    onClick={() => setActionModal({ isOpen: false, type: null })}
+                                    className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest rounded transition-all"
+                                >
+                                    {t('common.cancel')}
+                                </button>
+                                <button
+                                    onClick={handleTransition}
+                                    disabled={transitioning}
+                                    className={clsx(
+                                        "flex-1 px-4 py-2.5 text-white text-[10px] font-black uppercase tracking-widest rounded transition-all flex items-center justify-center gap-2",
+                                        actionModal.type?.includes('REJECT') ? "bg-rose-600 hover:bg-rose-700" : "bg-indigo-600 hover:bg-indigo-700"
+                                    )}
+                                >
+                                    {transitioning ? <LoadingSpinner size="sm" fullHeight={false} /> : t('common.confirm')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             )}
         </div>
     );

@@ -30,8 +30,11 @@
         "driverVerification": "Driver Verification",
         "select_options": "Select options...",
         "verificationRequests": "Verification Requests",
-        "storeVerification": "Store Verification"
+        "storeVerification": "Store Verification",
+        "confirm": "Confirm",
+        "cancel": "Cancel"
     },
+    "transitionToFreelancerMsg": "Our store driver wants to become a freelancer",
     "upgradeRequired": "You have reached your {{feature}} limit. Please upgrade your plan.",
     "errorCheckingLimits": "Error checking subscription limits",
     "addFirstProduct": "Add Your First Product",
@@ -199,6 +202,8 @@
     "email": "Email Address",
     "phone": "Phone Number",
     "actions": "Actions",
+    "accept": "Accept",
+    "reject": "Reject",
     "remove": "Remove",
     "status": "Status",
     "active": "Active",
@@ -238,7 +243,6 @@
     "approve_confirm_msg": "Are you sure you want to verify this driver? They will be able to start accepting orders immediately.",
     "reject_confirm_msg": "Please provide a reason for rejecting this driver's application.",
     "approve": "Approve",
-    "reject": "Reject",
     "type": "Type",
     "documents": "Verification Documents",
     "verificationStatuses": {
@@ -249,7 +253,17 @@
         "PENDING": "Pending",
         "ACTIVE": "Active",
         "ACCEPTED": "Accepted",
-        "REMOVED": "Removed"
+        "REMOVED": "Removed",
+        "RESIGNATION_PENDING": "Resignation Pending",
+        "resignationUpdateTitle": "Resignation Update",
+        "resignationAcceptedMessage": "Your resignation from {{storeName}} has been accepted.",
+        "resignationRejectedMessage": "Your resignation from {{storeName}} has been rejected.",
+        "transitionOfferTitle": "Contract Offer",
+        "transitionOfferMessage": "{{storeName}} wants to hire you as a store driver.",
+        "driverResignationRequestTitle": "Driver Resignation",
+        "driverResignationRequestMessage": "Driver {{driverName}} has sent a resignation request.",
+        "driverTransitionRequestTitle": "Transition Request",
+        "driverTransitionRequestMessage": "Store {{storeName}} has invited you to become a store driver."
     },
     "driverTypes": {
         "STORE_DRIVER": "Store Driver",
@@ -699,6 +713,7 @@
                 "available": "Available",
                 "busy": "Busy"
             },
+            "resignations": "Resignations",
             "stats": {
                 "active_orders": "Active Orders",
                 "on_the_way_orders": "On The Way",
@@ -715,13 +730,32 @@
                 "cancel_hiring_failed": "Failed to cancel hiring request",
                 "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACCEPTED.",
                 "accept_confirm_title": "Approve Application",
-                "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list."
+                "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.",
+                "accept_resignation_title": "Accept Resignation",
+                "accept_resignation_confirm": "Are you sure you want to accept this driver's resignation?",
+                "reject_resignation_title": "Reject Resignation",
+                "reject_resignation_confirm": "Are you sure you want to reject this driver's resignation request?"
+            },
+            "resignation": {
+                "request_received": "Resignation Request"
+            },
+            "transition": {
+                "title": "Transition Action",
+                "make_store_driver": "Make Store Driver",
+                "resend_store_driver_offer": "Resend Store Driver Offer",
+                "offer_pending": "Offer Pending Response",
+                "make_store_driver_confirm": "Are you sure you want to invite this driver to become a Store Driver? They will be exclusive to your store once they accept.",
+                "convert_to_freelancer_confirm": "Are you sure you want to transition this store driver to freelancer status? They will be able to work with other stores.",
+                "offer_sent": "Store driver offer sent successfully",
+                "request_sent": "Request to become freelancer sent"
             },
             "hiring_status": {
                 "pending": "Pending",
                 "accepted": "Accepted",
                 "rejected": "Rejected",
-                "removed": "Removed"
+                "removed": "Removed",
+                "resignation_pending": "Resignation Pending",
+                "transition_offer": "Transition Offer"
             },
             "reject_confirm_title": "Reject Application",
             "reject_confirm_message": "Are you sure you want to reject this driver's application? This action will notify the driver.",
@@ -730,7 +764,12 @@
             "select_towns": "Select Towns",
             "select_places": "Select Places",
             "select_town_first": "Please select a town first",
-            "no_places_found": "No places found for selected towns"
+            "no_places_found": "No places found for selected towns",
+            "active_drivers": "Active",
+            "history": {
+                "title": "History",
+                "access_expires": "Access expires in {{days}} days"
+            }
         }
     },
     "fields": {
@@ -750,8 +789,14 @@
         "vehicle": "Vehicle",
         "avatar": "Profile Photo",
         "active_orders": "Active Orders",
-        "total_orders": "Total Orders"
+        "resignation_reason": "Resignation Reason",
+        "total_orders": "Total Orders",
+        "notes": "Notes",
+        "notes_placeholder": "Add any additional notes..."
     },
+    "cannotRemoveDriverWithActiveOrders": "Cannot remove driver while they have active orders in your store.",
+    "cannotResignWithActiveOrders": "You cannot resign while you have active orders.",
+    "driverNotAssociatedWithThisStore": "This driver is not associated with your store.",
     "vehicle_types": {
         "bicycle": "Bicycle",
         "ebike": "E-Bike",
@@ -789,5 +834,12 @@
     "orderAmountIsLowerThanMinimumRequired": "Order amount is lower than the minimum required for this promo code",
     "promoCodeNotApplicableForThisOrder": "Promo code is not applicable for this order",
     "youNeedMoreOrdersToUseThisLoyaltyReward": "You need more delivered orders to use this loyalty reward",
-    "promoAvailableAfterMoreDaysOfInactivity": "This promo is only available after more days of inactivity"
+    "promoAvailableAfterMoreDaysOfInactivity": "This promo is only available after more days of inactivity",
+    "mustResignFromOtherStoresFirst": "You must resign from other stores before becoming an exclusive driver for this store.",
+    "driverNotFound": "Driver not found.",
+    "driverIsAlreadyStoreDriver": "Driver is already a store driver.",
+    "mustBeHiredAsFreelancerFirst": "Driver must be hired as a freelancer first.",
+    "driverIsAlreadyFreelancer": "Driver is already a freelancer.",
+    "notYourStoreDriver": "This driver is not your store driver.",
+    "cannotTransitionWithActiveOrders": "Cannot transition while there are active orders."
 }
