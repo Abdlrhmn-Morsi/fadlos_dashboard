@@ -602,7 +602,7 @@ const Dashboard: React.FC = () => {
                     </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-4">
                     {stats.topStores.map((store: any) => (
                         <div key={store.id} className="group p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 hover:shadow-md transition-all cursor-pointer" onClick={() => navigate(`/stores/${store.id}`)}>
                             <div className="w-16 h-16 bg-white dark:bg-slate-900 mx-auto mb-3 border border-slate-200 dark:border-slate-700 flex items-center justify-center p-1">
@@ -633,7 +633,7 @@ const Dashboard: React.FC = () => {
 
     return (
         <div className={clsx(
-            "p-6 max-w-7xl mx-auto space-y-6 min-h-full bg-[#fdfdfd] dark:bg-slate-950 transition-colors duration-500",
+            "p-6 max-w-full mx-auto space-y-6 min-h-full bg-[#fdfdfd] dark:bg-slate-950 transition-colors duration-500",
             isRTL ? "font-cairo" : "font-inter"
         )}>
             {renderStatusBanner()}
@@ -667,12 +667,12 @@ const Dashboard: React.FC = () => {
                 return (
                     <div className={clsx(
                         "grid gap-8",
-                        showOrderSummary ? "grid-cols-1 lg:grid-cols-3 xl:grid-cols-4" : "grid-cols-1"
+                        showOrderSummary ? "grid-cols-1 lg:grid-cols-4" : "grid-cols-1"
                     )}>
                         {/* Left Columns: Stat Cards Grid */}
                         <div className={clsx(
                             "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6",
-                            showOrderSummary ? "lg:col-span-2 xl:col-span-3" : "w-full"
+                            showOrderSummary ? "lg:col-span-3" : "w-full"
                         )}>
                             {(() => {
                                 const allCards = [

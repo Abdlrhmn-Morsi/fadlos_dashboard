@@ -278,7 +278,7 @@ const ReviewList = () => {
                         <LoadingSpinner fullHeight={false} />
                     </div>
                 ) : reviews.length === 0 ? (
-                    <div className="text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
+                    <div className="col-span-full text-center py-20 bg-slate-50 dark:bg-slate-900/50 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                         <MessageSquare size={48} className="mx-auto text-slate-200 mb-4" />
                         <p className="font-bold text-slate-400 uppercase tracking-widest text-sm">{t('noFeedbackYet')}</p>
                     </div>
