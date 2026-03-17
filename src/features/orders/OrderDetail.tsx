@@ -152,14 +152,19 @@ const OrderDetail = () => {
         try {
             setUpdating(true);
             const method = order.driverId ? ordersApi.reassignDriver : ordersApi.assignDriver;
-            await method(id!, confirmAssignModal.driverId);
+            const response = await method(id!, confirmAssignModal.driverId);
             setAssignDriverModal(false);
             setConfirmAssignModal({ isOpen: false, driverId: null });
             fetchOrder(); // Refresh order data
-            toast.success(t('orders:driverAssigned', 'Driver assigned successfully'));
+            const msgKey = response?.data?.message || response?.message;
+            const successMsg = msgKey ? String(t(`common:${msgKey}`, msgKey)) : t('common:driverAssignedSuccessfully', 'Driver assigned successfully');
+            toast.success(successMsg);
         } catch (error: any) {
             console.error('Failed to assign driver', error);
-            toast.error(error.response?.data?.message || t('common:error', 'Failed to assign driver'));
+            const errorData = error?.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common:error', 'Failed to assign driver');
+            toast.error(message);
         } finally {
             setUpdating(false);
         }
@@ -168,13 +173,18 @@ const OrderDetail = () => {
     const handleUnassignDriver = async () => {
         try {
             setUpdating(true);
-            await ordersApi.unassignDriver(id!);
+            const response = await ordersApi.unassignDriver(id!);
             setConfirmUnassignModal(false);
             fetchOrder();
-            toast.success(t('orders:unassignDriver', 'Driver unassigned successfully'));
+            const msgKey = response?.data?.message || response?.message;
+            const successMsg = msgKey ? String(t(`common:${msgKey}`, msgKey)) : t('common:driverUnassignedSuccessfully', 'Driver unassigned successfully');
+            toast.success(successMsg);
         } catch (error: any) {
             console.error('Failed to unassign driver', error);
-            toast.error(error.response?.data?.message || t('common:error', 'Failed to unassign driver'));
+            const errorData = error?.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common:error', 'Failed to unassign driver');
+            toast.error(message);
         } finally {
             setUpdating(false);
         }
