@@ -201,7 +201,7 @@ const DashboardLayout: React.FC = () => {
       {/* Sidebar */}
       <aside
         className={clsx(
-          'fixed inset-y-0 z-50 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 transition-all duration-300 flex flex-col',
+          'fixed inset-y-0 z-50 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 transition-all duration-300 flex flex-col print:hidden',
           isRTL ? 'right-0 border-l' : 'left-0 border-r',
           collapsed ? 'w-20' : 'w-64',
           mobileOpen
@@ -460,12 +460,12 @@ const DashboardLayout: React.FC = () => {
 
       {/* Main Content */}
       <div className={clsx(
-        "flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300",
+        "flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300 print:overflow-visible print:bg-white print:!m-0",
         isRTL
           ? (collapsed ? 'lg:mr-20' : 'lg:mr-64')
           : (collapsed ? 'lg:ml-20' : 'lg:ml-64')
       )}>
-        <header className="h-[70px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0 relative z-30 transition-colors">
+        <header className="h-[70px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0 relative z-30 transition-colors print:hidden">
           <div className="flex items-center gap-4">
             <button
               className="lg:hidden p-2 -mx-2 text-slate-500 hover:text-primary transition-colors"
@@ -536,7 +536,7 @@ const DashboardLayout: React.FC = () => {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative custom-scrollbar transition-colors">
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-950 relative custom-scrollbar transition-colors print:overflow-visible print:bg-white text-black">
           <Outlet />
         </main>
       </div>

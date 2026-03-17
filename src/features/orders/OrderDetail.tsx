@@ -500,8 +500,8 @@ const OrderDetail = () => {
     };
 
     return (
-        <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6" dir={isRTL ? 'rtl' : 'ltr'}>
-            <div className="p-6 space-y-6">
+        <div className="min-h-screen bg-slate-50/50 dark:bg-slate-950 p-6 print:bg-white print:p-0" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="p-6 space-y-6 print:hidden">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
@@ -554,7 +554,7 @@ const OrderDetail = () => {
                                     <div key={item.id} className="p-6 flex items-start gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors">
                                         <div className="w-16 h-16 bg-slate-100 dark:bg-slate-800 rounded-lg flex items-center justify-center text-slate-400 font-medium shrink-0 overflow-hidden">
                                             {item.product?.coverImage ? (
-                                                <ImageWithFallback src={item.product.coverImage} alt={item.productName} className="w-full h-full object-cover" />
+                                                <ImageWithFallback src={item.product.coverImage} alt={item.productName || item.product?.name} className="w-full h-full object-cover" />
                                             ) : (
                                                 <span>x{item.quantity}</span>
                                             )}
@@ -562,7 +562,7 @@ const OrderDetail = () => {
                                         <div className="flex-1 min-w-0">
                                             <div className="flex justify-between items-start mb-1">
                                                 <h3 className="font-bold text-slate-900 dark:text-white text-lg truncate pe-4">
-                                                    {item.productName}
+                                                    {isRTL ? (item.product?.nameAr || item.product?.name || item.productName) : (item.product?.name || item.product?.nameAr || item.productName)}
                                                 </h3>
                                                 <p className="font-bold text-slate-900 dark:text-white whitespace-nowrap">
                                                     {(Number(item.price) * item.quantity).toFixed(2)} {t('common:currencySymbol')}
@@ -1520,6 +1520,209 @@ const OrderDetail = () => {
                 </div>
             )}
 
+            {/* Print-Only Invoice Layout */}
+            <div className="hidden print:block bg-white text-black p-8 w-full max-w-4xl mx-auto font-sans" dir={isRTL ? 'rtl' : 'ltr'}>
+                {/* Invoice Header */}
+                <div className="flex justify-between items-start border-b-2 border-slate-200 pb-6 mb-6">
+                    <div>
+                        <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase mb-1">
+                            {t('orders:invoice', 'Invoice')}
+                        </h1>
+                        <p className="text-sm text-slate-600 font-medium">
+                            {t('orders:orderNumber', { number: order?.orderNumber || order?.id?.substring(0, 8) })}
+                        </p>
+                        <p className="text-sm text-slate-600 mt-1">
+                            {new Date(order?.createdAt || new Date()).toLocaleString(isRTL ? 'ar-EG' : 'en-US', {
+                                year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+                            })}
+                        </p>
+                    </div>
+                    <div className="text-right">
+                        <div className="font-bold text-slate-900 text-xl uppercase tracking-wide">
+                            {order?.store?.name || t('orders:store', 'Store')}
+                        </div>
+                        {order?.branch && (
+                            <div className="text-sm text-slate-600 mt-1 max-w-[200px] ms-auto">
+                                <p>
+                                    {isRTL
+                                    ? (order.branch.town?.arName || order.branch.town?.enName)
+                                    : (order.branch.town?.enName || order.branch.town?.arName)}
+                                </p>
+                                <p>
+                                    {isRTL
+                                    ? (order.branch.place?.arName || order.branch.place?.enName)
+                                    : (order.branch.place?.enName || order.branch.place?.arName)}
+                                </p>
+                                {(order.branch.addressEn || order.branch.addressAr) && (
+                                    <p className="mt-1">
+                                        {isRTL ? (order.branch.addressAr || order.branch.addressEn) : (order.branch.addressEn || order.branch.addressAr)}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Info Grid */}
+                <div className="grid grid-cols-2 gap-12 mb-8">
+                    {/* Customer Info */}
+                    <div>
+                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
+                            {t('orders:billTo', 'Bill To')}
+                        </h2>
+                        <div className="text-sm text-slate-800 space-y-1.5">
+                            <p className="font-bold text-lg text-slate-900">{order?.clientInfo?.name || order?.client?.name || t('orders:guest', 'Guest')}</p>
+                            {order?.clientInfo?.phone && <p className="flex items-center gap-2"><Phone size={14} className="text-slate-400"/> {order.clientInfo.phone}</p>}
+                            {order?.clientInfo?.email && <p className="flex items-center gap-2"><Mail size={14} className="text-slate-400"/> {order.clientInfo.email}</p>}
+                            
+                            {/* Payment Method nested here if present */}
+                            {order?.paymentMethod && (
+                                <div className="mt-4 pt-4 border-t border-slate-100">
+                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t('orders:paymentMethod', 'Payment Method')}</p>
+                                    <p className="font-medium text-slate-700">{order.paymentMethod.replace(/_/g, ' ')}</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Delivery Info */}
+                    <div>
+                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
+                            {t('orders:deliveryTo', 'Delivery To')}
+                        </h2>
+                        {order?.deliveryAddress ? (
+                            <div className="text-sm text-slate-800 space-y-1.5">
+                                <p className="font-bold text-slate-900">
+                                    {isRTL ? 
+                                        `${order.deliveryAddress.townArName} (${order.deliveryAddress.townEnName})` : 
+                                        `${order.deliveryAddress.townEnName} (${order.deliveryAddress.townArName})`}
+                                </p>
+                                <p className="text-slate-700">
+                                    {isRTL ? 
+                                        `${order.deliveryAddress.placeArName} (${order.deliveryAddress.placeEnName})` : 
+                                        `${order.deliveryAddress.placeEnName} (${order.deliveryAddress.placeArName})`}
+                                </p>
+                                <p className="text-slate-600 leading-relaxed mt-2 p-3 bg-slate-50 rounded-lg">{order.deliveryAddress.addressDetails}</p>
+                                {order.deliveryAddress.phone && <p className="mt-3 font-medium flex items-center gap-2"><Phone size={14} className="text-slate-400"/> {order.deliveryAddress.phone}</p>}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-slate-500 italic py-2">{t('orders:noDeliveryInfo', 'No Delivery Info')}</p>
+                        )}
+                    </div>
+                </div>
+
+                {/* Items Table */}
+                <div className="mb-10">
+                    <table className="w-full text-sm text-left border-collapse">
+                        <thead>
+                            <tr className="border-b-2 border-slate-200 bg-slate-50/50">
+                                <th className="py-3 px-4 font-black text-slate-500 uppercase tracking-widest">{t('orders:item', 'Item')}</th>
+                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:qty', 'Qty')}</th>
+                                <th className="py-3 px-4 text-right font-black text-slate-500 uppercase tracking-widest">{t('orders:price', 'Price')}</th>
+                                <th className="py-3 px-4 text-right font-black text-slate-500 uppercase tracking-widest">{t('orders:total', 'Total')}</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                            {order?.items?.map((item: any, idx: number) => (
+                                <tr key={item.id || idx} className="hover:bg-slate-50/30">
+                                    <td className="py-4 px-4">
+                                        <div className="flex items-center gap-3">
+                                            {/* Product Image */}
+                                            <div className="w-14 h-14 rounded-md border border-slate-200 overflow-hidden shrink-0 bg-slate-50 flex items-center justify-center">
+                                                {item.product?.coverImage ? (
+                                                    <ImageWithFallback src={item.product.coverImage} alt={item.productName || item.product?.name} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <Package className="w-6 h-6 text-slate-300" />
+                                                )}
+                                            </div>
+                                            
+                                            {/* Product Details */}
+                                            <div>
+                                                <p className="font-bold text-slate-900 text-base">
+                                                    {item.productName || (isRTL ? (item.product?.nameAr || item.product?.name) : (item.product?.name || item.product?.nameAr))}
+                                                </p>
+                                                <div className="mt-1 space-y-1">
+                                                    {getVariantDetails(item).map((detail, i) => (
+                                                        <p key={i} className="text-xs text-slate-500 flex items-center gap-1.5">
+                                                            <span className="w-1 h-1 rounded-full bg-slate-300"></span> {detail}
+                                                        </p>
+                                                    ))}
+                                                    {getAddonDetails(item).map((detail, i) => (
+                                                        <p key={i} className="text-xs text-slate-500 italic flex items-center gap-1.5">
+                                                            <span className="text-slate-400">+</span> {detail}
+                                                        </p>
+                                                    ))}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-4 text-center font-bold text-slate-700">{item.quantity}</td>
+                                    <td className="py-4 px-4 text-right text-slate-600 font-medium">
+                                        {Number(item.price).toFixed(2)}
+                                    </td>
+                                    <td className="py-4 px-4 text-right font-black text-slate-900 text-base">
+                                        {(Number(item.price) * item.quantity).toFixed(2)}
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Totals Section */}
+                <div className="flex justify-between items-start">
+                    {/* Driver & Notes area */}
+                    <div className="w-1/2 pr-8">
+                        {order?.driver && (
+                            <div className="mb-6 p-4 rounded-lg bg-slate-50 border border-slate-100">
+                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                    <Truck size={14}/> {t('orders:driver', 'Driver')}
+                                </h3>
+                                <p className="font-bold text-slate-800">{order.driver.name}</p>
+                                {order.driver.phone && <p className="text-sm text-slate-600">{order.driver.phone}</p>}
+                            </div>
+                        )}
+                        {order?.notes && (
+                            <div>
+                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                                    {t('orders:notes', 'Notes')}
+                                </h3>
+                                <p className="text-sm text-slate-600 italic leading-relaxed whitespace-pre-wrap p-4 bg-amber-50 rounded-lg text-amber-900 border border-amber-100">"{order.notes}"</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Calculations area */}
+                    <div className="w-5/12 space-y-3 text-sm">
+                        <div className="flex justify-between text-slate-600 py-1">
+                            <span>{t('orders:subtotal', 'Subtotal')}</span>
+                            <span className="font-medium">{Number(order?.subtotal || 0).toFixed(2)} {t('common:currencySymbol')}</span>
+                        </div>
+                        {Number(order?.deliveryFee) > 0 && (
+                            <div className="flex justify-between text-slate-600 py-1">
+                                <span>{t('orders:deliveryFee', 'Delivery Fee')}</span>
+                                <span className="font-medium">{Number(order?.deliveryFee).toFixed(2)} {t('common:currencySymbol')}</span>
+                            </div>
+                        )}
+                        {Number(order?.promoDiscount) > 0 && (
+                            <div className="flex justify-between text-emerald-600 py-1">
+                                <span>{t('orders:discount', 'Discount')}</span>
+                                <span className="font-medium">-{Number(order?.promoDiscount).toFixed(2)} {t('common:currencySymbol')}</span>
+                            </div>
+                        )}
+                        <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-slate-900">
+                            <span className="font-black text-slate-900 uppercase tracking-widest text-lg">{t('orders:total', 'Total')}</span>
+                            <span className="text-2xl font-black text-slate-900">
+                                {Number(order?.totalAmount || order?.total || 0).toFixed(2)} {t('common:currencySymbol')}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div className="mt-16 text-center text-xs text-slate-400 font-bold tracking-widest uppercase">
+                    *** {t('orders:thankYou', 'Thank you for your business!')} ***
+                </div>
+            </div>
 
             <ConfirmationModal
                 isOpen={confirmDeliveryModal}
