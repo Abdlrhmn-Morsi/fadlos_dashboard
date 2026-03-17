@@ -1539,7 +1539,7 @@ const OrderDetail = () => {
                     </div>
                     <div className="text-right">
                         <div className="font-bold text-slate-900 text-xl uppercase tracking-wide">
-                            {order?.store?.name || t('orders:store', 'Store')}
+                            {(isRTL ? (order?.store?.nameAr || order?.store?.name) : (order?.store?.name || order?.store?.nameAr)) || t('orders:store', 'Store')}
                         </div>
                         {order?.branch && (
                             <div className="text-sm text-slate-600 mt-1 max-w-[200px] ms-auto">
@@ -1579,7 +1579,7 @@ const OrderDetail = () => {
                             {order?.paymentMethod && (
                                 <div className="mt-4 pt-4 border-t border-slate-100">
                                     <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t('orders:paymentMethod', 'Payment Method')}</p>
-                                    <p className="font-medium text-slate-700">{order.paymentMethod.replace(/_/g, ' ')}</p>
+                                    <p className="font-medium text-slate-700">{t(`orders:${order.paymentMethod.toLowerCase()}`, { defaultValue: order.paymentMethod.replace(/_/g, ' ') })}</p>
                                 </div>
                             )}
                         </div>
@@ -1613,22 +1613,22 @@ const OrderDetail = () => {
 
                 {/* Items Table */}
                 <div className="mb-10">
-                    <table className="w-full text-sm text-left border-collapse">
+                    <table className="w-full text-sm text-center border-collapse">
                         <thead>
                             <tr className="border-b-2 border-slate-200 bg-slate-50/50">
-                                <th className="py-3 px-4 font-black text-slate-500 uppercase tracking-widest">{t('orders:item', 'Item')}</th>
+                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:item', 'Item')}</th>
                                 <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:qty', 'Qty')}</th>
-                                <th className="py-3 px-4 text-right font-black text-slate-500 uppercase tracking-widest">{t('orders:price', 'Price')}</th>
-                                <th className="py-3 px-4 text-right font-black text-slate-500 uppercase tracking-widest">{t('orders:total', 'Total')}</th>
+                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:price', 'Price')}</th>
+                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:total', 'Total')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                             {order?.items?.map((item: any, idx: number) => (
                                 <tr key={item.id || idx} className="hover:bg-slate-50/30">
                                     <td className="py-4 px-4">
-                                        <div className="flex items-center gap-3">
+                                        <div className="flex flex-col items-center gap-3">
                                             {/* Product Image */}
-                                            <div className="w-14 h-14 rounded-md border border-slate-200 overflow-hidden shrink-0 bg-slate-50 flex items-center justify-center">
+                                            <div className="w-14 h-14 rounded-md border border-slate-200 overflow-hidden bg-slate-50 flex items-center justify-center mx-auto">
                                                 {item.product?.coverImage ? (
                                                     <ImageWithFallback src={item.product.coverImage} alt={item.productName || item.product?.name} className="w-full h-full object-cover" />
                                                 ) : (
@@ -1637,18 +1637,18 @@ const OrderDetail = () => {
                                             </div>
                                             
                                             {/* Product Details */}
-                                            <div>
+                                            <div className="text-center w-full">
                                                 <p className="font-bold text-slate-900 text-base">
-                                                    {item.productName || (isRTL ? (item.product?.nameAr || item.product?.name) : (item.product?.name || item.product?.nameAr))}
+                                                    {isRTL ? (item.product?.nameAr || item.product?.name || item.productName) : (item.product?.name || item.product?.nameAr || item.productName)}
                                                 </p>
-                                                <div className="mt-1 space-y-1">
+                                                <div className="mt-1 space-y-1 flex flex-col items-center justify-center">
                                                     {getVariantDetails(item).map((detail, i) => (
-                                                        <p key={i} className="text-xs text-slate-500 flex items-center gap-1.5">
+                                                        <p key={i} className="text-xs text-slate-500 flex items-center justify-center gap-1.5">
                                                             <span className="w-1 h-1 rounded-full bg-slate-300"></span> {detail}
                                                         </p>
                                                     ))}
                                                     {getAddonDetails(item).map((detail, i) => (
-                                                        <p key={i} className="text-xs text-slate-500 italic flex items-center gap-1.5">
+                                                        <p key={i} className="text-xs text-slate-500 italic flex items-center justify-center gap-1.5">
                                                             <span className="text-slate-400">+</span> {detail}
                                                         </p>
                                                     ))}
@@ -1657,10 +1657,10 @@ const OrderDetail = () => {
                                         </div>
                                     </td>
                                     <td className="py-4 px-4 text-center font-bold text-slate-700">{item.quantity}</td>
-                                    <td className="py-4 px-4 text-right text-slate-600 font-medium">
+                                    <td className="py-4 px-4 text-center text-slate-600 font-medium">
                                         {Number(item.price).toFixed(2)}
                                     </td>
-                                    <td className="py-4 px-4 text-right font-black text-slate-900 text-base">
+                                    <td className="py-4 px-4 text-center font-black text-slate-900 text-base">
                                         {(Number(item.price) * item.quantity).toFixed(2)}
                                     </td>
                                 </tr>

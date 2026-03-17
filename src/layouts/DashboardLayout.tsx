@@ -188,7 +188,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className={clsx('flex h-screen overflow-hidden bg-slate-50 font-inter')}
+      className={clsx('flex h-screen overflow-hidden bg-slate-50 font-inter print:h-auto print:overflow-visible')}
     >
       {/* Mobile Overlay */}
       {mobileOpen && (
