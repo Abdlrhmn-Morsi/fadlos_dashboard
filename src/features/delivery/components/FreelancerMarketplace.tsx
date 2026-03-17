@@ -217,7 +217,7 @@ const FreelancerMarketplace = () => {
             ) : (freelancers || []).length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     {(freelancers || []).map((profile: any) => (
-                        <div key={profile.id} className="group border border-slate-200 dark:border-slate-700 rounded-2xl p-6 hover:shadow-xl hover:border-indigo-500/30 transition-all bg-white dark:bg-slate-900">
+                        <div key={profile.id} className="group flex flex-col border border-slate-200 dark:border-slate-700 rounded-2xl p-6 hover:shadow-xl hover:border-indigo-500/30 transition-all bg-white dark:bg-slate-900">
                             <div className="flex items-start justify-between mb-5">
                                 <div className="flex items-center gap-4">
                                     <div className="relative flex-shrink-0">
@@ -279,6 +279,7 @@ const FreelancerMarketplace = () => {
                                 </div>
                             </div>
 
+                            <div className="mt-auto">
                             {profile.hiringStatus === 'ACCEPTED' ? (
                                 <button
                                     disabled
@@ -323,6 +324,7 @@ const FreelancerMarketplace = () => {
                                     {t('common.sendRequest', 'Send Request')}
                                 </button>
                             )}
+                            </div>
                         </div>
                     ))}
                 </div>

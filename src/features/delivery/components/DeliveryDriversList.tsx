@@ -247,10 +247,10 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
             toast.success(t('delivery.drivers.remove_success', 'Driver removed successfully'));
         } catch (error: any) {
             console.error('Failed to remove driver error object:', error);
-            const messageKey = error?.response?.data?.message || 'common.error';
-            console.log('Extracted messageKey:', messageKey);
-            const fallback = t('common.error', 'Failed to remove driver');
-            toast.error(t(messageKey, fallback));
+            const errorData = error?.response?.data?.message;
+            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common.error', 'Failed to remove driver');
+            toast.error(message);
         } finally {
             setDeleteModal({ isOpen: false, driverId: null });
         }

@@ -959,55 +959,55 @@ const OrderDetail = () => {
                                         <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 transition-all hover:border-indigo-100 dark:hover:border-indigo-900/30">
                                             {/* Driver Info */}
                                             <div className="flex items-center gap-4 mb-4">
-                                             <div className="flex items-center gap-4">
-                                                 <div className={clsx(
-                                                     "w-16 h-16 rounded-2xl overflow-hidden flex items-center justify-center font-bold text-2xl shadow-inner border-2",
-                                                     order.driver.verificationStatus === 'VERIFIED' ? "bg-indigo-50 border-indigo-100 dark:bg-indigo-900/30 dark:border-indigo-800 text-indigo-600" : "bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-400"
-                                                 )}>
-                                                     {order.driver.deliveryProfile?.avatarUrl ? (
-                                                         <ImageWithFallback
-                                                             src={order.driver.deliveryProfile.avatarUrl}
-                                                             alt={order.driver.name}
-                                                             className="w-full h-full object-cover"
-                                                         />
-                                                     ) : (
-                                                         (order.driver.name || '?').charAt(0)
-                                                     )}
-                                                 </div>
-                                                 <div className="min-w-0 flex-1">
-                                                     <div className="flex items-center gap-2 mb-1">
-                                                         <p className="font-black text-lg text-slate-900 dark:text-white truncate">{order.driver.name}</p>
-                                                         {order.driver.verificationStatus && (
-                                                             <div className={clsx(
-                                                                 "flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm whitespace-nowrap",
-                                                                 order.driver.verificationStatus === 'VERIFIED'
-                                                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                                                     : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                                             )}>
-                                                                 {order.driver.verificationStatus === 'VERIFIED' ? <BadgeCheck size={11} /> : <Clock size={11} />}
-                                                                 {t(`common:verificationStatuses.${order.driver.verificationStatus}`, order.driver.verificationStatus) as string}
-                                                             </div>
-                                                         )}
-                                                     </div>
-                                                     <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-                                                         <div className="flex items-center gap-2">
-                                                             <div className={clsx(
-                                                                 "w-2.5 h-2.5 rounded-full ring-4",
-                                                                 order.driver.deliveryProfile?.isBusy ? "bg-amber-500 ring-amber-500/20 animate-pulse" : "bg-emerald-500 ring-emerald-500/20"
-                                                             )} />
-                                                             <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
-                                                                 {order.driver.deliveryProfile?.isBusy
-                                                                     ? (t('orders:driverStatusBusy', 'Busy') as string)
-                                                                     : (t('orders:driverStatusAvailable', 'Available') as string)}
-                                                             </span>
-                                                         </div>
-                                                         <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
-                                                             <Phone size={14} className="text-slate-400" />
-                                                             <p className="text-sm font-bold">{order.driver.phone}</p>
-                                                         </div>
-                                                     </div>
+                                                <div className={clsx(
+                                                    "w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0 flex items-center justify-center font-bold text-2xl shadow-inner border-2",
+                                                    order.driver.verificationStatus === 'VERIFIED' ? "bg-indigo-50 border-indigo-100 dark:bg-indigo-900/30 dark:border-indigo-800 text-indigo-600" : "bg-slate-100 border-slate-200 dark:bg-slate-800 dark:border-slate-700 text-slate-400"
+                                                )}>
+                                                    {order.driver.deliveryProfile?.avatarUrl ? (
+                                                        <ImageWithFallback
+                                                            src={order.driver.deliveryProfile.avatarUrl}
+                                                            alt={order.driver.name}
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        (order.driver.name || '?').charAt(0)
+                                                    )}
+                                                </div>
+                                                <div className="min-w-0 flex-1">
+                                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                                        <p className="font-black text-lg text-slate-900 dark:text-white truncate">{order.driver.name}</p>
+                                                        {order.driver.verificationStatus && (
+                                                            <div className={clsx(
+                                                                "flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm whitespace-nowrap",
+                                                                order.driver.verificationStatus === 'VERIFIED'
+                                                                    ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                                    : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                                            )}>
+                                                                {order.driver.verificationStatus === 'VERIFIED' ? <BadgeCheck size={11} /> : <Clock size={11} />}
+                                                                {t(`common:verificationStatuses.${order.driver.verificationStatus}`, order.driver.verificationStatus) as string}
+                                                            </div>
+                                                        )}
                                                     </div>
-                                             </div>
+                                                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
+                                                        <div className="flex items-center gap-2">
+                                                            <div className={clsx(
+                                                                "w-2.5 h-2.5 rounded-full ring-4",
+                                                                order.driver.deliveryProfile?.isBusy ? "bg-amber-500 ring-amber-500/20 animate-pulse" : "bg-emerald-500 ring-emerald-500/20"
+                                                            )} />
+                                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
+                                                                {order.driver.deliveryProfile?.isBusy
+                                                                    ? (t('orders:driverStatusBusy', 'Busy') as string)
+                                                                    : (t('orders:driverStatusAvailable', 'Available') as string)}
+                                                            </span>
+                                                        </div>
+                                                        {(order.driver.phone || order.driver.deliveryProfile?.profile?.user?.phone) && (
+                                                        <div className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400">
+                                                            <Phone size={14} className="text-slate-400" />
+                                                            <p className="text-sm font-bold">{order.driver.phone || order.driver.deliveryProfile?.profile?.user?.phone}</p>
+                                                        </div>
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
 
                                             {/* Action Buttons at the bottom of the card */}
