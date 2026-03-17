@@ -481,9 +481,23 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-start">
-                                                <span className="px-2 py-0.5 bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 text-[10px] font-bold uppercase tracking-widest rounded">
-                                                    {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
-                                                </span>
+                                                <div className="flex flex-col gap-1.5 items-start">
+                                                    <span className={clsx(
+                                                        "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
+                                                        req.status === 'REJECTED' 
+                                                            ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                                            : req.status === 'ACCEPTED'
+                                                            ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                            : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
+                                                    )}>
+                                                        {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
+                                                    </span>
+                                                    {req.status === 'REJECTED' && (req.responseReason || req.rejectionReason) && (
+                                                        <span className="text-[10px] text-rose-500 max-w-[200px] break-words line-clamp-2" title={req.responseReason || req.rejectionReason}>
+                                                            <span className="font-semibold">{t('common:delivery.drivers.rejection_reason', 'Reason for rejection')}:</span> {req.responseReason || req.rejectionReason}
+                                                        </span>
+                                                    )}
+                                                </div>
                                             </td>
                                             <td className="px-6 py-4 text-start">
                                                 <div className="max-w-[300px] whitespace-pre-wrap text-slate-500 italic text-xs" title={req.notes}>

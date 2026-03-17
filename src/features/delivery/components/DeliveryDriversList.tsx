@@ -469,7 +469,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                     {/* Status Dot */}
                                                     <div className={clsx(
                                                         "absolute -bottom-0.5 -inset-inline-end-0.5 w-3.5 h-3.5 rounded-full border-2 border-white dark:border-slate-900 shadow-sm",
-                                                        !driver.deliveryProfile?.isAvailableForWork ? "bg-slate-400" :
+                                                        (!driver.deliveryProfile?.isAvailableForWork || driver.isAvailableForCurrentStore === false) ? "bg-slate-400" :
                                                             driver.deliveryProfile?.isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
                                                     )} />
                                                 </div>

@@ -1351,8 +1351,9 @@ const OrderDetail = () => {
                                     const isSelected = order.driverId === driver.id;
                                     const isBusy = driver.deliveryProfile?.isBusy
                                         || (driver.activeDeliveriesCount >= maxOrdersPerDriver);
+                                    const isUnavailable = !driver.deliveryProfile?.isAvailableForWork || (driver as any).isAvailableForCurrentStore === false;
                                     const isOverLimit = (driver as any).isOverLimit === true;
-                                    const isDisabled = !isVerified || isBusy || isOverLimit;
+                                    const isDisabled = !isVerified || isBusy || isOverLimit || isUnavailable;
 
                                     return (
                                         <div
@@ -1406,12 +1407,15 @@ const OrderDetail = () => {
                                                             <div className="flex items-center gap-1.5">
                                                                 <span className={clsx(
                                                                     "w-2 h-2 rounded-full",
-                                                                    isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
+                                                                    isUnavailable ? "bg-slate-400" :
+                                                                        isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
                                                                 )} />
                                                                 <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-                                                                    {isBusy
-                                                                        ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
-                                                                        : (t('common:delivery.drivers.status.available', 'Available') as string)}
+                                                                    {isUnavailable
+                                                                        ? (t('common:delivery.drivers.status.unavailable', 'Unavailable') as string)
+                                                                        : isBusy
+                                                                            ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
+                                                                            : (t('common:delivery.drivers.status.available', 'Available') as string)}
                                                                 </span>
                                                             </div>
                                                             {(driver.activeDeliveriesCount > 0) && (
@@ -1449,7 +1453,11 @@ const OrderDetail = () => {
                                                 ) : !isOverLimit ? (
                                                     <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                                                         <ShieldAlert size={12} />
-                                                        {isBusy ? (t('orders:driverStatusBusy', 'Busy') as string) : t('orders:unverified', 'Unverified')}
+                                                        {isUnavailable
+                                                            ? (t('common:delivery.drivers.status.unavailable', 'Unavailable') as string)
+                                                            : isBusy
+                                                                ? (t('orders:driverStatusBusy', 'Busy') as string)
+                                                                : t('orders:unverified', 'Unverified')}
                                                     </div>
                                                 ) : null}
                                             </div>

@@ -707,7 +707,8 @@
             "rejection_reason": "Rejection Reason",
             "status": {
                 "available": "Available",
-                "busy": "Busy"
+                "busy": "Busy",
+                "unavailable": "Unavailable"
             },
             "resignations": "Resignations",
             "stats": {

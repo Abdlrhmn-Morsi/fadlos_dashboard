@@ -740,7 +740,8 @@
             },
             "status": {
                 "available": "متاح",
-                "busy": "مشغول"
+                "busy": "مشغول",
+                "unavailable": "غير متاح"
             },
             "resignations": "الاستقالات",
             "stats": {

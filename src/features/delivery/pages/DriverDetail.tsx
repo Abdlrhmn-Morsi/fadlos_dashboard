@@ -320,9 +320,9 @@ const DriverDetail: React.FC = () => {
                             </div>
                             <div className={clsx(
                                 "absolute -bottom-2 -inset-inline-end-2 w-8 h-8 rounded-[4px] border-4 border-white dark:border-slate-900 shadow-lg flex items-center justify-center",
-                                driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500" : "bg-slate-400"
-                            )} title={driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}>
-                                {driver.deliveryProfile?.isAvailableForWork ? <CheckCircle size={16} className="text-white" /> : <XCircle size={16} className="text-white" />}
+                                (driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? "bg-emerald-500" : "bg-slate-400"
+                            )} title={(driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? t('delivery.status.online') : t('delivery.status.offline')}>
+                                {(driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? <CheckCircle size={16} className="text-white" /> : <XCircle size={16} className="text-white" />}
                             </div>
                         </div>
 
@@ -494,17 +494,17 @@ const DriverDetail: React.FC = () => {
                                         )}
                                         <div className={clsx(
                                             "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
-                                            driver.deliveryProfile?.isAvailableForWork
+                                            (driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false)
                                                 ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50"
                                                 : "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:border-slate-700"
                                         )}>
-                                            <span className={clsx("w-2 h-2 rounded-full", driver.deliveryProfile?.isAvailableForWork ? "bg-emerald-500 animate-pulse" : "bg-slate-400")} />
-                                            {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
+                                            <span className={clsx("w-2 h-2 rounded-full", (driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? "bg-emerald-500 animate-pulse" : "bg-slate-400")} />
+                                            {(driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? t('delivery.status.online') : t('delivery.status.offline')}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">
-                                    {driver.deliveryProfile?.isAvailableForWork ? t('delivery.status.online_desc') : t('delivery.status.offline_desc')}
+                                    {(driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? t('delivery.status.online_desc') : t('delivery.status.offline_desc')}
                                 </div>
                             </div>
 
