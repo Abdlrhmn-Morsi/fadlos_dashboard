@@ -1,0 +1,308 @@
+import React, { useState, useEffect } from 'react';
+import { Plus, Search, Edit, Trash2, Users, Power, PowerOff, ShieldAlert } from 'lucide-react';
+import clsx from 'clsx';
+import { useNavigate, Link } from 'react-router-dom';
+import { AdminEmployeesApiService } from '../api/admin-employees.api';
+import { ConfirmModal } from '../../../components/ConfirmModal';
+import { toast } from '../../../utils/toast';
+import { useTranslation } from 'react-i18next';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { useCache } from '../../../contexts/CacheContext';
+import { AdminEmployee } from '../models/admin-employee.model';
+import { Pagination } from '../../../components/common/Pagination';
+
+const AdminEmployeesList = () => {
+    const navigate = useNavigate();
+    const { t } = useTranslation(['common']);
+    const { isRTL } = useLanguage();
+    const { getCache, setCache, invalidateCache } = useCache();
+    const [employees, setEmployees] = useState<AdminEmployee[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [debouncedSearch, setDebouncedSearch] = useState('');
+
+    const [page, setPage] = useState(1);
+    const [limit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [actionType, setActionType] = useState<'delete' | 'toggle'>('delete');
+    const [actionId, setActionId] = useState<string | null>(null);
+    const [isActiveStatus, setIsActiveStatus] = useState(false);
+
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearch(searchTerm);
+        }, 500);
+        return () => clearTimeout(timer);
+    }, [searchTerm]);
+
+    useEffect(() => {
+        fetchEmployees();
+    }, [page, debouncedSearch]);
+
+    useEffect(() => {
+        setPage(1);
+    }, [debouncedSearch]);
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (!document.hidden) fetchEmployees();
+        };
+        const handleFocus = () => fetchEmployees();
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        window.addEventListener('focus', handleFocus);
+
+        return () => {
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+            window.removeEventListener('focus', handleFocus);
+        };
+    }, [page, debouncedSearch]);
+
+    const fetchEmployees = async () => {
+        try {
+            setLoading(true);
+            const params: any = { page, limit, search: debouncedSearch || undefined };
+            const cacheKey = 'admin-employees';
+            const cachedData = getCache<any>(cacheKey, params);
+            
+            if (cachedData) {
+                if (cachedData.data) {
+                    setEmployees(cachedData.data);
+                    if (cachedData.meta) setTotalPages(cachedData.meta.totalPages || 1);
+                    else if (cachedData.pagination) setTotalPages(cachedData.pagination.totalPages || 1);
+                } else if (Array.isArray(cachedData)) {
+                    setEmployees(cachedData);
+                    setTotalPages(1);
+                }
+                setLoading(false);
+                return;
+            }
+
+            const response: any = await AdminEmployeesApiService.getAdminEmployees(params);
+
+            if (response && response.data) {
+                setEmployees(response.data);
+                if (response.pagination) setTotalPages(response.pagination.totalPages || 1);
+                else if (response.meta) setTotalPages(response.meta.totalPages || 1);
+                setCache(cacheKey, response, params);
+            } else if (Array.isArray(response)) {
+                setEmployees(response);
+                setTotalPages(1);
+                setCache(cacheKey, response, params);
+            } else {
+                setEmployees([]);
+                setTotalPages(1);
+            }
+        } catch (error) {
+            console.error('Failed to fetch admin employees', error);
+            toast.error(t('errorFetchingData'));
+            setEmployees([]);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = (id: string) => {
+        setDeleteId(id);
+        setActionType('delete');
+        setConfirmOpen(true);
+    };
+
+    const handleToggleStatus = (id: string, currentStatus: boolean) => {
+        setActionId(id);
+        setIsActiveStatus(currentStatus);
+        setActionType('toggle');
+        setConfirmOpen(true);
+    };
+
+    const confirmAction = async () => {
+        try {
+            if (actionType === 'delete' && deleteId) {
+                await AdminEmployeesApiService.deleteAdminEmployee(deleteId);
+                toast.success(t('success'));
+                setEmployees(prev => prev.filter(emp => emp.id !== deleteId));
+                invalidateCache('admin-employees');
+            } else if (actionType === 'toggle' && actionId) {
+                await AdminEmployeesApiService.toggleStatus(actionId, !isActiveStatus);
+                toast.success(t('success'));
+                setEmployees(prev => prev.map(emp =>
+                    emp.id === actionId ? { ...emp, isActive: !isActiveStatus } : emp
+                ));
+                invalidateCache('admin-employees');
+            }
+        } catch (error: any) {
+            console.error('Failed to perform action', error);
+            toast.error(error.response?.data?.message || t('error'));
+            fetchEmployees();
+        } finally {
+            setConfirmOpen(false);
+            setDeleteId(null);
+            setActionId(null);
+        }
+    };
+
+    return (
+        <div className="p-6 space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div className={isRTL ? 'text-right' : 'text-left'}>
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
+                        {t('adminEmployees')}
+                    </h1>
+                    <p className="text-slate-500 dark:text-slate-400 mt-1">
+                        {t('manageAdminEmployeesDesc')}
+                    </p>
+                </div>
+                <Link
+                    to="/admin-employees/new"
+                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                >
+                    <Plus size={20} />
+                    <span>{t('addAdminEmployee')}</span>
+                </Link>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 p-4">
+                <div className="relative">
+                    <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={20} />
+                    <input
+                        type="text"
+                        placeholder={t('searchEmployeePlaceholder')}
+                        className={clsx(
+                            "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border-transparent focus:bg-white dark:focus:bg-slate-900 border focus:border-indigo-500 rounded-xl transition-all duration-200 outline-none",
+                            isRTL ? "pr-10 pl-4 text-right" : "pl-10 pr-4"
+                        )}
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                </div>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
+                <div className="overflow-x-auto">
+                    <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")}>
+                        <thead>
+                            <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('employee')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('role')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('contact')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
+                                <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>{t('actions')}</th>
+                            </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
+                            {loading ? (
+                                [...Array(5)].map((_, i) => (
+                                    <tr key={i} className="animate-pulse">
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-48"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-40"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
+                                        <td className="px-6 py-4"></td>
+                                    </tr>
+                                ))
+                            ) : employees.length === 0 ? (
+                                <tr>
+                                    <td colSpan={5} className="px-6 py-12 text-center">
+                                        <div className="flex flex-col items-center justify-center text-slate-400">
+                                            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full mb-4">
+                                                <Users size={48} strokeWidth={1} className="text-slate-300 dark:text-slate-600" />
+                                            </div>
+                                            <p className="text-lg font-medium text-slate-600 dark:text-slate-300">{t('noDataFound')}</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ) : (
+                                employees.map((emp) => (
+                                    <tr key={emp.id} className="group hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors duration-200">
+                                        <td className="px-6 py-4">
+                                            <div className="flex items-center gap-3">
+                                                <div className="w-10 h-10 rounded-full overflow-hidden bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-sm border-2 border-white dark:border-slate-800 shadow-sm">
+                                                    {(emp.profile?.user?.name || '').charAt(0).toUpperCase()}
+                                                </div>
+                                                <div>
+                                                    <div className="font-semibold text-slate-800 dark:text-white">
+                                                        {emp.profile?.user?.name || ''}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-900/20 dark:text-indigo-400">
+                                                {emp.adminRole?.name || '-'}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4 text-slate-600 dark:text-slate-400 text-sm">
+                                            <div className="flex flex-col gap-1">
+                                                <span>{emp.profile?.user?.email || ''}</span>
+                                                {emp.profile?.user?.phone && <span className="text-xs text-slate-400">{emp.profile?.user?.phone}</span>}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${emp.isActive
+                                                ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-900/20 dark:text-emerald-400 dark:border-emerald-800'
+                                                : 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-900/20 dark:text-rose-400 dark:border-rose-800'
+                                                }`}>
+                                                <span className={clsx("w-1.5 h-1.5 rounded-full", isRTL ? "ml-1.5" : "mr-1.5", emp.isActive ? 'bg-emerald-500' : 'bg-rose-500')} />
+                                                {emp.isActive ? t('active') : t('inactive')}
+                                            </span>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <div className={clsx("flex items-center gap-2 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
+                                                <button
+                                                    onClick={() => navigate(`/admin-employees/edit/${emp.id}`)}
+                                                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                    title={t('edit')}
+                                                >
+                                                    <Edit size={18} />
+                                                </button>
+                                                <button
+                                                    onClick={() => handleToggleStatus(emp.id, emp.isActive)}
+                                                    className={clsx(
+                                                        "p-2 rounded-lg transition-all",
+                                                        emp.isActive
+                                                            ? "text-slate-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30"
+                                                            : "text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-900/30"
+                                                    )}
+                                                    title={emp.isActive ? t('deactivate') : t('activate')}
+                                                >
+                                                    {emp.isActive ? <PowerOff size={18} /> : <Power size={18} />}
+                                                </button>
+                                                <button
+                                                    onClick={() => handleDelete(emp.id)}
+                                                    className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                    title={t('delete')}
+                                                >
+                                                    <Trash2 size={18} />
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                ))
+                            )}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <Pagination
+                currentPage={page}
+                totalPages={totalPages}
+                onPageChange={setPage}
+                isLoading={loading}
+            />
+
+            <ConfirmModal
+                isOpen={confirmOpen}
+                title={actionType === 'delete' ? t('deleteAdminEmployee') : (isActiveStatus ? t('deactivateAdminEmployee') : t('activateAdminEmployee'))}
+                message={actionType === 'delete' ? t('deleteAdminEmployeeConfirmation') : t('toggleAdminEmployeeStatusConfirmation')}
+                onConfirm={confirmAction}
+                onCancel={() => setConfirmOpen(false)}
+            />
+        </div>
+    );
+};
+
+export default AdminEmployeesList;

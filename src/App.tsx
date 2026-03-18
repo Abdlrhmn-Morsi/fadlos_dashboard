@@ -53,6 +53,10 @@ import BillingHistory from './features/subscriptions/components/BillingHistory';
 import PlansManagement from './features/subscriptions-admin/pages/PlansManagement';
 import SendPromotionPage from './features/notification/pages/SendPromotionPage';
 import PromotionHistoryPage from './features/notification/pages/PromotionHistoryPage';
+import AdminRolesList from './features/admin-roles/components/AdminRolesList';
+import AdminRoleForm from './features/admin-roles/components/AdminRoleForm';
+import AdminEmployeesList from './features/admin-employees/components/AdminEmployeesList';
+import AdminEmployeeForm from './features/admin-employees/components/AdminEmployeeForm';
 
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -61,6 +65,7 @@ import { NotificationProvider } from './features/notification/context/Notificati
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { CacheProvider } from './contexts/CacheContext';
 import { Permissions } from './types/permissions';
+import { AdminPermissions } from './types/admin-permissions';
 import { UserRole } from './types/user-role';
 
 const ProtectedRoute = () => {
@@ -84,6 +89,18 @@ const PermissionGate = ({ permission, children }: { permission: string, children
   if (isLoading) return null;
 
   if (!hasPermission(permission)) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AdminPermissionGate = ({ permission, children }: { permission: string, children: React.ReactNode }) => {
+  const { hasAdminPermission, isLoading } = useAuth();
+
+  if (isLoading) return null;
+
+  if (!hasAdminPermission(permission)) {
     return <Navigate to="/" replace />;
   }
 
@@ -143,19 +160,27 @@ const AppContent = () => {
             <Route path="branches" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><BranchesList /></PermissionGate>} />
 
             {/* Admin Routes */}
-            <Route path="users" element={<Users />} />
-            <Route path="stores" element={<Stores />} />
-            <Route path="stores/:id" element={<StoreDetail />} />
-            <Route path="cities" element={<Cities />} />
-            <Route path="towns" element={<Towns />} />
-            <Route path="business-types" element={<BusinessTypes />} />
-            <Route path="business-categories" element={<BusinessCategories />} />
-            <Route path="reported-reviews" element={<ReportedReviewList />} />
-            <Route path="drivers/verification" element={<PermissionGate permission={Permissions.DELIVERY_DRIVERS_UPDATE}><DriverVerificationPage /></PermissionGate>} />
-            <Route path="stores/verification" element={<PermissionGate permission={Permissions.STORE_UPDATE}><StoreVerificationRequests /></PermissionGate>} />
+            <Route path="users" element={<AdminPermissionGate permission={AdminPermissions.USERS_VIEW}><Users /></AdminPermissionGate>} />
+            <Route path="stores" element={<AdminPermissionGate permission={AdminPermissions.STORES_VIEW}><Stores /></AdminPermissionGate>} />
+            <Route path="stores/:id" element={<AdminPermissionGate permission={AdminPermissions.STORES_VIEW}><StoreDetail /></AdminPermissionGate>} />
+            <Route path="cities" element={<AdminPermissionGate permission={AdminPermissions.CITIES_VIEW}><Cities /></AdminPermissionGate>} />
+            <Route path="towns" element={<AdminPermissionGate permission={AdminPermissions.TOWNS_VIEW}><Towns /></AdminPermissionGate>} />
+            <Route path="business-types" element={<AdminPermissionGate permission={AdminPermissions.BUSINESS_TYPES_VIEW}><BusinessTypes /></AdminPermissionGate>} />
+            <Route path="business-categories" element={<AdminPermissionGate permission={AdminPermissions.BUSINESS_CATEGORIES_VIEW}><BusinessCategories /></AdminPermissionGate>} />
+            <Route path="reported-reviews" element={<AdminPermissionGate permission={AdminPermissions.REPORTED_REVIEWS_VIEW}><ReportedReviewList /></AdminPermissionGate>} />
+            <Route path="drivers/verification" element={<AdminPermissionGate permission={AdminPermissions.DRIVER_VERIFICATION_VIEW}><DriverVerificationPage /></AdminPermissionGate>} />
+            <Route path="stores/verification" element={<AdminPermissionGate permission={AdminPermissions.STORE_VERIFICATION_VIEW}><StoreVerificationRequests /></AdminPermissionGate>} />
             <Route path="plans-management" element={
               user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
             } />
+
+            <Route path="admin-roles" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_ROLES_MANAGE}><AdminRolesList /></AdminPermissionGate>} />
+            <Route path="admin-roles/new" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_ROLES_MANAGE}><AdminRoleForm /></AdminPermissionGate>} />
+            <Route path="admin-roles/edit/:id" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_ROLES_MANAGE}><AdminRoleForm /></AdminPermissionGate>} />
+
+            <Route path="admin-employees" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_EMPLOYEES_VIEW}><AdminEmployeesList /></AdminPermissionGate>} />
+            <Route path="admin-employees/new" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_EMPLOYEES_MANAGE}><AdminEmployeeForm /></AdminPermissionGate>} />
+            <Route path="admin-employees/edit/:id" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_EMPLOYEES_MANAGE}><AdminEmployeeForm /></AdminPermissionGate>} />
 
             <Route path="store-settings" element={<PermissionGate permission={Permissions.STORE_VIEW}><StoreSettings /></PermissionGate>} />
             <Route path="profile-settings" element={<ProfileSettings />} />

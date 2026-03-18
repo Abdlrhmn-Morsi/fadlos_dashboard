@@ -39,6 +39,7 @@ import { NotificationBadge } from '../features/notification/components/Notificat
 import { NotificationList } from '../features/notification/components/NotificationList';
 import { useAuth } from '../contexts/AuthContext';
 import { Permissions } from '../types/permissions';
+import { AdminPermissions } from '../types/admin-permissions';
 import { useSubscription } from '../hooks/useSubscription';
 import { PlanFeature } from '../types/plan-feature';
 
@@ -155,7 +156,7 @@ const DashboardLayout: React.FC = () => {
   const navigate = useNavigate();
   const { t } = useTranslation(['common', 'subscriptions']);
   const { isRTL } = useLanguage();
-  const { user, logout, hasPermission } = useAuth(); // Use AuthContext
+  const { user, logout, hasPermission, hasAdminPermission } = useAuth(); // Use AuthContext
   const { hasFeature, usage } = useSubscription();
 
   const handleLogout = () => {
@@ -250,8 +251,20 @@ const DashboardLayout: React.FC = () => {
           {/* Admin Links */}
           {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
             <>
-              <SidebarItem to="/users" icon={Users} label={t('users')} collapsed={collapsed} />
-              <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />
+              {hasAdminPermission(AdminPermissions.USERS_VIEW) && <SidebarItem to="/users" icon={Users} label={t('users')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.STORES_VIEW) && <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />}
+
+              {!collapsed && (
+                <div className={clsx(
+                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
+                )}>
+                  {t('superAdminTeam', { defaultValue: 'Super Admin Team' })}
+                </div>
+              )}
+              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+
+              {hasAdminPermission(AdminPermissions.ADMIN_EMPLOYEES_VIEW) && <SidebarItem to="/admin-employees" icon={Users} label={t('adminEmployees', { defaultValue: 'Admin Employees' })} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.ADMIN_ROLES_MANAGE) && <SidebarItem to="/admin-roles" icon={Shield} label={t('adminRoles', { defaultValue: 'Admin Roles' })} collapsed={collapsed} />}
 
               {!collapsed && (
                 <div className={clsx(
@@ -262,14 +275,14 @@ const DashboardLayout: React.FC = () => {
               )}
               {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-              <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />
-              <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />
-              <SidebarItem to="/stores/verification" icon={ShieldCheck} label={t('storeVerification', 'Store Verification')} collapsed={collapsed} />
-              <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />
-              <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />
-              <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />
-              <SidebarItem to="/reported-reviews" icon={Shield} label={t('reportedReviews')} collapsed={collapsed} />
-              {user?.role === UserRole.SUPER_ADMIN && (
+              {hasAdminPermission(AdminPermissions.CITIES_VIEW) && <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.TOWNS_VIEW) && <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.STORE_VERIFICATION_VIEW) && <SidebarItem to="/stores/verification" icon={ShieldCheck} label={t('storeVerification', 'Store Verification')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) && <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) && <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW) && <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.REPORTED_REVIEWS_VIEW) && <SidebarItem to="/reported-reviews" icon={Shield} label={t('reportedReviews')} collapsed={collapsed} />}
+              {hasAdminPermission(AdminPermissions.PLANS_VIEW) && (
                 <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
               )}
             </>

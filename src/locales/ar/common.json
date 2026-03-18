@@ -361,8 +361,8 @@
     "employee": "الموظف",
     "contact": "جهات الاتصال",
     "role": "الدور",
-    "selectRole": "اختر الدور",
-    "accountAccess": "الوصول للحساب",
+    "selectRole": "اختر دوراً...",
+    "accountAccess": "الحساب والوصول",
     "activeStatus": "حالة النشاط",
     "createEmployee": "إضافة موظف جديد",
     "editEmployee": "تعديل بيانات الموظف",
@@ -375,15 +375,15 @@
     "deactivate": "تعطيل",
     "toggleEmployeeStatusConfirmation": "هل أنت متأكد أنك تريد تغيير حالة هذا الموظف؟",
     "employeeActiveDesc": "السماح بالوصول للوحة التحكم",
-    "roleActiveDesc": "تفعيل هذا الدور",
+    "roleActiveDesc": "تفعيل أو تعطيل هذا الدور",
     "super_admin": "مدير فائق",
     "admin": "مدير",
     "store_owner": "صاحب متجر",
     "customer": "عميل",
     "roleNamePlaceholder": "مثال: مدير المبيعات",
-    "roleDescriptionPlaceholder": "وصف لهذا الدور...",
+    "roleDescriptionPlaceholder": "صف الغرض من هذا الدور...",
     "permissionsCount": "صلاحيات",
-    "Store Management": "إدارة المتجر",
+    "Store Management": "إدارة المتاجر",
     "User Management": "إدارة المستخدمين",
     "Employee Management": "إدارة الموظفين",
     "Product Management": "إدارة المنتجات",
@@ -398,10 +398,10 @@
     "Cash Settlement": "تحصيل المبالغ النقدية",
     "Promotion Ads": "الإعلانات الترويجية",
     "Addon Management": "إدارة الإضافات",
-    "searchEmployeePlaceholder": "البحث بالاسم أو البريد الإلكتروني...",
+    "searchEmployeePlaceholder": "بحث بالاسم أو البريد الإلكتروني...",
     "searchPlaceholder": "بحث...",
     "activate": "تفعيل",
-    "leaveBlankToKeepCurrent": "اتركه فارغاً للاحتفاظ بكلمة المرور الحالية",
+    "leaveBlankToKeepCurrent": "اتركه فارغاً للحفاظ على الحالي",
     "password": "كلمة المرور",
     "assignToBranch": "تعيين لفرع",
     "branch": "الفرع",
@@ -646,6 +646,262 @@
                 "name": "إدارة مناطق التوصيل",
                 "description": "• إضافة/إزالة المدن لمناطق التوصيل\n• تعديل رسوم التوصيل والحد الأدنى لقيمة الطلب\n• إعادة ضبط جميع إعدادات التوصيل"
             }
+        },
+        "admin": {
+            "stores": {
+                "view": {
+                    "name": "عرض المتاجر",
+                    "description": "• عرض قائمة المتاجر وتفاصيلها"
+                },
+                "update_status": {
+                    "name": "تحديث حالة المتجر",
+                    "description": "• تفعيل، تعليق، أو إيقاف المتاجر"
+                },
+                "delete": {
+                    "name": "حذف المتاجر",
+                    "description": "• حذف المتاجر نهائياً"
+                }
+            },
+            "store_verification": {
+                "view": {
+                    "name": "عرض تحققات المتاجر",
+                    "description": "• عرض طلبات التحقق المعلقة للمتاجر"
+                },
+                "manage": {
+                    "name": "إدارة تحققات المتاجر",
+                    "description": "• قبول أو رفض طلبات تحقق المتاجر"
+                }
+            },
+            "driver_verification": {
+                "view": {
+                    "name": "عرض تحققات السائقين",
+                    "description": "• عرض طلبات السائقين المستقلين المعلقة"
+                },
+                "manage": {
+                    "name": "إدارة تحققات السائقين",
+                    "description": "• قبول أو رفض طلبات تحقق السائقين"
+                }
+            },
+            "reported_reviews": {
+                "view": {
+                    "name": "عرض التقييمات المبلغ عنها",
+                    "description": "• عرض قائمة التقييمات المبلغ عنها من قبل أصحاب المتاجر"
+                },
+                "manage": {
+                    "name": "إدارة التقييمات المبلغ عنها",
+                    "description": "• حذف أو تجاهل التقييمات المبلغ عنها"
+                }
+            },
+            "users": {
+                "view": {
+                    "name": "عرض المستخدمين",
+                    "description": "• عرض قائمة بجميع مستخدمي النظام"
+                },
+                "manage": {
+                    "name": "إدارة المستخدمين",
+                    "description": "• تعديل بيانات المستخدمين وتغيير حالتهم"
+                }
+            },
+            "cities": {
+                "view": {
+                    "name": "عرض المدن",
+                    "description": "• عرض قائمة مدن النظام"
+                },
+                "manage": {
+                    "name": "إدارة المدن",
+                    "description": "• إنشاء وتعديل وحذف المدن"
+                }
+            },
+            "towns": {
+                "view": {
+                    "name": "عرض البلدات",
+                    "description": "• عرض قائمة البلدات والمناطق"
+                },
+                "manage": {
+                    "name": "إدارة البلدات",
+                    "description": "• إنشاء وتعديل وحذف البلدات والمناطق"
+                }
+            },
+            "business_types": {
+                "view": {
+                    "name": "عرض أنواع الأعمال",
+                    "description": "• عرض قائمة أنواع الأعمال"
+                },
+                "manage": {
+                    "name": "إدارة أنواع الأعمال",
+                    "description": "• إنشاء وتعديل وحذف أنواع الأعمال"
+                }
+            },
+            "business_categories": {
+                "view": {
+                    "name": "عرض فئات الأعمال",
+                    "description": "• عرض قائمة فئات الأعمال"
+                },
+                "manage": {
+                    "name": "إدارة فئات الأعمال",
+                    "description": "• إنشاء وتعديل وحذف فئات الأعمال"
+                }
+            },
+            "plans": {
+                "view": {
+                    "name": "عرض الخطط",
+                    "description": "• عرض خطط الاشتراك"
+                },
+                "manage": {
+                    "name": "إدارة الخطط",
+                    "description": "• إنشاء وتعديل خطط الاشتراك"
+                }
+            },
+            "subscriptions": {
+                "view": {
+                    "name": "عرض الاشتراكات",
+                    "description": "• عرض اشتراكات المتاجر والحدود المتاحة"
+                },
+                "manage": {
+                    "name": "إدارة الاشتراكات",
+                    "description": "• تعديل أو منح اشتراكات للمتاجر"
+                }
+            },
+            "app_updates": {
+                "manage": {
+                    "name": "إدارة تحديثات التطبيق",
+                    "description": "• تكوين متطلبات إصدار التطبيق"
+                }
+            },
+            "employees": {
+                "view": {
+                    "name": "عرض موظفي الإدارة",
+                    "description": "• عرض قائمة موظفي إدارة النظام"
+                },
+                "manage": {
+                    "name": "إدارة موظفي الإدارة",
+                    "description": "• إضافة، تعديل، أو إزالة موظفي الإدارة"
+                }
+            },
+            "roles": {
+                "manage": {
+                    "name": "إدارة أدوار المشرفين",
+                    "description": "• إنشاء وتكوين مجموعات الصلاحيات لموظفي الإدارة"
+                }
+            },
+            "dashboard": {
+                "view": {
+                    "name": "عرض لوحة التحليلات",
+                    "description": "• عرض لوحة الإحصائيات الشاملة للنظام"
+                }
+            }
+        },
+        "admin.stores.view": {
+            "name": "عرض المتاجر",
+            "description": "• عرض قائمة بجميع المتاجر وتفاصيلها"
+        },
+        "admin.stores.update_status": {
+            "name": "تحديث حالة المتجر",
+            "description": "• تفعيل أو تعليق أو تعطيل المتاجر"
+        },
+        "admin.stores.delete": {
+            "name": "حذف المتاجر",
+            "description": "• حذف المتاجر نهائياً"
+        },
+        "admin.store_verification.view": {
+            "name": "عرض توثيقات المتاجر",
+            "description": "• عرض طلبات توثيق المتاجر المعلقة"
+        },
+        "admin.store_verification.manage": {
+            "name": "إدارة توثيقات المتاجر",
+            "description": "• الموافقة على توثيق المتاجر أو رفضه"
+        },
+        "admin.driver_verification.view": {
+            "name": "عرض توثيقات السائقين",
+            "description": "• عرض طلبات السائقين المستقلين المعلقة"
+        },
+        "admin.driver_verification.manage": {
+            "name": "إدارة توثيقات السائقين",
+            "description": "• الموافقة على توثيق السائقين أو رفضه"
+        },
+        "admin.reported_reviews.view": {
+            "name": "عرض التقييمات المبلغ عنها",
+            "description": "• عرض قائمة التقييمات التي أبلغ عنها أصحاب المتاجر"
+        },
+        "admin.reported_reviews.manage": {
+            "name": "إدارة التقييمات المبلغ عنها",
+            "description": "• حذف أو تجاهل التقييمات المبلغ عنها"
+        },
+        "admin.users.view": {
+            "name": "عرض المستخدمين",
+            "description": "• عرض قائمة بجميع مستخدمي النظام"
+        },
+        "admin.users.manage": {
+            "name": "إدارة المستخدمين",
+            "description": "• تعديل المستخدمين وتغيير حالتهم"
+        },
+        "admin.cities.view": {
+            "name": "عرض المدن",
+            "description": "• عرض قائمة مدن النظام"
+        },
+        "admin.cities.manage": {
+            "name": "إدارة المدن",
+            "description": "• إنشاء وتعديل وحذف المدن"
+        },
+        "admin.towns.view": {
+            "name": "عرض المناطق",
+            "description": "• عرض قائمة المناطق والأماكن"
+        },
+        "admin.towns.manage": {
+            "name": "إدارة المناطق",
+            "description": "• إنشاء وتعديل وحذف المناطق والأماكن"
+        },
+        "admin.business_types.view": {
+            "name": "عرض أنواع الأنشطة",
+            "description": "• عرض قائمة أنواع الأنشطة التجارية"
+        },
+        "admin.business_types.manage": {
+            "name": "إدارة أنواع الأنشطة",
+            "description": "• إنشاء وتعديل وحذف أنواع الأنشطة التجارية"
+        },
+        "admin.business_categories.view": {
+            "name": "عرض التصنيفات",
+            "description": "• عرض قائمة تصنيفات الأنشطة التجارية"
+        },
+        "admin.business_categories.manage": {
+            "name": "إدارة التصنيفات",
+            "description": "• إنشاء وتعديل وحذف تصنيفات الأنشطة التجارية"
+        },
+        "admin.plans.view": {
+            "name": "عرض الخطط",
+            "description": "• عرض خطط الاشتراك"
+        },
+        "admin.plans.manage": {
+            "name": "إدارة الخطط",
+            "description": "• إنشاء وتعديل خطط الاشتراك"
+        },
+        "admin.subscriptions.view": {
+            "name": "عرض الاشتراكات",
+            "description": "• عرض اشتراكات المتاجر وحدودها"
+        },
+        "admin.subscriptions.manage": {
+            "name": "إدارة الاشتراكات",
+            "description": "• تعديل أو منح اشتراكات المتاجر"
+        },
+        "admin.app_updates.manage": {
+            "name": "إدارة تحديثات التطبيق",
+            "description": "• تهيئة متطلبات إصدار التطبيق"
+        },
+        "admin.employees.view": {
+            "name": "عرض موظفي الإدارة",
+            "description": "• عرض قائمة موظفي إدارة النظام"
+        },
+        "admin.employees.manage": {
+            "name": "إدارة موظفي الإدارة",
+            "description": "• إضافة أو تعديل أو إزالة موظفي الإدارة"
+        },
+        "admin.roles.manage": {
+            "name": "إدارة أدوار الإدارة",
+            "description": "• إنشاء وتهيئة مجموعات الصلاحيات لموظفي الإدارة"
+        },
+        "admin.dashboard.view": {
+            "name": "عرض لوحة التحليلات",
+            "description": "• عرض لوحة إحصائيات النظام الشاملة"
         }
     },
     "delivery": {
@@ -882,5 +1138,64 @@
     "driverIsNotAStoreDriver": "هذا السائق ليس سائقاً لمتجر.",
     "driverMustBeVerifiedToSendHiringRequests": "يجب أن يكون حسابك موثقاً لإرسال طلبات التوظيف.",
     "aRequestIsAlreadyPending": "يوجد طلب معلق بالفعل.",
-    "busyStatusCanOnlyBeToggledForStoreDriversByStoreOwners": "يمكن تغيير حالة الانشغال للسائقي المتجر فقط من قبل أصحاب المتجر."
+    "busyStatusCanOnlyBeToggledForStoreDriversByStoreOwners": "يمكن تغيير حالة الانشغال للسائقي المتجر فقط من قبل أصحاب المتجر.",
+    "adminNotFound": "موظف الإدارة غير موجود",
+    "adminRoles": "أدوار الإدارة",
+    "manageAdminRolesDesc": "إدارة الأدوار والصلاحيات على مستوى النظام",
+    "addAdminRole": "إضافة دور إدارة",
+    "createAdminRole": "إنشاء دور إدارة جديد",
+    "editAdminRole": "تعديل دور إدارة",
+    "adminRoleDetails": "تفاصيل دور المشرف",
+    "adminRoleName": "اسم الدور",
+    "adminRoleDescription": "الوصف",
+    "noAdminRolesFound": "لم يتم العثور على أدوار مشرفين",
+    "deleteAdminRole": "حذف دور إدارة",
+    "deleteAdminRoleConfirmation": "هل أنت متأكد من حذف دور الإدارة هذا؟",
+    "errorFetchingRoles": "خطأ في جلب أدوار المشرفين",
+    "errorDeletingRole": "خطأ في حذف دور المشرف",
+    "errorCreatingRole": "خطأ في إنشاء دور المشرف",
+    "errorUpdatingRole": "خطأ في تحديث دور المشرف",
+    "adminEmployees": "موظفو الإدارة",
+    "manageAdminEmployeesDesc": "إدارة موظفي الإدارة العليا والصلاحيات",
+    "addAdminEmployee": "إضافة موظف إدارة",
+    "editAdminEmployee": "تعديل موظف إدارة",
+    "noAdminEmployeesFound": "لم يتم العثور على موظفي إدارة",
+    "adminRole": "دور الإدارة",
+    "selectAdminRole": "اختر دور المشرف",
+    "deleteAdminEmployee": "حذف موظف إدارة",
+    "deleteAdminEmployeeConfirmation": "هل أنت متأكد من حذف موظف الإدارة هذا؟",
+    "errorFetchingEmployees": "خطأ في جلب موظفي الإدارة",
+    "errorDeletingEmployee": "خطأ في حذف موظف الإدارة",
+    "errorUpdatingEmployee": "خطأ في تحديث موظف الإدارة",
+    "emailAlreadyInUse": "البريد الإلكتروني مستخدم بالفعل",
+    "phoneAlreadyInUse": "رقم الهاتف مستخدم بالفعل",
+    "usernameAlreadyInUse": "اسم المستخدم مستخدم بالفعل",
+    "adminRoleNotFound": "دور المشرف غير موجود",
+    "adminEmployeeNotFound": "موظف الإدارة غير موجود",
+    "userAlreadyExists": "المستخدم بهذه التفاصيل موجود بالفعل",
+    "createAdminEmployee": "إنشاء موظف إدارة جديد",
+    "adminEmployeeActiveDesc": "السماح لموظف الإدارة هذا بتسجيل الدخول",
+    "superAdminTeam": "فريق الإدارة العليا",
+    "Verification Requests": "طلبات التوثيق",
+    "Content Moderation": "إدارة المحتوى",
+    "Geography": "الجغرافيا",
+    "System Data": "بيانات النظام",
+    "Subscriptions & Plans": "الاشتراكات والخطط",
+    "Admin Team": "فريق الإدارة",
+    "System Configuration": "إعدادات النظام",
+    "noPermissionsFound": "لا توجد صلاحيات متاحة للاختيار. يرجى التحقق من إعدادات النظام.",
+    "employeeDetails": "تفاصيل الموظف",
+    "fullNamePlaceholder": "مثال: أحمد محمد",
+    "emailAddress": "البريد الإلكتروني",
+    "emailPlaceholder": "مثال: ahmed@example.com",
+    "phoneNumber": "رقم الهاتف",
+    "phonePlaceholder": "مثال: +20123456789",
+    "passwordPlaceholder": "على الأقل 8 أحرف",
+    "selectRolePlaceholder": "اختر دوراً...",
+    "allowLogin": "السماح بتسجيل الدخول",
+    "allowLoginDesc": "السماح لكل مستخدمي الإدارة هؤلاء بتسجيل الدخول",
+    "statusActiveDesc": "تفعيل أو تعطيل هذا الحساب",
+    "deactivateAdminEmployee": "تعطيل موظف إدارة",
+    "activateAdminEmployee": "تفعيل موظف إدارة",
+    "toggleAdminEmployeeStatusConfirmation": "هل أنت متأكد من تغيير حالة موظف الإدارة هذا؟"
 }

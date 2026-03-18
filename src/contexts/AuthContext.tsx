@@ -20,6 +20,7 @@ interface User {
         name: string;
         permissions: string[];
     };
+    adminPermissions?: string[];
     profile?: any;
     subscription?: {
         plan: string;
@@ -38,6 +39,7 @@ interface AuthContextType {
     logout: () => Promise<void>;
     refreshProfile: () => Promise<void>;
     hasPermission: (permission: string) => boolean;
+    hasAdminPermission: (permission: string) => boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -51,7 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!user) return false;
 
         // Super admins and Store Owners have all permissions in their scope
-        if (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.ADMIN || user.role === UserRole.STORE_OWNER) {
+        if (user.role === UserRole.SUPER_ADMIN || user.role === UserRole.STORE_OWNER) {
             return true;
         }
 
@@ -70,6 +72,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
 
             return false;
+        }
+
+        return false;
+    }, [user]);
+
+    const hasAdminPermission = useCallback((permission: string): boolean => {
+        if (!user) return false;
+
+        // Super admins have all permissions
+        if (user.role === UserRole.SUPER_ADMIN) {
+            return true;
+        }
+
+        if (user.role === UserRole.ADMIN) {
+            const permissions = user.adminPermissions || user.profile?.adminEmployee?.adminRole?.permissions || [];
+            if (permissions.includes(permission)) return true;
         }
 
         return false;
@@ -121,7 +139,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             login,
             logout,
             refreshProfile,
-            hasPermission
+            hasPermission,
+            hasAdminPermission
         }}>
             {children}
         </AuthContext.Provider>
