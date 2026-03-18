@@ -22,6 +22,9 @@ export interface DashboardStats {
         drivers: any[];
     };
     topStores?: any[];
+    recentSubscriptions?: any[];
+    platformGrowth?: number;
+    newStoresCount?: number;
     // Seller specific (Optional as they might not be present for Admin)
     totalClients?: number;
     totalFollowers?: number;

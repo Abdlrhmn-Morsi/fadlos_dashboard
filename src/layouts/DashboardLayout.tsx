@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, NavLink, useNavigate, Link } from 'react-router-dom';
+import { Outlet, NavLink, useNavigate, Link, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import {
   LayoutDashboard,
@@ -55,12 +55,28 @@ interface SidebarItemProps {
 
 const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collapsed, replace, end, isPremium }) => {
   const { isRTL } = useLanguage();
+  const location = useLocation();
+
+  const isActive = (() => {
+    if (end) return location.pathname === to;
+    if (to === '/' && location.pathname !== '/') return false;
+    
+    // special cases for stores and drivers overlapping with their /verification paths
+    if (to === '/stores') {
+      return location.pathname === '/stores' || (location.pathname.startsWith('/stores/') && !location.pathname.startsWith('/stores/verification'));
+    }
+    if (to === '/drivers') {
+      return location.pathname === '/drivers' || (location.pathname.startsWith('/drivers/') && !location.pathname.startsWith('/drivers/verification'));
+    }
+
+    return location.pathname === to || location.pathname.startsWith(to + '/');
+  })();
+
   return (
-    <NavLink
+    <Link
       to={to}
       replace={replace}
-      end={end}
-      className={({ isActive }) => clsx(
+      className={clsx(
         'flex items-center rounded-[4px] transition-all duration-200 group relative',
         collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
         isActive
@@ -96,7 +112,7 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
           {isPremium && <Crown size={10} className="text-amber-400" />}
         </div>
       )}
-    </NavLink>
+    </Link>
   );
 };
 
@@ -285,6 +301,7 @@ const DashboardLayout: React.FC = () => {
               {hasAdminPermission(AdminPermissions.PLANS_VIEW) && (
                 <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
               )}
+              <SidebarItem to="/admin-analytics" icon={BarChart3} label={t('dashboard:adminAnalytics', { defaultValue: 'Analytics' })} collapsed={collapsed} />
             </>
           )}
 

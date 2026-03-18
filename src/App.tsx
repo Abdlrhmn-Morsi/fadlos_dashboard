@@ -42,6 +42,7 @@ import EmployeeForm from './features/employees/components/EmployeeForm';
 import AddonsList from './features/addons/components/AddonsList';
 import AddonForm from './features/addons/components/AddonForm';
 import Analytics from './features/analytics/Analytics';
+import AdminAnalytics from './features/analytics/pages/AdminAnalytics';
 import DeliveryDriversPage from './features/delivery/pages/DeliveryDriversPage';
 import DeliveryDriverForm from './features/delivery/components/DeliveryDriverForm';
 import DriverDashboard from './features/delivery/pages/DriverDashboard';
@@ -172,6 +173,11 @@ const AppContent = () => {
             <Route path="stores/verification" element={<AdminPermissionGate permission={AdminPermissions.STORE_VERIFICATION_VIEW}><StoreVerificationRequests /></AdminPermissionGate>} />
             <Route path="plans-management" element={
               user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="admin-analytics" element={
+              (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN)
+                ? <AdminAnalytics />
+                : <Navigate to="/" replace />
             } />
 
             <Route path="admin-roles" element={<AdminPermissionGate permission={AdminPermissions.ADMIN_ROLES_MANAGE}><AdminRolesList /></AdminPermissionGate>} />

@@ -31,3 +31,15 @@ export const fetchCustomerAnalytics = async (period: string = '30d', startDate?:
     const response = await apiService.get(url);
     return response.data || response;
 };
+
+// ── Admin Analytics APIs ──────────────────────────────────────────
+export const fetchSubscriptionAnalytics = async () => {
+    const response = await apiService.get('/stats/subscription-analytics');
+    return response.data || response;
+};
+
+export const fetchSystemAnalytics = async () => {
+    const response = await apiService.get('/stats/system-analytics');
+    return response.data || response;
+};
+
