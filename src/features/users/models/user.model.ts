@@ -13,6 +13,7 @@ export interface User {
 export interface UsersFilters {
     role: string;
     search: string;
+    status?: string;
 }
 
 export interface UsersPagination {

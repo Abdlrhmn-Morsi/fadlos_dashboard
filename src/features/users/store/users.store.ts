@@ -15,7 +15,8 @@ export const usersFiltersState = atom<UsersFilters>({
     key: 'usersFiltersState',
     default: {
         role: '',
-        search: ''
+        search: '',
+        status: ''
     }
 });
 

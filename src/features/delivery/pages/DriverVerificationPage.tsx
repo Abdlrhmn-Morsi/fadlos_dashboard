@@ -1,33 +1,78 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Truck, ShieldCheck, Image as ImageIcon, CheckCircle, XCircle, User, Mail, Phone, Calendar, Info, ExternalLink } from 'lucide-react';
-import { getAllDrivers, verifyDriver } from '../api/delivery-drivers.api';
+import { Truck, ShieldCheck, Mail, Phone, Search } from 'lucide-react';
+import { getAllDrivers } from '../api/delivery-drivers.api';
 import { toast } from '../../../utils/toast';
-import { ConfirmModal } from '../../../components/ConfirmModal';
+import { useNavigate, useLocation } from 'react-router-dom';
 import clsx from 'clsx';
+import { Pagination } from '../../../components/common/Pagination';
 
 const DriverVerificationPage = () => {
     const { t } = useTranslation(['common', 'delivery']);
+    const navigate = useNavigate();
+    const location = useLocation();
+    
     const [drivers, setDrivers] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const [modal, setModal] = useState({
-        isOpen: false,
-        driverId: '',
-        status: '',
-        driverName: '',
-        notes: '',
-        rejectionReason: ''
+    
+    // Filters & Pagination
+    const [searchQuery, setSearchQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('');
+    const [pagination, setPagination] = useState({
+        page: 1,
+        limit: 10,
+        total: 0,
+        totalPages: 0,
     });
 
-    useEffect(() => {
-        fetchDrivers();
-    }, []);
+    const [stats, setStats] = useState({
+        all: 0,
+        UNDER_REVIEW: 0,
+        VERIFIED: 0,
+        REJECTED: 0,
+    });
+    
+    // Debounce Ref
+    const searchTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-    const fetchDrivers = async () => {
+    const fetchStats = async () => {
+        try {
+            const statuses = ['', 'UNDER_REVIEW', 'VERIFIED', 'REJECTED'];
+            const results = await Promise.all(statuses.map(s => 
+                getAllDrivers({ limit: 1, verificationStatus: s || undefined })
+            ));
+            
+            setStats({
+                all: results[0]?.meta?.total ?? (Array.isArray(results[0]) ? results[0].length : results[0]?.data?.length || 0),
+                UNDER_REVIEW: results[1]?.meta?.total ?? (Array.isArray(results[1]) ? results[1].length : results[1]?.data?.length || 0),
+                VERIFIED: results[2]?.meta?.total ?? (Array.isArray(results[2]) ? results[2].length : results[2]?.data?.length || 0),
+                REJECTED: results[3]?.meta?.total ?? (Array.isArray(results[3]) ? results[3].length : results[3]?.data?.length || 0),
+            });
+        } catch (error) {
+            console.error('Failed to fetch stats', error);
+        }
+    };
+
+    const fetchDrivers = async (page = 1, search = searchQuery, status: string = statusFilter) => {
         try {
             setLoading(true);
-            const data = await getAllDrivers();
+            const response = await getAllDrivers({
+                page,
+                limit: pagination.limit,
+                search: search || undefined,
+                verificationStatus: status || undefined,
+            });
+            
+            const data = response.data || (Array.isArray(response) ? response : []);
+            const meta = response.meta || { total: data.length, page, limit: pagination.limit, totalPages: 1 };
+            
             setDrivers(data);
+            setPagination({
+                page: meta.page,
+                limit: meta.limit,
+                total: meta.total,
+                totalPages: meta.totalPages || Math.ceil(meta.total / meta.limit),
+            });
         } catch (error) {
             console.error('Failed to fetch drivers', error);
             toast.error(t('common.error_fetching_data', 'Failed to load drivers'));
@@ -36,38 +81,25 @@ const DriverVerificationPage = () => {
         }
     };
 
-    const handleVerifyClick = (driverId: string, name: string, status: string) => {
-        setModal({
-            isOpen: true,
-            driverId,
-            status,
-            driverName: name,
-            notes: '',
-            rejectionReason: ''
-        });
-    };
+    useEffect(() => {
+        fetchStats();
+    }, []);
 
-    const confirmVerification = async () => {
-        try {
-            // Include rejectionReason if status is REJECTED
-            const reason = modal.status === 'REJECTED' ? modal.rejectionReason : undefined;
-            await verifyDriver(modal.driverId, modal.status, modal.notes, reason);
-            toast.success(t('verificationSuccess', 'Driver verification updated successfully'));
-            setModal({ ...modal, isOpen: false });
-            fetchDrivers();
-        } catch (error) {
-            console.error('Failed to verify driver', error);
-            toast.error(t('verificationError', 'Failed to update verification status'));
-        }
-    };
+    useEffect(() => {
+        fetchDrivers(pagination.page, searchQuery, statusFilter);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pagination.page, statusFilter]);
 
-    if (loading) {
-        return (
-            <div className="flex items-center justify-center min-h-[60vh]">
-                <div className="w-8 h-8 border-4 border-indigo-600/20 border-t-indigo-600 rounded-full animate-spin" />
-            </div>
-        );
-    }
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const val = e.target.value;
+        setSearchQuery(val);
+        
+        if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+        searchTimeoutRef.current = setTimeout(() => {
+            setPagination(prev => ({ ...prev, page: 1 }));
+            fetchDrivers(1, val, statusFilter);
+        }, 500);
+    };
 
     return (
         <div className="p-6 space-y-6">
@@ -79,218 +111,155 @@ const DriverVerificationPage = () => {
                     </h1>
                     <p className="text-slate-500 text-sm mt-1">{t('delivery.drivers.verification.desc', 'Review and approve driver identity documents.')}</p>
                 </div>
-                <div className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl border border-indigo-100 dark:border-indigo-800 flex items-center gap-2">
-                    <Truck className="text-indigo-600" size={20} />
-                    <span className="text-sm font-black text-indigo-700 dark:text-indigo-400">{drivers.length} {t('delivery.drivers.total', 'Drivers Total')}</span>
+                <div className="flex flex-wrap items-center gap-2">
+                    {[
+                        { label: t('all', 'Total'), value: '', count: stats.all, color: 'indigo', icon: Truck },
+                        { label: t('verificationStatuses.UNDER_REVIEW', 'Reviewing'), value: 'UNDER_REVIEW', count: stats.UNDER_REVIEW, color: 'blue', icon: Search },
+                        { label: t('verificationStatuses.VERIFIED', 'Verified'), value: 'VERIFIED', count: stats.VERIFIED, color: 'emerald', icon: ShieldCheck },
+                        { label: t('verificationStatuses.REJECTED', 'Rejected'), value: 'REJECTED', count: stats.REJECTED, color: 'rose', icon: ShieldCheck },
+                    ].map((s) => (
+                        <button
+                            key={s.value}
+                            onClick={() => {
+                                setStatusFilter(s.value);
+                                setPagination(prev => ({ ...prev, page: 1 }));
+                            }}
+                            className={clsx(
+                                "flex items-center gap-3 px-4 py-2 rounded-xl border transition-all active:scale-95 group",
+                                statusFilter === s.value
+                                    ? {
+                                        'bg-indigo-600 border-indigo-600 text-white shadow-lg shadow-indigo-600/20': s.color === 'indigo',
+                                        'bg-amber-600 border-amber-600 text-white shadow-lg shadow-amber-600/20': s.color === 'amber',
+                                        'bg-blue-600 border-blue-600 text-white shadow-lg shadow-blue-600/20': s.color === 'blue',
+                                        'bg-emerald-600 border-emerald-600 text-white shadow-lg shadow-emerald-600/20': s.color === 'emerald',
+                                        'bg-rose-600 border-rose-600 text-white shadow-lg shadow-rose-600/20': s.color === 'rose',
+                                    }
+                                    : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                            )}
+                        >
+                            <s.icon size={16} className={clsx(
+                                statusFilter === s.value ? "text-white" : 
+                                {
+                                    'text-indigo-500': s.color === 'indigo',
+                                    'text-amber-500': s.color === 'amber',
+                                    'text-blue-500': s.color === 'blue',
+                                    'text-emerald-500': s.color === 'emerald',
+                                    'text-rose-500': s.color === 'rose',
+                                }
+                            )} />
+                            <div className="flex items-center gap-2">
+                                <span className="text-[10px] font-black uppercase tracking-widest">{s.label}</span>
+                                <span className={clsx(
+                                    "px-1.5 py-0.5 rounded text-[10px] font-black",
+                                    statusFilter === s.value 
+                                        ? "bg-white/20 text-white" 
+                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"
+                                )}>
+                                    {s.count}
+                                </span>
+                            </div>
+                        </button>
+                    ))}
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div className="relative">
+                    <div className="absolute inset-y-0 left-inline-start-0 pl-3 flex items-center pointer-events-none text-slate-400">
+                        <Search size={18} />
+                    </div>
+                    <input
+                        type="text"
+                        placeholder={t('search', 'Search drivers by name, email or phone...') as string}
+                        value={searchQuery}
+                        onChange={handleSearchChange}
+                        className="w-full pl-10 rtl:pr-10 rtl:pl-4 pr-4 py-3 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 transition-all dark:text-white"
+                    />
+                </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {drivers.map((profile) => (
-                    <div key={profile.id} className="bg-white dark:bg-slate-900 rounded-3xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col group hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300">
+                    <div 
+                        key={profile.id} 
+                        onClick={() => navigate(`/drivers/verification/${profile.id}`, { state: { from: location.pathname } })}
+                        className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col group cursor-pointer hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 transform hover:-translate-y-1"
+                    >
                         {/* Status Header */}
                         <div className={clsx(
                             "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-center border-b",
-                            profile.verificationStatus === 'VERIFIED' ? "bg-emerald-50 text-emerald-600 border-emerald-100" :
-                                profile.verificationStatus === 'REJECTED' ? "bg-rose-50 text-rose-600 border-rose-100" :
-                                    profile.verificationStatus === 'UNDER_REVIEW' ? "bg-amber-50 text-amber-600 border-amber-100" :
-                                        "bg-slate-50 text-slate-600 border-slate-100"
+                            profile.verificationStatus === 'VERIFIED' ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400" :
+                                profile.verificationStatus === 'REJECTED' ? "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400" :
+                                    profile.verificationStatus === 'UNDER_REVIEW' ? "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400" :
+                                        "bg-slate-50 text-slate-600 border-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-400"
                         )}>
                             {t(`verificationStatuses.${profile.verificationStatus}`, profile.verificationStatus) as string}
                         </div>
 
                         {/* Driver Info */}
-                        <div className="p-5 space-y-4 flex-1">
-                            <div className="flex items-center gap-4">
-                                <div className="w-14 h-14 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-xl text-indigo-600 shadow-inner">
-                                    {(profile.profile?.user?.name || 'U').charAt(0)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                    <h3 className="font-black text-slate-900 dark:text-white truncate">{profile.profile?.user?.name || 'Unknown Driver'}</h3>
-                                    <div className="flex items-center gap-1 text-slate-400 text-xs">
-                                        <Mail size={12} />
+                        <div className="p-5 flex-1 flex flex-col items-center text-center space-y-3">
+                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-2xl text-indigo-600 shadow-inner overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                                {profile.avatarUrl ? (
+                                    <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    (profile.profile?.user?.name || 'U').charAt(0)
+                                )}
+                            </div>
+                            
+                            <div className="space-y-1 w-full min-w-0">
+                                <h3 className="font-black text-slate-900 dark:text-white truncate text-lg group-hover:text-indigo-600 transition-colors">
+                                    {profile.profile?.user?.name || 'Unknown Driver'}
+                                </h3>
+                                
+                                <div className="flex flex-col items-center gap-1.5 text-slate-500 text-xs mt-2">
+                                    <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded-md w-full justify-center truncate">
+                                        <Mail size={12} className="shrink-0 text-slate-400" />
                                         <span className="truncate">{profile.profile?.user?.email || '-'}</span>
                                     </div>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-3 text-xs">
-                                <div className="space-y-1">
-                                    <p className="text-slate-400 font-bold uppercase tracking-tighter">{t('type', 'Type')}</p>
-                                    <p className="font-black text-slate-700 dark:text-slate-300">{t(`driverTypes.${profile.driverType}`, profile.driverType) as string}</p>
-                                </div>
-                                <div className="space-y-1">
-                                    <p className="text-slate-400 font-bold uppercase tracking-tighter">{t('fields.phone', 'Phone')}</p>
-                                    <p className="font-black text-slate-700 dark:text-slate-300">{profile.profile?.user?.phone || '-'}</p>
-                                </div>
-                            </div>
-
-                            {/* Verification Notes / Rejection Reason */}
-                            {(profile.rejectionReason || profile.verificationNotes) && (
-                                <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800/50">
-                                    <div className="flex items-center gap-1.5 text-slate-400 mb-1">
-                                        <Info size={12} />
-                                        <span className="text-[10px] font-black uppercase tracking-widest">{t('reason', 'Reason')}</span>
+                                    <div className="flex items-center gap-1.5 bg-slate-50 dark:bg-slate-800/50 px-2 py-1 rounded-md w-full justify-center truncate">
+                                        <Phone size={12} className="shrink-0 text-slate-400" />
+                                        <span className="truncate">{profile.profile?.user?.phone || '-'}</span>
                                     </div>
-                                    {profile.rejectionReason && (
-                                        <p className="text-xs text-rose-600 dark:text-rose-400 leading-relaxed font-bold mb-1">{profile.rejectionReason}</p>
-                                    )}
-                                    {profile.verificationNotes && (
-                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed italic">"{profile.verificationNotes}"</p>
-                                    )}
-                                </div>
-                            )}
-
-                            {/* Documents Grid */}
-                            <div className="space-y-2">
-                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('documents', 'Verification Documents')}</p>
-                                <div className="grid grid-cols-3 gap-2">
-                                    <DocPreview url={profile.identityImageFrontUrl} label={t('delivery.drivers.id_front')} />
-                                    <DocPreview url={profile.identityImageBackUrl} label={t('delivery.drivers.id_back')} />
-                                    <DocPreview url={profile.identityImageSelfieUrl} label={t('delivery.drivers.selfie')} />
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Actions */}
-                        <div className="p-4 bg-slate-50 dark:bg-slate-800/30 border-t border-slate-100 dark:border-slate-800 flex items-center gap-3">
-                            <button
-                                onClick={() => handleVerifyClick(profile.id, profile.profile?.user?.name || 'Unknown Driver', 'VERIFIED')}
-                                disabled={profile.verificationStatus === 'VERIFIED'}
-                                className={clsx(
-                                    "flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm",
-                                    profile.verificationStatus === 'VERIFIED'
-                                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                        : "bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow-emerald-200 dark:hover:shadow-none"
-                                )}
-                            >
-                                <CheckCircle size={16} />
-                                {t('approve', 'Approve')}
-                            </button>
-                            <button
-                                onClick={() => handleVerifyClick(profile.id, profile.profile?.user?.name || 'Unknown Driver', 'REJECTED')}
-                                disabled={profile.verificationStatus === 'REJECTED'}
-                                className={clsx(
-                                    "flex-1 py-2.5 rounded-xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all shadow-sm",
-                                    profile.verificationStatus === 'REJECTED'
-                                        ? "bg-slate-100 text-slate-400 cursor-not-allowed"
-                                        : "bg-rose-50 text-rose-600 border border-rose-200 hover:bg-rose-100"
-                                )}
-                            >
-                                <XCircle size={16} />
-                                {t('reject', 'Reject')}
-                            </button>
+                            
+                            <div className="mt-auto pt-4 w-full border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
+                                <span className="font-bold text-slate-400 uppercase">{t('type', 'Type')}</span>
+                                <span className="font-black text-slate-700 dark:text-slate-300">
+                                    {t(`driverTypes.${profile.driverType}`, profile.driverType) as string}
+                                </span>
+                            </div>
                         </div>
                     </div>
                 ))}
 
-                {drivers.length === 0 && (
-                    <div className="col-span-full py-20 bg-white dark:bg-slate-900 rounded-[3rem] border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center space-y-4">
+                {!loading && drivers.length === 0 && (
+                    <div className="col-span-full py-20 bg-white dark:bg-slate-900 rounded-3xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center text-center space-y-4">
                         <div className="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center">
                             <ShieldCheck size={40} className="text-slate-300" />
                         </div>
                         <div className="space-y-1">
                             <p className="text-lg font-black text-slate-900 dark:text-white">
-                                {t('delivery.drivers.no_pending', 'No drivers awaiting verification')}
+                                {t('delivery.drivers.no_pending', 'No drivers found')}
                             </p>
-                            <p className="text-sm text-slate-500 max-w-xs mx-auto">
-                                {t('delivery.drivers.verification.desc', 'Review and approve driver identity documents.')}
-                            </p>
+                            <p className="text-sm text-slate-500">{t('try_different_search', 'Try adjusting your search or filters.')}</p>
                         </div>
                     </div>
                 )}
             </div>
 
-            {/* Verification Reason Modal */}
-            {modal.isOpen && (
-                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-                    <div className="bg-white dark:bg-slate-900 rounded-[2.5rem] shadow-2xl border border-slate-200 dark:border-slate-800 w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
-                        <div className="p-8 space-y-6">
-                            <div className="space-y-2">
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">
-                                    {modal.status === 'VERIFIED' ? t('approve', 'Approve') : t('reject', 'Reject')} {modal.driverName}
-                                </h2>
-                                <p className="text-slate-500 text-sm">
-                                    {modal.status === 'VERIFIED'
-                                        ? t('approve_confirm_msg', 'Are you sure you want to verify this driver? They will be able to start accepting orders immediately.')
-                                        : t('reject_confirm_msg', 'Please provide a reason for rejecting this driver\'s application.')}
-                                </p>
-                            </div>
-
-                            {modal.status === 'REJECTED' && (
-                                <div className="space-y-2">
-                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('rejection_reason', 'Rejection Reason')}</label>
-                                    <textarea
-                                        className="w-full h-32 p-4 bg-rose-50 dark:bg-rose-900/10 border-2 border-rose-100 dark:border-rose-800 rounded-2xl text-slate-900 dark:text-white placeholder:text-rose-300 focus:border-rose-500 focus:ring-0 transition-all outline-none resize-none text-sm"
-                                        placeholder={t('provide_rejection_reason', 'Provide a reason for rejection (required)')}
-                                        value={modal.rejectionReason}
-                                        onChange={(e) => setModal({ ...modal, rejectionReason: e.target.value })}
-                                    />
-                                </div>
-                            )}
-
-                            <div className="space-y-2">
-                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1">{t('admin_notes', 'Admin Notes')} ({t('optional', 'Optional')})</label>
-                                <textarea
-                                    className="w-full h-20 p-4 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-2xl text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-indigo-500 focus:ring-0 transition-all outline-none resize-none text-sm"
-                                    placeholder={t('provide_notes', 'Internal notes (optional)')}
-                                    value={modal.notes}
-                                    onChange={(e) => setModal({ ...modal, notes: e.target.value })}
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-4 pt-2">
-                                <button
-                                    onClick={() => setModal({ ...modal, isOpen: false })}
-                                    className="flex-1 py-4 font-black text-sm uppercase tracking-widest text-slate-500 hover:text-slate-700 transition-colors"
-                                >
-                                    {t('cancel', 'Cancel')}
-                                </button>
-                                <button
-                                    onClick={confirmVerification}
-                                    className={clsx(
-                                        "flex-[2] py-4 rounded-2xl font-black text-sm uppercase tracking-widest text-white transition-all shadow-lg hover:translate-y-[-2px] active:translate-y-0",
-                                        modal.status === 'VERIFIED'
-                                            ? "bg-emerald-600 shadow-emerald-200 dark:shadow-none hover:bg-emerald-700"
-                                            : "bg-rose-600 shadow-rose-200 dark:shadow-none hover:bg-rose-700"
-                                    )}
-                                >
-                                    {t('confirm', 'Confirm')}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            {/* Pagination */}
+            {!loading && pagination.totalPages > 1 && (
+                <div className="mt-8 flex justify-center">
+                    <Pagination
+                        currentPage={pagination.page}
+                        totalPages={pagination.totalPages}
+                        onPageChange={(page) => setPagination(prev => ({ ...prev, page }))}
+                        isLoading={loading}
+                    />
                 </div>
             )}
         </div>
-    );
-};
-
-const DocPreview = ({ url, label }: { url: string | null; label: string }) => {
-    if (!url) {
-        return (
-            <div className="aspect-[4/3] bg-slate-50 dark:bg-slate-800/50 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex flex-col items-center justify-center p-2 text-center opacity-50">
-                <ImageIcon size={20} className="text-slate-300 mb-1" />
-                <span className="text-[8px] font-bold text-slate-400 truncate w-full px-1">{label}</span>
-            </div>
-        );
-    }
-
-    return (
-        <a
-            href={url}
-            target="_blank"
-            rel="noreferrer"
-            className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100 shadow-sm transition-all hover:scale-105 hover:shadow-md"
-        >
-            <img src={url} alt={label} className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-indigo-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <ExternalLink size={20} className="text-white" />
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-slate-900/60 backdrop-blur-sm p-1">
-                <p className="text-[8px] font-black text-white text-center truncate">{label}</p>
-            </div>
-        </a>
     );
 };
 

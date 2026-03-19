@@ -33,7 +33,8 @@ import {
     cancelHiringRequest,
     respondToResignation,
     initiateTransition,
-    respondToTransition
+    respondToTransition,
+    verifyDriver
 } from '../api/delivery-drivers.api';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -158,6 +159,35 @@ const DriverDetail: React.FC = () => {
         notes?: string;
         rejectionReason?: string;
     }>({ isOpen: false, type: null });
+
+    const [verificationModal, setVerificationModal] = useState<{
+        isOpen: boolean;
+        status: string;
+        rejectionReason: string;
+        notes: string;
+    }>({ isOpen: false, status: '', rejectionReason: '', notes: '' });
+
+    const [verifying, setVerifying] = useState(false);
+
+    const confirmVerification = async () => {
+        if (!id) return;
+        setVerifying(true);
+        try {
+            const reason = verificationModal.status === 'REJECTED' ? verificationModal.rejectionReason : undefined;
+            await verifyDriver(id, verificationModal.status, verificationModal.notes, reason);
+            toast.success(t('verificationSuccess', 'Driver verification updated successfully'));
+            setVerificationModal({ ...verificationModal, isOpen: false });
+            
+            // Refresh driver data
+            const response: any = await getDriverById(id);
+            setDriver(response.data || response);
+        } catch (error) {
+            console.error('Failed to verify driver', error);
+            toast.error(t('verificationError', 'Failed to update verification status'));
+        } finally {
+            setVerifying(false);
+        }
+    };
 
     const handleTransition = async () => {
         if (!id || !actionModal.type) return;
@@ -692,6 +722,23 @@ const DriverDetail: React.FC = () => {
                                 </div>
                             </div>
                         )}
+
+                        {isSystemAdmin && driver.deliveryProfile?.verificationStatus !== 'VERIFIED' && (
+                            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
+                                <button
+                                    onClick={() => setVerificationModal({ isOpen: true, status: 'VERIFIED', rejectionReason: '', notes: '' })}
+                                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest rounded transition-all shadow-md shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
+                                >
+                                    <CheckCircle size={14} /> {t('approve', 'Approve')}
+                                </button>
+                                <button
+                                    onClick={() => setVerificationModal({ isOpen: true, status: 'REJECTED', rejectionReason: '', notes: '' })}
+                                    className="px-6 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 dark:border-rose-900/30 text-xs font-black uppercase tracking-widest rounded transition-all active:scale-95 flex items-center gap-2"
+                                >
+                                    <XCircle size={14} /> {t('reject', 'Reject')}
+                                </button>
+                            </div>
+                        )}
                     </DetailCard>
 
                     {/* Operating Regions Card */}
@@ -801,22 +848,91 @@ const DriverDetail: React.FC = () => {
                                 </div>
                             )}
 
-                            <div className="flex gap-3">
+                            <div className="flex items-center gap-3 mt-8">
                                 <button
                                     onClick={() => setActionModal({ isOpen: false, type: null })}
-                                    className="flex-1 px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-300 text-[10px] font-black uppercase tracking-widest rounded transition-all"
+                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[4px] font-black uppercase tracking-widest text-xs transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95"
                                 >
                                     {t('common.cancel')}
                                 </button>
                                 <button
                                     onClick={handleTransition}
-                                    disabled={transitioning || (actionModal.type === 'REJECT_RESIGNATION' && !actionModal.rejectionReason?.trim())}
+                                    disabled={transitioning || (actionModal.type === 'REJECT_RESIGNATION' && !actionModal.rejectionReason)}
                                     className={clsx(
-                                        "flex-1 px-4 py-2.5 text-white text-[10px] font-black uppercase tracking-widest rounded transition-all flex items-center justify-center gap-2",
+                                        "flex-[2] py-3 px-4 text-white rounded-[4px] font-black uppercase tracking-widest text-xs transition-all shadow-sm shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2",
                                         actionModal.type?.includes('REJECT') ? "bg-rose-600 hover:bg-rose-700" : "bg-indigo-600 hover:bg-indigo-700"
                                     )}
                                 >
                                     {transitioning ? <LoadingSpinner size="sm" fullHeight={false} /> : t('common.confirm')}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Verification Modal */}
+            {verificationModal.isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+                    <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[4px] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300">
+                        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                                <ShieldCheck size={16} className="text-indigo-500" />
+                                {verificationModal.status === 'VERIFIED' ? t('approve', 'Approve') : t('reject', 'Reject')} {driver?.name}
+                            </h3>
+                            <button onClick={() => setVerificationModal({ ...verificationModal, isOpen: false })} className="text-slate-400 hover:text-rose-500 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        <div className="p-6">
+                            <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-4 leading-relaxed">
+                                {verificationModal.status === 'VERIFIED'
+                                    ? t('approve_confirm_msg', 'Are you sure you want to verify this driver? They will be able to start accepting orders immediately.')
+                                    : t('reject_confirm_msg', 'Please provide a reason for rejecting this driver\'s application.')}
+                            </p>
+
+                            {verificationModal.status === 'REJECTED' && (
+                                <div className="space-y-2 mb-4">
+                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('rejection_reason', 'Rejection Reason')}</label>
+                                    <textarea
+                                        className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px] text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all placeholder:text-slate-400"
+                                        rows={3}
+                                        placeholder={t('provide_rejection_reason', 'Provide a reason for rejection (required)')}
+                                        value={verificationModal.rejectionReason}
+                                        onChange={(e) => setVerificationModal(prev => ({ ...prev, rejectionReason: e.target.value }))}
+                                    />
+                                </div>
+                            )}
+
+                            <div className="space-y-2 mb-6">
+                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('admin_notes', 'Admin Notes')} ({t('optional', 'Optional')})</label>
+                                <textarea
+                                    className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px] text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
+                                    rows={2}
+                                    placeholder={t('provide_notes', 'Internal notes (optional)')}
+                                    value={verificationModal.notes}
+                                    onChange={(e) => setVerificationModal(prev => ({ ...prev, notes: e.target.value }))}
+                                />
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setVerificationModal({ ...verificationModal, isOpen: false })}
+                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[4px] font-black uppercase tracking-widest text-xs transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95"
+                                >
+                                    {t('cancel', 'Cancel')}
+                                </button>
+                                <button
+                                    onClick={confirmVerification}
+                                    disabled={verifying || (verificationModal.status === 'REJECTED' && !verificationModal.rejectionReason)}
+                                    className={clsx(
+                                        "flex-[2] py-3 px-4 text-white rounded-[4px] font-black uppercase tracking-widest text-xs transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2",
+                                        verificationModal.status === 'VERIFIED'
+                                            ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
+                                            : "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20"
+                                    )}
+                                >
+                                    {verifying ? <LoadingSpinner size="sm" fullHeight={false} /> : t('confirm', 'Confirm')}
                                 </button>
                             </div>
                         </div>

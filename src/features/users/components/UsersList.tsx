@@ -23,6 +23,7 @@ import {
 import { useLanguage } from '../../../contexts/LanguageContext';
 import clsx from 'clsx';
 import ConfirmationModal from '../../../components/ui/ConfirmationModal';
+import { Pagination } from '../../../components/common/Pagination';
 
 const UsersList: React.FC = () => {
     const { t } = useTranslation(['users', 'common']);
@@ -48,6 +49,9 @@ const UsersList: React.FC = () => {
 
             if (filters.role && filters.role !== 'all') {
                 params.role = filters.role;
+            }
+            if (filters.status) {
+                params.isActive = filters.status === 'true';
             }
 
             const { users, meta } = await getUsers(params);
@@ -101,10 +105,10 @@ const UsersList: React.FC = () => {
         setPagination(prev => ({ ...prev, page: 1 }));
     }, [debouncedSearch, setPagination]);
 
-    // Fetch on page, role, or debounced search change
+    // Fetch on page, role, status, or debounced search change
     useEffect(() => {
         fetchUsers();
-    }, [pagination.page, filters.role, debouncedSearch]);
+    }, [pagination.page, filters.role, filters.status, debouncedSearch]);
 
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
@@ -166,6 +170,22 @@ const UsersList: React.FC = () => {
                             <option value={UserRole.EMPLOYEE}>{t('employee')}</option>
                             <option value={UserRole.DELIVERY}>{t('delivery')}</option>
                             <option value={UserRole.ADMIN}>{t('admin')}</option>
+                        </select>
+                    </div>
+
+                    <div className="relative group">
+                        <Filter size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none start-4" />
+                        <select
+                            className="appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group-hover:shadow-md ps-11 pe-12"
+                            value={filters.status || ''}
+                            onChange={(e) => {
+                                setFilters((prev: any) => ({ ...prev, status: e.target.value }));
+                                setPagination((prev: any) => ({ ...prev, page: 1 }));
+                            }}
+                        >
+                            <option value="">{t('common:status')}</option>
+                            <option value="true">{t('common:active')}</option>
+                            <option value="false">{t('common:inactive')}</option>
                         </select>
                     </div>
                 </div>
@@ -262,33 +282,12 @@ const UsersList: React.FC = () => {
                 )}
             </div>
 
-            {
-                pagination.totalPages > 1 && (
-                    <div className="flex items-center justify-between py-6">
-                        <button
-                            disabled={pagination.page === 1}
-                            onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page - 1 }))}
-                            className="btn btn-secondary border-none shadow-sm h-11"
-                        >
-                            {t('common:previous')}
-                        </button>
-                        <div className="flex items-center gap-2">
-                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('common:page')}</span>
-                            <div className="w-10 h-10 rounded-none bg-slate-900 dark:bg-slate-700 flex items-center justify-center text-white text-sm font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50">
-                                {pagination.page}
-                            </div>
-                            <span className="text-[11px] font-black text-slate-400 uppercase tracking-widest">{t('common:of')} {pagination.totalPages}</span>
-                        </div>
-                        <button
-                            disabled={pagination.page >= pagination.totalPages}
-                            onClick={() => setPagination((prev: any) => ({ ...prev, page: prev.page + 1 }))}
-                            className="btn btn-secondary border-none shadow-sm h-11"
-                        >
-                            {t('common:next')}
-                        </button>
-                    </div>
-                )
-            }
+            <Pagination
+                currentPage={pagination.page}
+                totalPages={pagination.totalPages}
+                onPageChange={(page) => setPagination((prev: any) => ({ ...prev, page }))}
+                isLoading={loading}
+            />
 
             <ConfirmationModal
                 isOpen={isConfirmingStatus}

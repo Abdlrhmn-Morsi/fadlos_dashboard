@@ -92,10 +92,10 @@ export const toggleDriverBusy = async () => {
     }
 };
 
-export const getAllDrivers = async () => {
+export const getAllDrivers = async (params: { page?: number; limit?: number; search?: string; verificationStatus?: string } = {}) => {
     try {
-        const response = await apiService.get('/delivery-drivers');
-        return response.data || response;
+        const response = await apiService.get('/delivery-drivers', { params });
+        return response;
     } catch (error) {
         throw error;
     }
@@ -155,9 +155,10 @@ export const removeDriver = async (driverId: string) => {
     }
 };
 
-export const getDriverById = async (driverId: string) => {
+export const getDriverById = async (driverId: string, isSystemAdmin?: boolean) => {
     try {
-        const response = await apiService.get(`/delivery-drivers/store-drivers/${driverId}`);
+        const endpoint = isSystemAdmin ? `/delivery-drivers/${driverId}` : `/delivery-drivers/store-drivers/${driverId}`;
+        const response = await apiService.get(endpoint);
         return response;
     } catch (error) {
         throw error;

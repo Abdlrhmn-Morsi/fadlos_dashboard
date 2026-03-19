@@ -48,6 +48,7 @@ import DeliveryDriverForm from './features/delivery/components/DeliveryDriverFor
 import DriverDashboard from './features/delivery/pages/DriverDashboard';
 import DriverVerificationPage from './features/delivery/pages/DriverVerificationPage';
 import DriverDetail from './features/delivery/pages/DriverDetail';
+import AdminDriverDetail from './features/delivery/pages/AdminDriverDetail';
 import SubscriptionPage from './features/subscriptions/pages/SubscriptionPage';
 import UsagePage from './features/subscriptions/pages/UsagePage';
 import BillingHistory from './features/subscriptions/components/BillingHistory';
@@ -170,6 +171,7 @@ const AppContent = () => {
             <Route path="business-categories" element={<AdminPermissionGate permission={AdminPermissions.BUSINESS_CATEGORIES_VIEW}><BusinessCategories /></AdminPermissionGate>} />
             <Route path="reported-reviews" element={<AdminPermissionGate permission={AdminPermissions.REPORTED_REVIEWS_VIEW}><ReportedReviewList /></AdminPermissionGate>} />
             <Route path="drivers/verification" element={<AdminPermissionGate permission={AdminPermissions.DRIVER_VERIFICATION_VIEW}><DriverVerificationPage /></AdminPermissionGate>} />
+            <Route path="drivers/verification/:id" element={<AdminPermissionGate permission={AdminPermissions.DRIVER_VERIFICATION_VIEW}><AdminDriverDetail /></AdminPermissionGate>} />
             <Route path="stores/verification" element={<AdminPermissionGate permission={AdminPermissions.STORE_VERIFICATION_VIEW}><StoreVerificationRequests /></AdminPermissionGate>} />
             <Route path="plans-management" element={
               user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
