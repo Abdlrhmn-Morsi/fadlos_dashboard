@@ -113,7 +113,7 @@ const DriverVerificationPage = () => {
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     {[
-                        { label: t('all', 'Total'), value: '', count: stats.all, color: 'indigo', icon: Truck },
+                        { label: t('total', 'Total'), value: '', count: stats.all, color: 'indigo', icon: Truck },
                         { label: t('verificationStatuses.UNDER_REVIEW', 'Reviewing'), value: 'UNDER_REVIEW', count: stats.UNDER_REVIEW, color: 'blue', icon: Search },
                         { label: t('verificationStatuses.VERIFIED', 'Verified'), value: 'VERIFIED', count: stats.VERIFIED, color: 'emerald', icon: ShieldCheck },
                         { label: t('verificationStatuses.REJECTED', 'Rejected'), value: 'REJECTED', count: stats.REJECTED, color: 'rose', icon: ShieldCheck },

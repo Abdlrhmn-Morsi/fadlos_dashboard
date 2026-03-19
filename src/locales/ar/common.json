@@ -1025,7 +1025,14 @@
                 "title": "السجل",
                 "access_expires": "ينتهي الوصول خلال {{days}} يوم"
             }
-        }
+        },
+        "authenticityCheck": "التحقق من صحة المستندات",
+        "finalAuditDecision": "قرار التدقيق النهائي",
+        "auditInstruction": "تقييم المستندات وتحديث حالة توثيق السائق.",
+        "verifyPersonnel": "اعتماد السائق",
+        "performanceSummary": "ملخص الأداء",
+        "onTheWay": "في الطريق",
+        "totalOrders": "إجمالي الطلبات"
     },
     "fields": {
         "type": "النوع",

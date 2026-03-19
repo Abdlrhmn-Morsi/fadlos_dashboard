@@ -368,7 +368,7 @@ const DriverDetail: React.FC = () => {
                                 </div>
                                 <div>
                                     <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-100">{t('delivery.drivers.identity_verification')}</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{t('delivery.drivers.audit_sub', 'Document Authenticity Check')}</p>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{t('delivery.authenticityCheck', 'Document Authenticity Check')}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -420,8 +420,8 @@ const DriverDetail: React.FC = () => {
                                         <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[4px] border border-slate-100 dark:border-slate-800/50">
                                             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                                                 <div>
-                                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 mb-1">{t('delivery.drivers.audit_decision', 'Final Audit Decision')}</h3>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('delivery.drivers.audit_desc', 'Evaluate the documentation and update the driver verification status.')}</p>
+                                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 mb-1">{t('delivery.finalAuditDecision', 'Final Audit Decision')}</h3>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('delivery.auditInstruction', 'Evaluate the documentation and update the driver verification status.')}</p>
                                                 </div>
                                                 <div className="flex items-center gap-4 shrink-0">
                                                     <button
@@ -436,7 +436,7 @@ const DriverDetail: React.FC = () => {
                                                         className="px-8 py-3 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-[0.1em] rounded-[4px] hover:bg-emerald-700 transition-all flex items-center gap-3 shadow-lg shadow-emerald-500/20 active:translate-y-0.5 ring-2 ring-emerald-500/10 ring-offset-2 dark:ring-offset-slate-900"
                                                     >
                                                         <CheckCircle size={16} strokeWidth={2.5} />
-                                                        {t('approve', 'Verify Personnel')}
+                                                        {t('delivery.verifyPersonnel', 'Verify Personnel')}
                                                     </button>
                                                 </div>
                                             </div>
@@ -536,7 +536,7 @@ const DriverDetail: React.FC = () => {
                                 <p className="text-xs font-bold text-slate-400 mt-1 flex items-center gap-2">
                                     <span className="opacity-40">@</span>{driver.profile?.user?.username}
                                     <span className="w-1 h-1 rounded-full bg-slate-200 dark:bg-slate-800" />
-                                    <span className="text-[10px] text-indigo-500 font-black tracking-widest uppercase">{driver.driverType || 'FREELANCER'}</span>
+                                    <span className="text-[10px] text-indigo-500 font-black tracking-widest uppercase">{t('driverTypes.' + (driver.deliveryProfile?.driverType || 'FREELANCER'))}</span>
                                 </p>
                             </div>
                         </div>
@@ -584,12 +584,12 @@ const DriverDetail: React.FC = () => {
                     {/* Status Summary & Quick Stats */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[4px] shadow-sm overflow-hidden">
                         <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">{t('delivery.drivers.performance_summary', 'Performance Summary')}</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">{t('delivery.performanceSummary', 'Performance Summary')}</h3>
                             <ChevronLeft size={14} className="text-slate-300 -rotate-90" />
                         </div>
                         <div className="p-4 grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-800">
                             {[
-                                { label: t('onTheWay'), value: driver.onTheWayOrdersCount || 0, icon: Package, color: 'text-amber-500' },
+                                { label: t('delivery.onTheWay', 'On the way'), value: driver.onTheWayOrdersCount || 0, icon: Package, color: 'text-amber-500' },
                                 { label: t('delivered'), value: driver.deliveredOrdersCount || 0, icon: CheckCircle, color: 'text-emerald-500' },
                                 { label: t('returned'), value: driver.returnedOrdersCount || 0, icon: MapPin, color: 'text-blue-500' },
                                 { label: t('cancelled'), value: driver.cancelledOrdersCount || 0, icon: XCircle, color: 'text-rose-500' }
@@ -603,7 +603,7 @@ const DriverDetail: React.FC = () => {
                         </div>
                         <div className="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between px-2">
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('delivery.drivers.total_orders')}</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('delivery.totalOrders', 'Total Orders')}</span>
                                 <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 underline decoration-indigo-500/30 underline-offset-4">{driver.totalOrdersCount || 0}</span>
                             </div>
                         </div>

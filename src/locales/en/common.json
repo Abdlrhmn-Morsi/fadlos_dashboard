@@ -1027,7 +1027,14 @@
                 "title": "History",
                 "access_expires": "Access expires in {{days}} days"
             }
-        }
+        },
+        "authenticityCheck": "Document Authenticity Check",
+        "finalAuditDecision": "Final Audit Decision",
+        "auditInstruction": "Evaluate the documentation and update the driver verification status.",
+        "verifyPersonnel": "Verify Personnel",
+        "performanceSummary": "Performance Summary",
+        "onTheWay": "On the way",
+        "totalOrders": "Total Orders"
     },
     "fields": {
         "type": "Type",
