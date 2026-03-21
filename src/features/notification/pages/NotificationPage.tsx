@@ -74,7 +74,7 @@ export const NotificationPage = () => {
 
             <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-gray-200 dark:border-slate-800 overflow-hidden">
                 {isLoading && displayNotifications.length === 0 ? (
-                    <div className="p-12 text-center text-gray-500 dark:text-slate-400">Loading notifications...</div>
+                    <div className="p-12 text-center text-gray-500 dark:text-slate-400">{t('loadingNotifications')}</div>
                 ) : displayNotifications.length === 0 ? (
                     <div className="p-12 text-center text-gray-500 dark:text-slate-400 flex flex-col items-center">
                         <BellOff className="w-12 h-12 text-gray-300 dark:text-slate-600 mb-4" />

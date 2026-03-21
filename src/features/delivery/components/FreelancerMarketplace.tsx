@@ -112,7 +112,7 @@ const FreelancerMarketplace = () => {
         setHiringId(userId);
         try {
             await cancelHiringRequest(requestId);
-            toast.success(t('delivery.drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
+            toast.success(t('delivery:drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
 
             // Invalidate My Drivers cache
             invalidateCache('delivery_drivers');
@@ -123,7 +123,7 @@ const FreelancerMarketplace = () => {
             console.error('Failed to cancel hiring request', error);
             const errorData = error.response?.data?.message;
             const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
-            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request');
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('delivery:drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request');
             toast.error(message);
         } finally {
             setHiringId(null);
@@ -135,7 +135,7 @@ const FreelancerMarketplace = () => {
         setHiringId(deliveryId);
         try {
             await hireFreelancer(deliveryId);
-            toast.success(t('delivery.drivers.hire_success', 'Freelancer hired successfully'));
+            toast.success(t('delivery:drivers.hire_success', 'Freelancer hired successfully'));
 
             // Invalidate My Drivers cache
             invalidateCache('delivery_drivers');
@@ -159,9 +159,9 @@ const FreelancerMarketplace = () => {
                 <div>
                     <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                         <User size={24} className="text-indigo-600" />
-                        {t('delivery.drivers.find_freelancers')}
+                        {t('delivery:drivers.find_freelancers')}
                     </h2>
-                    <p className="text-sm text-slate-500">{t('delivery.drivers.marketplace_desc')}</p>
+                    <p className="text-sm text-slate-500">{t('delivery:drivers.marketplace_desc')}</p>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3">
@@ -235,7 +235,7 @@ const FreelancerMarketplace = () => {
                                         )} />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{profile.profile?.user?.name || t('delivery.drivers.unknown_driver')}</h3>
+                                        <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{profile.profile?.user?.name || t('delivery:drivers.unknown_driver')}</h3>
                                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold uppercase tracking-wider mt-1">
                                             <Shield size={12} />
                                             {t('common.verified')}
@@ -247,8 +247,8 @@ const FreelancerMarketplace = () => {
                                     (profile.isBusy || profile.activeDeliveriesCount > 0) ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
                                         profile.isAvailableForWork ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
                                 )}>
-                                    {(profile.isBusy || profile.activeDeliveriesCount > 0) ? t('delivery.status.busy') :
-                                        profile.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
+                                    {(profile.isBusy || profile.activeDeliveriesCount > 0) ? t('delivery:status.busy') :
+                                        profile.isAvailableForWork ? t('delivery:status.online') : t('delivery:status.offline')}
                                 </span>
                             </div>
 
@@ -301,7 +301,7 @@ const FreelancerMarketplace = () => {
                                         onClick={() => handleCancelRequest(profile.hiringRequestId, profile.id)}
                                         disabled={hiringId === profile.id}
                                         className="px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 font-bold rounded-xl transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
-                                        title={t('delivery.drivers.cancel_hiring', 'Cancel Application')}
+                                        title={t('delivery:drivers.cancel_hiring', 'Cancel Application')}
                                     >
                                         {hiringId === profile.id ? (
                                             <div className="w-5 h-5 border-2 border-rose-600/30 border-t-rose-600 rounded-full animate-spin" />
@@ -363,8 +363,8 @@ const FreelancerMarketplace = () => {
             {isCancelModalOpen && (
                 <ConfirmModal
                     isOpen={isCancelModalOpen}
-                    title={t('delivery.drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
-                    message={t('delivery.drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                    title={t('delivery:drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
+                    message={t('delivery:drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
                     onConfirm={confirmCancelRequest}
                     onCancel={() => {
                         setIsCancelModalOpen(false);

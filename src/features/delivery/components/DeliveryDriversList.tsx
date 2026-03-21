@@ -150,7 +150,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 updateCacheItem(CACHE_KEY, driverId, finalUpdater);
             }
 
-            toast.success(t('delivery.drivers.status_updated', 'Driver status updated successfully'));
+            toast.success(t('delivery:drivers.status_updated', 'Driver status updated successfully'));
         } catch (error) {
             console.error('Failed to update status:', error);
             const revertUpdater = (d: any) => ({ ...d, deliveryProfile: { ...d.deliveryProfile, verificationStatus: currentStatus } });
@@ -203,7 +203,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 updateCacheItem(CACHE_KEY, driverId, finalUpdater);
             }
 
-            toast.success(t('delivery.drivers.status_updated', 'Driver status updated successfully'));
+            toast.success(t('delivery:drivers.status_updated', 'Driver status updated successfully'));
         } catch (error) {
             console.error('Failed to toggle driver status:', error);
             // Revert local state
@@ -244,7 +244,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 total: prev.total - 1,
                 totalPages: Math.ceil((prev.total - 1) / prev.limit)
             }));
-            toast.success(t('delivery.drivers.remove_success', 'Driver removed successfully'));
+            toast.success(t('delivery:drivers.remove_success', 'Driver removed successfully'));
         } catch (error: any) {
             console.error('Failed to remove driver error object:', error);
             const errorData = error?.response?.data?.message;
@@ -276,7 +276,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 resignationModal.accept,
                 !resignationModal.accept ? resignationRejectionReason : undefined
             );
-            toast.success(resignationModal.accept ? t('delivery.drivers.resignation_accepted', 'Resignation accepted') : t('delivery.drivers.resignation_rejected', 'Resignation rejected'));
+            toast.success(resignationModal.accept ? t('delivery:drivers.resignation_accepted', 'Resignation accepted') : t('delivery:drivers.resignation_rejected', 'Resignation rejected'));
             invalidateCache(CACHE_KEY);
             fetchDrivers();
         } catch (error: any) {
@@ -303,7 +303,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
             case 'PENDING':
                 return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('verificationStatuses.PENDING', 'Pending')}</span>;
             case 'RESIGNATION_PENDING':
-                return <span className={`${baseClass} bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-800`}><Clock size={12} /> {t('delivery.drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
+                return <span className={`${baseClass} bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-800`}><Clock size={12} /> {t('delivery:drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
             case 'REJECTED':
                 return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('verificationStatuses.REJECTED', 'Rejected')}</span>;
             case 'REMOVED':
@@ -340,8 +340,8 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                         <Truck size={24} className="text-indigo-600 dark:text-indigo-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('delivery.drivers.list_title')}</h2>
-                        <p className="text-sm text-slate-500">{t('delivery.drivers.manage_desc')}</p>
+                        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">{t('delivery:drivers.list_title')}</h2>
+                        <p className="text-sm text-slate-500">{t('delivery:drivers.manage_desc')}</p>
                     </div>
                 </div>
 
@@ -350,7 +350,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                         <Search size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors start-4" />
                         <input
                             type="text"
-                            placeholder={t('delivery.drivers.search_placeholder')}
+                            placeholder={t('delivery:drivers.search_placeholder')}
                             className="py-2.5 w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-lg focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all shadow-sm ps-11 pe-4"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
@@ -369,7 +369,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             view === 'active' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
-                        {t('delivery.drivers.active_drivers', 'Active')}
+                        {t('delivery:drivers.active_drivers', 'Active')}
                     </button>
                     <button
                         onClick={() => handleTabChange('resignations')}
@@ -378,7 +378,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             view === 'resignations' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
-                        {t('delivery.drivers.resignations', 'Resignations')}
+                        {t('delivery:drivers.resignations', 'Resignations')}
                         {view !== 'resignations' && pendingCounts?.resignations ? (
                             <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full">
                                 {pendingCounts.resignations}
@@ -394,7 +394,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             view === 'history' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
-                        {t('delivery.drivers.history.title', 'History')}
+                        {t('delivery:drivers.history.title', 'History')}
                     </button>
                 </div>
 
@@ -426,7 +426,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.name')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.type')}</th>
                                 <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.contact')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('delivery.drivers.verification.title', 'Verification')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('delivery:drivers.verification.title', 'Verification')}</th>
                                 {view === 'active' && (
                                     <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.hiring_status', 'Hiring Status')}</th>
                                 )}
@@ -560,7 +560,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                     )}
                                                     {view === 'history' && driver.removedAt && (
                                                         <span className="text-[10px] text-rose-500 font-medium">
-                                                            {t('delivery.drivers.history.access_expires', {
+                                                            {t('delivery:drivers.history.access_expires', {
                                                                 defaultValue: 'Access expires in {{days}} days',
                                                                 days: Math.max(0, 60 - Math.floor((new Date().getTime() - new Date(driver.removedAt).getTime()) / (1000 * 60 * 60 * 24)))
                                                             })}
@@ -660,8 +660,8 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 isOpen={deleteModal.isOpen}
                 onCancel={() => setDeleteModal({ isOpen: false, driverId: null })}
                 onConfirm={confirmDelete}
-                title={t('delivery.drivers.remove_title', 'Remove Driver')}
-                message={t('delivery.drivers.remove_confirm_message', 'Are you sure you want to remove this driver from your store? This action cannot be undone.')}
+                title={t('delivery:drivers.remove_title', 'Remove Driver')}
+                message={t('delivery:drivers.remove_confirm_message', 'Are you sure you want to remove this driver from your store? This action cannot be undone.')}
             />
 
             {resignationModal.isOpen && (
@@ -669,10 +669,10 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden">
                         <div className="p-6">
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                                {resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_title', 'Accept Resignation') : t('delivery.drivers.drivers.reject_resignation_title', 'Reject Resignation')}
+                                {resignationModal.accept ? t('delivery:drivers.drivers.accept_resignation_title', 'Accept Resignation') : t('delivery:drivers.drivers.reject_resignation_title', 'Reject Resignation')}
                             </h3>
                             <p className="text-sm text-slate-500 font-medium mb-4">
-                                {resignationModal.accept ? t('delivery.drivers.drivers.accept_resignation_confirm') : t('delivery.drivers.drivers.reject_resignation_confirm')}
+                                {resignationModal.accept ? t('delivery:drivers.drivers.accept_resignation_confirm') : t('delivery:drivers.drivers.reject_resignation_confirm')}
                             </p>
 
                             {!resignationModal.accept && (

@@ -59,8 +59,8 @@ const DriverDashboard = () => {
             const updatedProfile = await toggleDriverAvailability();
             setProfile(updatedProfile);
             toast.success(updatedProfile.isAvailableForWork
-                ? t('delivery.status.online', 'You are now online')
-                : t('delivery.status.offline', 'You are now offline')
+                ? t('delivery:status.online', 'You are now online')
+                : t('delivery:status.offline', 'You are now offline')
             );
         } catch (error) {
             console.error('Failed to toggle availability', error);
@@ -76,8 +76,8 @@ const DriverDashboard = () => {
             const updatedProfile = await toggleDriverBusy();
             setProfile(updatedProfile);
             toast.success(updatedProfile.isBusy
-                ? t('delivery.status.busy_on', 'You are now busy')
-                : t('delivery.status.available_on', 'You are now available')
+                ? t('delivery:status.busy_on', 'You are now busy')
+                : t('delivery:status.available_on', 'You are now available')
             );
         } catch (error) {
             console.error('Failed to toggle busy status', error);
@@ -123,10 +123,10 @@ const DriverDashboard = () => {
                                 )} />
                                 <span className="text-sm text-slate-500 font-medium">
                                     {(profile?.isBusy || orders.length > 0)
-                                        ? t('delivery.status.busy', 'Busy')
+                                        ? t('delivery:status.busy', 'Busy')
                                         : profile?.isAvailableForWork
-                                            ? t('delivery.status.online', 'Online & Available')
-                                            : t('delivery.status.offline', 'Offline')}
+                                            ? t('delivery:status.online', 'Online & Available')
+                                            : t('delivery:status.offline', 'Offline')}
                                 </span>
                             </div>
                         </div>
@@ -145,7 +145,7 @@ const DriverDashboard = () => {
                                 )}
                             >
                                 <Clock size={18} />
-                                {profile?.isBusy ? t('delivery.status.busy', 'Busy') : t('delivery.status.available', 'Available')}
+                                {profile?.isBusy ? t('delivery:status.busy', 'Busy') : t('delivery:status.available', 'Available')}
                             </button>
                         )}
 
@@ -170,7 +170,7 @@ const DriverDashboard = () => {
             <div className="space-y-4">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     <Package className="text-indigo-500" size={20} />
-                    {t('delivery.orders.current', 'Current Deliveries')}
+                    {t('delivery:orders.current', 'Current Deliveries')}
                     <span className="ml-2 px-2 py-0.5 bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 text-xs rounded-full">
                         {orders.length}
                     </span>
@@ -231,8 +231,8 @@ const DriverDashboard = () => {
                         <div className="w-16 h-16 bg-white dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
                             <Map className="text-slate-300" size={32} />
                         </div>
-                        <h3 className="font-bold text-slate-900 dark:text-white">{t('delivery.orders.no_active', 'No active deliveries')}</h3>
-                        <p className="text-sm text-slate-500 mt-1">{t('delivery.orders.no_active_desc', 'New orders will appear here when assigned')}</p>
+                        <h3 className="font-bold text-slate-900 dark:text-white">{t('delivery:orders.no_active', 'No active deliveries')}</h3>
+                        <p className="text-sm text-slate-500 mt-1">{t('delivery:orders.no_active_desc', 'New orders will appear here when assigned')}</p>
                     </div>
                 )}
             </div>

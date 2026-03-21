@@ -1,0 +1,59 @@
+{
+  "drivers": {
+    "verification": {
+      "title": "توثيق السائقين",
+      "desc": "مراجعة واعتماد مستندات هوية السائق.",
+      "verified": "موثق",
+      "under_review": "قيد المراجعة",
+      "rejected": "مرفوض"
+    },
+    "no_pending": "لا يوجد سائقين",
+    "transition": {
+      "offer_sent": "تم إرسال عرض سائق متجر بنجاح",
+      "request_sent": "تم إرسال طلب للتحويل إلى مستقل",
+      "title": "إجراء التحويل",
+      "make_store_driver_confirm": "هل أنت متأكد أنك تريد دعوة هذا السائق ليصبح سائق متجر؟ سيكون حصرياً لمتجرك بمجرد قبوله.",
+      "convert_to_freelancer_confirm": "هل أنت متأكد أنك تريد تحويل سائق المتجر هذا إلى حالة مستقل؟ سيكون قادراً على العمل مع متاجر أخرى."
+    },
+    "resignation": {
+      "approved": "تم قبول الاستقالة",
+      "rejected": "تم رفض الاستقالة",
+      "request_received": "تم استلام طلب الاستقالة",
+      "title": "إجراء الاستقالة"
+    },
+    "drivers": {
+      "cancel_hiring_success": "تم إلغاء طلب التوظيف بنجاح",
+      "cancel_hiring_failed": "فشل إلغاء طلب التوظيف",
+      "cancel_hiring_title": "إلغاء طلب التوظيف",
+      "confirm_cancel_hiring": "هل أنت متأكد من رغبتك في إلغاء طلب التوظيف هذا؟",
+      "accept_resignation_confirm": "هل أنت متأكد من رغبتك في الموافقة على هذه الاستقالة؟",
+      "reject_resignation_confirm": "هل أنت متأكد من رغبتك في رفض هذه الاستقالة؟"
+    },
+    "identity_verification": "التحقق من الهوية",
+    "id_front": "الهوية (الأمام)",
+    "id_back": "الهوية (الخلف)",
+    "selfie": "صورة شخصية",
+    "rejection_reason": "سبب الرفض",
+    "operating_regions": "مناطق العمل",
+    "vehicle_details": "تفاصيل المركبة",
+    "vehicle_type": "نوع المركبة",
+    "plate_number": "رقم اللوحة",
+    "hiring_status": {
+        "pending": "قيد الانتظار",
+        "resignation_pending": "استقالة قيد الانتظار"
+    }
+  },
+  "authenticityCheck": "فحص أصالة المستند",
+  "finalAuditDecision": "القرار النهائي للتدقيق",
+  "auditInstruction": "تقييم الوثائق وتحديث حالة توثيق السائق.",
+  "verifyPersonnel": "تأكيد هوية الموظف",
+  "performanceSummary": "ملخص الأداء",
+  "onTheWay": "في الطريق",
+  "totalOrders": "إجمالي الطلبات",
+  "status": {
+    "online": "متاح",
+    "offline": "غير متاح",
+    "busy": "مشغول",
+    "available": "متوفر"
+  }
+}

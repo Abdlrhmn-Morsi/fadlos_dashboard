@@ -107,9 +107,9 @@ const DriverVerificationPage = () => {
                 <div>
                     <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
                         <ShieldCheck className="text-indigo-600" size={28} />
-                        {t('delivery.drivers.verification.title', 'Driver Verification')}
+                        {t('delivery:drivers.verification.title', 'Driver Verification')}
                     </h1>
-                    <p className="text-slate-500 text-sm mt-1">{t('delivery.drivers.verification.desc', 'Review and approve driver identity documents.')}</p>
+                    <p className="text-slate-500 text-sm mt-1">{t('delivery:drivers.verification.desc', 'Review and approve driver identity documents.')}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
                     {[
@@ -240,7 +240,7 @@ const DriverVerificationPage = () => {
                         </div>
                         <div className="space-y-1">
                             <p className="text-lg font-black text-slate-900 dark:text-white">
-                                {t('delivery.drivers.no_pending', 'No drivers found')}
+                                {t('delivery:drivers.no_pending', 'No drivers found')}
                             </p>
                             <p className="text-sm text-slate-500">{t('try_different_search', 'Try adjusting your search or filters.')}</p>
                         </div>

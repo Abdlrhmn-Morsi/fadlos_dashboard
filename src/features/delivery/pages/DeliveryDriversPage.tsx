@@ -13,7 +13,7 @@ import { getMySubscriptionUsage } from '../../subscriptions/api/subscriptions.ap
 import { toast } from '../../../utils/toast';
 
 const DeliveryDriversPage = () => {
-    const { t } = useTranslation(['common', 'dashboard']);
+    const { t } = useTranslation(['common', 'dashboard', 'delivery']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
     const location = useLocation();
@@ -185,7 +185,7 @@ const DeliveryDriversPage = () => {
     return (
         <div className="p-6 space-y-6">
             <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold">{t('delivery.drivers.title', 'Store Drivers')}</h1>
+                <h1 className="text-2xl font-bold">{t('delivery:drivers.title', 'Store Drivers')}</h1>
                 {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
                     <button
                         onClick={async () => {
@@ -204,7 +204,7 @@ const DeliveryDriversPage = () => {
                         className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-all shadow-sm flex items-center gap-2"
                     >
                         <Plus size={18} />
-                        {t('delivery.drivers.add_new')}
+                        {t('delivery:drivers.add_new')}
                     </button>
                 )}
             </div>
@@ -220,7 +220,7 @@ const DeliveryDriversPage = () => {
                     )}
                 >
                     <Truck size={18} />
-                    {t('delivery.drivers.my_drivers')}
+                    {t('delivery:drivers.my_drivers')}
                 </button>
                 <button
                     onClick={() => setActiveTab('incoming')}
@@ -266,7 +266,7 @@ const DeliveryDriversPage = () => {
                     )}
                 >
                     <Globe size={18} />
-                    {t('delivery.drivers.marketplace')}
+                    {t('delivery:drivers.marketplace')}
                 </button>
             </div>
 
@@ -337,8 +337,8 @@ const DeliveryDriversPage = () => {
 
             <ConfirmModal
                 isOpen={!!cancellingRequestId}
-                title={t('delivery.drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
-                message={t('delivery.drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                title={t('delivery:drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
+                message={t('delivery:drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
                 onConfirm={confirmCancel}
                 onCancel={() => setCancellingRequestId(null)}
             />
@@ -348,10 +348,10 @@ const DeliveryDriversPage = () => {
                     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100">
                         <div className="p-6">
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                                {t('delivery.drivers.reject_confirm_title', 'Reject Application')}
+                                {t('delivery:drivers.reject_confirm_title', 'Reject Application')}
                             </h3>
                             <p className="text-sm text-slate-500 font-medium mb-4">
-                                {t('delivery.drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
+                                {t('delivery:drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
                             </p>
                             
                                 <div className="mb-4">
@@ -392,8 +392,8 @@ const DeliveryDriversPage = () => {
 
             <ConfirmModal
                 isOpen={!!acceptingRequestId}
-                title={t('delivery.drivers.drivers.accept_confirm_title', 'Approve Application')}
-                message={t('delivery.drivers.drivers.accept_confirm_message', "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.")}
+                title={t('delivery:drivers.drivers.accept_confirm_title', 'Approve Application')}
+                message={t('delivery:drivers.drivers.accept_confirm_message', "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.")}
                 onConfirm={confirmAccept}
                 onCancel={() => setAcceptingRequestId(null)}
             />
@@ -402,7 +402,7 @@ const DeliveryDriversPage = () => {
 };
 
 const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: any[], type: 'incoming' | 'sent', loading: boolean, onAction: (req: any, action: any) => void }) => {
-    const { t } = useTranslation(['common', 'dashboard']);
+    const { t } = useTranslation(['common', 'dashboard', 'delivery']);
     const { isRTL } = useLanguage();
 
     if (loading) return <div className="py-12 text-center text-slate-400">{t('loading')}...</div>;

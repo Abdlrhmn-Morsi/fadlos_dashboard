@@ -238,7 +238,7 @@ const DeliveryDriverForm = () => {
                 toast.success(t('common.update_success', 'Driver updated successfully'));
             } else {
                 await createStoreDriver(data);
-                toast.success(t('delivery.drivers.hire_success'));
+                toast.success(t('delivery:drivers.hire_success'));
             }
 
             // Invalidate drivers cache
@@ -306,7 +306,7 @@ const DeliveryDriverForm = () => {
                         <XCircle size={20} className="text-rose-500 shrink-0" />
                         <div className="space-y-1">
                             <p className="text-sm font-bold text-rose-800 dark:text-rose-300 uppercase tracking-tight">
-                                {t('delivery.drivers.rejected_title', 'Verification Rejected')}
+                                {t('delivery:drivers.rejected_title', 'Verification Rejected')}
                             </p>
                             <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">
                                 {rejectionReason}
@@ -325,7 +325,7 @@ const DeliveryDriverForm = () => {
                         </Link>
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {isEditMode ? t('delivery.drivers.edit_title', 'Edit Driver') : t('delivery.drivers.create_title')}
+                                {isEditMode ? t('delivery:drivers.edit_title', 'Edit Driver') : t('delivery:drivers.create_title')}
                             </h1>
                             {isEditMode && verificationStatus && (
                                 <div className="flex items-center gap-3 mt-1">
@@ -340,7 +340,7 @@ const DeliveryDriverForm = () => {
                                     {verificationStatus === 'UNDER_REVIEW' && (
                                         <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 italic">
                                             <Info size={14} className="text-amber-500" />
-                                            {t('delivery.drivers.under_review')}
+                                            {t('delivery:drivers.under_review')}
                                         </div>
                                     )}
                                 </div>
@@ -534,10 +534,10 @@ const DeliveryDriverForm = () => {
                             </div>
                             <div>
                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                                    {t('delivery.drivers.service_areas', 'Service Areas')}
+                                    {t('delivery:drivers.service_areas', 'Service Areas')}
                                 </h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                                    {t('delivery.drivers.service_areas_desc', 'Select towns and specific places the driver will serve')}
+                                    {t('delivery:drivers.service_areas_desc', 'Select towns and specific places the driver will serve')}
                                 </p>
                             </div>
                         </div>
@@ -547,7 +547,7 @@ const DeliveryDriverForm = () => {
                             <div className="space-y-4" ref={townRef}>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
                                     <MapPin size={16} className="text-indigo-500" />
-                                    {t('delivery.drivers.select_towns', 'Select Towns')}
+                                    {t('delivery:drivers.select_towns', 'Select Towns')}
                                 </label>
 
                                 <div className="relative">
@@ -644,7 +644,7 @@ const DeliveryDriverForm = () => {
                             <div className="space-y-4" ref={placeRef}>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
                                     <MapPin size={16} className="text-indigo-500" />
-                                    {t('delivery.drivers.select_places', 'Select Places')}
+                                    {t('delivery:drivers.select_places', 'Select Places')}
                                 </label>
 
                                 <div className="relative">
@@ -681,7 +681,7 @@ const DeliveryDriverForm = () => {
                                             ) : (
                                                 <span className="text-slate-500">
                                                     {formData.townIds.length === 0
-                                                        ? t('delivery.drivers.select_town_first', 'Please select a town first')
+                                                        ? t('delivery:drivers.select_town_first', 'Please select a town first')
                                                         : t('common.select_options', 'Select options...')}
                                                 </span>
                                             )}
@@ -734,7 +734,7 @@ const DeliveryDriverForm = () => {
                                                         ))
                                                 ) : (
                                                     <div className="py-8 text-center text-slate-500 text-sm">
-                                                        {t('delivery.drivers.no_places_found', 'No places found for selected towns')}
+                                                        {t('delivery:drivers.no_places_found', 'No places found for selected towns')}
                                                     </div>
                                                 )}
                                             </div>
@@ -750,11 +750,11 @@ const DeliveryDriverForm = () => {
                         <div className="flex items-center justify-between">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white flex items-center gap-2">
                                 <ImageIcon size={20} className="text-indigo-500" />
-                                {t('delivery.drivers.identity_verification')}
+                                {t('delivery:drivers.identity_verification')}
                             </h3>
                             {isEditMode && verificationStatus !== 'REJECTED' && (
                                 <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-slate-200 dark:border-slate-700">
-                                    {t('delivery.drivers.locked_verification', 'Read Only')}
+                                    {t('delivery:drivers.locked_verification', 'Read Only')}
                                 </span>
                             )}
                         </div>
@@ -765,20 +765,20 @@ const DeliveryDriverForm = () => {
                             isEditMode && verificationStatus !== 'REJECTED' && "pointer-events-none opacity-80"
                         )}>
                             <FileUploadField
-                                label={t('delivery.drivers.id_front')}
+                                label={t('delivery:drivers.id_front')}
                                 field="identityImageFront"
                                 icon={CreditCard}
                             />
                             <FileUploadField
-                                label={t('delivery.drivers.id_back')}
+                                label={t('delivery:drivers.id_back')}
                                 field="identityImageBack"
                                 icon={CreditCard}
                             />
                             <FileUploadField
-                                label={t('delivery.drivers.selfie')}
+                                label={t('delivery:drivers.selfie')}
                                 field="identityImageSelfie"
                                 icon={Camera}
-                                description={t('delivery.drivers.selfie_desc')}
+                                description={t('delivery:drivers.selfie_desc')}
                             />
                         </div>
                     </div>
@@ -787,8 +787,8 @@ const DeliveryDriverForm = () => {
 
             <ConfirmModal
                 isOpen={showConfirmModal}
-                title={t('delivery.drivers.confirm_update_title', 'Sensitive Update')}
-                message={t('delivery.drivers.confirm_update_message', 'Updating your profile information will set your verification status back to UNDER REVIEW. Do you want to continue?')}
+                title={t('delivery:drivers.confirm_update_title', 'Sensitive Update')}
+                message={t('delivery:drivers.confirm_update_message', 'Updating your profile information will set your verification status back to UNDER REVIEW. Do you want to continue?')}
                 onConfirm={() => {
                     setShowConfirmModal(false);
                     handleSubmit({ preventDefault: () => { } } as any); // Trigger submit again, now with modal bypassed

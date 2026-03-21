@@ -331,6 +331,7 @@ const AdminAnalytics: React.FC = () => {
                                                 boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                                 fontSize: '12px',
                                                 fontWeight: 'bold',
+                                                color: isDark ? '#e2e8f0' : '#1e293b',
                                                 textAlign: isRTL ? 'right' : 'left'
                                             }}
                                             formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:systemCurrency')}`, t('dashboard:revenue')]}
@@ -379,8 +380,11 @@ const AdminAnalytics: React.FC = () => {
                                                 border: 'none',
                                                 borderRadius: '0px',
                                                 fontSize: '12px',
-                                                fontWeight: 'bold'
+                                                fontWeight: 'bold',
+                                                color: isDark ? '#e2e8f0' : '#1e293b'
                                             }}
+                                            itemStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
+                                            labelStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>
@@ -434,8 +438,11 @@ const AdminAnalytics: React.FC = () => {
                                                 border: 'none',
                                                 borderRadius: '0px',
                                                 fontSize: '12px',
-                                                fontWeight: 'bold'
+                                                fontWeight: 'bold',
+                                                color: isDark ? '#e2e8f0' : '#1e293b'
                                             }}
+                                            itemStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
+                                            labelStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
                                         />
                                     </PieChart>
                                 </ResponsiveContainer>

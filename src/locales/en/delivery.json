@@ -1,0 +1,59 @@
+{
+  "drivers": {
+    "verification": {
+      "title": "Driver Verification",
+      "desc": "Review and approve driver identity documents.",
+      "verified": "Verified",
+      "under_review": "Under Review",
+      "rejected": "Rejected"
+    },
+    "no_pending": "No drivers found",
+    "transition": {
+      "offer_sent": "Store driver offer sent successfully",
+      "request_sent": "Request to become freelancer sent",
+      "title": "Transition Action",
+      "make_store_driver_confirm": "Are you sure you want to invite this driver to become a Store Driver?",
+      "convert_to_freelancer_confirm": "Are you sure you want to transition this store driver to freelancer status?"
+    },
+    "resignation": {
+      "approved": "Resignation approved",
+      "rejected": "Resignation rejected",
+      "request_received": "Resignation Request Received",
+      "title": "Resignation Action"
+    },
+    "drivers": {
+      "cancel_hiring_success": "Hiring request cancelled successfully",
+      "cancel_hiring_failed": "Failed to cancel hiring request",
+      "cancel_hiring_title": "Cancel Hiring Request",
+      "confirm_cancel_hiring": "Are you sure you want to cancel this hiring request?",
+      "accept_resignation_confirm": "Are you sure you want to approve this resignation?",
+      "reject_resignation_confirm": "Are you sure you want to reject this resignation?"
+    },
+    "identity_verification": "Identity Verification",
+    "id_front": "ID Front",
+    "id_back": "ID Back",
+    "selfie": "Selfie",
+    "rejection_reason": "Rejection Reason",
+    "operating_regions": "Operating Regions",
+    "vehicle_details": "Vehicle Details",
+    "vehicle_type": "Vehicle Type",
+    "plate_number": "Plate Number",
+    "hiring_status": {
+        "pending": "Pending",
+        "resignation_pending": "Resignation Pending"
+    }
+  },
+  "authenticityCheck": "Document Authenticity Check",
+  "finalAuditDecision": "Final Audit Decision",
+  "auditInstruction": "Evaluate the documentation and update the driver verification status.",
+  "verifyPersonnel": "Verify Personnel",
+  "performanceSummary": "Performance Summary",
+  "onTheWay": "On the way",
+  "totalOrders": "Total Orders",
+  "status": {
+    "online": "Online",
+    "offline": "Offline",
+    "busy": "Busy",
+    "available": "Available"
+  }
+}

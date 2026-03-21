@@ -127,9 +127,9 @@ const PlansManagement: React.FC = () => {
     return (
         <div className="p-6 space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
-                        {t('admin.title').split(' ')[0]} <span className="text-primary italic">{t('admin.title').split(' ').slice(1).join(' ')}</span>
+                <div className={isRtl ? 'text-right' : 'text-left'}>
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
+                        {t('admin.title')}
                     </h1>
                     <p className="text-slate-500 font-medium mt-1">{t('admin.description')}</p>
                 </div>
@@ -152,12 +152,12 @@ const PlansManagement: React.FC = () => {
                     <div className="w-16 h-16 bg-rose-100 dark:bg-rose-900/20 rounded-2xl flex items-center justify-center text-rose-600 mb-4">
                         <AlertCircle size={32} />
                     </div>
-                    <h3 className="text-xl font-black text-slate-900 dark:text-slate-100 mb-2">{error}</h3>
+                    <h3 className="text-xl font-extrabold text-slate-900 dark:text-slate-100 mb-2">{error}</h3>
                     <p className="text-slate-500 font-medium mb-6">{t('admin.connectError')}</p>
                     <button
                         onClick={() => fetchPlans(true)}
                         disabled={isRefreshing}
-                        className="px-8 py-3 bg-rose-600 text-white font-black rounded-2xl shadow-lg shadow-rose-600/20 hover:scale-105 transition-all disabled:opacity-50"
+                        className="px-8 py-3 bg-rose-600 text-white font-bold rounded-2xl shadow-lg shadow-rose-600/20 hover:scale-105 transition-all disabled:opacity-50"
                     >
                         {isRefreshing ? (
                             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
@@ -171,7 +171,7 @@ const PlansManagement: React.FC = () => {
                     <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-3xl shadow-xl flex items-center justify-center text-slate-300 mb-6">
                         <CreditCard size={40} />
                     </div>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 mb-2">{t('admin.noBundles')}</h3>
+                    <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 mb-2">{t('admin.noBundles')}</h3>
                     <p className="text-slate-500 font-medium max-w-sm">
                         {t('admin.noBundlesDesc')}
                     </p>
@@ -208,7 +208,7 @@ const PlansManagement: React.FC = () => {
                                         <Shield size={24} />
                                     </div>
                                     <span className={clsx(
-                                        "px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest",
+                                        "px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider",
                                         isPremium ? "bg-white text-slate-900" : "bg-slate-900 text-white"
                                     )}>
                                         {t(`plans.${plan.name}.name`)}
@@ -218,8 +218,8 @@ const PlansManagement: React.FC = () => {
                                 <div className="space-y-4">
                                     <div className="group relative">
                                         <label className={clsx(
-                                            "text-[10px] font-black uppercase tracking-widest mb-1 block",
-                                            isPremium ? "text-slate-400" : "text-slate-400"
+                                            "text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block",
+                                            isPremium ? "text-slate-400" : "text-slate-500"
                                         )}>{t('admin.monthlyPrice')}</label>
                                         <div className="relative">
                                             <span className={clsx("absolute start-4 top-1/2 -translate-y-1/2 font-bold", isPremium ? "text-slate-500" : "text-slate-400")}>{t('subscriptions:currencySymbol')}</span>
@@ -228,7 +228,7 @@ const PlansManagement: React.FC = () => {
                                                 value={plan.priceMonthly}
                                                 onChange={(e) => setPlans(plans.map(p => p.id === plan.id ? { ...p, priceMonthly: parseFloat(e.target.value) } : p))}
                                                 className={clsx(
-                                                    "w-full border-2 rounded-2xl py-3 ps-10 pe-4 font-black transition-all outline-none",
+                                                    "w-full border-2 rounded-2xl py-3 ps-14 pe-4 font-bold transition-all outline-none",
                                                     isPremium ? "bg-slate-800/50 border-slate-700 text-white focus:border-white" : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:border-primary"
                                                 )}
                                             />
@@ -237,8 +237,8 @@ const PlansManagement: React.FC = () => {
 
                                     <div className="group relative">
                                         <label className={clsx(
-                                            "text-[10px] font-black uppercase tracking-widest mb-1 block",
-                                            isPremium ? "text-slate-400" : "text-slate-400"
+                                            "text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block",
+                                            isPremium ? "text-slate-400" : "text-slate-500"
                                         )}>{t('admin.yearlyPrice')}</label>
                                         <div className="relative">
                                             <span className={clsx("absolute start-4 top-1/2 -translate-y-1/2 font-bold", isPremium ? "text-slate-500" : "text-slate-400")}>{t('subscriptions:currencySymbol')}</span>
@@ -247,7 +247,7 @@ const PlansManagement: React.FC = () => {
                                                 value={plan.priceYearly}
                                                 onChange={(e) => setPlans(plans.map(p => p.id === plan.id ? { ...p, priceYearly: parseFloat(e.target.value) } : p))}
                                                 className={clsx(
-                                                    "w-full border-2 rounded-2xl py-3 ps-10 pe-4 font-black transition-all outline-none",
+                                                    "w-full border-2 rounded-2xl py-3 ps-14 pe-4 font-bold transition-all outline-none",
                                                     isPremium ? "bg-slate-800/50 border-slate-700 text-white focus:border-white" : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700 text-slate-900 dark:text-slate-100 focus:border-primary"
                                                 )}
                                             />
@@ -260,8 +260,8 @@ const PlansManagement: React.FC = () => {
                             <div className="p-8 flex-1 space-y-6">
                                 <div>
                                     <h3 className={clsx(
-                                        "text-xs font-black uppercase tracking-[0.2em] mb-4 flex items-center gap-2",
-                                        isPremium ? "text-slate-400" : "text-slate-400"
+                                        "text-xs font-bold text-slate-500 uppercase tracking-wider mb-4 flex items-center gap-2",
+                                        isPremium ? "text-slate-400" : "text-slate-500"
                                     )}>
                                         <Zap size={14} className={isPremium ? "text-amber-400" : "text-amber-500"} />
                                         {t('admin.unlockedFeatures')}
@@ -300,8 +300,8 @@ const PlansManagement: React.FC = () => {
                                     isPremium ? "border-white/10" : "border-slate-100 dark:border-slate-800"
                                 )}>
                                     <h3 className={clsx(
-                                        "text-xs font-black uppercase tracking-[0.2em] mb-4",
-                                        isPremium ? "text-slate-400" : "text-slate-400"
+                                        "text-xs font-bold text-slate-500 uppercase tracking-wider mb-4",
+                                        isPremium ? "text-slate-400" : "text-slate-500"
                                     )}>{t('admin.resourceLimits')}</h3>
                                     <div className="grid grid-cols-1 gap-4">
                                         {metadata?.limits.map((key) => (
@@ -320,13 +320,13 @@ const PlansManagement: React.FC = () => {
                                                             value={plan.limits[key]}
                                                             onChange={(e) => handleLimitChange(plan.id, key, e.target.value)}
                                                             className={clsx(
-                                                                "w-16 border-none rounded-xl py-2 px-2 text-center font-black transition-all outline-none",
+                                                                "w-16 border-none rounded-xl py-2 px-2 text-center font-bold transition-all outline-none",
                                                                 isPremium ? "bg-slate-800 text-white focus:ring-2 focus:ring-white" : "bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:ring-2 focus:ring-primary"
                                                             )}
                                                         />
                                                         {plan.limits[key] === -1 && (
                                                             <span className={clsx(
-                                                                "absolute text-lg font-black",
+                                                                "absolute text-lg font-bold",
                                                                 isRtl ? "-right-6" : "-left-6",
                                                                 isPremium ? "text-white" : "text-primary"
                                                             )}>
@@ -348,7 +348,7 @@ const PlansManagement: React.FC = () => {
                                     onClick={() => setConfirmModal({ isOpen: true, plan })}
                                     disabled={savingPlanId === plan.id}
                                     className={clsx(
-                                        "w-full flex items-center justify-center gap-2 font-black py-4 px-6 rounded-2xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50",
+                                        "w-full flex items-center justify-center gap-2 font-bold py-4 px-6 rounded-2xl shadow-lg transition-all hover:scale-[1.02] active:scale-95 disabled:opacity-50",
                                         isPremium
                                             ? "bg-white text-slate-900 hover:bg-slate-100 shadow-white/5"
                                             : isPro

@@ -96,7 +96,7 @@ const DetailCard = ({ title, icon: Icon, children, className, action }: any) => 
 const DriverDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { t } = useTranslation(['common']);
+    const { t } = useTranslation(['common', 'delivery']);
     const { isRTL } = useLanguage();
     const { user: authUser, hasPermission, hasAdminPermission } = useAuth();
     const [driver, setDriver] = useState<any>(null);
@@ -196,18 +196,18 @@ const DriverDetail: React.FC = () => {
         try {
             if (actionModal.type === 'CONVERT_TO_STORE_DRIVER') {
                 await initiateTransition({ deliveryId: id, type: 'TO_STORE_DRIVER', notes: actionModal.notes });
-                toast.success(t('delivery.drivers.transition.offer_sent', 'Store driver offer sent successfully'));
+                toast.success(t('delivery:drivers.transition.offer_sent', 'Store driver offer sent successfully'));
             } else if (actionModal.type === 'CONVERT_TO_FREELANCER') {
                 await initiateTransition({ deliveryId: id, type: 'TO_FREELANCER', notes: actionModal.notes });
-                toast.success(t('delivery.drivers.transition.request_sent', 'Request to become freelancer sent'));
+                toast.success(t('delivery:drivers.transition.request_sent', 'Request to become freelancer sent'));
             } else if (actionModal.type === 'APPROVE_RESIGNATION') {
                 await respondToResignation(id, true);
-                toast.success(t('delivery.drivers.resignation.approved', 'Resignation approved'));
+                toast.success(t('delivery:drivers.resignation.approved', 'Resignation approved'));
                 navigate(backUrl);
                 return;
             } else if (actionModal.type === 'REJECT_RESIGNATION') {
                 await respondToResignation(id, false, actionModal.rejectionReason);
-                toast.success(t('delivery.drivers.resignation.rejected', 'Resignation rejected'));
+                toast.success(t('delivery:drivers.resignation.rejected', 'Resignation rejected'));
             }
 
             // Refresh driver data
@@ -234,11 +234,11 @@ const DriverDetail: React.FC = () => {
         setCancelling(true);
         try {
             await cancelHiringRequest(driver.storeDriverRequestId);
-            toast.success(t('delivery.drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
+            toast.success(t('delivery:drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
             navigate(backUrl);
         } catch (err: any) {
             console.error("Failed to cancel hiring request:", err);
-            toast.error(t('delivery.drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request'));
+            toast.error(t('delivery:drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request'));
         } finally {
             setCancelling(false);
         }
@@ -267,20 +267,20 @@ const DriverDetail: React.FC = () => {
         const baseClass = "inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-[4px] border transition-all";
         switch (status) {
             case 'VERIFIED':
-                return <span className={`${baseClass} bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50`}><ShieldCheck size={12} strokeWidth={2.5} /> {t('delivery.drivers.verification.verified')}</span>;
+                return <span className={`${baseClass} bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50`}><ShieldCheck size={12} strokeWidth={2.5} /> {t('delivery:drivers.verification.verified')}</span>;
             case 'UNDER_REVIEW':
-                return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.verification.under_review')}</span>;
+                return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery:drivers.verification.under_review')}</span>;
             case 'REJECTED':
-                return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery.drivers.verification.rejected')}</span>;
+                return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><XCircle size={12} strokeWidth={2.5} /> {t('delivery:drivers.verification.rejected')}</span>;
             case 'PENDING':
-                return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.pending', 'Pending')}</span>;
+                return <span className={`${baseClass} bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery:drivers.hiring_status.pending', 'Pending')}</span>;
             case 'ACCEPTED':
                 return <span className={`${baseClass} bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50`}><CheckCircle size={12} strokeWidth={2.5} /> {t('verificationStatuses.ACCEPTED', 'Accepted')}</span>;
             case 'REMOVED':
                 return <span className={`${baseClass} bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}><XCircle size={12} strokeWidth={2.5} /> {t('verificationStatuses.REMOVED', 'Removed')}</span>;
             case 'CANCELLED':
             case 'RESIGNATION_PENDING':
-                return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery.drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
+                return <span className={`${baseClass} bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50`}><Clock size={12} strokeWidth={2.5} /> {t('delivery:drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
             default:
                 return <span className={`${baseClass} bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700`}>{status}</span>;
         }
@@ -319,7 +319,7 @@ const DriverDetail: React.FC = () => {
                     </div>
                     <div>
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] block leading-none mb-1 opacity-50">{t('back')}</span>
-                        <span className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">{t('delivery.drivers.verification.title', 'Verification Audit')}</span>
+                        <span className="text-sm font-black text-slate-800 dark:text-slate-100 uppercase tracking-tight">{t('delivery:drivers.verification.title', 'Verification Audit')}</span>
                     </div>
                 </button>
 
@@ -337,7 +337,7 @@ const DriverDetail: React.FC = () => {
                                     <ShieldAlert size={28} strokeWidth={2.5} />
                                 </div>
                                 <div className="space-y-1">
-                                    <h4 className="text-sm font-black uppercase tracking-[0.1em] text-rose-800 dark:text-rose-300">{t('delivery.drivers.resignation.request_received')}</h4>
+                                    <h4 className="text-sm font-black uppercase tracking-[0.1em] text-rose-800 dark:text-rose-300">{t('delivery:drivers.resignation.request_received')}</h4>
                                     {driver.resignationReason && (
                                         <p className="text-xs text-rose-700 dark:text-rose-400 font-medium">"{driver.resignationReason}"</p>
                                     )}
@@ -367,8 +367,8 @@ const DriverDetail: React.FC = () => {
                                     <ShieldCheck size={20} strokeWidth={2.5} />
                                 </div>
                                 <div>
-                                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-100">{t('delivery.drivers.identity_verification')}</h2>
-                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{t('delivery.authenticityCheck', 'Document Authenticity Check')}</p>
+                                    <h2 className="text-sm font-black uppercase tracking-widest text-slate-800 dark:text-slate-100">{t('delivery:drivers.identity_verification')}</h2>
+                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mt-0.5">{t('delivery:authenticityCheck', 'Document Authenticity Check')}</p>
                                 </div>
                             </div>
                             <div className="flex items-center gap-2">
@@ -382,9 +382,9 @@ const DriverDetail: React.FC = () => {
                                 <div className="space-y-6 md:col-span-2">
                                     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                         {[
-                                            { label: t('delivery.drivers.id_front'), url: driver.identityImageFrontUrl, icon: ShieldCheck },
-                                            { label: t('delivery.drivers.id_back'), url: driver.identityImageBackUrl, icon: ShieldCheck },
-                                            { label: t('delivery.drivers.selfie'), url: driver.identityImageSelfieUrl, icon: User }
+                                            { label: t('delivery:drivers.id_front'), url: driver.identityImageFrontUrl, icon: ShieldCheck },
+                                            { label: t('delivery:drivers.id_back'), url: driver.identityImageBackUrl, icon: ShieldCheck },
+                                            { label: t('delivery:drivers.selfie'), url: driver.identityImageSelfieUrl, icon: User }
                                         ].map((doc, idx) => (
                                             <div key={idx} className="space-y-3 group/doc">
                                                 <div className="flex items-center justify-between px-1">
@@ -420,8 +420,8 @@ const DriverDetail: React.FC = () => {
                                         <div className="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-[4px] border border-slate-100 dark:border-slate-800/50">
                                             <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                                                 <div>
-                                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 mb-1">{t('delivery.finalAuditDecision', 'Final Audit Decision')}</h3>
-                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('delivery.auditInstruction', 'Evaluate the documentation and update the driver verification status.')}</p>
+                                                    <h3 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200 mb-1">{t('delivery:finalAuditDecision', 'Final Audit Decision')}</h3>
+                                                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium">{t('delivery:auditInstruction', 'Evaluate the documentation and update the driver verification status.')}</p>
                                                 </div>
                                                 <div className="flex items-center gap-4 shrink-0">
                                                     <button
@@ -436,7 +436,7 @@ const DriverDetail: React.FC = () => {
                                                         className="px-8 py-3 bg-emerald-600 text-white text-[11px] font-black uppercase tracking-[0.1em] rounded-[4px] hover:bg-emerald-700 transition-all flex items-center gap-3 shadow-lg shadow-emerald-500/20 active:translate-y-0.5 ring-2 ring-emerald-500/10 ring-offset-2 dark:ring-offset-slate-900"
                                                     >
                                                         <CheckCircle size={16} strokeWidth={2.5} />
-                                                        {t('delivery.verifyPersonnel', 'Verify Personnel')}
+                                                        {t('delivery:verifyPersonnel', 'Verify Personnel')}
                                                     </button>
                                                 </div>
                                             </div>
@@ -453,7 +453,7 @@ const DriverDetail: React.FC = () => {
                             <div className="p-1.5 bg-white dark:bg-slate-800 rounded border border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-400">
                                 <Map size={16} strokeWidth={2.5} />
                             </div>
-                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">{t('delivery.drivers.operating_regions')}</h3>
+                            <h3 className="text-xs font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">{t('delivery:drivers.operating_regions')}</h3>
                         </div>
                         <div className="p-8">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
@@ -504,7 +504,7 @@ const DriverDetail: React.FC = () => {
                                 <XCircle size={24} strokeWidth={2.5} />
                             </div>
                             <div>
-                                <h4 className="text-[10px] font-black uppercase text-rose-800 dark:text-rose-300 tracking-[0.2em] mb-1">{t('delivery.drivers.rejection_reason')}</h4>
+                                <h4 className="text-[10px] font-black uppercase text-rose-800 dark:text-rose-300 tracking-[0.2em] mb-1">{t('delivery:drivers.rejection_reason')}</h4>
                                 <p className="text-sm text-rose-700 dark:text-rose-400 font-bold leading-tight uppercase tracking-tight">{driver.rejectionReason}</p>
                             </div>
                         </div>
@@ -562,17 +562,17 @@ const DriverDetail: React.FC = () => {
                             <div className="p-1.5 bg-white/5 rounded text-emerald-400 border border-white/10 shadow-inner shadow-black">
                                 <Truck size={16} strokeWidth={2.5} />
                             </div>
-                            <h3 className="text-xs font-black uppercase tracking-widest">{t('delivery.drivers.vehicle_details')}</h3>
+                            <h3 className="text-xs font-black uppercase tracking-widest">{t('delivery:drivers.vehicle_details')}</h3>
                         </div>
                         <div className="space-y-4 relative z-10">
                             <div>
-                                <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-1.5">{t('delivery.drivers.vehicle_type')}</p>
+                                <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-1.5">{t('delivery:drivers.vehicle_type')}</p>
                                 <p className="text-sm font-black tracking-tight uppercase text-emerald-400">
                                     {driver.vehicleType ? t('vehicle_types.' + driver.vehicleType) : '--'}
                                 </p>
                             </div>
                             <div>
-                                <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-1.5">{t('delivery.drivers.plate_number')}</p>
+                                <p className="text-[9px] font-black text-white/30 uppercase tracking-[0.2em] mb-1.5">{t('delivery:drivers.plate_number')}</p>
                                 <p className="text-xl font-black tracking-tighter tabular-nums text-slate-100 flex items-center justify-between">
                                     {driver.vehiclePlateNumber || '--'}
                                     <ShieldCheck size={16} className="text-white/10" />
@@ -584,12 +584,12 @@ const DriverDetail: React.FC = () => {
                     {/* Status Summary & Quick Stats */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-[4px] shadow-sm overflow-hidden">
                         <div className="px-6 py-4 bg-slate-50/50 dark:bg-slate-800/30 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">{t('delivery.performanceSummary', 'Performance Summary')}</h3>
+                            <h3 className="text-[10px] font-black uppercase tracking-widest text-slate-800 dark:text-slate-200">{t('delivery:performanceSummary', 'Performance Summary')}</h3>
                             <ChevronLeft size={14} className="text-slate-300 -rotate-90" />
                         </div>
                         <div className="p-4 grid grid-cols-2 gap-px bg-slate-100 dark:bg-slate-800">
                             {[
-                                { label: t('delivery.onTheWay', 'On the way'), value: driver.onTheWayOrdersCount || 0, icon: Package, color: 'text-amber-500' },
+                                { label: t('delivery:onTheWay', 'On the way'), value: driver.onTheWayOrdersCount || 0, icon: Package, color: 'text-amber-500' },
                                 { label: t('delivered'), value: driver.deliveredOrdersCount || 0, icon: CheckCircle, color: 'text-emerald-500' },
                                 { label: t('returned'), value: driver.returnedOrdersCount || 0, icon: MapPin, color: 'text-blue-500' },
                                 { label: t('cancelled'), value: driver.cancelledOrdersCount || 0, icon: XCircle, color: 'text-rose-500' }
@@ -603,7 +603,7 @@ const DriverDetail: React.FC = () => {
                         </div>
                         <div className="p-4 bg-slate-50/50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between px-2">
-                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('delivery.totalOrders', 'Total Orders')}</span>
+                                <span className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{t('delivery:totalOrders', 'Total Orders')}</span>
                                 <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 underline decoration-indigo-500/30 underline-offset-4">{driver.totalOrdersCount || 0}</span>
                             </div>
                         </div>
@@ -617,16 +617,16 @@ const DriverDetail: React.FC = () => {
                                     "px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest",
                                     driver.isAvailableForWork ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20" : "bg-slate-100 text-slate-500 dark:bg-slate-800"
                                 )}>
-                                    {driver.isAvailableForWork ? t('delivery.status.online') : t('delivery.status.offline')}
+                                    {driver.isAvailableForWork ? t('delivery:status.online') : t('delivery:status.offline')}
                                 </div>
                             </div>
                             <div className="p-4 flex items-center justify-between">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('delivery.status.busy')}</span>
+                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('delivery:status.busy')}</span>
                                 <div className={clsx(
                                     "px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest",
                                     driver.isBusy ? "bg-amber-50 text-amber-600 dark:bg-amber-900/20" : "bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20"
                                 )}>
-                                    {driver.isBusy ? t('delivery.status.busy') : t('delivery.status.available')}
+                                    {driver.isBusy ? t('delivery:status.busy') : t('delivery:status.available')}
                                 </div>
                             </div>
                         </div>
@@ -636,8 +636,8 @@ const DriverDetail: React.FC = () => {
             {isCancelModalOpen && (
                 <ConfirmModal
                     isOpen={isCancelModalOpen}
-                    title={t('delivery.drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
-                    message={t('delivery.drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                    title={t('delivery:drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
+                    message={t('delivery:drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
                     onConfirm={confirmCancelHiring}
                     onCancel={() => setIsCancelModalOpen(false)}
                 />
@@ -649,7 +649,7 @@ const DriverDetail: React.FC = () => {
                         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                             <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                 <ArrowRightLeft size={16} className="text-indigo-500" />
-                                {actionModal.type?.includes('RESIGNATION') ? t('delivery.drivers.resignation.title', 'Resignation Action') : t('delivery.drivers.transition.title', 'Transition Action')}
+                                {actionModal.type?.includes('RESIGNATION') ? t('delivery:drivers.resignation.title', 'Resignation Action') : t('delivery:drivers.transition.title', 'Transition Action')}
                             </h3>
                             <button onClick={() => setActionModal({ isOpen: false, type: null })} className="text-slate-400 hover:text-rose-500 transition-colors">
                                 <X size={20} />
@@ -657,10 +657,10 @@ const DriverDetail: React.FC = () => {
                         </div>
                         <div className="p-6">
                             <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mb-4 leading-relaxed">
-                                {actionModal.type === 'CONVERT_TO_STORE_DRIVER' && t('delivery.drivers.transition.make_store_driver_confirm', 'Are you sure you want to invite this driver to become a Store Driver? They will be exclusive to your store once they accept.')}
-                                {actionModal.type === 'CONVERT_TO_FREELANCER' && t('delivery.drivers.transition.convert_to_freelancer_confirm', 'Are you sure you want to transition this store driver to freelancer status? They will be able to work with other stores.')}
-                                {actionModal.type === 'APPROVE_RESIGNATION' && t('delivery.drivers.drivers.accept_resignation_confirm')}
-                                {actionModal.type === 'REJECT_RESIGNATION' && t('delivery.drivers.drivers.reject_resignation_confirm')}
+                                {actionModal.type === 'CONVERT_TO_STORE_DRIVER' && t('delivery:drivers.transition.make_store_driver_confirm', 'Are you sure you want to invite this driver to become a Store Driver? They will be exclusive to your store once they accept.')}
+                                {actionModal.type === 'CONVERT_TO_FREELANCER' && t('delivery:drivers.transition.convert_to_freelancer_confirm', 'Are you sure you want to transition this store driver to freelancer status? They will be able to work with other stores.')}
+                                {actionModal.type === 'APPROVE_RESIGNATION' && t('delivery:drivers.drivers.accept_resignation_confirm')}
+                                {actionModal.type === 'REJECT_RESIGNATION' && t('delivery:drivers.drivers.reject_resignation_confirm')}
                             </p>
 
                             {(actionModal.type === 'CONVERT_TO_STORE_DRIVER' || actionModal.type === 'CONVERT_TO_FREELANCER') && (
