@@ -34,6 +34,7 @@
         "confirm": "تأكيد",
         "cancel": "إلغاء"
     },
+    "date": "التاريخ",
     "transitionToFreelancerMsg": "يرغب سائق المتجر في أن يصبح عملاً حراً",
     "upgradeRequired": "لقد وصلت إلى الحد المسموح به {{feature}}. يرجى ترقية باقتك.",
     "errorCheckingLimits": "خطأ في التحقق من حدود الاشتراك",

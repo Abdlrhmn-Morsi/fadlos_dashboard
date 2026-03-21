@@ -34,6 +34,7 @@
         "confirm": "Confirm",
         "cancel": "Cancel"
     },
+    "date": "Date",
     "transitionToFreelancerMsg": "Our store driver wants to become a freelancer",
     "upgradeRequired": "You have reached your {{feature}} limit. Please upgrade your plan.",
     "errorCheckingLimits": "Error checking subscription limits",

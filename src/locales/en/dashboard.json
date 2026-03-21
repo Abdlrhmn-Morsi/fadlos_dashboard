@@ -16,9 +16,13 @@
     "pendingStores": "Pending Stores",
     "activeSubscriptions": "Active Subscriptions",
     "totalTowns": "Total Towns",
+    "pendingStoreVerifications": "Pending Verifications",
+    "underReviewDrivers": "Drivers Under Review",
+    "reportedReviews": "Reported Reviews",
     "platformUsers": "Platform Users",
     "platformDrivers": "Platform Drivers",
-    "totalDrivers": "Store Drivers",
+    "totalEmployees": "Total Employees (Store)",
+    "totalDrivers": "Total Drivers",
     "vsLastPeriod": "vs last period",
     "todayRevenue": "Today's Revenue",
     "todayOrders": "Today's Orders",
@@ -136,5 +140,18 @@
     "userRoleDistribution": "User Role Distribution",
     "cycleDistribution": "Cycle Distribution",
     "monthly": "Monthly",
-    "yearly": "Yearly"
+    "yearly": "Yearly",
+    "plans": {
+        "FREE": "Free",
+        "STARTER": "Starter",
+        "PRO": "Pro",
+        "PREMIUM": "Premium",
+        "ENTERPRISE": "Enterprise"
+    },
+    "subscriptionStatus": {
+        "ACTIVE": "Active",
+        "CANCELLED": "Cancelled",
+        "EXPIRED": "Expired",
+        "PENDING": "Pending"
+    }
 }

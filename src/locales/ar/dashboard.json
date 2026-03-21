@@ -16,9 +16,13 @@
     "pendingStores": "متاجر قيد الانتظار",
     "activeSubscriptions": "اشتراكات نشطة",
     "totalTowns": "إجمالي المناطق",
+    "pendingStoreVerifications": "طلبات التوثيق",
+    "underReviewDrivers": "سائقون بانتظار المراجعة",
+    "reportedReviews": "التقييمات المبلغ عنها",
     "platformUsers": "مستخدمو المنصة",
     "platformDrivers": "سائقو المنصة",
-    "totalDrivers": "سائقي المتجر",
+    "totalEmployees": "إجمالي الموظفين (المتجر)",
+    "totalDrivers": "إجمالي السائقين",
     "vsLastPeriod": "مقارنة بالفترة السابقة",
     "todayRevenue": "إيرادات اليوم",
     "todayOrders": "طلبات اليوم",
@@ -136,5 +140,18 @@
     "userRoleDistribution": "توزيع أدوار المستخدمين",
     "cycleDistribution": "توزيع الاشتراكات بالمدة",
     "monthly": "شهري",
-    "yearly": "سنوي"
+    "yearly": "سنوي",
+    "plans": {
+        "FREE": "مجانية",
+        "STARTER": "ستارتر",
+        "PRO": "برو",
+        "PREMIUM": "بريميوم",
+        "ENTERPRISE": "إنتربرايز"
+    },
+    "subscriptionStatus": {
+        "ACTIVE": "نشط",
+        "CANCELLED": "ملغي",
+        "EXPIRED": "منتهي",
+        "PENDING": "قيد الانتظار"
+    }
 }

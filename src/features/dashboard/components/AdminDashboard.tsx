@@ -11,7 +11,9 @@ import {
     TrendingUp,
     MapPin,
     Package,
-    Layers
+    Layers,
+    ShieldCheck,
+    Flag
 } from 'lucide-react';
 import { DashboardStats } from '../models/dashboard.model';
 import { useTranslation } from 'react-i18next';
@@ -75,7 +77,7 @@ interface AdminDashboardProps {
 }
 
 const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
-    const { t } = useTranslation(['dashboard', 'common']);
+    const { t, i18n } = useTranslation(['dashboard', 'common']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
 
@@ -145,56 +147,36 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                 />
             </div>
 
-            {/* Action Centers */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Pending Approvals Section */}
-                {stats.pendingApprovals && (
-                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]">
-                        <div className="p-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <ShieldAlert size={20} className="text-amber-500" />
-                                <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                                    {t('dashboard:pendingApprovals')}
-                                </h3>
-                            </div>
-                            <span className="px-2 py-1 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-black uppercase rounded">
-                                {(stats.pendingApprovals.stores.length + stats.pendingApprovals.drivers.length) || 0} {t('common:pending')}
-                            </span>
-                        </div>
-                        <div className="p-0">
-                            {/* Stores */}
-                            <div className="p-4 space-y-3">
-                                <p className={clsx("text-[10px] font-bold text-slate-400 uppercase tracking-widest", isRTL && "text-right")}>
-                                    {t('dashboard:totalStores')}
-                                </p>
-                                {stats.pendingApprovals.stores.length === 0 ? (
-                                    <p className="text-xs text-slate-400 italic py-2">{t('dashboard:noPendingApprovals')}</p>
-                                ) : (
-                                    stats.pendingApprovals.stores.map((store: any) => (
-                                        <div key={store.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded shadow-sm transition-all hover:border-primary/20">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-10 h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-center overflow-hidden">
-                                                    {store.logo ? <img src={store.logo} alt="" className="w-full h-full object-cover" /> : <Store size={20} className="text-slate-300" />}
-                                                </div>
-                                                <div className={isRTL ? "text-right" : "text-left"}>
-                                                    <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{isRTL ? store.nameAr || store.name : store.name}</p>
-                                                    <p className="text-[10px] text-slate-400">{store.owner?.name || t('common:unknown')}</p>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                onClick={() => navigate(`/stores/${store.id}`)}
-                                                className="px-3 py-1.5 bg-primary text-white text-[10px] font-black uppercase tracking-widest rounded hover:bg-primary/90 transition-all shadow-sm"
-                                            >
-                                                {t('dashboard:review')}
-                                            </button>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                )}
+            {/* Admin Action Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <AdminStatCard 
+                    title={t('dashboard:pendingStores')} 
+                    value={stats.pendingStores || 0} 
+                    icon={Store} 
+                    color="amber"
+                />
+                <AdminStatCard 
+                    title={t('dashboard:pendingStoreVerifications')} 
+                    value={stats.pendingStoreVerifications || 0} 
+                    icon={ShieldCheck} 
+                    color="blue"
+                />
+                <AdminStatCard 
+                    title={t('dashboard:underReviewDrivers')} 
+                    value={stats.underReviewDrivers || 0} 
+                    icon={Truck} 
+                    color="orange"
+                />
+                <AdminStatCard 
+                    title={t('dashboard:reportedReviews')} 
+                    value={stats.reportedReviews || 0} 
+                    icon={Flag} 
+                    color="rose"
+                />
+            </div>
 
+            {/* Analytics Overview - Side by Side */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
                 {/* Top Performing Stores */}
                 {stats.topStores && (
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]">
@@ -213,7 +195,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                             {stats.topStores.length === 0 ? (
                                 <p className="text-xs text-slate-400 italic py-2">{t('common:noData')}</p>
                             ) : (
-                                stats.topStores.map((store: any) => (
+                                stats.topStores.slice(0, 5).map((store: any) => (
                                     <div key={store.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800 rounded shadow-sm transition-all hover:border-emerald-200 dark:hover:border-emerald-800/50">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-center overflow-hidden">
@@ -244,47 +226,9 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                         </div>
                     </div>
                 )}
-            </div>
-
-            {/* Platform Insights & Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm p-6 flex flex-col">
-                    <div className="flex items-center gap-2 mb-6">
-                        <TrendingUp size={20} className="text-primary" />
-                        <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                            {t('dashboard:platformGrowth')}
-                        </h3>
-                    </div>
-                    
-                    <div className="flex-1 flex flex-col justify-center space-y-8">
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                                {t('dashboard:platformUsers')}
-                            </p>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 dark:text-white leading-none">
-                                    +{stats.platformGrowth || 0}
-                                </span>
-                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{t('dashboard:newThisMonth')}</span>
-                            </div>
-                        </div>
-
-                        <div>
-                            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">
-                                {t('dashboard:totalStores')}
-                            </p>
-                            <div className="flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-900 dark:text-white leading-none">
-                                    +{stats.newStoresCount || 0}
-                                </span>
-                                <span className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest">{t('dashboard:newThisMonth')}</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
                 {/* Recent Subscriptions Section */}
-                <div className="lg:col-span-2 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]">
+                <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]">
                     <div className="p-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex items-center justify-between">
                         <div className="flex items-center gap-2">
                             <CreditCard size={20} className="text-violet-500" />
@@ -298,12 +242,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                     </div>
                     <div className="p-0">
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left whitespace-nowrap">
+                            <table className={clsx("w-full text-sm whitespace-nowrap", isRTL ? "text-right" : "text-left")}>
                                 <thead className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800">
                                     <tr>
-                                        <th className="px-6 py-3 font-black">{t('dashboard:storeName')}</th>
-                                        <th className="px-6 py-3 font-black">{t('common:plan')}</th>
-                                        <th className="px-6 py-3 font-black">{t('common:status')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('dashboard:storeName')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('common:plan')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('common:status')}</th>
                                         <th className={clsx("px-6 py-3 font-black", isRTL ? "text-left" : "text-right")}>{t('common:date')}</th>
                                     </tr>
                                 </thead>
@@ -315,27 +259,27 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                                             </td>
                                         </tr>
                                     ) : (
-                                        stats.recentSubscriptions.map((sub: any) => (
+                                        stats.recentSubscriptions.slice(0, 5).map((sub: any) => (
                                             <tr key={sub.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                                <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
+                                                <td className={clsx("px-6 py-4 font-bold text-slate-800 dark:text-slate-200", isRTL ? "text-right" : "text-left")}>
                                                     {isRTL ? sub.storeNameAr || sub.storeName : sub.storeName}
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className={clsx("px-6 py-4", isRTL ? "text-right" : "text-left")}>
                                                     <span className="px-2 py-0.5 bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 text-[10px] font-black uppercase rounded">
-                                                        {sub.plan}
+                                                        {t(`dashboard:plans.${sub.plan?.toUpperCase()}`)}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className={clsx("px-6 py-4", isRTL ? "text-right" : "text-left")}>
                                                     <span className={clsx(
                                                         "px-2 py-0.5 text-[10px] font-black uppercase rounded inline-flex items-center gap-1",
                                                         sub.status === 'ACTIVE' ? "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400" : "bg-slate-100 dark:bg-slate-800 text-slate-500"
                                                     )}>
                                                         <span className={clsx("w-1 h-1 rounded-full", sub.status === 'ACTIVE' ? "bg-emerald-500" : "bg-slate-400")} />
-                                                        {sub.status}
+                                                        {t(`dashboard:subscriptionStatus.${sub.status?.toUpperCase()}`)}
                                                     </span>
                                                 </td>
                                                 <td className={clsx("px-6 py-4 text-[11px] font-bold tracking-tight text-slate-400 uppercase tabular-nums", isRTL ? "text-left" : "text-right")}>
-                                                    {new Date(sub.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', {
+                                                    {new Date(sub.createdAt).toLocaleDateString(i18n.language === 'ar' ? 'ar-SA' : 'en-US', {
                                                         month: 'short',
                                                         day: 'numeric',
                                                         year: 'numeric'
@@ -351,37 +295,32 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                 </div>
             </div>
 
-            {/* System Totals Fact Bar */}
-            <div className="bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 rounded p-6 shadow-sm">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
-                            <Layers size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('dashboard:totalProducts')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight mt-0.5">{stats.totalProducts || 0}</h4>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center">
-                            <Users size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('dashboard:totalCustomers')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight mt-0.5">{stats.totalCustomers || 0}</h4>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 rounded bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center">
-                            <MapPin size={20} />
-                        </div>
-                        <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('dashboard:totalTowns')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-tight mt-0.5">{stats.totalTowns || 0}</h4>
-                        </div>
-                    </div>
-                </div>
+            {/* Bottom Tier Metrics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
+                <AdminStatCard 
+                    title={t('dashboard:totalCustomers')} 
+                    value={stats.totalCustomers || 0} 
+                    icon={Users} 
+                    color="blue"
+                />
+                <AdminStatCard 
+                    title={t('dashboard:totalStores')} 
+                    value={stats.totalStores || 0} 
+                    icon={Store} 
+                    color="primary"
+                />
+                <AdminStatCard 
+                    title={t('dashboard:totalDrivers')} 
+                    value={stats.totalDrivers || 0} 
+                    icon={Truck} 
+                    color="orange"
+                />
+                <AdminStatCard 
+                    title={t('dashboard:totalEmployees')} 
+                    value={stats.totalEmployees || 0} 
+                    icon={Users} 
+                    color="violet"
+                />
             </div>
         </div>
     );

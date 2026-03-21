@@ -25,6 +25,10 @@ export interface DashboardStats {
     recentSubscriptions?: any[];
     platformGrowth?: number;
     newStoresCount?: number;
+    pendingStoreVerifications?: number;
+    reportedReviews?: number;
+    underReviewDrivers?: number;
+    totalEmployees?: number;
     // Seller specific (Optional as they might not be present for Admin)
     totalClients?: number;
     totalFollowers?: number;

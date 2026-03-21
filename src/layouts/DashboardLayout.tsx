@@ -165,6 +165,20 @@ const LockedSidebarItem: React.FC<LockedSidebarItemProps> = ({ icon: Icon, label
   );
 };
 
+interface SidebarHeaderProps {
+  label: string;
+  collapsed: boolean;
+}
+
+const SidebarHeader: React.FC<SidebarHeaderProps> = ({ label, collapsed }) => {
+  if (collapsed) return <div className="h-[1px] bg-slate-100 dark:bg-slate-800 my-4" />;
+  return (
+    <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+      {label}
+    </div>
+  );
+};
+
 const DashboardLayout: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -245,103 +259,138 @@ const DashboardLayout: React.FC = () => {
         </div>
 
         <nav className="flex-1 overflow-y-auto overflow-x-hidden p-4 space-y-2 custom-scrollbar">
-          <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
-
-          {user?.role === UserRole.DELIVERY && (
-            <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
-          )}
-
-          {/* Analytics - Role-aware feature gating */}
-          {user?.role !== UserRole.SUPER_ADMIN && user?.role !== UserRole.ADMIN && (
-            user?.role === UserRole.STORE_OWNER ? (
-              (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro')
-                ? hasPermission(Permissions.ANALYTICS_VIEW) && <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
-                : <LockedSidebarItem icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
-            ) : (
-              (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
-                <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
-              )
-            )
-          )}
-
           {/* Admin Links */}
           {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
             <>
-              {hasAdminPermission(AdminPermissions.USERS_VIEW) && <SidebarItem to="/users" icon={Users} label={t('users')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.STORES_VIEW) && <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />}
+              {/* System Data Section */}
+              {(hasAdminPermission(AdminPermissions.DASHBOARD_VIEW) ||
+                hasAdminPermission(AdminPermissions.USERS_VIEW) ||
+                hasAdminPermission(AdminPermissions.STORES_VIEW)) && (
+                  <>
+                    <SidebarHeader label={t('System Data')} collapsed={collapsed} />
+                    {hasAdminPermission(AdminPermissions.DASHBOARD_VIEW) && (
+                      <>
+                        <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
+                        <SidebarItem to="/admin-analytics" icon={BarChart3} label={t('dashboard:adminAnalytics', { defaultValue: 'Analytics' })} collapsed={collapsed} />
+                      </>
+                    )}
+                    {hasAdminPermission(AdminPermissions.USERS_VIEW) && <SidebarItem to="/users" icon={Users} label={t('users')} collapsed={collapsed} />}
+                    {hasAdminPermission(AdminPermissions.STORES_VIEW) && <SidebarItem to="/stores" icon={Store} label={t('stores')} collapsed={collapsed} />}
+                  </>
+                )}
 
-              {!collapsed && (
-                <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                )}>
-                  {t('superAdminTeam', { defaultValue: 'Super Admin Team' })}
-                </div>
+              {/* Verification Section */}
+              {(hasAdminPermission(AdminPermissions.STORE_VERIFICATION_VIEW) ||
+                hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW)) && (
+                  <>
+                    <SidebarHeader label={t('Verification Requests')} collapsed={collapsed} />
+                    {hasAdminPermission(AdminPermissions.STORE_VERIFICATION_VIEW) && (
+                      <SidebarItem to="/stores/verification" icon={ShieldCheck} label={t('storeVerification', 'Store Verification')} collapsed={collapsed} />
+                    )}
+                    {hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW) && (
+                      <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />
+                    )}
+                  </>
+                )}
+
+              {/* Content Section */}
+              {hasAdminPermission(AdminPermissions.REPORTED_REVIEWS_VIEW) && (
+                <>
+                  <SidebarHeader label={t('Content Moderation')} collapsed={collapsed} />
+                  <SidebarItem to="/reported-reviews" icon={Shield} label={t('reportedReviews')} collapsed={collapsed} />
+                </>
               )}
-              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
 
-              {hasAdminPermission(AdminPermissions.ADMIN_EMPLOYEES_VIEW) && <SidebarItem to="/admin-employees" icon={Users} label={t('adminEmployees', { defaultValue: 'Admin Employees' })} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.ADMIN_ROLES_MANAGE) && <SidebarItem to="/admin-roles" icon={Shield} label={t('adminRoles', { defaultValue: 'Admin Roles' })} collapsed={collapsed} />}
+              {/* Team Section */}
+              {(hasAdminPermission(AdminPermissions.ADMIN_EMPLOYEES_VIEW) ||
+                hasAdminPermission(AdminPermissions.ADMIN_ROLES_MANAGE)) && (
+                  <>
+                    <SidebarHeader label={t('Admin Team')} collapsed={collapsed} />
+                    {hasAdminPermission(AdminPermissions.ADMIN_EMPLOYEES_VIEW) && (
+                      <SidebarItem to="/admin-employees" icon={Users} label={t('adminEmployees', { defaultValue: 'Admin Employees' })} collapsed={collapsed} />
+                    )}
+                    {hasAdminPermission(AdminPermissions.ADMIN_ROLES_MANAGE) && (
+                      <SidebarItem to="/admin-roles" icon={Shield} label={t('adminRoles', { defaultValue: 'Admin Roles' })} collapsed={collapsed} />
+                    )}
+                  </>
+                )}
 
-              {!collapsed && (
-                <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                )}>
-                  {t('geoAndOrg')}
-                </div>
-              )}
-              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+              {/* Geography Section */}
+              {(hasAdminPermission(AdminPermissions.CITIES_VIEW) ||
+                hasAdminPermission(AdminPermissions.TOWNS_VIEW)) && (
+                  <>
+                    <SidebarHeader label={t('Geography')} collapsed={collapsed} />
+                    {hasAdminPermission(AdminPermissions.CITIES_VIEW) && <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />}
+                    {hasAdminPermission(AdminPermissions.TOWNS_VIEW) && <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />}
+                  </>
+                )}
 
-              {hasAdminPermission(AdminPermissions.CITIES_VIEW) && <SidebarItem to="/cities" icon={Map} label={t('cities')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.TOWNS_VIEW) && <SidebarItem to="/towns" icon={MapPin} label={t('towns')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.STORE_VERIFICATION_VIEW) && <SidebarItem to="/stores/verification" icon={ShieldCheck} label={t('storeVerification', 'Store Verification')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) && <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) && <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW) && <SidebarItem to="/drivers/verification" icon={Shield} label={t('driverVerification', 'Driver Verification')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.REPORTED_REVIEWS_VIEW) && <SidebarItem to="/reported-reviews" icon={Shield} label={t('reportedReviews')} collapsed={collapsed} />}
-              {hasAdminPermission(AdminPermissions.PLANS_VIEW) && (
-                <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
-              )}
-              <SidebarItem to="/admin-analytics" icon={BarChart3} label={t('dashboard:adminAnalytics', { defaultValue: 'Analytics' })} collapsed={collapsed} />
+              {/* Configuration Section */}
+              {(hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) ||
+                hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) ||
+                hasAdminPermission(AdminPermissions.PLANS_VIEW)) && (
+                  <>
+                    <SidebarHeader label={t('System Configuration')} collapsed={collapsed} />
+                    {hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) && <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />}
+                    {hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) && <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />}
+                    {hasAdminPermission(AdminPermissions.PLANS_VIEW) && (
+                      <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
+                    )}
+                  </>
+                )}
             </>
           )}
 
           {/* Store Management Sections */}
           {(user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE) && (
             <>
-              {!collapsed && (
-                <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                )}>
-                  {t('management')}
-                </div>
+              <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
+
+              {/* Analytics - Role-aware feature gating */}
+              {user?.role === UserRole.STORE_OWNER ? (
+                (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro')
+                  ? hasPermission(Permissions.ANALYTICS_VIEW) && <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
+                  : <LockedSidebarItem icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
+              ) : (
+                (hasFeature(PlanFeature.ADVANCED_ANALYTICS) || usage?.plan?.toLowerCase() === 'premium' || usage?.plan?.toLowerCase() === 'pro') && hasPermission(Permissions.ANALYTICS_VIEW) && (
+                  <SidebarItem to="/analytics" icon={TrendingUp} label={t('analytics')} collapsed={collapsed} />
+                )
               )}
-              {(hasPermission(Permissions.PRODUCTS_CREATE) || hasPermission(Permissions.PRODUCTS_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
-                <SidebarItem to="/products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
-              )}
-              {(hasPermission(Permissions.CATEGORIES_CREATE) || hasPermission(Permissions.CATEGORIES_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
-                <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
-              )}
-              {(hasPermission(Permissions.ADDONS_VIEW) || hasPermission(Permissions.ADDONS_CREATE) || user?.role === UserRole.EMPLOYEE) && (
-                <SidebarItem to="/addons" icon={Layers} label={t('addons')} collapsed={collapsed} />
-              )}
-              {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
-                <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} end={true} />
-              )}
-              {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
-                <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
-              )}
+
+              {(hasPermission(Permissions.PRODUCTS_CREATE) ||
+                hasPermission(Permissions.PRODUCTS_UPDATE) ||
+                hasPermission(Permissions.CATEGORIES_CREATE) ||
+                hasPermission(Permissions.CATEGORIES_UPDATE) ||
+                hasPermission(Permissions.ADDONS_VIEW) ||
+                hasPermission(Permissions.ADDONS_CREATE) ||
+                hasPermission(Permissions.ORDERS_VIEW) ||
+                hasPermission(Permissions.ORDERS_UPDATE) ||
+                hasPermission(Permissions.CASH_SETTLEMENT_READ) ||
+                user?.role === UserRole.EMPLOYEE) && (
+                  <>
+                    <SidebarHeader label={t('management')} collapsed={collapsed} />
+                    {(hasPermission(Permissions.PRODUCTS_CREATE) || hasPermission(Permissions.PRODUCTS_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
+                      <SidebarItem to="/products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
+                    )}
+                    {(hasPermission(Permissions.CATEGORIES_CREATE) || hasPermission(Permissions.CATEGORIES_UPDATE) || user?.role === UserRole.EMPLOYEE) && (
+                      <SidebarItem to="/categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
+                    )}
+                    {(hasPermission(Permissions.ADDONS_VIEW) || hasPermission(Permissions.ADDONS_CREATE) || user?.role === UserRole.EMPLOYEE) && (
+                      <SidebarItem to="/addons" icon={Layers} label={t('addons')} collapsed={collapsed} />
+                    )}
+                    {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
+                      <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} end={true} />
+                    )}
+                    {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
+                      <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
+                    )}
+                  </>
+                )}
               {(hasPermission(Permissions.PROMO_CODES_VIEW) || hasPermission(Permissions.PROMO_CODES_CREATE) || hasPermission(Permissions.PROMO_CODES_UPDATE) ||
                 (user?.role === UserRole.STORE_OWNER ? hasPermission(Permissions.STORE_VIEW) : hasPermission(Permissions.CLIENTS_VIEW)) ||
                 hasPermission(Permissions.CLIENTS_VIEW) || hasPermission(Permissions.FOLLOWERS_VIEW)) && (
                   <>
-                    {!collapsed && (
-                      <div className={clsx(
-                        "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                      )}>
-                        {t('marketingAndCustomers')}
-                      </div>
-                    )}
-                    {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+                    <SidebarHeader label={t('marketingAndCustomers')} collapsed={collapsed} />
 
                     {/* Reviews - Role-aware */}
                     {user?.role === UserRole.STORE_OWNER ? (
@@ -392,39 +441,26 @@ const DashboardLayout: React.FC = () => {
                   </>
                 )}
 
-              {(hasPermission(Permissions.EMPLOYEES_VIEW) || hasPermission(Permissions.ROLES_MANAGE) || hasPermission(Permissions.DELIVERY_DRIVERS_VIEW)) && (
-                <>
-                  {!collapsed && (
-                    <div className={clsx(
-                      "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                    )}>
-                      {t('team')}
-                    </div>
-                  )}
-                  {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
-                </>
-              )}
-              {hasPermission(Permissions.EMPLOYEES_VIEW) && (
-                <SidebarItem to="/employees" icon={Users} label={t('employees')} collapsed={collapsed} />
-              )}
-              {hasPermission(Permissions.ROLES_MANAGE) && (
-                <SidebarItem to="/roles" icon={Shield} label={t('roles')} collapsed={collapsed} />
-              )}
-              {hasPermission(Permissions.DELIVERY_DRIVERS_VIEW) && (
-                <SidebarItem to="/delivery-drivers" icon={Truck} label={t('deliveryDrivers')} collapsed={collapsed} />
-              )}
+              {(hasPermission(Permissions.EMPLOYEES_VIEW) ||
+                hasPermission(Permissions.ROLES_MANAGE) ||
+                hasPermission(Permissions.DELIVERY_DRIVERS_VIEW)) && (
+                  <>
+                    <SidebarHeader label={t('team')} collapsed={collapsed} />
+                    {hasPermission(Permissions.EMPLOYEES_VIEW) && (
+                      <SidebarItem to="/employees" icon={Users} label={t('employees')} collapsed={collapsed} />
+                    )}
+                    {hasPermission(Permissions.ROLES_MANAGE) && (
+                      <SidebarItem to="/roles" icon={Shield} label={t('roles')} collapsed={collapsed} />
+                    )}
+                    {hasPermission(Permissions.DELIVERY_DRIVERS_VIEW) && (
+                      <SidebarItem to="/delivery-drivers" icon={Truck} label={t('deliveryDrivers')} collapsed={collapsed} />
+                    )}
+                  </>
+                )}
 
               {user?.role === UserRole.STORE_OWNER && (
                 <>
-                  {!collapsed && (
-                    <div className={clsx(
-                      "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                    )}>
-                      {t('subscriptions:title')}
-                    </div>
-                  )}
-                  {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
-
+                  <SidebarHeader label={t('subscriptions:title')} collapsed={collapsed} />
                   <SidebarItem to="/subscription" icon={CreditCard} label={t('subscriptions:currentPlan')} collapsed={collapsed} />
                   <SidebarItem to="/billing-history" icon={DollarSign} label={t('subscriptions:billingHistory.title')} collapsed={collapsed} />
                   <SidebarItem to="/usage" icon={BarChart3} label={t('subscriptions:usage.title')} collapsed={collapsed} />
@@ -433,17 +469,16 @@ const DashboardLayout: React.FC = () => {
             </>
           )}
 
+          {user?.role === UserRole.DELIVERY && (
+            <>
+              <SidebarItem to="/delivery-dashboard" icon={Truck} label={t('deliveryDashboard', 'Driver Dashboard')} collapsed={collapsed} />
+            </>
+          )}
+
           {/* Store Config Section - Shared by all authorized roles */}
           {(hasPermission(Permissions.SETTINGS_VIEW) || user?.role === UserRole.STORE_OWNER || user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
             <>
-              {!collapsed && (
-                <div className={clsx(
-                  "pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]"
-                )}>
-                  {t('common:storeSettings')}
-                </div>
-              )}
-              {collapsed && <div className="h-[1px] bg-slate-100 my-4" />}
+              <SidebarHeader label={t('common:storeSettings')} collapsed={collapsed} />
 
               {user?.role !== UserRole.SUPER_ADMIN && (
                 <>
