@@ -11,6 +11,8 @@
     "delete_success": "Deleted successfully",
     "create_success": "Created successfully",
     "save": "Save",
+    "updateChanges": "Update Changes",
+    "confirmUnassignMessage": "Are you sure you want to unassign this driver from the order?",
     "from": "From",
     "to": "To",
     "verified": "Verified",

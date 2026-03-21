@@ -11,6 +11,8 @@
     "delete_success": "تم الحذف بنجاح",
     "create_success": "تم الإنشاء بنجاح",
     "save": "حفظ",
+    "updateChanges": "تحديث التغييرات",
+    "confirmUnassignMessage": "هل أنت متأكد من رغبتك في إلغاء تعيين هذا السائق من الطلب؟",
     "from": "من",
     "to": "إلى",
     "verified": "موثق",
