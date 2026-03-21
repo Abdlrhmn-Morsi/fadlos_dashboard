@@ -10,6 +10,11 @@
     "update_success": "Updated successfully",
     "delete_success": "Deleted successfully",
     "create_success": "Created successfully",
+    "createRole": "Create New Role",
+    "editRole": "Edit Role",
+    "addRole": "Add Role",
+    "deleteRole": "Delete Role",
+    "deleteRoleConfirmation": "Are you sure you want to delete this role?",
     "save": "Save",
     "updateChanges": "Update Changes",
     "confirmUnassignMessage": "Are you sure you want to unassign this driver from the order?",
@@ -76,6 +81,7 @@
     "updateStoreDirectly": "Update your store profile, location, and settings directly.",
     "employees": "Staff Accounts",
     "manageEmployeesDesc": "Manage store staff and their access",
+    "manageRolesDesc": "Manage user roles and permissions",
     "addEmployee": "Add Employee",
     "createEmployee": "Create New Employee",
     "editEmployee": "Edit Employee",
@@ -123,11 +129,13 @@
     "vehicle_types": {
         "BICYCLE": "Bicycle",
         "MOTORCYCLE": "Motorcycle",
+        "TRICYCLE": "Tricycle",
         "CAR": "Car",
         "VAN": "Van",
         "WALKING": "Walking",
         "bicycle": "Bicycle",
         "motorcycle": "Motorcycle",
+        "tricycle": "Tricycle",
         "car": "Car",
         "van": "Van",
         "walking": "Walking"
@@ -242,7 +250,209 @@
     "Store Management": "Store Management",
     "User Management": "User Management",
     "Subscriptions & Plans": "Subscriptions & Plans",
+    "Employee Management": "Employee Management",
+    "Product Management": "Product Management",
+    "Category Management": "Category Management",
+    "Branch Management": "Branch Management",
+    "Order Management": "Order Management",
+    "Variants": "Variants",
+    "Delivery Drivers": "Delivery Drivers",
+    "Cash Settlement": "Cash Settlement",
+    "Promotion Ads": "Promotion Ads",
+    "Delivery Areas": "Delivery Areas",
     "permissions": {
+        "store.view": {
+            "name": "View Store Info",
+            "description": "• View store profile and identity\n• Access contact info and social links\n• Review operating hours and policies\n• See current subscription plan and limits"
+        },
+        "store.update": {
+            "name": "Update Store Info",
+            "description": "• Modify store identity (logo, banner, name)\n• Update business category and description\n• Manage contact details and social media\n• Configure opening hours and closed-time rules\n• Toggle store availability and hiring status"
+        },
+        "followers.view": {
+            "name": "View Followers",
+            "description": "• Access the store followers directory\n• View follower engagement statistics\n• Monitor follower growth and trends"
+        },
+        "clients.view": {
+            "name": "View Clients",
+            "description": "• Access the customer and client directories\n• View customer profile history and statistics\n• Monitor store and product reviews"
+        },
+        "employees.view": {
+            "name": "View Employees",
+            "description": "• See list of all staff members\n• View employee roles and status"
+        },
+        "employees.create": {
+            "name": "Create Employees",
+            "description": "• Add new employees to the team\n• Set initial roles and credentials"
+        },
+        "employees.update": {
+            "name": "Update Employees",
+            "description": "• Edit staff information\n• Change employee roles and permissions\n• Reset employee passwords"
+        },
+        "employees.delete": {
+            "name": "Delete Employees",
+            "description": "• Remove employees from the system\n• Terminate staff access"
+        },
+        "products.create": {
+            "name": "Create Products",
+            "description": "• Add new products to the catalog\n• Upload product images\n• Set prices and descriptions"
+        },
+        "products.update": {
+            "name": "Update Products",
+            "description": "• Edit existing product details\n• Update inventory/stock levels\n• Manage product status"
+        },
+        "products.delete": {
+            "name": "Delete Products",
+            "description": "• Remove products from the catalog\n• Delete product media and data"
+        },
+        "categories.create": {
+            "name": "Create Categories",
+            "description": "• Create new product categories\n• Define category hierarchy"
+        },
+        "categories.update": {
+            "name": "Update Categories",
+            "description": "• Edit category names and icons\n• Reorder category display sequence"
+        },
+        "categories.delete": {
+            "name": "Delete Categories",
+            "description": "• Remove product categories"
+        },
+        "branches.create": {
+            "name": "Create Branches",
+            "description": "• Add new store branches\n• Set branch location and details"
+        },
+        "branches.update": {
+            "name": "Update Branches",
+            "description": "• Edit branch information\n• Update branch address and hours"
+        },
+        "branches.delete": {
+            "name": "Delete Branches",
+            "description": "• Remove store branches"
+        },
+        "orders.view": {
+            "name": "View Orders",
+            "description": "• Access the order fulfillment dashboard\n• View order lists and details\n• Track order history"
+        },
+        "orders.update": {
+            "name": "Update Order Status",
+            "description": "• Change order status (Preparing, Ready, etc.)"
+        },
+        "orders.cancel": {
+            "name": "Cancel Orders",
+            "description": "• Cancel customer orders\n• Return customer orders\n• Process order rejections"
+        },
+        "orders.assign_driver": {
+            "name": "Assign Delivery Driver",
+            "description": "• Assign orders to drivers\n• Reassign or unassign drivers from orders"
+        },
+        "analytics.view": {
+            "name": "View Analytics",
+            "description": "• Access sales reports and graphs\n• View revenue performance\n• See top-selling products"
+        },
+        "analytics.export": {
+            "name": "Export Data",
+            "description": "• Download analytics data as CSV/Excel\n• Generate printable reports"
+        },
+        "settings.view": {
+            "name": "View Settings",
+            "description": "• View store branches and locations\n• Access delivery area configurations\n• See employee roles and assigned permissions"
+        },
+        "settings.update": {
+            "name": "Update Settings",
+            "description": "• Manage store branches and their details\n• Configure delivery areas, fees, and minimums\n• Update system preferences"
+        },
+        "roles.manage": {
+            "name": "Manage Roles",
+            "description": "• Create custom employee roles\n• Define permission sets for roles\n• Manage team access levels"
+        },
+        "promo_codes.view": {
+            "name": "View Promo Codes",
+            "description": "• View active and expired promo codes\n• Check usage statistics"
+        },
+        "promo_codes.create": {
+            "name": "Create Promo Codes",
+            "description": "• Create new discount coupons\n• Set expiry dates and usage limits"
+        },
+        "promo_codes.update": {
+            "name": "Update Promo Codes",
+            "description": "• Edit existing promo code details\n• Deactivate/Activate coupons"
+        },
+        "promo_codes.delete": {
+            "name": "Delete Promo Codes",
+            "description": "• Delete promo code records"
+        },
+        "variants.view": {
+            "name": "View Variants",
+            "description": "• View product variant options (Size, Color, etc.)"
+        },
+        "variants.create": {
+            "name": "Create Variants",
+            "description": "• Define new attribute groups\n• Add option values for products"
+        },
+        "variants.update": {
+            "name": "Update Variants",
+            "description": "• Edit variant names and values"
+        },
+        "variants.delete": {
+            "name": "Delete Variants",
+            "description": "• Remove variant configurations"
+        },
+        "addons.view": {
+            "name": "View Addons",
+            "description": "• See available product addons and extras"
+        },
+        "addons.create": {
+            "name": "Create Addons",
+            "description": "• Create new addons with prices\n• Add addon images"
+        },
+        "addons.update": {
+            "name": "Update Addons",
+            "description": "• Modify addon details and pricing"
+        },
+        "addons.delete": {
+            "name": "Delete Addons",
+            "description": "• Delete product addons"
+        },
+        "delivery_drivers.view": {
+            "name": "View Drivers",
+            "description": "• See list of all delivery drivers\n• View driver profiles and statistics"
+        },
+        "delivery_drivers.create": {
+            "name": "Create Drivers",
+            "description": "• Add new store drivers\n• Register freelancers"
+        },
+        "delivery_drivers.update": {
+            "name": "Update Drivers",
+            "description": "• Edit driver information\n• Toggle driver status and availability"
+        },
+        "delivery_drivers.delete": {
+            "name": "Delete Drivers",
+            "description": "• Remove drivers from the system"
+        },
+        "cash_settlement.read": {
+            "name": "View Cash Settlements",
+            "description": "• View pending collections and settled batches"
+        },
+        "cash_settlement.manage": {
+            "name": "Manage Cash Settlements",
+            "description": "• Mark pending collections as settled\n• Create new settlement batches"
+        },
+        "promotion_ads.view": {
+            "name": "View Promotion History",
+            "description": "• View sent promotion ads and their history"
+        },
+        "promotion_ads.send": {
+            "name": "Send Promotion Ads",
+            "description": "• Send push notification ads to followers and clients"
+        },
+        "delivery_areas.view": {
+            "name": "View Delivery Areas",
+            "description": "• Access the delivery areas list\n• View delivery fees and minimums"
+        },
+        "delivery_areas.update": {
+            "name": "Manage Delivery Areas",
+            "description": "• Add/Remove towns to delivery zones\n• Edit delivery fees and minimum order amounts\n• Reset all delivery configurations"
+        },
         "admin.stores.view": { "name": "View Stores", "description": "List all stores and view their details" },
         "admin.stores.update_status": { "name": "Update Store Status", "description": "Activate, suspend, or deactivate stores" },
         "admin.stores.delete": { "name": "Delete Stores", "description": "Permanently remove stores" },
@@ -278,6 +488,8 @@
         "phone": "Phone Number",
         "joined_at": "Joined At",
         "name": "Name",
+        "username": "Username",
+        "email": "Email Address",
         "type": "Type",
         "contact": "Contact",
         "hiring_status": "Hiring Status",

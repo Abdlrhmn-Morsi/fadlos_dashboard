@@ -268,7 +268,7 @@ const StoresList = () => {
                                                         <img src={store.logo} alt="" className="w-11 h-11 rounded-[4px] object-cover shadow-lg shadow-slate-200 dark:shadow-slate-900/50 border border-white dark:border-slate-700" />
                                                     ) : (
                                                         <div className="w-11 h-11 rounded-[4px] bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
-                                                            {store.name.charAt(0).toUpperCase()}
+                                                            {(isRTL ? store.nameAr || store.name : store.name || store.nameAr).charAt(0).toUpperCase()}
                                                         </div>
                                                     )}
                                                     <div
@@ -276,7 +276,9 @@ const StoresList = () => {
                                                         onClick={() => navigate(`/stores/${store.id}`)}
                                                     >
                                                         <div className="flex items-center gap-1.5 group">
-                                                            <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors hover:underline">{store.name}</div>
+                                                            <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors hover:underline">
+                                                                {isRTL ? store.nameAr || store.name : store.name || store.nameAr}
+                                                            </div>
                                                             {store.isVerified && <BadgeCheck size={16} className="text-blue-500 fill-blue-500/10" />}
                                                         </div>
                                                         <div className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{isRTL ? store.businessType?.ar_name || store.businessType?.en_name : store.businessType?.en_name}</div>
