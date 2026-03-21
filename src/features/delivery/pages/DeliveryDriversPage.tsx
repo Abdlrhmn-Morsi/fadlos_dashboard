@@ -138,13 +138,13 @@ const DeliveryDriversPage = () => {
         try {
             if (activeActionRequest.status === 'TRANSITION_OFFER') {
                 if (!rejectionReason.trim()) {
-                    toast.error(t('rejection_reason_required', 'Rejection reason is required.'));
+                    toast.error(t('common:rejection_reason_required'));
                     return;
                 }
                 await respondToTransition(rejectingRequestId, false, rejectionReason);
             } else {
                 if (!rejectionReason.trim()) {
-                    toast.error(t('rejection_reason_required', 'Rejection reason is required.'));
+                    toast.error(t('common:rejection_reason_required'));
                     return;
                 }
                 await respondToHiringRequest(rejectingRequestId, 'REJECTED', rejectionReason);
@@ -185,7 +185,7 @@ const DeliveryDriversPage = () => {
     return (
         <div className="p-6 space-y-6">
             <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold">{t('delivery:drivers.title', 'Store Drivers')}</h1>
+                <h1 className="text-2xl font-bold">{t('delivery:drivers.title')}</h1>
                 {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
                     <button
                         onClick={async () => {
@@ -286,7 +286,7 @@ const DeliveryDriversPage = () => {
                                 disabled={incomingRequestsData.page === 1}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {t('previous')}
+                                {t('common:previous')}
                             </button>
                             <span className="px-4 py-2 flex items-center">
                                 {incomingRequestsData.page} / {incomingRequestsData.totalPages}
@@ -296,7 +296,7 @@ const DeliveryDriversPage = () => {
                                 disabled={incomingRequestsData.page === incomingRequestsData.totalPages}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {t('next')}
+                                {t('common:next')}
                             </button>
                         </div>
                     )}
@@ -317,7 +317,7 @@ const DeliveryDriversPage = () => {
                                 disabled={sentRequestsData.page === 1}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {t('previous')}
+                                {t('common:previous')}
                             </button>
                             <span className="px-4 py-2 flex items-center">
                                 {sentRequestsData.page} / {sentRequestsData.totalPages}
@@ -327,7 +327,7 @@ const DeliveryDriversPage = () => {
                                 disabled={sentRequestsData.page === sentRequestsData.totalPages}
                                 className="px-4 py-2 border rounded-lg disabled:opacity-50"
                             >
-                                {t('next')}
+                                {t('common:next')}
                             </button>
                         </div>
                     )}
@@ -337,8 +337,8 @@ const DeliveryDriversPage = () => {
 
             <ConfirmModal
                 isOpen={!!cancellingRequestId}
-                title={t('delivery:drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
-                message={t('delivery:drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                title={t('delivery:drivers.drivers.cancel_hiring_title')}
+                message={t('delivery:drivers.drivers.confirm_cancel_hiring')}
                 onConfirm={confirmCancel}
                 onCancel={() => setCancellingRequestId(null)}
             />
@@ -348,20 +348,20 @@ const DeliveryDriversPage = () => {
                     <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-md overflow-hidden transform transition-all duration-300 scale-100 opacity-100">
                         <div className="p-6">
                             <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                                {t('delivery:drivers.reject_confirm_title', 'Reject Application')}
+                                {t('delivery:drivers.reject_confirm_title')}
                             </h3>
                             <p className="text-sm text-slate-500 font-medium mb-4">
-                                {t('delivery:drivers.reject_confirm_message', "Are you sure you want to reject this driver's application? This action will notify the driver.")}
+                                {t('delivery:drivers.reject_confirm_message')}
                             </p>
                             
                                 <div className="mb-4">
                                     <label className="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
-                                        {t('rejection_reason', 'Reason for rejection')} <span className="text-rose-500">*</span>
+                                        {t('common:rejection_reason')} <span className="text-rose-500">*</span>
                                     </label>
                                     <textarea
                                         value={rejectionReason}
                                         onChange={(e) => setRejectionReason(e.target.value)}
-                                        placeholder={t('rejection_reason_placeholder', 'Please provide a reason...')}
+                                        placeholder={t('common:rejection_reason_placeholder')}
                                         className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-none h-24"
                                     />
                                 </div>
@@ -375,14 +375,14 @@ const DeliveryDriversPage = () => {
                                     }}
                                     className="px-5 py-2.5 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-xl font-bold text-sm transition-colors"
                                 >
-                                    {t('common:cancel', 'Cancel')}
+                                    {t('common:cancel')}
                                 </button>
                                 <button
                                     onClick={confirmReject}
                                     disabled={!rejectionReason.trim()}
                                     className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-sm transition-colors shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    {t('dashboard:reject', 'Reject')}
+                                    {t('common:reject')}
                                 </button>
                             </div>
                         </div>
@@ -392,8 +392,8 @@ const DeliveryDriversPage = () => {
 
             <ConfirmModal
                 isOpen={!!acceptingRequestId}
-                title={t('delivery:drivers.drivers.accept_confirm_title', 'Approve Application')}
-                message={t('delivery:drivers.drivers.accept_confirm_message', "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.")}
+                title={t('delivery:drivers.drivers.accept_confirm_title')}
+                message={t('delivery:drivers.drivers.accept_confirm_message')}
                 onConfirm={confirmAccept}
                 onCancel={() => setAcceptingRequestId(null)}
             />
@@ -494,7 +494,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                     </span>
                                                     {req.status === 'REJECTED' && (req.responseReason || req.rejectionReason) && (
                                                         <span className="text-[10px] text-rose-500 max-w-[200px] break-words line-clamp-2" title={req.responseReason || req.rejectionReason}>
-                                                            <span className="font-semibold">{t('common:delivery.drivers.rejection_reason', 'Reason for rejection')}:</span> {req.responseReason || req.rejectionReason}
+                                                            <span className="font-semibold">{t('common:rejection_reason')}:</span> {req.responseReason || req.rejectionReason}
                                                         </span>
                                                     )}
                                                 </div>
@@ -502,7 +502,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                             <td className="px-6 py-4 text-start">
                                                 <div className="max-w-[300px] whitespace-pre-wrap text-slate-500 italic text-xs" title={req.notes}>
                                                     {req.type === 'TO_FREELANCER' && req.initiatedBy === 'DRIVER' 
-                                                        ? t('transitionToFreelancerMsg') 
+                                                        ? t('common:transitionToFreelancerMsg') 
                                                         : (req.notes || '-')}
                                                 </div>
                                             </td>

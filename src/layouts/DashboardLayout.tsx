@@ -184,7 +184,7 @@ const DashboardLayout: React.FC = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const navigate = useNavigate();
-  const { t } = useTranslation(['common', 'subscriptions']);
+  const { t } = useTranslation(['common', 'subscriptions', 'dashboard', 'analytics']);
   const { isRTL } = useLanguage();
   const { user, logout, hasPermission, hasAdminPermission } = useAuth(); // Use AuthContext
   const { hasFeature, usage } = useSubscription();

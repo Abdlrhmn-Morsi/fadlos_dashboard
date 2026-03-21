@@ -60,6 +60,7 @@
         "driver_assigned": "Driver Assigned",
         "out_for_delivery": "On The Way",
         "delivered": "Delivered",
+        "delivered_confirmed": "Delivered (Confirmed)",
         "cancelled": "Cancelled",
         "returned": "Returned"
     },

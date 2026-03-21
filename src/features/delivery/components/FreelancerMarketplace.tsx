@@ -21,7 +21,7 @@ import { useDebounce } from '../../../hooks';
 import { useLanguage } from '../../../contexts/LanguageContext';
 
 const FreelancerMarketplace = () => {
-    const { t } = useTranslation(['common']);
+    const { t } = useTranslation(['common', 'delivery']);
     const { isRTL } = useLanguage();
     const { invalidateCache } = useCache();
     const [freelancers, setFreelancers] = useState<any[]>([]);
@@ -112,7 +112,7 @@ const FreelancerMarketplace = () => {
         setHiringId(userId);
         try {
             await cancelHiringRequest(requestId);
-            toast.success(t('delivery:drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
+            toast.success(t('delivery:drivers.drivers.cancel_hiring_success'));
 
             // Invalidate My Drivers cache
             invalidateCache('delivery_drivers');
@@ -123,7 +123,7 @@ const FreelancerMarketplace = () => {
             console.error('Failed to cancel hiring request', error);
             const errorData = error.response?.data?.message;
             const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
-            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('delivery:drivers.drivers.cancel_hiring_failed', 'Failed to cancel hiring request');
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('delivery:drivers.drivers.cancel_hiring_failed');
             toast.error(message);
         } finally {
             setHiringId(null);
@@ -135,7 +135,7 @@ const FreelancerMarketplace = () => {
         setHiringId(deliveryId);
         try {
             await hireFreelancer(deliveryId);
-            toast.success(t('delivery:drivers.hire_success', 'Freelancer hired successfully'));
+            toast.success(t('delivery:drivers.hire_success'));
 
             // Invalidate My Drivers cache
             invalidateCache('delivery_drivers');
@@ -172,7 +172,7 @@ const FreelancerMarketplace = () => {
                             type="text"
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={t('common.search_placeholder')}
+                            placeholder={t('common:search_placeholder')}
                             className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm"
                         />
                     </div>
@@ -185,7 +185,7 @@ const FreelancerMarketplace = () => {
                         onChange={(e) => handleTownChange(e.target.value)}
                         className="px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm"
                     >
-                        <option value="">{t('common.all_towns', 'All Towns')}</option>
+                        <option value="">{t('common:all_towns')}</option>
                         {towns.map((town: any) => (
                             <option key={town.id} value={town.id}>
                                 {isRTL ? town.arName : town.enName}
@@ -200,7 +200,7 @@ const FreelancerMarketplace = () => {
                         disabled={!filters.townId}
                         className="px-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500/20 text-sm disabled:opacity-50"
                     >
-                        <option value="">{t('common.all_places', 'All Areas')}</option>
+                        <option value="">{t('common:all_places')}</option>
                         {places.map((place: any) => (
                             <option key={place.id} value={place.id}>
                                 {isRTL ? place.arName : place.enName}
@@ -238,7 +238,7 @@ const FreelancerMarketplace = () => {
                                         <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{profile.profile?.user?.name || t('delivery:drivers.unknown_driver')}</h3>
                                         <div className="flex items-center gap-1.5 text-xs text-emerald-600 font-semibold uppercase tracking-wider mt-1">
                                             <Shield size={12} />
-                                            {t('common.verified')}
+                                            {t('common:verified')}
                                         </div>
                                     </div>
                                 </div>
@@ -263,7 +263,7 @@ const FreelancerMarketplace = () => {
                                                 </span>
                                             ))
                                         ) : (
-                                            <span className="text-sm text-slate-400 italic">{t('common.no_location')}</span>
+                                            <span className="text-sm text-slate-400 italic">{t('common:no_location')}</span>
                                         )}
                                     </div>
                                 </div>
@@ -271,7 +271,7 @@ const FreelancerMarketplace = () => {
                                     <Truck size={18} className="text-slate-400" />
                                     <span>
                                         <span className="font-medium text-slate-900 dark:text-slate-200">
-                                            {profile.vehicleType ? t(`vehicle_types.${profile.vehicleType.toLowerCase()}`) : '---'}
+                                            {profile.vehicleType ? t(`common:vehicle_types.${profile.vehicleType.toLowerCase()}`) : '---'}
                                         </span>
                                         {profile.vehiclePlateNumber && <span className="text-slate-300 dark:text-slate-600 mx-2">|</span>}
                                         {profile.vehiclePlateNumber}
@@ -286,7 +286,7 @@ const FreelancerMarketplace = () => {
                                     className="w-full py-3 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed"
                                 >
                                     <CheckCircle size={20} />
-                                    {t('common.alreadyHired', 'Already Hired')}
+                                    {t('common:alreadyHired')}
                                 </button>
                             ) : profile.hiringStatus === 'PENDING' ? (
                                 <div className="flex gap-2">
@@ -295,13 +295,13 @@ const FreelancerMarketplace = () => {
                                         className="flex-1 py-3 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 font-bold rounded-xl transition-all flex items-center justify-center gap-2 cursor-not-allowed"
                                     >
                                         <CheckCircle size={20} />
-                                        {t('common.requestSent', 'Request Sent')}
+                                        {t('common:requestSent')}
                                     </button>
                                     <button
                                         onClick={() => handleCancelRequest(profile.hiringRequestId, profile.id)}
                                         disabled={hiringId === profile.id}
                                         className="px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 font-bold rounded-xl transition-all flex items-center justify-center disabled:opacity-50 active:scale-[0.98]"
-                                        title={t('delivery:drivers.cancel_hiring', 'Cancel Application')}
+                                        title={t('delivery:drivers.cancel_hiring')}
                                     >
                                         {hiringId === profile.id ? (
                                             <div className="w-5 h-5 border-2 border-rose-600/30 border-t-rose-600 rounded-full animate-spin" />
@@ -321,7 +321,7 @@ const FreelancerMarketplace = () => {
                                     ) : (
                                         <CheckCircle size={20} />
                                     )}
-                                    {t('common.sendRequest', 'Send Request')}
+                                    {t('common:sendRequest')}
                                 </button>
                             )}
                             </div>
@@ -333,8 +333,8 @@ const FreelancerMarketplace = () => {
                     <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                         <Search size={40} className="text-slate-300" />
                     </div>
-                    <p className="text-lg font-medium text-slate-500 dark:text-slate-400 mb-2">{t('common.no_results')}</p>
-                    <p className="text-sm max-w-xs text-center">{t('adjustSearch', 'Try adjusting your search criteria to find available freelancers.')}</p>
+                    <p className="text-lg font-medium text-slate-500 dark:text-slate-400 mb-2">{t('common:no_results')}</p>
+                    <p className="text-sm max-w-xs text-center">{t('common:adjustSearch')}</p>
                 </div>
             )}
 
@@ -345,7 +345,7 @@ const FreelancerMarketplace = () => {
                         disabled={page === 1}
                         className="px-4 py-2 border rounded-lg disabled:opacity-50"
                     >
-                        {isRTL ? 'التالي' : 'Previous'}
+                        {t('common:previous')}
                     </button>
                     <span className="px-4 py-2 flex items-center">
                         {page} / {totalPages}
@@ -355,7 +355,7 @@ const FreelancerMarketplace = () => {
                         disabled={page === totalPages}
                         className="px-4 py-2 border rounded-lg disabled:opacity-50"
                     >
-                        {isRTL ? 'السابق' : 'Next'}
+                        {t('common:next')}
                     </button>
                 </div>
             )}
@@ -363,8 +363,8 @@ const FreelancerMarketplace = () => {
             {isCancelModalOpen && (
                 <ConfirmModal
                     isOpen={isCancelModalOpen}
-                    title={t('delivery:drivers.drivers.cancel_hiring_title', 'Cancel Hiring Request')}
-                    message={t('delivery:drivers.drivers.confirm_cancel_hiring', 'Are you sure you want to cancel this hiring request?')}
+                    title={t('delivery:drivers.drivers.cancel_hiring_title')}
+                    message={t('delivery:drivers.drivers.confirm_cancel_hiring')}
                     onConfirm={confirmCancelRequest}
                     onCancel={() => {
                         setIsCancelModalOpen(false);

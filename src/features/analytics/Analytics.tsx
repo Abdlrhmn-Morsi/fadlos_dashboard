@@ -49,7 +49,7 @@ interface StatCardProps {
 
 const StatCard: React.FC<StatCardProps> = ({ title, value, subValue, growth, icon: Icon, color }) => {
     const { isRTL } = useLanguage();
-    const { t } = useTranslation(['common', 'dashboard']);
+    const { t } = useTranslation(['common', 'dashboard', 'analytics']);
 
     const colorClasses = {
         emerald: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800',
@@ -88,7 +88,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subValue, growth, ico
 };
 
 const Analytics: React.FC = () => {
-    const { t } = useTranslation(['common', 'dashboard']);
+    const { t } = useTranslation(['analytics', 'common', 'dashboard', 'orders']);
     const { isDark } = useTheme();
     const { isRTL } = useLanguage();
     const [period, setPeriod] = useState('7d');
@@ -452,7 +452,7 @@ const Analytics: React.FC = () => {
                                         {isRTL ? product.nameAr || product.name : product.name}
                                     </h4>
                                     <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">
-                                        {product.totalSold} {t('unitsSold')}
+                                        {product.totalSold} {t('common:unitsSold')}
                                     </p>
                                 </div>
                                 <div className={clsx("text-right font-black text-slate-900 dark:text-slate-100", isRTL && "text-left")}>
@@ -466,7 +466,7 @@ const Analytics: React.FC = () => {
                 {/* Order Status Distribution */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-8">
                     <h3 className={clsx("text-lg font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-8", isRTL && "text-right")}>
-                        {t('orderStatus')}
+                        {t('orders:status')}
                     </h3>
                     <div className="space-y-6">
                         {[

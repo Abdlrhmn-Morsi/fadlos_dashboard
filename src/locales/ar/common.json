@@ -1,6 +1,9 @@
 {
-    "no_results": "لا توجد نتائج",
-    "click_to_upload": "انقر للتحميل",
+    "no_results": "لم يتم العثور على نتائج",
+    "noDataFound": "لم يتم العثور على سجلات",
+    "showingResults": "عرض {{count}} نتيجة",
+    "click_to_upload": "اضغط للرفع",
+    "upload": "رفع",
     "leave_blank_to_keep": "اتركه فارغاً للإبقاء عليه دون تغيير",
     "error_fetching_data": "فشل تحميل البيانات",
     "not_found": "البيانات غير موجودة",
@@ -19,11 +22,14 @@
     "all_places": "كل المناطق",
     "no_location": "لا توجد مناطق عمل محددة",
     "search_placeholder": "البحث بالاسم، البريد أو الهاتف...",
+    "select_options": "اختر من القائمة...",
     "hiring": "يوظف",
     "not_hiring": "لا يوظف",
     "date": "التاريخ",
     "plan": "الباقة",
-    "currencySymbol": "ر.س",
+    "currencySymbol": "ج.م",
+    "required": "مطلوب",
+    "sortOrder": "ترتيب العرض",
     "noData": "لا توجد بيانات متاحة",
     "viewAll": "عرض الكل",
     "periodRevenue": "أرباح الفترة",
@@ -41,7 +47,6 @@
     "storeVerification": "توثيق المتاجر",
     "driverVerification": "توثيق المناديب",
     "reportedReviews": "التقييمات المبلغ عنها",
-    "deliveryDashboard": "لوحة المناديب",
     "storeCurrency": "ج.م",
     "systemCurrency": "دولار",
     "cities": "المدن",
@@ -62,6 +67,23 @@
     "employee": "موظف",
     "delivery": "كابتن توصيل",
     "status": "الحالة",
+    "confirmed": "مؤكد",
+    "unitsSold": "وحدة مباعة",
+    "thisMonth": "هذا الشهر",
+    "manageYourStore": "إدارة متجرك",
+    "updateStoreDirectly": "قم بتحديث بروفايل متجرك، موقعه، وإعداداته مباشرة.",
+    "manageEmployeesDesc": "إدارة طاقم عمل المتجر وصلاحيات وصولهم",
+    "addEmployee": "إضافة موظف",
+    "createEmployee": "إنشاء موظف جديد",
+    "editEmployee": "تعديل الموظف",
+    "allBranches": "جميع الفروع",
+    "selectRole": "اختر دوراً...",
+    "assignToBranch": "تعيين لفرع",
+    "branchAssignmentDesc": "اتركه فارغاً للسماح للموظف بإدارة جميع الفروع",
+    "employeeActiveDesc": "السماح لهذا المستخدم بتسجيل الدخول",
+    "branch": "الفرع",
+    "role": "الدور",
+    "contact": "التواصل",
     "active": "نشط",
     "inactive": "غير نشط",
     "confirmStatusChange": "تأكيد تغيير الحالة",
@@ -75,7 +97,10 @@
     "allStatuses": "جميع الحالات",
     "allCities": "جميع المدن",
     "pending": "قيد الانتظار",
-    "actions": "إجراءات",
+    "actions": "الإجراءات",
+    "view": "عرض",
+    "edit": "تعديل",
+    "remove": "إزالة",
     "updateStatus": "تحديث الحالة",
     "operationalState": "الحالة التشغيلية",
     "reasonNotes": "السبب / ملاحظات",
@@ -168,11 +193,6 @@
     "manageAdminEmployeesDesc": "إدارة أعضاء الفريق الإداري وأدوار وصولهم",
     "addAdminEmployee": "إضافة موظف إداري",
     "searchEmployeePlaceholder": "بحث بالاسم أو البريد أو الهاتف...",
-    "role": "الدور",
-    "contact": "معلومات التواصل",
-    "noDataFound": "لا توجد سجلات",
-    "errorFetchingData": "فشل تحميل البيانات",
-    "edit": "تعديل",
     "deactivate": "تعطيل",
     "activate": "تفعيل",
     "delete": "حذف",
@@ -220,39 +240,166 @@
     "User Management": "إدارة المستخدمين",
     "Subscriptions & Plans": "الاشتراكات والخطط",
     "permissions": {
-        "admin.stores.view": { "name": "عرض المتاجر", "description": "عرض قائمة المتاجر وتفاصيلها" },
-        "admin.stores.update_status": { "name": "تحديث حالة المتجر", "description": "تفعيل أو تعليق أو إلغاء تفعيل المتاجر" },
-        "admin.stores.delete": { "name": "حذف المتاجر", "description": "حذف المتاجر نهائيًا" },
-        "admin.store_verification.view": { "name": "عرض تحققات المتاجر", "description": "عرض طلبات التحقق المعلقة" },
-        "admin.store_verification.manage": { "name": "إدارة تحققات المتاجر", "description": "قبول أو رفض تحققات المتاجر" },
-        "admin.driver_verification.view": { "name": "عرض تحققات السائقين", "description": "عرض طلبات السائقين المعلقة" },
-        "admin.driver_verification.manage": { "name": "إدارة تحققات السائقين", "description": "قبول أو رفض تحققات السائقين" },
-        "admin.reported_reviews.view": { "name": "عرض التقييمات المبلغ عنها", "description": "عرض التقييمات التي أبلغ عنها أصحاب المتاجر" },
-        "admin.reported_reviews.manage": { "name": "إدارة التقييمات المبلغ عنها", "description": "حذف أو إغلاق التقييمات المبلغ عنها" },
-        "admin.cities.view": { "name": "عرض المدن", "description": "عرض مدن النظام" },
-        "admin.cities.manage": { "name": "إدارة المدن", "description": "إضافة وتعديل وحذف المدن" },
-        "admin.towns.view": { "name": "عرض المناطق", "description": "عرض المناطق والأحياء" },
-        "admin.towns.manage": { "name": "إدارة المناطق", "description": "إضافة وتعديل وحذف المناطق" },
-        "admin.business_types.view": { "name": "عرض أنواع الأعمال", "description": "عرض أنواع الأعمال" },
-        "admin.business_types.manage": { "name": "إدارة أنواع الأعمال", "description": "إضافة وتعديل وحذف أنواع الأعمال" },
-        "admin.business_categories.view": { "name": "عرض تصنيفات الأعمال", "description": "عرض تصنيفات الأعمال" },
-        "admin.business_categories.manage": { "name": "إدارة تصنيفات الأعمال", "description": "إضافة وتعديل وحذف تصنيفات الأعمال" },
-        "admin.users.view": { "name": "عرض المستخدمين", "description": "عرض جميع مستخدمي النظام" },
-        "admin.users.manage": { "name": "إدارة المستخدمين", "description": "تعديل المستخدمين وتغيير الحالة" },
-        "admin.plans.view": { "name": "عرض الخطط", "description": "عرض خطط الاشتراك" },
-        "admin.plans.manage": { "name": "إدارة الخطط", "description": "إنشاء وتعديل خطط الاشتراك" },
-        "admin.subscriptions.view": { "name": "عرض الاشتراكات", "description": "عرض اشتراكات المتاجر وحدودها" },
-        "admin.subscriptions.manage": { "name": "إدارة الاشتراكات", "description": "تعديل أو منح اشتراكات المتاجر" },
-        "admin.employees.view": { "name": "عرض الموظفين الإداريين", "description": "عرض قائمة موظفي الإدارة" },
-        "admin.employees.manage": { "name": "إدارة الموظفين الإداريين", "description": "إضافة وتعديل وحذف موظفي الإدارة" },
-        "admin.roles.manage": { "name": "إدارة أدوار المسؤولين", "description": "إنشاء وضبط مجموعات الصلاحيات" },
-        "admin.app_updates.manage": { "name": "إدارة تحديثات التطبيق", "description": "ضبط متطلبات إصدار التطبيق" },
-        "admin.dashboard.view": { "name": "عرض لوحة التحليلات", "description": "عرض لوحة الإحصائيات الشاملة" }
+        "admin.stores.view": {
+            "name": "عرض المتاجر",
+            "description": "عرض قائمة المتاجر وتفاصيلها"
+        },
+        "admin.stores.update_status": {
+            "name": "تحديث حالة المتجر",
+            "description": "تفعيل أو تعليق أو إلغاء تفعيل المتاجر"
+        },
+        "admin.stores.delete": {
+            "name": "حذف المتاجر",
+            "description": "حذف المتاجر نهائيًا"
+        },
+        "admin.store_verification.view": {
+            "name": "عرض تحققات المتاجر",
+            "description": "عرض طلبات التحقق المعلقة"
+        },
+        "admin.store_verification.manage": {
+            "name": "إدارة تحققات المتاجر",
+            "description": "قبول أو رفض تحققات المتاجر"
+        },
+        "admin.driver_verification.view": {
+            "name": "عرض تحققات السائقين",
+            "description": "عرض طلبات السائقين المعلقة"
+        },
+        "admin.driver_verification.manage": {
+            "name": "إدارة تحققات السائقين",
+            "description": "قبول أو رفض تحققات السائقين"
+        },
+        "admin.reported_reviews.view": {
+            "name": "عرض التقييمات المبلغ عنها",
+            "description": "عرض التقييمات التي أبلغ عنها أصحاب المتاجر"
+        },
+        "admin.reported_reviews.manage": {
+            "name": "إدارة التقييمات المبلغ عنها",
+            "description": "حذف أو إغلاق التقييمات المبلغ عنها"
+        },
+        "admin.cities.view": {
+            "name": "عرض المدن",
+            "description": "عرض مدن النظام"
+        },
+        "admin.cities.manage": {
+            "name": "إدارة المدن",
+            "description": "إضافة وتعديل وحذف المدن"
+        },
+        "admin.towns.view": {
+            "name": "عرض المناطق",
+            "description": "عرض المناطق والأحياء"
+        },
+        "admin.towns.manage": {
+            "name": "إدارة المناطق",
+            "description": "إضافة وتعديل وحذف المناطق"
+        },
+        "admin.business_types.view": {
+            "name": "عرض أنواع الأعمال",
+            "description": "عرض أنواع الأعمال"
+        },
+        "admin.business_types.manage": {
+            "name": "إدارة أنواع الأعمال",
+            "description": "إضافة وتعديل وحذف أنواع الأعمال"
+        },
+        "admin.business_categories.view": {
+            "name": "عرض تصنيفات الأعمال",
+            "description": "عرض تصنيفات الأعمال"
+        },
+        "admin.business_categories.manage": {
+            "name": "إدارة تصنيفات الأعمال",
+            "description": "إضافة وتعديل وحذف تصنيفات الأعمال"
+        },
+        "admin.users.view": {
+            "name": "عرض المستخدمين",
+            "description": "عرض جميع مستخدمي النظام"
+        },
+        "admin.users.manage": {
+            "name": "إدارة المستخدمين",
+            "description": "تعديل المستخدمين وتغيير الحالة"
+        },
+        "admin.plans.view": {
+            "name": "عرض الخطط",
+            "description": "عرض خطط الاشتراك"
+        },
+        "admin.plans.manage": {
+            "name": "إدارة الخطط",
+            "description": "إنشاء وتعديل خطط الاشتراك"
+        },
+        "admin.subscriptions.view": {
+            "name": "عرض الاشتراكات",
+            "description": "عرض اشتراكات المتاجر وحدودها"
+        },
+        "admin.subscriptions.manage": {
+            "name": "إدارة الاشتراكات",
+            "description": "تعديل أو منح اشتراكات المتاجر"
+        },
+        "admin.employees.view": {
+            "name": "عرض الموظفين الإداريين",
+            "description": "عرض قائمة موظفي الإدارة"
+        },
+        "admin.employees.manage": {
+            "name": "إدارة الموظفين الإداريين",
+            "description": "إضافة وتعديل وحذف موظفي الإدارة"
+        },
+        "admin.roles.manage": {
+            "name": "إدارة أدوار المسؤولين",
+            "description": "إنشاء وضبط مجموعات الصلاحيات"
+        },
+        "admin.app_updates.manage": {
+            "name": "إدارة تحديثات التطبيق",
+            "description": "ضبط متطلبات إصدار التطبيق"
+        },
+        "admin.dashboard.view": {
+            "name": "عرض لوحة التحليلات",
+            "description": "عرض لوحة الإحصائيات الشاملة"
+        }
     },
     "fields": {
         "status": "الحالة",
         "availability": "التوفر",
         "phone": "رقم الهاتف",
-        "joined_at": "تاريخ الانضمام"
-    }
+        "joined_at": "تاريخ الانضمام",
+        "name": "الاسم",
+        "type": "النوع",
+        "contact": "التواصل",
+        "hiring_status": "حالة التوظيف",
+        "resignation_reason": "سبب الاستقالة",
+        "active_orders": "الطلبات النشطة",
+        "notes": "ملاحظات",
+        "date": "التاريخ",
+        "avatar": "الصورة الشخصية",
+        "vehicle_type": "نوع المركبة"
+    },
+    "am": "ص",
+    "pm": "م",
+    "management": "الإدارة",
+    "marketingAndCustomers": "التسويق والعملاء",
+    "team": "الفريق",
+    "products": "المنتجات",
+    "categories": "الأصناف",
+    "addons": "الإضافات",
+    "orders": "الطلبات",
+    "feedback": "التقييمات",
+    "promoCodes": "أكواد الخصم",
+    "clients": "العملاء",
+    "followers": "المتابعون",
+    "employees": "حسابات الموظفين",
+    "roles": "الأدوار",
+    "deliveryDrivers": "المناديب",
+    "branches": "الفروع",
+    "deliveryAreas": "مناطق التوصيل",
+    "revenue": "الإيرادات",
+    "analytics": "التحليلات",
+    "settlements": "تحصيل المبالغ النقدية",
+    "deliveryDashboard": "لوحة تحكم المناديب",
+    "results": "نتائج",
+    "no_results_for": "لا توجد نتائج لـ \"{{term}}\"",
+    "previous": "السابق",
+    "next": "التالي",
+    "rejection_reason_placeholder": "يرجى تقديم سبب...",
+    "rejection_reason_required": "سبب الرفض مطلوب.",
+    "transitionToFreelancerMsg": "طلب التحول إلى مستقل",
+    "sendRequest": "إرسال طلب",
+    "requestSent": "تم إرسال الطلب",
+    "alreadyHired": "تم التوظيف مسبقاً",
+    "adjustSearch": "حاول تعديل معايير البحث للعثور على سائقين مستقلين متاحين."
 }

@@ -423,7 +423,7 @@ export const BranchesList: React.FC = () => {
 
                             <h3 className="text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight">
                                 {searchTerm
-                                    ? (isRTL ? `لا توجد نتائج لـ "${searchTerm}"` : `No results for "${searchTerm}"`)
+                                    ? t('common:no_results_for', { term: searchTerm })
                                     : t('noBranches')}
                             </h3>
 

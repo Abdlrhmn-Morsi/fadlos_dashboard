@@ -60,6 +60,7 @@
         "driver_assigned": "تم تعيين سائق",
         "out_for_delivery": "جاري التوصيل",
         "delivered": "تم التوصيل",
+        "delivered_confirmed": "تم التوصيل (مؤكد)",
         "cancelled": "ملغي",
         "returned": "مرتجع"
     },

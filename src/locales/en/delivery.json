@@ -1,5 +1,7 @@
 {
   "drivers": {
+    "title": "Store Drivers",
+    "add_new": "Add Driver",
     "verification": {
       "title": "Driver Verification",
       "desc": "Review and approve driver identity documents.",
@@ -24,10 +26,12 @@
     "drivers": {
       "cancel_hiring_success": "Hiring request cancelled successfully",
       "cancel_hiring_failed": "Failed to cancel hiring request",
-      "cancel_hiring_title": "Cancel Hiring Request",
-      "confirm_cancel_hiring": "Are you sure you want to cancel this hiring request?",
-      "accept_resignation_confirm": "Are you sure you want to approve this resignation?",
-      "reject_resignation_confirm": "Are you sure you want to reject this resignation?"
+      "accept_resignation_title": "Accept Resignation",
+      "accept_resignation_confirm": "Are you sure you want to accept this driver's resignation?",
+      "reject_resignation_title": "Reject Resignation",
+      "reject_resignation_confirm": "Are you sure you want to reject this driver's resignation?",
+      "accept_confirm_title": "Approve Application",
+      "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list."
     },
     "identity_verification": "Identity Verification",
     "id_front": "ID Front",
@@ -39,9 +43,49 @@
     "vehicle_type": "Vehicle Type",
     "plate_number": "Plate Number",
     "hiring_status": {
-        "pending": "Pending",
-        "resignation_pending": "Resignation Pending"
-    }
+      "pending": "Pending",
+      "resignation_pending": "Resignation Pending",
+      "accepted": "Accepted",
+      "rejected": "Rejected",
+      "transition_offer": "Transition Offer"
+    },
+    "marketplace": "Marketplace",
+    "search_placeholder": "Search by name or contact...",
+    "my_drivers": "My Drivers",
+    "active_drivers": "Active",
+    "resignations": "Resignations",
+    "list_title": "Drivers List",
+    "manage_desc": "Manage your store drivers and their performance.",
+    "status_updated": "Driver status updated successfully",
+    "resignation_accepted": "Resignation accepted",
+    "resignation_rejected": "Resignation rejected",
+    "remove_title": "Remove Driver",
+    "remove_confirm_message": "Are you sure you want to remove this driver from your store? This action cannot be undone.",
+    "remove_success": "Driver removed successfully",
+    "reject_confirm_title": "Reject Application",
+    "reject_confirm_message": "Are you sure you want to reject this driver's application?",
+    "find_freelancers": "Find Freelancers",
+    "marketplace_desc": "Search for available freelancer drivers in your area.",
+    "unknown_driver": "Unknown Driver",
+    "cancel_hiring": "Cancel Application",
+    "hire_success": "Freelancer hired successfully",
+    "history": {
+      "title": "History",
+      "access_expires": "Access expires in {{days}} days"
+    },
+    "rejected_title": "Verification Rejected",
+    "edit_title": "Edit Driver",
+    "create_title": "Add New Driver",
+    "service_areas": "Service Areas",
+    "service_areas_desc": "Select towns and specific places the driver will serve",
+    "select_towns": "Select Towns",
+    "select_places": "Select Places",
+    "select_town_first": "Please select a town first",
+    "no_places_found": "No places found for selected towns",
+    "locked_verification": "Read Only",
+    "selfie_desc": "Selfie with ID card",
+    "confirm_update_title": "Sensitive Update",
+    "confirm_update_message": "Updating your profile information will set your verification status back to UNDER REVIEW. Do you want to continue?"
   },
   "authenticityCheck": "Document Authenticity Check",
   "finalAuditDecision": "Final Audit Decision",

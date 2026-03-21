@@ -17,7 +17,7 @@ import { ConfirmModal } from '../../../components/ConfirmModal';
 import { useCache } from '../../../contexts/CacheContext';
 
 const DeliveryDriverForm = () => {
-    const { t } = useTranslation(['common']);
+    const { t } = useTranslation(['common', 'delivery']);
     const { invalidateCache } = useCache();
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
@@ -178,12 +178,12 @@ const DeliveryDriverForm = () => {
                     });
                 }
             } else {
-                toast.error(t('common.not_found', 'Driver not found'));
+                toast.error(t('common:not_found'));
                 navigate(backUrl);
             }
         } catch (error) {
             console.error('Failed to fetch driver:', error);
-            toast.error(t('common.error', 'Failed to load driver details'));
+            toast.error(t('common:error'));
         } finally {
             setLoading(false);
         }
@@ -235,7 +235,7 @@ const DeliveryDriverForm = () => {
                 }
 
                 await updateStoreDriver(id, data);
-                toast.success(t('common.update_success', 'Driver updated successfully'));
+                toast.success(t('common:update_success'));
             } else {
                 await createStoreDriver(data);
                 toast.success(t('delivery:drivers.hire_success'));
@@ -249,7 +249,7 @@ const DeliveryDriverForm = () => {
             console.error('Failed to save driver', error);
             const errorData = error.response?.data?.message;
             const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
-            const message = errorKey ? String(t(errorKey, errorKey)) : t('common.error', 'Failed to save driver');
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common:error');
             toast.error(message as string);
         } finally {
             setSubmitting(false);
@@ -283,7 +283,7 @@ const DeliveryDriverForm = () => {
                                 <Icon size={32} />
                             </div>
                             <p className="mb-1 text-sm text-slate-700 dark:text-slate-200">
-                                <span className="font-semibold">{t('common.click_to_upload', 'Click to upload')}</span>
+                                <span className="font-semibold">{t('common:click_to_upload')}</span>
                             </p>
                             <p className="text-xs text-slate-500 dark:text-slate-400">PNG, JPG (MAX. 5MB)</p>
                         </div>
@@ -306,7 +306,7 @@ const DeliveryDriverForm = () => {
                         <XCircle size={20} className="text-rose-500 shrink-0" />
                         <div className="space-y-1">
                             <p className="text-sm font-bold text-rose-800 dark:text-rose-300 uppercase tracking-tight">
-                                {t('delivery:drivers.rejected_title', 'Verification Rejected')}
+                                {t('delivery:drivers.rejected_title')}
                             </p>
                             <p className="text-sm text-rose-600 dark:text-rose-400 font-medium">
                                 {rejectionReason}
@@ -325,7 +325,7 @@ const DeliveryDriverForm = () => {
                         </Link>
                         <div>
                             <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
-                                {isEditMode ? t('delivery:drivers.edit_title', 'Edit Driver') : t('delivery:drivers.create_title')}
+                                {isEditMode ? t('delivery:drivers.edit_title') : t('delivery:drivers.create_title')}
                             </h1>
                             {isEditMode && verificationStatus && (
                                 <div className="flex items-center gap-3 mt-1">
@@ -335,7 +335,7 @@ const DeliveryDriverForm = () => {
                                             verificationStatus === 'REJECTED' ? "bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" :
                                                 "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
                                     )}>
-                                        {t(`verificationStatuses.${verificationStatus}`)}
+                                        {t(`common:verificationStatuses.${verificationStatus}`)}
                                     </span>
                                     {verificationStatus === 'UNDER_REVIEW' && (
                                         <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 italic">
@@ -358,7 +358,7 @@ const DeliveryDriverForm = () => {
                         ) : (
                             <Save size={20} />
                         )}
-                        <span>{t('common.save', 'Save')}</span>
+                        <span>{t('common:save')}</span>
                     </button>
                 </div>
 
@@ -369,7 +369,7 @@ const DeliveryDriverForm = () => {
                             {/* Avatar Upload */}
                             <div className="flex flex-col items-center gap-4">
                                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                    {t('fields.avatar', 'Profile Photo')} <span className="text-rose-500">*</span>
+                                    {t('common:fields.avatar')} <span className="text-rose-500">*</span>
                                 </label>
                                 <div className="relative group">
                                     <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 flex items-center justify-center relative">
@@ -399,7 +399,7 @@ const DeliveryDriverForm = () => {
                             <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div className="space-y-1.5">
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                        {t('fields.name')} <span className="text-rose-500">*</span>
+                                        {t('common:fields.name')} <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -411,7 +411,7 @@ const DeliveryDriverForm = () => {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                        {t('fields.username')} <span className="text-rose-500">*</span>
+                                        {t('common:fields.username')} <span className="text-rose-500">*</span>
                                     </label>
                                     <input
                                         type="text"
@@ -423,7 +423,7 @@ const DeliveryDriverForm = () => {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                        {t('fields.email')} <span className="text-rose-500">*</span>
+                                        {t('common:fields.email')} <span className="text-rose-500">*</span>
                                     </label>
                                     <div className="relative">
                                         <Mail size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
@@ -441,7 +441,7 @@ const DeliveryDriverForm = () => {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                        {t('fields.phone')}
+                                        {t('common:fields.phone')}
                                     </label>
                                     <div className="relative">
                                         <Phone size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
@@ -458,7 +458,7 @@ const DeliveryDriverForm = () => {
                                 </div>
                                 <div className="space-y-1.5">
                                     <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                                        {t('fields.password')} {!isEditMode && <span className="text-rose-500">*</span>}
+                                        {t('common:password')} {!isEditMode && <span className="text-rose-500">*</span>}
                                     </label>
                                     <div className="relative">
                                         <Lock size={18} className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} />
@@ -468,7 +468,7 @@ const DeliveryDriverForm = () => {
                                             minLength={6}
                                             value={formData.password}
                                             onChange={e => setFormData({ ...formData, password: e.target.value })}
-                                            placeholder={isEditMode ? t('common.leave_blank_to_keep', 'Leave blank to keep unchanged') : ''}
+                                            placeholder={isEditMode ? t('common:leave_blank_to_keep') : ''}
                                             className={clsx(
                                                 "w-full py-2.5 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all",
                                                 isRTL ? "pr-10 pl-12" : "pl-10 pr-12"
@@ -491,7 +491,7 @@ const DeliveryDriverForm = () => {
 
                         <div className="space-y-1.5 pt-4 border-t border-slate-100 dark:border-slate-800">
                             <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
-                                {t('fields.vehicle_type', 'Vehicle Type')}
+                                {t('common:fields.vehicle_type')}
                             </label>
                             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
                                 {Object.values(VehicleType).map((type) => {
@@ -517,7 +517,7 @@ const DeliveryDriverForm = () => {
                                         >
                                             <VehicleIcon size={24} className={isSelected ? "text-indigo-600 dark:text-indigo-400" : "text-slate-400 shadow-sm"} />
                                             <span className="text-xs font-semibold break-words text-center">
-                                                {t(`vehicle_types.${type}`, type)}
+                                                {t(`common:vehicle_types.${type.toLowerCase()}`)}
                                             </span>
                                         </button>
                                     );
@@ -534,10 +534,10 @@ const DeliveryDriverForm = () => {
                             </div>
                             <div>
                                 <h3 className="text-lg font-bold text-slate-900 dark:text-white">
-                                    {t('delivery:drivers.service_areas', 'Service Areas')}
+                                    {t('delivery:drivers.service_areas')}
                                 </h3>
                                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                                    {t('delivery:drivers.service_areas_desc', 'Select towns and specific places the driver will serve')}
+                                    {t('delivery:drivers.service_areas_desc')}
                                 </p>
                             </div>
                         </div>
@@ -547,7 +547,7 @@ const DeliveryDriverForm = () => {
                             <div className="space-y-4" ref={townRef}>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
                                     <MapPin size={16} className="text-indigo-500" />
-                                    {t('delivery:drivers.select_towns', 'Select Towns')}
+                                    {t('delivery:drivers.select_towns')}
                                 </label>
 
                                 <div className="relative">
@@ -580,7 +580,7 @@ const DeliveryDriverForm = () => {
                                                     })}
                                                 </div>
                                             ) : (
-                                                <span className="text-slate-500">{t('common.select_options', 'Select options...')}</span>
+                                                <span className="text-slate-500">{t('common:select_options')}</span>
                                             )}
                                         </div>
                                         <ChevronDown size={18} className={clsx("text-slate-400 transition-transform", townDropdownOpen && "rotate-180")} />
@@ -594,7 +594,7 @@ const DeliveryDriverForm = () => {
                                                     <input
                                                         type="text"
                                                         autoFocus
-                                                        placeholder={t('common.search', 'Search...')}
+                                                        placeholder={t('common:search')}
                                                         value={townSearch}
                                                         onChange={(e) => setTownSearch(e.target.value)}
                                                         className={clsx(
@@ -631,7 +631,7 @@ const DeliveryDriverForm = () => {
                                                         ))
                                                 ) : (
                                                     <div className="py-8 text-center text-slate-500 text-sm">
-                                                        {t('common.no_results', 'No results found')}
+                                                        {t('common:no_results')}
                                                     </div>
                                                 )}
                                             </div>
@@ -644,7 +644,7 @@ const DeliveryDriverForm = () => {
                             <div className="space-y-4" ref={placeRef}>
                                 <label className="flex items-center gap-2 text-sm font-bold text-slate-700 dark:text-slate-300">
                                     <MapPin size={16} className="text-indigo-500" />
-                                    {t('delivery:drivers.select_places', 'Select Places')}
+                                    {t('delivery:drivers.select_places')}
                                 </label>
 
                                 <div className="relative">
@@ -681,8 +681,8 @@ const DeliveryDriverForm = () => {
                                             ) : (
                                                 <span className="text-slate-500">
                                                     {formData.townIds.length === 0
-                                                        ? t('delivery:drivers.select_town_first', 'Please select a town first')
-                                                        : t('common.select_options', 'Select options...')}
+                                                        ? t('delivery:drivers.select_town_first')
+                                                        : t('common:select_options')}
                                                 </span>
                                             )}
                                         </div>
@@ -697,7 +697,7 @@ const DeliveryDriverForm = () => {
                                                     <input
                                                         type="text"
                                                         autoFocus
-                                                        placeholder={t('common.search', 'Search...')}
+                                                        placeholder={t('common:search')}
                                                         value={placeSearch}
                                                         onChange={(e) => setPlaceSearch(e.target.value)}
                                                         className={clsx(
@@ -734,7 +734,7 @@ const DeliveryDriverForm = () => {
                                                         ))
                                                 ) : (
                                                     <div className="py-8 text-center text-slate-500 text-sm">
-                                                        {t('delivery:drivers.no_places_found', 'No places found for selected towns')}
+                                                        {t('delivery:drivers.no_places_found')}
                                                     </div>
                                                 )}
                                             </div>
@@ -754,7 +754,7 @@ const DeliveryDriverForm = () => {
                             </h3>
                             {isEditMode && verificationStatus !== 'REJECTED' && (
                                 <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-slate-200 dark:border-slate-700">
-                                    {t('delivery:drivers.locked_verification', 'Read Only')}
+                                    {t('delivery:drivers.locked_verification')}
                                 </span>
                             )}
                         </div>
@@ -787,8 +787,8 @@ const DeliveryDriverForm = () => {
 
             <ConfirmModal
                 isOpen={showConfirmModal}
-                title={t('delivery:drivers.confirm_update_title', 'Sensitive Update')}
-                message={t('delivery:drivers.confirm_update_message', 'Updating your profile information will set your verification status back to UNDER REVIEW. Do you want to continue?')}
+                title={t('delivery:drivers.confirm_update_title')}
+                message={t('delivery:drivers.confirm_update_message')}
                 onConfirm={() => {
                     setShowConfirmModal(false);
                     handleSubmit({ preventDefault: () => { } } as any); // Trigger submit again, now with modal bypassed

@@ -336,7 +336,7 @@ const AddonForm = () => {
                                 ) : (
                                     <label className={clsx("w-32 h-32 flex flex-col items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-2xl transition-all group", !isReadOnly ? "cursor-pointer hover:border-indigo-500 hover:bg-slate-50 dark:hover:bg-slate-800" : "cursor-not-allowed opacity-50")}>
                                         <Upload className="w-8 h-8 text-slate-300 group-hover:text-indigo-500 mb-2" />
-                                        <span className="text-xs font-medium text-slate-400 group-hover:text-indigo-500">Upload</span>
+                                        <span className="text-xs font-medium text-slate-400 group-hover:text-indigo-500">{t('common:upload')}</span>
                                         {!isReadOnly && <input type="file" className="hidden" accept="image/*" onChange={handleImageChange} />}
                                     </label>
                                 )}

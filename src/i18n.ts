@@ -42,6 +42,8 @@ import subscriptionsEN from './locales/en/subscriptions.json';
 import subscriptionsAR from './locales/ar/subscriptions.json';
 import deliveryEN from './locales/en/delivery.json';
 import deliveryAR from './locales/ar/delivery.json';
+import analyticsEN from './locales/en/analytics.json';
+import analyticsAR from './locales/ar/analytics.json';
 
 
 const resources = {
@@ -66,6 +68,7 @@ const resources = {
         addons: addonsEN,
         subscriptions: subscriptionsEN,
         delivery: deliveryEN,
+        analytics: analyticsEN,
     },
     ar: {
         common: commonAR,
@@ -88,6 +91,7 @@ const resources = {
         addons: addonsAR,
         subscriptions: subscriptionsAR,
         delivery: deliveryAR,
+        analytics: analyticsAR,
     },
 };
 

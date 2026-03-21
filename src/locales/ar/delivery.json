@@ -1,5 +1,7 @@
 {
   "drivers": {
+    "title": "مناديب المتجر",
+    "add_new": "إضافة مندوب",
     "verification": {
       "title": "توثيق السائقين",
       "desc": "مراجعة واعتماد مستندات هوية السائق.",
@@ -24,10 +26,12 @@
     "drivers": {
       "cancel_hiring_success": "تم إلغاء طلب التوظيف بنجاح",
       "cancel_hiring_failed": "فشل إلغاء طلب التوظيف",
-      "cancel_hiring_title": "إلغاء طلب التوظيف",
-      "confirm_cancel_hiring": "هل أنت متأكد من رغبتك في إلغاء طلب التوظيف هذا؟",
-      "accept_resignation_confirm": "هل أنت متأكد من رغبتك في الموافقة على هذه الاستقالة؟",
-      "reject_resignation_confirm": "هل أنت متأكد من رغبتك في رفض هذه الاستقالة؟"
+      "accept_resignation_title": "قبول الاستقالة",
+      "accept_resignation_confirm": "هل أنت متأكد من رغبتك في قبول استقالة هذا السائق؟",
+      "reject_resignation_title": "رفض الاستقالة",
+      "reject_resignation_confirm": "هل أنت متأكد من رغبتك في رفض استقالة هذا السائق؟",
+      "accept_confirm_title": "الموافقة على الطلب",
+      "accept_confirm_message": "هل أنت متأكد أنك تريد الموافقة على طلب هذا السائق؟ سيؤدي ذلك إلى إضافته إلى قائمة مناديب متجرك."
     },
     "identity_verification": "التحقق من الهوية",
     "id_front": "الهوية (الأمام)",
@@ -39,9 +43,49 @@
     "vehicle_type": "نوع المركبة",
     "plate_number": "رقم اللوحة",
     "hiring_status": {
-        "pending": "قيد الانتظار",
-        "resignation_pending": "استقالة قيد الانتظار"
-    }
+      "pending": "قيد الانتظار",
+      "resignation_pending": "استقالة قيد الانتظار",
+      "accepted": "مقبول",
+      "rejected": "مرفوض",
+      "transition_offer": "عرض تحويل"
+    },
+    "marketplace": "سوق المناديب",
+    "search_placeholder": "البحث بالاسم أو رقم الاتصال...",
+    "my_drivers": "سائقي الخاصين",
+    "active_drivers": "نشط",
+    "resignations": "الاستقالات",
+    "list_title": "قائمة المناديب",
+    "manage_desc": "إدارة مناديب متجرك وأدائهم.",
+    "status_updated": "تم تحديث حالة السائق بنجاح",
+    "resignation_accepted": "تم قبول الاستقالة",
+    "resignation_rejected": "تم رفض الاستقالة",
+    "remove_title": "إزالة السائق",
+    "remove_confirm_message": "هل أنت متأكد من إزالة هذا السائق من متجرك؟ لا يمكن التراجع عن هذا الإجراء.",
+    "remove_success": "تمت إزالة السائق بنجاح",
+    "reject_confirm_title": "رفض الطلب",
+    "reject_confirm_message": "هل أنت متأكد أنك تريد رفض طلب هذا السائق؟",
+    "find_freelancers": "البحث عن سائقين مستقلين",
+    "marketplace_desc": "ابحث عن السائقين المستقلين المتاحين في منطقتك.",
+    "unknown_driver": "سائق غير معروف",
+    "cancel_hiring": "إلغاء الطلب",
+    "hire_success": "تم إرسال طلب التوظيف بنجاح",
+    "history": {
+      "title": "السجل",
+      "access_expires": "تنتهي الصلاحية خلال {{days}} يوم"
+    },
+    "rejected_title": "تم رفض التحقق",
+    "edit_title": "تعديل بيانات السائق",
+    "create_title": "إضافة سائق جديد",
+    "service_areas": "مناطق الخدمة",
+    "service_areas_desc": "حدد المدن والأماكن المحددة التي سيخدمها السائق",
+    "select_towns": "اختر المدن",
+    "select_places": "اختر المناطق",
+    "select_town_first": "يرجى اختيار المدينة أولاً",
+    "no_places_found": "لا توجد مناطق متاحة للمدن المختارة",
+    "locked_verification": "للقراءة فقط",
+    "selfie_desc": "صورة شخصية مع بطاقة الهوية",
+    "confirm_update_title": "تحديث بيانات حساسة",
+    "confirm_update_message": "تحديث معلومات ملفك الشخصي سيعيد حالة التحقق الخاصة بك إلى 'قيد المراجعة'. هل تريد الاستمرار؟"
   },
   "authenticityCheck": "فحص أصالة المستند",
   "finalAuditDecision": "القرار النهائي للتدقيق",

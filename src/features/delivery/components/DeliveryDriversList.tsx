@@ -21,7 +21,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
     const CACHE_KEY = 'delivery_drivers';
 
     const { isRTL } = useLanguage();
-    const { t } = useTranslation('common');
+    const { t } = useTranslation(['common', 'delivery']);
     const navigate = useNavigate();
     const location = useLocation();
     const [drivers, setDrivers] = useState<any[]>([]);
@@ -150,7 +150,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 updateCacheItem(CACHE_KEY, driverId, finalUpdater);
             }
 
-            toast.success(t('delivery:drivers.status_updated', 'Driver status updated successfully'));
+            toast.success(t('delivery:drivers.status_updated'));
         } catch (error) {
             console.error('Failed to update status:', error);
             const revertUpdater = (d: any) => ({ ...d, deliveryProfile: { ...d.deliveryProfile, verificationStatus: currentStatus } });
@@ -203,7 +203,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 updateCacheItem(CACHE_KEY, driverId, finalUpdater);
             }
 
-            toast.success(t('delivery:drivers.status_updated', 'Driver status updated successfully'));
+            toast.success(t('delivery:drivers.status_updated'));
         } catch (error) {
             console.error('Failed to toggle driver status:', error);
             // Revert local state
@@ -244,12 +244,12 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 total: prev.total - 1,
                 totalPages: Math.ceil((prev.total - 1) / prev.limit)
             }));
-            toast.success(t('delivery:drivers.remove_success', 'Driver removed successfully'));
+            toast.success(t('delivery:drivers.remove_success'));
         } catch (error: any) {
             console.error('Failed to remove driver error object:', error);
             const errorData = error?.response?.data?.message;
             const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
-            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common.error', 'Failed to remove driver');
+            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common:error_occurred');
             toast.error(message);
         } finally {
             setDeleteModal({ isOpen: false, driverId: null });
@@ -276,7 +276,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                 resignationModal.accept,
                 !resignationModal.accept ? resignationRejectionReason : undefined
             );
-            toast.success(resignationModal.accept ? t('delivery:drivers.resignation_accepted', 'Resignation accepted') : t('delivery:drivers.resignation_rejected', 'Resignation rejected'));
+            toast.success(resignationModal.accept ? t('delivery:drivers.resignation_accepted') : t('delivery:drivers.resignation_rejected'));
             invalidateCache(CACHE_KEY);
             fetchDrivers();
         } catch (error: any) {
@@ -295,23 +295,23 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
 
         switch (status) {
             case 'VERIFIED':
-                return <span {...toggleProps} className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors`}><CheckCircle size={12} /> {t('verificationStatuses.VERIFIED', 'Verified')}</span>;
+                return <span {...toggleProps} className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300 hover:bg-emerald-200 dark:hover:bg-emerald-900/50 transition-colors`}><CheckCircle size={12} /> {t('common:verificationStatuses.VERIFIED')}</span>;
             case 'ACCEPTED':
-                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('verificationStatuses.ACCEPTED', 'Accepted')}</span>;
+                return <span className={`${baseClass} bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300`}><CheckCircle size={12} /> {t('common:verificationStatuses.ACCEPTED')}</span>;
             case 'UNDER_REVIEW':
-                return <span {...toggleProps} className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors`}><Clock size={12} /> {t('verificationStatuses.UNDER_REVIEW', 'Under Review')}</span>;
+                return <span {...toggleProps} className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300 hover:bg-amber-200 dark:hover:bg-amber-900/50 transition-colors`}><Clock size={12} /> {t('common:verificationStatuses.UNDER_REVIEW')}</span>;
             case 'PENDING':
-                return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('verificationStatuses.PENDING', 'Pending')}</span>;
+                return <span className={`${baseClass} bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300`}><Clock size={12} /> {t('common:verificationStatuses.PENDING')}</span>;
             case 'RESIGNATION_PENDING':
-                return <span className={`${baseClass} bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-800`}><Clock size={12} /> {t('delivery:drivers.hiring_status.resignation_pending', 'Resignation Pending')}</span>;
+                return <span className={`${baseClass} bg-rose-50 text-rose-700 dark:bg-rose-900/20 dark:text-rose-400 border border-rose-100 dark:border-rose-800`}><Clock size={12} /> {t('delivery:drivers.hiring_status.resignation_pending')}</span>;
             case 'REJECTED':
-                return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('verificationStatuses.REJECTED', 'Rejected')}</span>;
+                return <span className={`${baseClass} bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-300`}><XCircle size={12} /> {t('common:verificationStatuses.REJECTED')}</span>;
             case 'REMOVED':
-                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><XCircle size={12} /> {t('verificationStatuses.REMOVED', 'Removed')}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300`}><XCircle size={12} /> {t('common:verificationStatuses.REMOVED')}</span>;
             case 'UNVERIFIED':
-                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t('verificationStatuses.UNVERIFIED', 'Unverified')}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t('common:verificationStatuses.UNVERIFIED')}</span>;
             default:
-                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t(`verificationStatuses.${status}`, status)}</span>;
+                return <span className={`${baseClass} bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400`}><User size={12} /> {t(`common:verificationStatuses.${status}`, status)}</span>;
         }
     };
 
@@ -320,13 +320,13 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
 
         switch (type) {
             case 'walking':
-                return <span className={baseClass}><Footprints size={12} /> {t('vehicle_types.walking', 'Walking')}</span>;
+                return <span className={baseClass}><Footprints size={12} /> {t('common:vehicle_types.walking')}</span>;
             case 'bicycle':
-                return <span className={baseClass}><Bike size={12} /> {t('vehicle_types.bicycle', 'Bicycle')}</span>;
+                return <span className={baseClass}><Bike size={12} /> {t('common:vehicle_types.bicycle')}</span>;
             case 'tricycle':
-                return <span className={baseClass}><Truck size={12} /> {t('vehicle_types.tricycle', 'Tricycle')}</span>;
+                return <span className={baseClass}><Truck size={12} /> {t('common:vehicle_types.tricycle')}</span>;
             case 'motorcycle':
-                return <span className={baseClass}><Bike size={12} /> {t('vehicle_types.motorcycle', 'Motorcycle')}</span>;
+                return <span className={baseClass}><Bike size={12} /> {t('common:vehicle_types.motorcycle')}</span>;
             default:
                 return <span className={baseClass}>{type}</span>;
         }
@@ -369,7 +369,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             view === 'active' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
-                        {t('delivery:drivers.active_drivers', 'Active')}
+                        {t('delivery:drivers.active_drivers')}
                     </button>
                     <button
                         onClick={() => handleTabChange('resignations')}
@@ -378,7 +378,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             view === 'resignations' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
-                        {t('delivery:drivers.resignations', 'Resignations')}
+                        {t('delivery:drivers.resignations')}
                         {view !== 'resignations' && pendingCounts?.resignations ? (
                             <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full">
                                 {pendingCounts.resignations}
@@ -394,7 +394,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             view === 'history' ? "bg-white dark:bg-slate-700 text-indigo-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                         )}
                     >
-                        {t('delivery:drivers.history.title', 'History')}
+                        {t('delivery:drivers.history.title')}
                     </button>
                 </div>
 
@@ -409,7 +409,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             <Package size={20} />
                         </div>
                         <div>
-                            <p className="text-xs text-slate-500 font-medium">{t('fields.active_orders', 'Active Orders')}</p>
+                            <p className="text-xs text-slate-500 font-medium">{t('common:fields.active_orders')}</p>
                             <p className="text-lg font-bold text-slate-900 dark:text-white">
                                 {drivers.reduce((acc, d) => acc + (d.activeDeliveriesCount || 0), 0)}
                             </p>
@@ -423,18 +423,18 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                     <table className="w-full text-start border-collapse" dir={isRTL ? 'rtl' : 'ltr'}>
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider text-start">
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.name')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.type')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.contact')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('delivery:drivers.verification.title', 'Verification')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:fields.name')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:fields.type')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:fields.contact')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('delivery:drivers.verification.title')}</th>
                                 {view === 'active' && (
-                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.hiring_status', 'Hiring Status')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:fields.hiring_status')}</th>
                                 )}
                                 {(view === 'history' || view === 'resignations') && (
-                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.resignation_reason', 'Reason')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:fields.resignation_reason')}</th>
                                 )}
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.active_orders', 'Active Orders')}</th>
-                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('actions')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:fields.active_orders')}</th>
+                                <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-200 dark:divide-slate-800">

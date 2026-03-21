@@ -132,7 +132,6 @@ const Dashboard: React.FC = () => {
                     storeDetails={storeDetails} 
                     subscription={subscription} 
                     hasPermission={hasPermission}
-                    chartData={chartData}
                 />
             )}
         </div>
