@@ -612,6 +612,8 @@ const AdminAnalytics: React.FC = () => {
                                             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                             textAlign: isRTL ? 'right' : 'left'
                                         }}
+                                        itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
+                                        labelStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
                                     />
                                     <Bar dataKey="newUsers" name={t('dashboard:newUsers')} fill="#3b82f6" radius={[2, 2, 0, 0]} animationDuration={1500} />
                                     <Bar dataKey="newStores" name={t('dashboard:newStores')} fill="#FF5C00" radius={[2, 2, 0, 0]} animationDuration={1500} />

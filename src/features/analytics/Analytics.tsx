@@ -348,6 +348,7 @@ const Analytics: React.FC = () => {
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
                                     itemStyle={{ color: '#FF5C00' }}
+                                    labelStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
                                     formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:storeCurrency')}`, t('revenue')]}
                                     labelFormatter={(label) => {
                                         const parts = label.split('-');
@@ -419,6 +420,8 @@ const Analytics: React.FC = () => {
                                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
+                                    labelStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
+                                    itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
                                     formatter={(value: any) => [value, t('ordersCount')]}
                                 />
                                 <Bar dataKey="count" name={t('ordersCount')} fill="#4f46e5" radius={[2, 2, 0, 0]} animationDuration={1500} />
