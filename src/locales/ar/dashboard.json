@@ -153,5 +153,31 @@
         "CANCELLED": "ملغي",
         "EXPIRED": "منتهي",
         "PENDING": "قيد الانتظار"
-    }
+    },
+    "roles": {
+        "super_admin": "مدير النظام",
+        "admin": "مدير",
+        "store_owner": "صاحب متجر",
+        "customer": "عميل",
+        "employee": "موظف",
+        "delivery": "سائق"
+    },
+    "storeStatuses": {
+        "active": "نشط",
+        "pending": "قيد الانتظار",
+        "suspended": "موقوف",
+        "rejected": "مرفوض"
+    },
+    "billingTransactions": "معاملات الفوترة",
+    "billingTransactionsDesc": "سجل مفصل لجميع اشتراكات المتاجر والمدفوعات",
+    "searchByStoreName": "البحث باسم المتجر...",
+    "allPlans": "جميع الخطط",
+    "allCycles": "جميع الدورات",
+    "free": "مجانية",
+    "pro": "برو",
+    "premium": "بريميوم",
+    "noTransactionsFound": "لم يتم العثور على معاملات",
+    "adjustFilters": "حاول تعديل البحث أو الفلاتر",
+    "showingItems": "عرض {{from}} إلى {{to}} من أصل {{total}} نتيجة",
+    "store": "المتجر"
 }

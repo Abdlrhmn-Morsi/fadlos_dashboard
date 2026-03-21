@@ -94,7 +94,7 @@
     "maintenanceMode": "Maintenance Mode",
     "maintenanceMessage": "Maintenance Message",
     "savePlatformSettings": "Save {{platform}} Settings",
-    "actionCenter": "Action Center",
+    "action Center": "Action Center",
     "pendingApprovals": "Pending Approvals",
     "storesAwaitingApproval": "Stores awaiting approval",
     "driversAwaitingReview": "Drivers awaiting review",
@@ -153,5 +153,31 @@
         "CANCELLED": "Cancelled",
         "EXPIRED": "Expired",
         "PENDING": "Pending"
-    }
+    },
+    "roles": {
+        "super_admin": "Super Admin",
+        "admin": "Admin",
+        "store_owner": "Store Owner",
+        "customer": "Customer",
+        "employee": "Employee",
+        "delivery": "Driver"
+    },
+    "storeStatuses": {
+        "active": "Active",
+        "pending": "Pending",
+        "suspended": "Suspended",
+        "rejected": "Rejected"
+    },
+    "billingTransactions": "Billing Transactions",
+    "billingTransactionsDesc": "Detailed history of all store subscriptions and payments",
+    "searchByStoreName": "Search by store name...",
+    "allPlans": "All Plans",
+    "allCycles": "All Cycles",
+    "free": "Free",
+    "pro": "Pro",
+    "premium": "Premium",
+    "noTransactionsFound": "No transactions found",
+    "adjustFilters": "Try adjusting your search or filters",
+    "showingItems": "Showing {{from}} to {{to}} of {{total}} results",
+    "store": "Store"
 }

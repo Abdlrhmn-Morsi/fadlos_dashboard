@@ -262,7 +262,7 @@ const Analytics: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <StatCard
                     title={t('revenue')}
-                    value={`${(orderStats?.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                    value={`${(orderStats?.totalRevenue || 0).toLocaleString()} ${t('common:storeCurrency')}`}
                     growth={orderStats?.comparison?.revenueGrowth}
                     subValue={t('previousPeriod')}
                     icon={DollarSign}
@@ -270,13 +270,13 @@ const Analytics: React.FC = () => {
                 />
                 <StatCard
                     title={t('orders:confirmedRevenue')}
-                    value={`${(orderStats?.confirmedRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                    value={`${(orderStats?.confirmedRevenue || 0).toLocaleString()} ${t('common:storeCurrency')}`}
                     icon={DollarSign}
                     color="emerald"
                 />
                 <StatCard
                     title={t('orders:pendingRevenue')}
-                    value={`${(orderStats?.pendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
+                    value={`${(orderStats?.pendingRevenue || 0).toLocaleString()} ${t('common:storeCurrency')}`}
                     icon={Clock}
                     color="amber"
                 />
@@ -348,7 +348,7 @@ const Analytics: React.FC = () => {
                                         textAlign: isRTL ? 'right' : 'left'
                                     }}
                                     itemStyle={{ color: '#FF5C00' }}
-                                    formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:currencySymbol')}`, t('revenue')]}
+                                    formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:storeCurrency')}`, t('revenue')]}
                                     labelFormatter={(label) => {
                                         const parts = label.split('-');
                                         if (parts.length === 3) {
@@ -456,7 +456,7 @@ const Analytics: React.FC = () => {
                                     </p>
                                 </div>
                                 <div className={clsx("text-right font-black text-slate-900 dark:text-slate-100", isRTL && "text-left")}>
-                                    {Number(product.price).toLocaleString()} {t('common:currencySymbol')}
+                                    {Number(product.price).toLocaleString()} {t('common:storeCurrency')}
                                 </div>
                             </div>
                         ))}

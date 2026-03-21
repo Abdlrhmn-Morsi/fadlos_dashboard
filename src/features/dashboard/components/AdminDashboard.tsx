@@ -129,13 +129,13 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                 />
                 <AdminStatCard 
                     title={t('dashboard:totalRevenue')} 
-                    value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`} 
+                    value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:storeCurrency')}`} 
                     icon={CreditCard} 
                     color="emerald"
                 />
                  <AdminStatCard 
                     title={t('dashboard:avgOrderValue')} 
-                    value={`${(stats.avgOrderValue || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${t('common:currencySymbol')}`} 
+                    value={`${(stats.avgOrderValue || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${t('common:storeCurrency')}`} 
                     icon={TrendingUp} 
                     color="blue"
                 />
@@ -205,7 +205,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                                                 <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{isRTL ? store.nameAr || store.name : store.name}</p>
                                                 <div className="flex items-center gap-2">
                                                     <span className="text-[10px] font-black text-emerald-600 uppercase tabular-nums">
-                                                        {(store.totalRevenue || 0).toLocaleString()} {t('common:currencySymbol')}
+                                                        {(store.totalRevenue || 0).toLocaleString()} {t('common:storeCurrency')}
                                                     </span>
                                                     <span className="w-1 h-1 rounded-full bg-slate-300 shrink-0" />
                                                     <span className="text-[9px] text-slate-400 font-bold uppercase">

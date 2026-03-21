@@ -334,7 +334,10 @@ const DashboardLayout: React.FC = () => {
                     {hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) && <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />}
                     {hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) && <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />}
                     {hasAdminPermission(AdminPermissions.PLANS_VIEW) && (
-                      <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
+                      <>
+                        <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
+                        <SidebarItem to="/billing-transactions" icon={DollarSign} label={t('dashboard:billingTransactions', 'Billing Transactions')} collapsed={collapsed} />
+                      </>
                     )}
                   </>
                 )}

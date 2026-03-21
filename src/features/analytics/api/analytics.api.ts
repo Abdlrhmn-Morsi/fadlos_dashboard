@@ -6,7 +6,7 @@ export const fetchOrderStats = async (period: string = '7d', startDate?: string,
     if (endDate) url += `&endDate=${endDate}`;
     if (branchId) url += `&branchId=${branchId}`;
     const response = await apiService.get(url);
-    return response.data || response;
+    return response;
 };
 
 export const fetchProductMerchantStats = async (startDate?: string, endDate?: string, branchId?: string) => {
@@ -20,7 +20,7 @@ export const fetchProductMerchantStats = async (startDate?: string, endDate?: st
         url += params.join('&');
     }
     const response = await apiService.get(url);
-    return response.data || response;
+    return response;
 };
 
 export const fetchCustomerAnalytics = async (period: string = '30d', startDate?: string, endDate?: string, branchId?: string) => {
@@ -29,17 +29,45 @@ export const fetchCustomerAnalytics = async (period: string = '30d', startDate?:
     if (endDate) url += `&endDate=${endDate}`;
     if (branchId) url += `&branchId=${branchId}`;
     const response = await apiService.get(url);
-    return response.data || response;
+    return response;
 };
 
 // ── Admin Analytics APIs ──────────────────────────────────────────
-export const fetchSubscriptionAnalytics = async () => {
-    const response = await apiService.get('/stats/subscription-analytics');
-    return response.data || response;
+export const fetchSubscriptionAnalytics = async (startDate?: string, endDate?: string) => {
+    let url = '/stats/subscription-analytics';
+    if (startDate || endDate) {
+        url += `?startDate=${startDate || ''}&endDate=${endDate || ''}`;
+    }
+    const response = await apiService.get(url);
+    return response;
 };
 
-export const fetchSystemAnalytics = async () => {
-    const response = await apiService.get('/stats/system-analytics');
-    return response.data || response;
+export const fetchSystemAnalytics = async (startDate?: string, endDate?: string) => {
+    let url = '/stats/system-analytics';
+    if (startDate || endDate) {
+        url += `?startDate=${startDate || ''}&endDate=${endDate || ''}`;
+    }
+    const response = await apiService.get(url);
+    return response;
+};
+
+export const fetchAllSubscriptions = async (options: {
+    page?: number;
+    limit?: number;
+    search?: string;
+    plan?: string;
+    billingCycle?: string;
+    startDate?: string;
+    endDate?: string;
+}) => {
+    const { page = 1, limit = 10, search, plan, billingCycle, startDate, endDate } = options;
+    let url = `/subscriptions/admin/all?page=${page}&limit=${limit}`;
+    if (search) url += `&search=${search}`;
+    if (plan && plan !== 'all') url += `&plan=${plan}`;
+    if (billingCycle && billingCycle !== 'all') url += `&billingCycle=${billingCycle}`;
+    if (startDate) url += `&startDate=${startDate}`;
+    if (endDate) url += `&endDate=${endDate}`;
+    const response = await apiService.get(url);
+    return response;
 };
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { Link } from 'react-router-dom';
 import {
     BarChart,
     Bar,
@@ -29,7 +30,9 @@ import {
     ArrowDownRight,
     Zap,
     BarChart3,
-    ShoppingBag
+    ShoppingBag,
+    Calendar,
+    RefreshCw
 } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -56,14 +59,16 @@ const AdminAnalytics: React.FC = () => {
     const [subData, setSubData] = useState<any>(null);
     const [sysData, setSysData] = useState<any>(null);
     const [activeTab, setActiveTab] = useState<'subscriptions' | 'system'>('subscriptions');
+    const [startDate, setStartDate] = useState('');
+    const [endDate, setEndDate] = useState('');
 
     useEffect(() => {
         const load = async () => {
             setLoading(true);
             try {
                 const [sub, sys] = await Promise.all([
-                    fetchSubscriptionAnalytics(),
-                    fetchSystemAnalytics(),
+                    fetchSubscriptionAnalytics(startDate, endDate),
+                    fetchSystemAnalytics(startDate, endDate),
                 ]);
                 setSubData(sub);
                 setSysData(sys);
@@ -74,10 +79,33 @@ const AdminAnalytics: React.FC = () => {
             }
         };
         load();
-    }, []);
+    }, [startDate, endDate]);
 
     const gridColor = isDark ? '#1e293b' : '#f1f5f9';
     const textColor = isDark ? '#64748b' : '#94a3b8';
+
+    const formatDate = (dateStr: string) => {
+        if (!dateStr) return '';
+        try {
+            return new Date(dateStr).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            });
+        } catch (e) {
+            return dateStr;
+        }
+    };
+
+    const getDateRangeLabel = () => {
+        if (!startDate && !endDate) return t('dashboard:allTime');
+        const start = formatDate(startDate);
+        const end = formatDate(endDate);
+        if (startDate && endDate) return `${t('common:from')} ${start} ${t('common:to')} ${end}`;
+        if (startDate) return `${t('common:from')} ${start}`;
+        if (endDate) return `${t('common:to')} ${end}`;
+        return t('dashboard:allTime');
+    };
 
     if (loading) return <LoadingSpinner />;
 
@@ -97,30 +125,65 @@ const AdminAnalytics: React.FC = () => {
                     </p>
                 </div>
 
-                {/* Tabs */}
-                <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 w-fit">
-                    <button
-                        onClick={() => setActiveTab('subscriptions')}
-                        className={clsx(
-                            "px-5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all",
-                            activeTab === 'subscriptions'
-                                ? "bg-white dark:bg-slate-700 text-primary shadow-sm"
-                                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                <div className="flex flex-col md:flex-row items-center gap-4">
+                    {/* Date Filters */}
+                    <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/50 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex items-center gap-2 px-3 py-1.5">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">{t('common:from')}</span>
+                            <Calendar size={14} className="text-slate-400 dark:text-slate-300" />
+                            <input 
+                                type="date" 
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-600 dark:text-slate-300 outline-none w-28"
+                            />
+                        </div>
+                        <div className="h-4 w-px bg-slate-200 dark:bg-slate-700" />
+                        <div className="flex items-center gap-2 px-3 py-1.5">
+                            <span className="text-[10px] font-bold text-slate-400 uppercase">{t('common:to')}</span>
+                            <Calendar size={14} className="text-slate-400 dark:text-slate-300" />
+                            <input 
+                                type="date" 
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="bg-transparent border-none focus:ring-0 text-xs font-bold text-slate-600 dark:text-slate-300 outline-none w-28"
+                            />
+                        </div>
+                        {(startDate || endDate) && (
+                            <button 
+                                onClick={() => { setStartDate(''); setEndDate(''); }}
+                                className="p-1.5 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors"
+                            >
+                                <RefreshCw size={14} />
+                            </button>
                         )}
-                    >
-                        {t('dashboard:subscriptionAnalytics')}
-                    </button>
-                    <button
-                        onClick={() => setActiveTab('system')}
-                        className={clsx(
-                            "px-5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all",
-                            activeTab === 'system'
-                                ? "bg-white dark:bg-slate-700 text-primary shadow-sm"
-                                : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
-                        )}
-                    >
-                        {t('dashboard:systemAnalytics')}
-                    </button>
+                    </div>
+
+                    {/* Tabs */}
+                    <div className="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 w-fit">
+                        <button
+                            onClick={() => setActiveTab('subscriptions')}
+                            className={clsx(
+                                "px-5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all",
+                                activeTab === 'subscriptions'
+                                    ? "bg-white dark:bg-slate-700 text-primary shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            )}
+                        >
+                            {t('dashboard:subscriptionAnalytics')}
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('system')}
+                            className={clsx(
+                                "px-5 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all",
+                                activeTab === 'system'
+                                    ? "bg-white dark:bg-slate-700 text-primary shadow-sm"
+                                    : "text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                            )}
+                        >
+                            {t('dashboard:systemAnalytics')}
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -139,9 +202,9 @@ const AdminAnalytics: React.FC = () => {
                                         {t('dashboard:totalSystemProfit')}
                                     </p>
                                     <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
-                                        {(subData.totalSystemProfit || 0).toLocaleString()} {t('common:currencySymbol')}
+                                        {(subData.totalSystemProfit || 0).toLocaleString()} {t('common:systemCurrency')}
                                     </h3>
-                                    <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">{t('dashboard:allTime')}</p>
+                                    <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">{getDateRangeLabel()}</p>
                                 </div>
                                 <div className="w-12 h-12 rounded bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center shadow-sm">
                                     <DollarSign size={24} />
@@ -154,19 +217,24 @@ const AdminAnalytics: React.FC = () => {
                             <div className="flex items-start justify-between">
                                 <div className={clsx(isRTL ? "text-right" : "text-left")}>
                                     <p className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">
-                                        {t('dashboard:thisMonthRevenue')}
+                                        {(subData as any).isFiltered ? t('common:periodRevenue') : t('dashboard:thisMonthRevenue')}
                                     </p>
                                     <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
-                                        {(subData.thisMonthRevenue || 0).toLocaleString()} {t('common:currencySymbol')}
+                                        {(subData.thisMonthRevenue || 0).toLocaleString()} {t('common:systemCurrency')}
                                     </h3>
-                                    <div className={clsx(
-                                        "flex items-center gap-1 mt-2 text-[10px] font-bold uppercase",
-                                        (subData.revenueGrowth || 0) >= 0 ? "text-emerald-600" : "text-rose-600",
-                                        isRTL && "flex-row-reverse"
-                                    )}>
-                                        {(subData.revenueGrowth || 0) >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                                        {Math.abs(subData.revenueGrowth || 0).toFixed(1)}% {t('dashboard:vsLastMonth')}
-                                    </div>
+                                    {!(subData as any).isFiltered && (
+                                        <div className={clsx(
+                                            "flex items-center gap-1 mt-2 text-[10px] font-bold uppercase",
+                                            (subData.revenueGrowth || 0) >= 0 ? "text-emerald-600" : "text-rose-600",
+                                            isRTL && "flex-row-reverse"
+                                        )}>
+                                            {(subData.revenueGrowth || 0) >= 0 ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
+                                            {Math.abs(subData.revenueGrowth || 0).toFixed(1)}% {t('dashboard:vsLastMonth')}
+                                        </div>
+                                    )}
+                                    {(subData as any).isFiltered && (
+                                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">{getDateRangeLabel()}</p>
+                                    )}
                                 </div>
                                 <div className="w-12 h-12 rounded bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 flex items-center justify-center shadow-sm">
                                     <TrendingUp size={24} />
@@ -185,7 +253,7 @@ const AdminAnalytics: React.FC = () => {
                                         {subData.totalActiveSubscriptions || 0}
                                     </h3>
                                     <p className="text-[10px] text-emerald-500 mt-1 font-bold uppercase">
-                                        +{subData.newSubscriptionsThisMonth || 0} {t('dashboard:newThisMonth')}
+                                        +{subData.newSubscriptionsThisMonth || 0} {(subData as any).isFiltered ? t('common:newInPeriod') : t('dashboard:newThisMonth')}
                                     </p>
                                 </div>
                                 <div className="w-12 h-12 rounded bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 flex items-center justify-center shadow-sm">
@@ -199,14 +267,19 @@ const AdminAnalytics: React.FC = () => {
                             <div className="flex items-start justify-between">
                                 <div className={clsx(isRTL ? "text-right" : "text-left")}>
                                     <p className="text-slate-400 dark:text-slate-500 text-xs font-bold uppercase tracking-wider mb-1">
-                                        {t('dashboard:monthlyTransactions')}
+                                        {(subData as any).isFiltered ? t('common:periodTransactions') : t('dashboard:monthlyTransactions')}
                                     </p>
                                     <h3 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
                                         {subData.thisMonthTransactions || 0}
                                     </h3>
-                                    <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">
-                                        {t('dashboard:lastMonth')}: {subData.lastMonthTransactions || 0}
-                                    </p>
+                                    {!(subData as any).isFiltered && (
+                                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">
+                                            {t('dashboard:lastMonth')}: {subData.lastMonthTransactions || 0}
+                                        </p>
+                                    )}
+                                    {(subData as any).isFiltered && (
+                                        <p className="text-[10px] text-slate-400 mt-1 font-bold uppercase">{getDateRangeLabel()}</p>
+                                    )}
                                 </div>
                                 <div className="w-12 h-12 rounded bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 flex items-center justify-center shadow-sm">
                                     <Zap size={24} />
@@ -260,7 +333,7 @@ const AdminAnalytics: React.FC = () => {
                                                 fontWeight: 'bold',
                                                 textAlign: isRTL ? 'right' : 'left'
                                             }}
-                                            formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:currencySymbol')}`, t('dashboard:revenue')]}
+                                            formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:systemCurrency')}`, t('dashboard:revenue')]}
                                         />
                                         <Area
                                             type="monotone"
@@ -300,7 +373,7 @@ const AdminAnalytics: React.FC = () => {
                                             ))}
                                         </Pie>
                                         <Tooltip
-                                            formatter={(value: any, name: any) => [value, name]}
+                                            formatter={(value: any, name: any) => [value, t(`dashboard:plans.${String(name).toUpperCase()}`, { defaultValue: name })]}
                                             contentStyle={{
                                                 backgroundColor: isDark ? '#1e293b' : '#fff',
                                                 border: 'none',
@@ -318,7 +391,7 @@ const AdminAnalytics: React.FC = () => {
                                     <div key={p.plan} className="flex items-center justify-between">
                                         <div className="flex items-center gap-2">
                                             <div className="w-3 h-3 rounded-sm" style={{ backgroundColor: PLAN_COLORS[p.plan?.toLowerCase()] || '#94a3b8' }} />
-                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">{p.plan}</span>
+                                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase">{t(`dashboard:plans.${String(p.plan).toUpperCase()}`)}</span>
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <span className="text-sm font-black text-slate-900 dark:text-white">{p.count}</span>
@@ -394,20 +467,28 @@ const AdminAnalytics: React.FC = () => {
 
                     {/* Recent Billing */}
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden">
-                        <div className="p-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex items-center gap-2">
-                            <DollarSign size={20} className="text-emerald-500" />
-                            <h3 className="text-base font-bold text-slate-900 dark:text-slate-100">
-                                {t('dashboard:recentBillings')}
-                            </h3>
+                        <div className="flex items-center justify-between p-6 border-b border-slate-50 dark:border-slate-800">
+                            <div className="flex items-center gap-2">
+                                <CreditCard size={18} className="text-primary" />
+                                <h3 className={clsx("text-sm font-black uppercase tracking-tight text-slate-900 dark:text-slate-100", isRTL && "text-right")}>
+                                    {t('dashboard:recentBillings')}
+                                </h3>
+                            </div>
+                            <Link
+                                to="/billing-transactions"
+                                className="text-[10px] font-black uppercase tracking-widest text-primary hover:underline"
+                            >
+                                {t('common:viewAll')}
+                            </Link>
                         </div>
                         <div className="overflow-x-auto">
-                            <table className="w-full text-sm text-left whitespace-nowrap">
+                            <table className={clsx("w-full text-sm whitespace-nowrap", isRTL ? "text-right" : "text-left")}>
                                 <thead className="text-[10px] font-black text-slate-400 uppercase tracking-widest bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-50 dark:border-slate-800">
                                     <tr>
-                                        <th className="px-6 py-3 font-black">{t('dashboard:storeName')}</th>
-                                        <th className="px-6 py-3 font-black">{t('common:plan')}</th>
-                                        <th className="px-6 py-3 font-black">{t('dashboard:billingCycle')}</th>
-                                        <th className="px-6 py-3 font-black">{t('dashboard:amount')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('dashboard:storeName')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('common:plan')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('dashboard:billingCycle')}</th>
+                                        <th className={clsx("px-6 py-3 font-black", isRTL ? "text-right" : "text-left")}>{t('dashboard:amount')}</th>
                                         <th className={clsx("px-6 py-3 font-black", isRTL ? "text-left" : "text-right")}>{t('common:date')}</th>
                                     </tr>
                                 </thead>
@@ -421,23 +502,25 @@ const AdminAnalytics: React.FC = () => {
                                     ) : (
                                         subData.recentBillings.map((b: any) => (
                                             <tr key={b.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/30 transition-colors">
-                                                <td className="px-6 py-4 font-bold text-slate-800 dark:text-slate-200">
+                                                <td className={clsx("px-6 py-4 font-bold text-slate-800 dark:text-slate-200", isRTL ? "text-right" : "text-left")}>
                                                     {isRTL ? b.storeNameAr || b.storeName : b.storeName}
                                                 </td>
-                                                <td className="px-6 py-4">
+                                                <td className={clsx("px-6 py-4", isRTL ? "text-right" : "text-left")}>
                                                     <span
                                                         className="px-2 py-0.5 text-[10px] font-black uppercase rounded"
                                                         style={{
-                                                            backgroundColor: (PLAN_COLORS[b.plan] || '#94a3b8') + '20',
-                                                            color: PLAN_COLORS[b.plan] || '#94a3b8',
+                                                            backgroundColor: (PLAN_COLORS[b.plan?.toLowerCase()] || '#94a3b8') + '20',
+                                                            color: PLAN_COLORS[b.plan?.toLowerCase()] || '#94a3b8',
                                                         }}
                                                     >
-                                                        {b.plan}
+                                                        {t(`dashboard:plans.${String(b.plan).toUpperCase()}`)}
                                                     </span>
                                                 </td>
-                                                <td className="px-6 py-4 text-xs font-bold uppercase text-slate-500">{b.billingCycle || '—'}</td>
-                                                <td className="px-6 py-4 font-black text-emerald-600">
-                                                    {(b.amount || 0).toLocaleString()} {t('common:currencySymbol')}
+                                                <td className={clsx("px-6 py-4 text-xs font-bold uppercase text-slate-500", isRTL ? "text-right" : "text-left")}>
+                                                    {b.billingCycle ? t(`dashboard:${String(b.billingCycle).toLowerCase()}`) : '—'}
+                                                </td>
+                                                <td className={clsx("px-6 py-4 font-black text-emerald-600", isRTL ? "text-right" : "text-left")}>
+                                                    {(b.amount || 0).toLocaleString()} {t('common:systemCurrency')}
                                                 </td>
                                                 <td className={clsx("px-6 py-4 text-[11px] font-bold tracking-tight text-slate-400 uppercase tabular-nums", isRTL ? "text-left" : "text-right")}>
                                                     {new Date(b.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', {
@@ -478,6 +561,7 @@ const AdminAnalytics: React.FC = () => {
                                 </div>
                                 <h4 className="text-2xl font-black text-slate-900 dark:text-white">{item.value.toLocaleString()}</h4>
                                 <p className="text-[9px] font-black text-slate-400 uppercase tracking-wider mt-1">{item.label}</p>
+                                <p className="text-[8px] text-slate-400 font-bold uppercase mt-0.5 opacity-60">{getDateRangeLabel()}</p>
                             </div>
                         ))}
                     </div>
@@ -564,7 +648,7 @@ const AdminAnalytics: React.FC = () => {
                                     return (
                                         <div key={item.status} className="space-y-2">
                                             <div className={clsx("flex justify-between text-[10px] font-black uppercase tracking-wider", isRTL && "flex-row-reverse")}>
-                                                <span className="text-slate-500">{item.status}</span>
+                                                <span className="text-slate-500">{t(`dashboard:storeStatuses.${item.status}`)}</span>
                                                 <span className="text-slate-900 dark:text-slate-100">{item.count} ({pct}%)</span>
                                             </div>
                                             <div className="h-2 bg-slate-100 dark:bg-slate-800 overflow-hidden rounded-full">
@@ -599,7 +683,7 @@ const AdminAnalytics: React.FC = () => {
                                     return (
                                         <div key={item.role} className="space-y-2">
                                             <div className={clsx("flex justify-between text-[10px] font-black uppercase tracking-wider", isRTL && "flex-row-reverse")}>
-                                                <span className="text-slate-500">{item.role}</span>
+                                                <span className="text-slate-500">{t(`dashboard:roles.${item.role}`)}</span>
                                                 <span className="text-slate-900 dark:text-slate-100">{item.count} ({pct}%)</span>
                                             </div>
                                             <div className="h-2 bg-slate-100 dark:bg-slate-800 overflow-hidden rounded-full">
