@@ -438,14 +438,11 @@ const Analytics: React.FC = () => {
                     <h3 className={clsx("text-lg font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6", isRTL && "text-right")}>
                         {t('topProducts')}
                     </h3>
-                    <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
+                    <div className={clsx("space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar", isRTL ? "pl-2" : "pr-2")}>
                         {merchantStats?.bestSellers?.slice(0, 10).map((product: any, idx: number) => (
-                            <div key={product.id} className={clsx(
-                                "flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:border-primary/50",
-                                isRTL && "flex-row-reverse"
-                            )}>
+                            <div key={product.id} className="flex items-center gap-4 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800 transition-all hover:border-primary/50">
                                 <div className="w-12 h-12 bg-white dark:bg-slate-700 flex items-center justify-center font-black text-primary border border-slate-200 dark:border-slate-600">
-                                    #{idx + 1}
+                                    <span dir="ltr">#{idx + 1}</span>
                                 </div>
                                 {product.coverImage && (
                                     <img src={product.coverImage} className="w-12 h-12 object-cover" alt="" />

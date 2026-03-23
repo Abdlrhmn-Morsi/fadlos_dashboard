@@ -423,11 +423,12 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <div className="lg:col-span-2 xl:col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                     <StatCard title={t('dashboard:todayRevenue')} value={`${(stats.todayRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`} icon={Zap} color="emerald" />
-                    <StatCard title={t('dashboard:todayOrders')} value={stats.todayOrders || 0} icon={Activity} color="blue" />
+                    <StatCard title={t('dashboard:pendingRevenue')} value={`${(stats.totalPendingRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`} icon={Clock} color="amber" />
                     <StatCard title={t('dashboard:totalRevenue')} value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`} icon={DollarSign} color="emerald" />
+
+                    <StatCard title={t('dashboard:todayOrders')} value={stats.todayOrders || 0} icon={Activity} color="blue" />
+                    <StatCard title={t('dashboard:pendingOrders')} value={stats.pendingOrders || 0} icon={Clock} color="amber" />
                     <StatCard title={t('dashboard:totalOrders')} value={stats.totalOrders || 0} icon={ShoppingBag} color="orange" />
-                    <StatCard title={t('dashboard:totalProducts')} value={stats.totalProducts || 0} icon={Store} color="indigo" />
-                    <StatCard title={t('dashboard:totalEmployees')} value={stats.totalEmployees || 0} icon={Users} color="violet" />
                 </div>
 
                 {/* Sidebar Summary */}
