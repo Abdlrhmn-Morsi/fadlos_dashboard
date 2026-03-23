@@ -320,6 +320,64 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({
                 )}
             </div>
 
+            {/* Top Clients & Top Products - Show above chart when bottom Top Products is hidden */}
+            {(canViewAnalytics || canViewOrders) && (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {/* Top Clients by Total Spent - Only if plan supports it */}
+                    {stats.topClients && stats.topClients.length > 0 && (
+                        <div className="bg-white dark:bg-slate-900 p-6 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                            <div className="flex items-center justify-between mb-5">
+                                <h3 className="font-black text-slate-900 dark:text-white tracking-tight text-sm uppercase">{t('dashboard:topClients')}</h3>
+                                <button onClick={() => navigate('/clients')} className="text-primary text-[10px] font-bold uppercase tracking-widest hover:underline">{t('common:viewAll')}</button>
+                            </div>
+                            <div className="space-y-3">
+                                {stats.topClients.slice(0, 3).map((client: any, idx) => (
+                                    <div key={client.id} className="group flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" onClick={() => navigate(`/clients/${client.customerId}`)}>
+                                        <div className="w-10 h-10 rounded overflow-hidden bg-cyan-50 dark:bg-cyan-900/20 flex items-center justify-center shrink-0">
+                                            {client.client?.profileImage ? <img src={client.client.profileImage} alt="" className="w-full h-full object-cover" /> : <Users size={18} className="text-cyan-400" />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm truncate">{client.client?.name || client.client?.username || '—'}</h4>
+                                            <span className="text-[10px] font-bold text-emerald-500">{(client.stats?.totalSpent || 0).toLocaleString()} {t('common:currencySymbol')}</span>
+                                        </div>
+                                        <span className="text-[10px] font-black text-slate-300 shrink-0">#{idx + 1}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Top Products by Units Sold */}
+                    <div className="bg-white dark:bg-slate-900 p-6 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">
+                        <div className="flex items-center justify-between mb-5">
+                            <h3 className="font-black text-slate-900 dark:text-white tracking-tight text-sm uppercase">{t('dashboard:topProducts')}</h3>
+                            <button onClick={() => navigate('/products')} className="text-primary text-[10px] font-bold uppercase tracking-widest hover:underline">{t('common:viewAll')}</button>
+                        </div>
+                        <div className="space-y-3">
+                            {(!stats.topRatedProducts || stats.topRatedProducts.length === 0) ? (
+                                <div className="py-8 flex flex-col items-center justify-center border-2 border-dashed border-slate-100 dark:border-slate-800 rounded">
+                                    <ShoppingBag size={32} className="text-slate-200 dark:text-slate-700 mb-2" />
+                                    <p className="text-slate-400 text-xs">{t('common:noResults')}</p>
+                                </div>
+                            ) : (
+                                stats.topRatedProducts.slice(0, 3).map((product: any, idx) => (
+                                    <div key={product.id} className="group flex items-center gap-3 p-3 bg-slate-50 dark:bg-slate-800/50 rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer" onClick={() => navigate(`/products/${product.id}`)}>
+                                        <div className="w-10 h-10 rounded overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                                            {product.coverImage ? <img src={product.coverImage} alt="" className="w-full h-full object-cover" /> : <ShoppingBag size={18} className="text-slate-300 m-auto mt-2.5" />}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <h4 className="font-bold text-slate-900 dark:text-slate-100 text-sm truncate">{isRTL ? product.nameAr || product.name : product.name}</h4>
+                                            <span className="text-[10px] font-bold text-slate-400">{product.unitsSold || 0} {t('common:unitsSold')}</span>
+                                        </div>
+                                        <span className="text-[10px] font-black text-slate-300 shrink-0">#{idx + 1}</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
             {/* Revenue Chart - Only for analytics.view */}
             {canViewAnalytics && (
                 <div className="bg-white dark:bg-slate-900 p-8 rounded border-none shadow-[0_8px_30px_rgb(0,0,0,0.04)]">

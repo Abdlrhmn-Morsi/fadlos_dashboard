@@ -31,6 +31,7 @@ export const fetchDashboardStats = async (user: any) => {
             topRatedProducts: [],
             topCategories: [],
             topAddons: [],
+            topClients: [],
             incomingRequests: [],
             sentInvitations: [],
             averageRating: 0,
@@ -134,6 +135,14 @@ export const fetchDashboardStats = async (user: any) => {
             // Top Add-ons (Default for all employees)
             promises.push(apiService.get('/addons?limit=3').then(res => ({ key: 'topAddons', val: (res as any).data || [] })).catch(() => ({ key: 'topAddons', val: [] })));
 
+            // Top Clients (clients.view)
+            if (hasPerm(Permissions.CLIENTS_VIEW)) {
+                const hasClientsFeature = user.subscription?.features?.includes(PlanFeature.STORE_CLIENTS_MANAGEMENT);
+                if (hasClientsFeature) {
+                    promises.push(apiService.get('/store/clients/top?limit=3&sortBy=totalSpent').then(res => ({ key: 'topClients', val: res || [] })).catch(() => ({ key: 'topClients', val: [] })));
+                }
+            }
+
             const results = await Promise.all(promises);
 
             results.forEach((res: any) => {
@@ -152,6 +161,7 @@ export const fetchDashboardStats = async (user: any) => {
                 if (res.key === 'topProducts') stats.topRatedProducts = res.val;
                 if (res.key === 'topCategories') stats.topCategories = res.val;
                 if (res.key === 'topAddons') stats.topAddons = res.val;
+                if (res.key === 'topClients') stats.topClients = res.val;
             });
         }
 

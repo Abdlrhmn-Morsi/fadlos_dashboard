@@ -41,6 +41,7 @@ export interface DashboardStats {
     topRatedProducts?: any[];
     topCategories?: any[];
     topAddons?: any[];
+    topClients?: any[];
     incomingRequests?: any[];
     sentInvitations?: any[];
     averageRating?: number;
