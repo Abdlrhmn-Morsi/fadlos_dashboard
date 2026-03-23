@@ -29,6 +29,10 @@ export interface DashboardStats {
     reportedReviews?: number;
     underReviewDrivers?: number;
     totalEmployees?: number;
+    totalCities?: number;
+    totalBusinessTypes?: number;
+    totalBusinessCategories?: number;
+    totalAdminEmployees?: number;
     // Seller specific (Optional as they might not be present for Admin)
     totalClients?: number;
     totalFollowers?: number;

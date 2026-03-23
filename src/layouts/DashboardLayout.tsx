@@ -263,12 +263,12 @@ const DashboardLayout: React.FC = () => {
           {(user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN) && (
             <>
               {/* System Data Section */}
-              {(hasAdminPermission(AdminPermissions.DASHBOARD_VIEW) ||
+              {(hasAdminPermission(AdminPermissions.ANALYTICS_VIEW) ||
                 hasAdminPermission(AdminPermissions.USERS_VIEW) ||
                 hasAdminPermission(AdminPermissions.STORES_VIEW)) && (
                   <>
                     <SidebarHeader label={t('System Data')} collapsed={collapsed} />
-                    {hasAdminPermission(AdminPermissions.DASHBOARD_VIEW) && (
+                    {hasAdminPermission(AdminPermissions.ANALYTICS_VIEW) && (
                       <>
                         <SidebarItem to="/" icon={LayoutDashboard} label={t('dashboard')} collapsed={collapsed} replace={true} />
                         <SidebarItem to="/admin-analytics" icon={BarChart3} label={t('dashboard:adminAnalytics', { defaultValue: 'Analytics' })} collapsed={collapsed} />
@@ -326,18 +326,20 @@ const DashboardLayout: React.FC = () => {
                 )}
 
               {/* Configuration Section */}
-              {(hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) ||
+              {(user?.role === UserRole.SUPER_ADMIN ||
+                hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) ||
                 hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) ||
-                hasAdminPermission(AdminPermissions.PLANS_VIEW)) && (
+                hasAdminPermission(AdminPermissions.PLANS_VIEW) ||
+                hasAdminPermission(AdminPermissions.ANALYTICS_VIEW)) && (
                   <>
                     <SidebarHeader label={t('System Configuration')} collapsed={collapsed} />
                     {hasAdminPermission(AdminPermissions.BUSINESS_TYPES_VIEW) && <SidebarItem to="/business-types" icon={Briefcase} label={t('businessTypes')} collapsed={collapsed} />}
                     {hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) && <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />}
-                    {hasAdminPermission(AdminPermissions.PLANS_VIEW) && (
-                      <>
-                        <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
-                        <SidebarItem to="/billing-transactions" icon={DollarSign} label={t('dashboard:billingTransactions', 'Billing Transactions')} collapsed={collapsed} />
-                      </>
+                    {user?.role === UserRole.SUPER_ADMIN && (
+                      <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
+                    )}
+                    {(user?.role === UserRole.SUPER_ADMIN || hasAdminPermission(AdminPermissions.ANALYTICS_VIEW)) && (
+                      <SidebarItem to="/billing-transactions" icon={CreditCard} label={t('billingTransactions')} collapsed={collapsed} />
                     )}
                   </>
                 )}

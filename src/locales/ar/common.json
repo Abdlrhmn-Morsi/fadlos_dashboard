@@ -62,6 +62,7 @@
     "businessTypes": "أنواع الأعمال",
     "businessCategories": "فئات الأعمال",
     "plansManagement": "إدارة الباقات",
+    "billingTransactions": "معاملات الفوترة",
     "notifications": "الإشعارات",
     "settings": "الإعدادات",
     "storeSettings": "إعدادات المتجر",
@@ -535,22 +536,6 @@
             "name": "إدارة المستخدمين",
             "description": "تعديل المستخدمين وتغيير الحالة"
         },
-        "admin.plans.view": {
-            "name": "عرض الخطط",
-            "description": "عرض خطط الاشتراك"
-        },
-        "admin.plans.manage": {
-            "name": "إدارة الخطط",
-            "description": "إنشاء وتعديل خطط الاشتراك"
-        },
-        "admin.subscriptions.view": {
-            "name": "عرض الاشتراكات",
-            "description": "عرض اشتراكات المتاجر وحدودها"
-        },
-        "admin.subscriptions.manage": {
-            "name": "إدارة الاشتراكات",
-            "description": "تعديل أو منح اشتراكات المتاجر"
-        },
         "admin.employees.view": {
             "name": "عرض الموظفين الإداريين",
             "description": "عرض قائمة موظفي الإدارة"
@@ -567,9 +552,9 @@
             "name": "إدارة تحديثات التطبيق",
             "description": "ضبط متطلبات إصدار التطبيق"
         },
-        "admin.dashboard.view": {
-            "name": "عرض لوحة التحليلات",
-            "description": "عرض لوحة الإحصائيات الشاملة"
+        "admin.analytics.view": {
+            "name": "التحليلات والفوترة",
+            "description": "• الوصول إلى إحصائيات النظام وأداء الإيرادات\n• عرض توزيعات المنصة (الباقات، المدن، أنواع الأعمال)\n• مراقبة معاملات الفوترة والتاريخ"
         }
     },
     "fields": {

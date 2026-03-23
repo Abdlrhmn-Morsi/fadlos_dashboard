@@ -13,7 +13,9 @@ import {
     Package,
     Layers,
     ShieldCheck,
-    Flag
+    Flag,
+    Building2,
+    LayoutGrid
 } from 'lucide-react';
 import { DashboardStats } from '../models/dashboard.model';
 import { useTranslation } from 'react-i18next';
@@ -22,6 +24,7 @@ import { useNavigate } from 'react-router-dom';
 import clsx from 'clsx';
 import { useAuth } from '../../../contexts/AuthContext';
 import { AdminPermissions } from '../../../types/admin-permissions';
+import { UserRole } from '../../../types/user-role';
 
 interface AdminStatCardProps {
     title: string;
@@ -82,89 +85,92 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
     const { t, i18n } = useTranslation(['dashboard', 'common']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
-    const { hasAdminPermission } = useAuth();
+    const { user, hasAdminPermission } = useAuth();
+    const isSuperAdmin = user?.role === UserRole.SUPER_ADMIN;
+    const showSubscriptions = isSuperAdmin || hasAdminPermission(AdminPermissions.ANALYTICS_VIEW);
+    const showDashboard = hasAdminPermission(AdminPermissions.ANALYTICS_VIEW);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-700">
-            {/* Primary Metrics Grid */}
+            {/* Primary Metrics Grid - Top Row (Always 4 Slots) */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {hasAdminPermission(AdminPermissions.STORES_VIEW) && (
-                    <AdminStatCard 
-                        title={t('dashboard:totalStores')} 
-                        value={stats.totalStores || 0} 
-                        icon={Store} 
-                        color="primary"
-                        trend={{
-                            value: `+${stats.newStoresCount || 0} ${t('dashboard:newThisMonth')}`,
-                            positive: true
-                        }}
-                    />
-                )}
-                {hasAdminPermission(AdminPermissions.USERS_VIEW) && (
-                    <AdminStatCard 
-                        title={t('dashboard:platformUsers')} 
-                        value={stats.totalUsers || 0} 
-                        icon={Users} 
-                        color="blue"
-                        trend={{
-                            value: `+${stats.platformGrowth || 0} ${t('dashboard:newThisMonth')}`,
-                            positive: true
-                        }}
-                    />
-                )}
-                {hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW) && (
-                    <AdminStatCard 
-                        title={t('dashboard:platformDrivers')} 
-                        value={stats.totalDrivers || 0} 
-                        icon={Truck} 
-                        color="orange"
-                    />
-                )}
-                {hasAdminPermission(AdminPermissions.SUBSCRIPTIONS_VIEW) && (
+                <AdminStatCard 
+                    title={t('dashboard:totalStores')} 
+                    value={stats.totalStores || 0} 
+                    icon={Store} 
+                    color="primary"
+                    trend={{
+                        value: `+${stats.newStoresCount || 0} ${t('dashboard:newThisMonth')}`,
+                        positive: true
+                    }}
+                />
+                <AdminStatCard 
+                    title={t('dashboard:platformUsers')} 
+                    value={stats.totalUsers || 0} 
+                    icon={Users} 
+                    color="blue"
+                    trend={{
+                        value: `+${stats.platformGrowth || 0} ${t('dashboard:newThisMonth')}`,
+                        positive: true
+                    }}
+                />
+                <AdminStatCard 
+                    title={t('dashboard:platformDrivers')} 
+                    value={stats.totalDrivers || 0} 
+                    icon={Truck} 
+                    color="orange"
+                />
+                {showSubscriptions ? (
                     <AdminStatCard 
                         title={t('dashboard:activeSubscriptions')} 
                         value={stats.activeSubscriptions || 0} 
                         icon={CreditCard} 
                         color="emerald"
                     />
-                )}
-            </div>
-
-            {/* Secondary Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                {hasAdminPermission(AdminPermissions.DASHBOARD_VIEW) && (
-                    <>
-                        <AdminStatCard 
-                            title={t('dashboard:totalOrders')} 
-                            value={stats.totalOrders || 0} 
-                            icon={Zap} 
-                            color="violet"
-                        />
-                        <AdminStatCard 
-                            title={t('dashboard:totalRevenue')} 
-                            value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:storeCurrency')}`} 
-                            icon={CreditCard} 
-                            color="emerald"
-                        />
-                        <AdminStatCard 
-                            title={t('dashboard:avgOrderValue')} 
-                            value={`${(stats.avgOrderValue || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${t('common:storeCurrency')}`} 
-                            icon={TrendingUp} 
-                            color="blue"
-                        />
-                    </>
-                )}
-                {hasAdminPermission(AdminPermissions.TOWNS_VIEW) && (
+                ) : (
+                    /* Fallback slot to keep 4-per-row */
                     <AdminStatCard 
-                        title={t('dashboard:totalTowns')} 
-                        value={stats.totalTowns || 0} 
-                        icon={MapPin} 
-                        color="amber"
+                        title={t('dashboard:totalAdminEmployees')} 
+                        value={stats.totalAdminEmployees || 0} 
+                        icon={ShieldCheck} 
+                        color="violet"
                     />
                 )}
             </div>
 
-            {/* Admin Action Metrics */}
+            {/* Secondary Metrics - Orders & Revenue (Gated) */}
+            {showDashboard && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <AdminStatCard 
+                        title={t('dashboard:totalOrders')} 
+                        value={stats.totalOrders || 0} 
+                        icon={Zap} 
+                        color="violet"
+                    />
+                    <AdminStatCard 
+                        title={t('dashboard:totalRevenue')} 
+                        value={`${(stats.totalRevenue || 0).toLocaleString()} ${t('common:storeCurrency')}`} 
+                        icon={CreditCard} 
+                        color="emerald"
+                    />
+                    <AdminStatCard 
+                        title={t('dashboard:avgOrderValue')} 
+                        value={`${(stats.avgOrderValue || 0).toLocaleString(undefined, { maximumFractionDigits: 1 })} ${t('common:storeCurrency')}`} 
+                        icon={TrendingUp} 
+                        color="blue"
+                    />
+                    {showSubscriptions && (
+                        <AdminStatCard 
+                            title={t('dashboard:totalAdminEmployees')} 
+                            value={stats.totalAdminEmployees || 0} 
+                            icon={ShieldCheck} 
+                            color="violet"
+                        />
+                    )}
+                </div>
+            )}
+
+            {/* Admin Action Metrics - Gated by specific permissions */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 {hasAdminPermission(AdminPermissions.STORES_VIEW) && (
                     <AdminStatCard 
@@ -202,9 +208,12 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
 
             {/* Analytics Overview - Side by Side */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-                {/* Top Performing Stores */}
-                {stats.topStores && hasAdminPermission(AdminPermissions.STORES_VIEW) && (
-                    <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]">
+                {/* Top Performing Stores - Universal fallback */}
+                {stats.topStores && (
+                    <div className={clsx(
+                        "bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]",
+                        !showSubscriptions && "lg:col-span-2"
+                    )}>
                         <div className="p-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex items-center justify-between">
                             <div className="flex items-center gap-2">
                                 <TrendingUp size={20} className="text-emerald-500" />
@@ -212,9 +221,11 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                                     {t('dashboard:topPerformingStores')}
                                 </h3>
                             </div>
-                            <button onClick={() => navigate('/stores')} className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline">
-                                {t('common:viewAll')}
-                            </button>
+                            {hasAdminPermission(AdminPermissions.STORES_VIEW) && (
+                                <button onClick={() => navigate('/stores')} className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline">
+                                    {t('common:viewAll')}
+                                </button>
+                            )}
                         </div>
                         <div className="p-4 space-y-3">
                             {stats.topStores.length === 0 ? (
@@ -239,12 +250,14 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                                                 </div>
                                             </div>
                                         </div>
-                                        <button 
-                                            onClick={() => navigate(`/stores/${store.id}`)}
-                                            className="p-2 text-slate-400 hover:text-primary transition-colors hover:bg-white dark:hover:bg-slate-800 rounded"
-                                        >
-                                            <Zap size={16} />
-                                        </button>
+                                        {hasAdminPermission(AdminPermissions.STORES_VIEW) && (
+                                            <button 
+                                                onClick={() => navigate(`/stores/${store.id}`)}
+                                                className="p-2 text-slate-400 hover:text-primary transition-colors hover:bg-white dark:hover:bg-slate-800 rounded"
+                                            >
+                                                <Zap size={16} />
+                                            </button>
+                                        )}
                                     </div>
                                 ))
                             )}
@@ -252,8 +265,8 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                     </div>
                 )}
 
-                {/* Recent Subscriptions Section */}
-                {hasAdminPermission(AdminPermissions.SUBSCRIPTIONS_VIEW) && (
+                {/* Recent Subscriptions - Gated */}
+                {showSubscriptions && (
                     <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded shadow-sm overflow-hidden text-[#1e293b] dark:text-[#f1f5f9]">
                         <div className="p-6 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20 flex items-center justify-between">
                             <div className="flex items-center gap-2">
@@ -262,7 +275,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                                     {t('dashboard:recentSubscriptions')}
                                 </h3>
                             </div>
-                            <button onClick={() => navigate('/subscriptions-admin')} className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline">
+                            <button onClick={() => navigate('/billing-transactions')} className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline">
                                 {t('common:viewAll')}
                             </button>
                         </div>
@@ -322,40 +335,51 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                 )}
             </div>
 
-            {/* Bottom Tier Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-8">
-                {hasAdminPermission(AdminPermissions.USERS_VIEW) && (
+            {/* Universal / Fallback Metrics - Always visible to all admin employees */}
+            <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <AdminStatCard 
+                        title={t('dashboard:totalTowns')} 
+                        value={stats.totalTowns || 0} 
+                        icon={MapPin} 
+                        color="amber"
+                    />
+                    <AdminStatCard 
+                        title={t('dashboard:totalCities')} 
+                        value={stats.totalCities || 0} 
+                        icon={MapPin} 
+                        color="blue"
+                    />
+                    <AdminStatCard 
+                        title={t('dashboard:totalBusinessTypes')} 
+                        value={stats.totalBusinessTypes || 0} 
+                        icon={Building2} 
+                        color="emerald"
+                    />
+                    <AdminStatCard 
+                        title={t('dashboard:totalBusinessCategories')} 
+                        value={stats.totalBusinessCategories || 0} 
+                        icon={LayoutGrid} 
+                        color="rose"
+                    />
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                     <AdminStatCard 
                         title={t('dashboard:totalCustomers')} 
                         value={stats.totalCustomers || 0} 
                         icon={Users} 
-                        color="blue"
-                    />
-                )}
-                {hasAdminPermission(AdminPermissions.STORES_VIEW) && (
-                    <AdminStatCard 
-                        title={t('dashboard:totalStores')} 
-                        value={stats.totalStores || 0} 
-                        icon={Store} 
                         color="primary"
                     />
-                )}
-                {hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW) && (
-                    <AdminStatCard 
-                        title={t('dashboard:totalDrivers')} 
-                        value={stats.totalDrivers || 0} 
-                        icon={Truck} 
-                        color="orange"
-                    />
-                )}
-                {hasAdminPermission(AdminPermissions.ADMIN_EMPLOYEES_VIEW) && (
                     <AdminStatCard 
                         title={t('dashboard:totalEmployees')} 
                         value={stats.totalEmployees || 0} 
                         icon={Users} 
                         color="violet"
                     />
-                )}
+                    {/* Empty slots for spacing */}
+                    <div className="hidden lg:block md:hidden" />
+                    <div className="hidden lg:block md:hidden" />
+                </div>
             </div>
         </div>
     );

@@ -62,6 +62,7 @@
     "businessTypes": "Business Types",
     "businessCategories": "Business Categories",
     "plansManagement": "Plans Management",
+    "billingTransactions": "Billing Transactions",
     "notifications": "Notifications",
     "settings": "Settings",
     "storeSettings": "Store Settings",
@@ -479,15 +480,11 @@
         "admin.business_categories.manage": { "name": "Manage Business Categories", "description": "Create, edit, and delete business categories" },
         "admin.users.view": { "name": "View Users", "description": "List all system users" },
         "admin.users.manage": { "name": "Manage Users", "description": "Edit users, change status" },
-        "admin.plans.view": { "name": "View Plans", "description": "View subscription plans" },
-        "admin.plans.manage": { "name": "Manage Plans", "description": "Create and edit subscription plans" },
-        "admin.subscriptions.view": { "name": "View Subscriptions", "description": "View store subscriptions and limits" },
-        "admin.subscriptions.manage": { "name": "Manage Subscriptions", "description": "Modify or grant store subscriptions" },
         "admin.employees.view": { "name": "View Admin Employees", "description": "View list of system administration staff" },
         "admin.employees.manage": { "name": "Manage Admin Employees", "description": "Add, edit, or remove admin staff" },
         "admin.roles.manage": { "name": "Manage Admin Roles", "description": "Create and configure permission sets for admin staff" },
         "admin.app_updates.manage": { "name": "Manage App Updates", "description": "Configure app version requirements" },
-        "admin.dashboard.view": { "name": "View Analytics Dashboard", "description": "View system-wide statistics dashboard" }
+        "admin.analytics.view": { "name": "Analytics & Billing", "description": "• Access system metrics and revenue performance\n• View platform distributions (Plans, Cities, Business Types)\n• Monitor billing transactions and history" }
     },
     "fields": {
         "status": "Status",

@@ -114,7 +114,7 @@ const DriverVerificationPage = () => {
                 <div className="flex flex-wrap items-center gap-2">
                     {[
                         { label: t('total', 'Total'), value: '', count: stats.all, color: 'indigo', icon: Truck },
-                        { label: t('verificationStatuses.UNDER_REVIEW', 'Reviewing'), value: 'UNDER_REVIEW', count: stats.UNDER_REVIEW, color: 'blue', icon: Search },
+                        { label: t('verificationStatuses.UNDER_REVIEW', 'Reviewing'), value: 'UNDER_REVIEW', count: stats.UNDER_REVIEW, color: 'amber', icon: Search },
                         { label: t('verificationStatuses.VERIFIED', 'Verified'), value: 'VERIFIED', count: stats.VERIFIED, color: 'emerald', icon: ShieldCheck },
                         { label: t('verificationStatuses.REJECTED', 'Rejected'), value: 'REJECTED', count: stats.REJECTED, color: 'rose', icon: ShieldCheck },
                     ].map((s) => (
@@ -150,10 +150,17 @@ const DriverVerificationPage = () => {
                             <div className="flex items-center gap-2">
                                 <span className="text-[10px] font-black uppercase tracking-widest">{s.label}</span>
                                 <span className={clsx(
-                                    "px-1.5 py-0.5 rounded text-[10px] font-black",
+                                    "px-1.5 py-0.5 rounded text-[10px] font-black transition-colors",
                                     statusFilter === s.value 
                                         ? "bg-white/20 text-white" 
-                                        : "bg-slate-100 dark:bg-slate-800 text-slate-500 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors"
+                                        : {
+                                            "bg-slate-100 dark:bg-slate-800 text-slate-500": true,
+                                            "group-hover:bg-indigo-50 group-hover:text-indigo-600": s.color === 'indigo',
+                                            "group-hover:bg-amber-50 group-hover:text-amber-600": s.color === 'amber',
+                                            "group-hover:bg-blue-50 group-hover:text-blue-600": s.color === 'blue',
+                                            "group-hover:bg-emerald-50 group-hover:text-emerald-600": s.color === 'emerald',
+                                            "group-hover:bg-rose-50 group-hover:text-rose-600": s.color === 'rose',
+                                        }
                                 )}>
                                     {s.count}
                                 </span>

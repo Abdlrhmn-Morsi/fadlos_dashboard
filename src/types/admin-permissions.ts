@@ -47,7 +47,7 @@ export enum AdminPermissions {
   ADMIN_ROLES_MANAGE = 'admin.roles.manage',
 
   // Dashboard & Analytics
-  DASHBOARD_VIEW = 'admin.dashboard.view',
+  ANALYTICS_VIEW = 'admin.analytics.view',
 }
 
 export interface AdminPermissionGroup {
@@ -185,31 +185,7 @@ export const ADMIN_PERMISSION_GROUPS: AdminPermissionGroup[] = [
       },
     ],
   },
-  {
-    category: 'Subscriptions & Plans',
-    permissions: [
-      {
-        key: AdminPermissions.PLANS_VIEW,
-        name: 'View Plans',
-        description: '• View subscription plans',
-      },
-      {
-        key: AdminPermissions.PLANS_MANAGE,
-        name: 'Manage Plans',
-        description: '• Create and edit subscription plans',
-      },
-      {
-        key: AdminPermissions.SUBSCRIPTIONS_VIEW,
-        name: 'View Subscriptions',
-        description: '• View store subscriptions and limits',
-      },
-      {
-        key: AdminPermissions.SUBSCRIPTIONS_MANAGE,
-        name: 'Manage Subscriptions',
-        description: '• Modify or grant store subscriptions',
-      },
-    ],
-  },
+
   {
     category: 'Admin Team',
     permissions: [
@@ -239,9 +215,9 @@ export const ADMIN_PERMISSION_GROUPS: AdminPermissionGroup[] = [
         description: '• Configure app version requirements',
       },
       {
-        key: AdminPermissions.DASHBOARD_VIEW,
-        name: 'View Analytics Dashboard',
-        description: '• View system-wide statistics dashboard',
+        key: AdminPermissions.ANALYTICS_VIEW,
+        name: 'Analytics & Billing',
+        description: '• Access system metrics, revenue analytics, and billing transactions',
       },
     ],
   },

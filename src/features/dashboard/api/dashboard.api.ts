@@ -47,7 +47,7 @@ export const fetchDashboardStats = async (user: any) => {
             return false;
         };
 
-        if (userRole === UserRole.SUPER_ADMIN) {
+        if (userRole === UserRole.SUPER_ADMIN || userRole === UserRole.ADMIN) {
             const adminStats = await apiService.get('/stats/admin-summary');
             const data = adminStats.data || adminStats;
             return {

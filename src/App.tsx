@@ -112,7 +112,7 @@ const AdminPermissionGate = ({ permission, children }: { permission: string, chi
 
 const AppContent = () => {
   const { isDark } = useTheme();
-  const { user, hasPermission } = useAuth();
+  const { user, hasPermission, hasAdminPermission } = useAuth();
 
   return (
     <div className={isDark ? 'dark' : ''}>
@@ -178,12 +178,12 @@ const AppContent = () => {
               user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
             } />
             <Route path="billing-transactions" element={
-              (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN)
+              (user?.role === UserRole.SUPER_ADMIN || (user?.role === UserRole.ADMIN && hasAdminPermission(AdminPermissions.ANALYTICS_VIEW)))
                 ? <AdminBillingTransactions />
                 : <Navigate to="/" replace />
             } />
             <Route path="admin-analytics" element={
-              (user?.role === UserRole.SUPER_ADMIN || user?.role === UserRole.ADMIN)
+              (user?.role === UserRole.SUPER_ADMIN || (user?.role === UserRole.ADMIN && hasAdminPermission(AdminPermissions.ANALYTICS_VIEW)))
                 ? <AdminAnalytics />
                 : <Navigate to="/" replace />
             } />
