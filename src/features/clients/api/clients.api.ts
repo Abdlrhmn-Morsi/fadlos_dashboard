@@ -19,6 +19,13 @@ export const clientsApi = {
     },
 
     /**
+     * Fetch a specific client with stats
+     */
+    getStoreClient: async (clientId: string) => {
+        return apiService.get(`/store/clients/${clientId}`);
+    },
+
+    /**
      * Sync/recalculate all client stats
      */
     syncClientStats: async () => {

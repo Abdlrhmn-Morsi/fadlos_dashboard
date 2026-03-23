@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import {
     User, ShoppingBag, DollarSign, Calendar,
     Search, ArrowUpDown, ChevronRight, X,
@@ -26,6 +26,7 @@ const ClientList = () => {
     const { t, i18n } = useTranslation(['clients', 'common', 'orders']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
+    const { id } = useParams();
     const { getCache, setCache } = useCache();
     const { hasPermission, user } = useAuth();
     const [clients, setClients] = useState<any[]>([]);
@@ -68,6 +69,36 @@ const ClientList = () => {
     useEffect(() => {
         fetchClients();
     }, [sortBy, order, page, debouncedSearch]);
+
+    // Handle Deep Link
+    useEffect(() => {
+        if (id) {
+            handleDeepLink(id);
+        } else {
+            setSelectedClient(null);
+        }
+    }, [id]);
+
+    const handleDeepLink = async (clientId: string) => {
+        try {
+            setLoadingOrders(true);
+            const response: any = await clientsApi.getStoreClient(clientId);
+            if (response) {
+                setSelectedClient(response);
+                setViewMode('list');
+                setSelectedOrder(null);
+                
+                // Fetch orders
+                const ordersResponse: any = await clientsApi.getClientOrders(clientId);
+                setClientOrders(ordersResponse.data || ordersResponse.orders || []);
+            }
+        } catch (error) {
+            console.error('Failed to fetch specific client for deep link', error);
+            toast.error(t('common:errorFetchingData'));
+        } finally {
+            setLoadingOrders(false);
+        }
+    };
 
     // Reset to page 1 when search or sort changes
     useEffect(() => {

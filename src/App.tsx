@@ -158,6 +158,7 @@ const AppContent = () => {
             } />
 
             <Route path="clients" element={<PermissionGate permission={Permissions.CLIENTS_VIEW}><ClientList /></PermissionGate>} />
+            <Route path="clients/:id" element={<PermissionGate permission={Permissions.CLIENTS_VIEW}><ClientList /></PermissionGate>} />
             <Route path="followers" element={<PermissionGate permission={Permissions.FOLLOWERS_VIEW}><FollowerList /></PermissionGate>} />
             <Route path="delivery-areas" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><DeliveryAreasPage /></PermissionGate>} />
             <Route path="branches" element={<PermissionGate permission={Permissions.SETTINGS_VIEW}><BranchesList /></PermissionGate>} />
