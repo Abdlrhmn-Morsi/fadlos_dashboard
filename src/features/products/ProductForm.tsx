@@ -126,6 +126,7 @@ const ProductForm = () => {
         isAvailable: true,
         isActive: true,
         isOffer: false,
+        isDisplayOnly: false,
         sortOrder: '0',
         variants: [] as Variant[],
         relatedProductIds: [] as string[],
@@ -229,6 +230,7 @@ const ProductForm = () => {
                 isAvailable: data.isAvailable ?? true,
                 isActive: data.isActive ?? true,
                 isOffer: data.isOffer ?? false,
+                isDisplayOnly: data.isDisplayOnly ?? false,
                 sortOrder: data.sort || '0',
                 variants: data.variants ? data.variants.map((v: any) => ({
                     id: v.id,
@@ -386,9 +388,16 @@ const ProductForm = () => {
             Object.keys(formData).forEach(key => {
                 if (key === 'variants' || key === 'relatedProductIds' || key === 'addonIds') return; // Handle manually
                 const value = (formData as any)[key];
+
+                // Allow clearing comparePrice by sending an empty string
+                if (key === 'comparePrice' && value === '') {
+                    data.append(key, '');
+                    return;
+                }
+
                 if (value !== null && value !== undefined && value !== '') {
                     // Start Debug
-                    if (['trackInventory', 'isActive', 'isAvailable', 'isOffer'].includes(key)) {
+                    if (['trackInventory', 'isActive', 'isAvailable', 'isOffer', 'isDisplayOnly'].includes(key)) {
                         console.log(`Appending ${key}:`, value, `(Type: ${typeof value})`);
                     }
                     // End Debug
@@ -1247,7 +1256,7 @@ const ProductForm = () => {
                                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
                                 </label>
                             </div>
-                            <div className="flex items-center justify-between">
+                            <div className="flex items-center justify-between mb-4">
                                 <div className={isRTL ? "text-right" : "text-left"}>
                                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('available')}</label>
                                     <p className="text-[10px] text-slate-400">{t('availableSubtitle')}</p>
@@ -1258,6 +1267,27 @@ const ProductForm = () => {
                                         className="sr-only peer"
                                         checked={formData.isAvailable}
                                         onChange={e => setFormData({ ...formData, isAvailable: e.target.checked })}
+                                        disabled={!canModifyProduct}
+                                    />
+                                    <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>
+                                </label>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                                <div className={isRTL ? "text-right" : "text-left"}>
+                                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+                                        {t('isDisplayOnly', { defaultValue: 'Display Only' })}
+                                    </label>
+                                    <p className="text-[10px] text-slate-400">
+                                        {t('isDisplayOnlySubtitle', { defaultValue: 'Disable ordering/adding to cart for this product' })}
+                                    </p>
+                                </div>
+                                <label className={clsx("relative inline-flex items-center", canModifyProduct ? "cursor-pointer" : "cursor-default")}>
+                                    <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={formData.isDisplayOnly}
+                                        onChange={e => setFormData({ ...formData, isDisplayOnly: e.target.checked })}
                                         disabled={!canModifyProduct}
                                     />
                                     <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500"></div>

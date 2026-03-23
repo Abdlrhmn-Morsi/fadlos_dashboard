@@ -361,6 +361,14 @@ const ProductList = () => {
                                                             {t('isOffer')}
                                                         </div>
                                                     )}
+                                                    {product.isDisplayOnly && (
+                                                        <div className={clsx(
+                                                            "absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-wider shadow-sm border whitespace-nowrap",
+                                                            "bg-slate-800 text-white border-slate-700 dark:bg-slate-700 dark:border-slate-600"
+                                                        )}>
+                                                            {t('displayOnlyBadge', { defaultValue: 'Display Only' })}
+                                                        </div>
+                                                    )}
                                                 </div>
                                                 <div>
                                                     <div className="flex flex-col">
