@@ -137,17 +137,19 @@ const StoreSettings = () => {
 
             const allCategories = store.businessType?.id ? await getBusinessCategories(store.businessType.id) : [];
 
+            const activeV = vData?.verification || store?.verification || user?.store?.verification;
+
             setStoreData(store);
             setBusinessTypes(bTypes);
-            setVerificationData(vData.verification);
+            setVerificationData(activeV);
             setAvailableCategories(allCategories);
 
-            if (vData.verification) {
+            if (activeV) {
                 setVerificationForm(prev => ({
                     ...prev,
-                    commercialRegisterNumber: vData.verification.commercialRegisterNumber
+                    commercialRegisterNumber: activeV.commercialRegisterNumber
                 }));
-                setVerificationPhotoPreview(vData.verification.commercialRegisterPhoto);
+                setVerificationPhotoPreview(activeV.commercialRegisterPhoto);
             }
 
             setFormData({
@@ -1216,6 +1218,7 @@ const StoreSettings = () => {
                                                 <ShieldCheck size={24} className="text-primary" />
                                             </div>
                                             <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('storeVerification')}</h3>
+
                                         </div>
                                         {verificationData && (
                                             <div className={clsx(
@@ -1230,7 +1233,7 @@ const StoreSettings = () => {
                                     </div>
 
                                     <div className="p-8">
-                                        {verificationData?.status === StoreVerificationStatus.APPROVED ? (
+                                        {String(verificationData?.status).toUpperCase() === 'APPROVED' ? (
                                             <div className="flex flex-col items-center justify-center py-12 gap-6">
                                                 <div className="w-20 h-20 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center shadow-lg animate-in zoom-in">
                                                     <CheckCircle size={48} />
@@ -1246,7 +1249,7 @@ const StoreSettings = () => {
                                                     </div>
                                                 </div>
                                             </div>
-                                         ) : verificationData?.status === StoreVerificationStatus.PENDING ? (
+                                         ) : (String(verificationData?.status).toUpperCase() === 'PENDING') ? (
                                             <div className="flex flex-col items-center justify-center py-12 gap-6">
                                                 <div className="w-24 h-24 bg-amber-50 dark:bg-amber-900/30 text-amber-500 dark:text-amber-400 rounded-full flex items-center justify-center shadow-xl shadow-amber-200/20 dark:shadow-none animate-in zoom-in duration-700">
                                                     {justSubmitted ? (

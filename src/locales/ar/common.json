@@ -65,6 +65,8 @@
     "notifications": "الإشعارات",
     "settings": "الإعدادات",
     "storeSettings": "إعدادات المتجر",
+    "storeVerificationRequestTitle": "طلب توثيق متجر جديد",
+    "storeVerificationRequestMessage": "قام المتجر {{storeName}} بتقديم طلب توثيق جديد.",
     "dashboard": "لوحة التحكم",
     "users": "المستخدمين",
     "stores": "المتاجر",

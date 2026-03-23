@@ -334,6 +334,8 @@ const AdminAnalytics: React.FC = () => {
                                                 color: isDark ? '#e2e8f0' : '#1e293b',
                                                 textAlign: isRTL ? 'right' : 'left'
                                             }}
+                                            itemStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
+                                            labelStyle={{ color: isDark ? '#e2e8f0' : '#1e293b' }}
                                             formatter={(value: any) => [`${Number(value || 0).toLocaleString()} ${t('common:systemCurrency')}`, t('dashboard:revenue')]}
                                         />
                                         <Area
@@ -610,7 +612,8 @@ const AdminAnalytics: React.FC = () => {
                                             border: 'none',
                                             borderRadius: '0px',
                                             boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                            textAlign: isRTL ? 'right' : 'left'
+                                            textAlign: isRTL ? 'right' : 'left',
+                                            color: isDark ? '#f1f5f9' : '#0f172a'
                                         }}
                                         itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
                                         labelStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}

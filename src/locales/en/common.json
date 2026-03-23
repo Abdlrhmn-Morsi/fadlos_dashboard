@@ -65,6 +65,8 @@
     "notifications": "Notifications",
     "settings": "Settings",
     "storeSettings": "Store Settings",
+    "storeVerificationRequestTitle": "New Store Verification Request",
+    "storeVerificationRequestMessage": "Store {{storeName}} has submitted a new verification request.",
     "dashboard": "Dashboard",
     "users": "Users",
     "stores": "Stores",
@@ -261,6 +263,10 @@
     "Cash Settlement": "Cash Settlement",
     "Promotion Ads": "Promotion Ads",
     "Delivery Areas": "Delivery Areas",
+    "Settings": "Settings",
+    "Analytics": "Analytics",
+    "Promo Codes": "Promo Codes",
+    "Addons": "Add-ons",
     "permissions": {
         "store.view": {
             "name": "View Store Info",

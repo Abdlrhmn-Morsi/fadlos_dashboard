@@ -415,8 +415,11 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({
                                         borderRadius: '4px',
                                         border: 'none',
                                         boxShadow: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
-                                        textAlign: isRTL ? 'right' : 'left'
+                                        textAlign: isRTL ? 'right' : 'left',
+                                        color: isDark ? '#f8fafc' : '#1e293b'
                                     }}
+                                    itemStyle={{ color: isDark ? '#f8fafc' : '#1e293b' }}
+                                    labelStyle={{ color: isDark ? '#f8fafc' : '#1e293b' }}
                                     formatter={(val: any) => [`${val.toLocaleString()} ${t('common:currencySymbol')}`, t('dashboard:totalRevenue')]}
                                 />
                                 <Bar dataKey="revenue" radius={[4, 4, 4, 4]} barSize={12}>

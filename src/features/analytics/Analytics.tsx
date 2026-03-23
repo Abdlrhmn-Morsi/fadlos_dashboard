@@ -345,7 +345,8 @@ const Analytics: React.FC = () => {
                                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
                                         fontSize: '12px',
                                         fontWeight: 'bold',
-                                        textAlign: isRTL ? 'right' : 'left'
+                                        textAlign: isRTL ? 'right' : 'left',
+                                        color: isDark ? '#f1f5f9' : '#0f172a'
                                     }}
                                     itemStyle={{ color: '#FF5C00' }}
                                     labelStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
@@ -418,7 +419,8 @@ const Analytics: React.FC = () => {
                                         border: 'none',
                                         borderRadius: '0px',
                                         boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                                        textAlign: isRTL ? 'right' : 'left'
+                                        textAlign: isRTL ? 'right' : 'left',
+                                        color: isDark ? '#f1f5f9' : '#0f172a'
                                     }}
                                     labelStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
                                     itemStyle={{ color: isDark ? '#f1f5f9' : '#0f172a' }}
