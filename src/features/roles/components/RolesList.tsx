@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Shield } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Shield, Crown } from 'lucide-react';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
 import { RolesService } from '../api/roles.api';
@@ -9,12 +9,15 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
 import { Role } from '../models/role.model';
+import { useSubscription } from '../../../hooks/useSubscription';
+import { PlanFeature } from '../../../types/plan-feature';
 
 const RolesList = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
     const { getCache, setCache, invalidateCache } = useCache();
+    const { hasFeature } = useSubscription();
     const [roles, setRoles] = useState<Role[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -143,13 +146,24 @@ const RolesList = () => {
                         {t('manageRolesDesc', { defaultValue: 'Manage user roles and permissions' })}
                     </p>
                 </div>
-                <Link
-                    to="/roles/new"
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                >
-                    <Plus size={20} />
-                    <span>{t('addRole', { defaultValue: 'Add Role' })}</span>
-                </Link>
+                {hasFeature(PlanFeature.CUSTOM_ROLES) ? (
+                    <Link
+                        to="/roles/new"
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                    >
+                        <Plus size={20} />
+                        <span>{t('addRole', { defaultValue: 'Add Role' })}</span>
+                    </Link>
+                ) : (
+                    <button
+                        onClick={() => navigate('/subscriptions')}
+                        className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                        title={t('upgradeToAddCustomRoles', { defaultValue: 'Upgrade to Pro/Premium to add custom roles' })}
+                    >
+                        <Crown size={20} className="text-amber-100" />
+                        <span>{t('addRole', { defaultValue: 'Add Role' })}</span>
+                    </button>
+                )}
             </div>
 
             {/* Search Bar */}
@@ -231,20 +245,32 @@ const RolesList = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={clsx("flex items-center gap-2 transition-opacity duration-200", isRTL ? "justify-start" : "justify-end")}>
-                                                <button
-                                                    onClick={() => navigate(`/roles/edit/${role.id}`)}
-                                                    className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                    title={t('edit')}
-                                                >
-                                                    <Edit size={18} />
-                                                </button>
-                                                {!role.isSystem && (
+                                                {hasFeature(PlanFeature.CUSTOM_ROLES) ? (
+                                                    <>
+                                                        <button
+                                                            onClick={() => navigate(`/roles/edit/${role.id}`)}
+                                                            className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                            title={t('edit')}
+                                                        >
+                                                            <Edit size={18} />
+                                                        </button>
+                                                        {!role.isSystem && (
+                                                            <button
+                                                                onClick={() => handleDelete(role.id)}
+                                                                className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                                title={t('delete')}
+                                                            >
+                                                                <Trash2 size={18} />
+                                                            </button>
+                                                        )}
+                                                    </>
+                                                ) : (
                                                     <button
-                                                        onClick={() => handleDelete(role.id)}
-                                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
-                                                        title={t('delete')}
+                                                        onClick={() => navigate('/subscriptions')}
+                                                        className="p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all"
+                                                        title={t('upgradeToEdit', { defaultValue: 'Upgrade to edit custom roles' })}
                                                     >
-                                                        <Trash2 size={18} />
+                                                        <Crown size={18} />
                                                     </button>
                                                 )}
                                             </div>
