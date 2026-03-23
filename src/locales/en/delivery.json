@@ -26,12 +26,16 @@
     "drivers": {
       "cancel_hiring_success": "Hiring request cancelled successfully",
       "cancel_hiring_failed": "Failed to cancel hiring request",
+      "cancel_hiring_title": "Cancel Hiring Request",
+      "confirm_cancel_hiring": "Are you sure you want to cancel this hiring request?",
       "accept_resignation_title": "Accept Resignation",
       "accept_resignation_confirm": "Are you sure you want to accept this driver's resignation?",
       "reject_resignation_title": "Reject Resignation",
       "reject_resignation_confirm": "Are you sure you want to reject this driver's resignation?",
       "accept_confirm_title": "Approve Application",
-      "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list."
+      "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.",
+      "hire_confirm_title": "Send Hiring Request",
+      "hire_confirm_message": "Are you sure you want to send a hiring request to this freelancer?"
     },
     "identity_verification": "Identity Verification",
     "id_front": "ID Front",

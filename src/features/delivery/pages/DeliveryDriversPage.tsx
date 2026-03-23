@@ -185,7 +185,7 @@ const DeliveryDriversPage = () => {
     return (
         <div className="p-6 space-y-6">
             <div className="flex items-center justify-between mb-4">
-                <h1 className="text-2xl font-bold">{t('delivery:drivers.title')}</h1>
+                <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('delivery:drivers.title')}</h1>
                 {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
                     <button
                         onClick={async () => {
@@ -409,7 +409,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
 
     if (requests.length === 0) return (
         <div className="py-12 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-center">
-            <p className="text-slate-400 italic text-sm">{t('common.no_results')}</p>
+            <p className="text-slate-400 italic text-sm">{t('common:no_results')}</p>
         </div>
     );
 

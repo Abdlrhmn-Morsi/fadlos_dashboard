@@ -319,7 +319,7 @@ const ClientList = () => {
                         {sortBy === 'totalSpent' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalSpent' ? "text-white/70" : "text-slate-400")}>{t('highestSpenders')}</p>
-                    <p className="text-sm font-black">{t('sortByTotalSpent')}</p>
+                    <p className="text-sm font-black text-slate-900 dark:text-white">{t('sortByTotalSpent')}</p>
                 </button>
 
                 <button
@@ -335,7 +335,7 @@ const ClientList = () => {
                         {sortBy === 'totalOrders' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalOrders' ? "text-white/70" : "text-slate-400")}>{t('mostActive')}</p>
-                    <p className="text-sm font-black">{t('sortByTotalOrders')}</p>
+                    <p className="text-sm font-black text-slate-900 dark:text-white">{t('sortByTotalOrders')}</p>
                 </button>
 
                 <button
@@ -351,7 +351,7 @@ const ClientList = () => {
                         {sortBy === 'deliveredOrders' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'deliveredOrders' ? "text-white/70" : "text-slate-400")}>{t('mostDelivered')}</p>
-                    <p className="text-sm font-black">{t('sortByDeliveredOrders')}</p>
+                    <p className="text-sm font-black text-slate-900 dark:text-white">{t('sortByDeliveredOrders')}</p>
                 </button>
             </div>
 

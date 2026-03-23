@@ -31,6 +31,8 @@ const FreelancerMarketplace = () => {
     const [places, setPlaces] = useState<any[]>([]);
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [cancelData, setCancelData] = useState<{ requestId: string, userId: string } | null>(null);
+    const [isHireModalOpen, setIsHireModalOpen] = useState(false);
+    const [hireId, setHireId] = useState<string | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
     const debouncedSearch = useDebounce(searchQuery, 500);
     const [page, setPage] = useState(1);
@@ -131,17 +133,20 @@ const FreelancerMarketplace = () => {
         }
     };
 
-    const handleHire = async (deliveryId: string) => {
-        setHiringId(deliveryId);
+    const handleHire = (deliveryId: string) => {
+        setHireId(deliveryId);
+        setIsHireModalOpen(true);
+    };
+    
+    const confirmHire = async () => {
+        if (!hireId) return;
+        setHiringId(hireId);
+        setIsHireModalOpen(false);
         try {
-            await hireFreelancer(deliveryId);
+            await hireFreelancer(hireId);
             toast.success(t('delivery:drivers.hire_success'));
-
-            // Invalidate My Drivers cache
             invalidateCache('delivery_drivers');
-
-            // Update status locally
-            setFreelancers(prev => prev.map(f => f.id === deliveryId ? { ...f, hiringStatus: 'PENDING' } : f));
+            setFreelancers(prev => prev.map(f => f.id === hireId ? { ...f, hiringStatus: 'PENDING' } : f));
         } catch (error: any) {
             console.error('Failed to hire freelancer', error);
             const errorData = error.response?.data?.message;
@@ -150,6 +155,7 @@ const FreelancerMarketplace = () => {
             toast.error(message);
         } finally {
             setHiringId(null);
+            setHireId(null);
         }
     };
 
@@ -369,6 +375,19 @@ const FreelancerMarketplace = () => {
                     onCancel={() => {
                         setIsCancelModalOpen(false);
                         setCancelData(null);
+                    }}
+                />
+            )}
+
+            {isHireModalOpen && (
+                <ConfirmModal
+                    isOpen={isHireModalOpen}
+                    title={t('delivery:drivers.drivers.hire_confirm_title')}
+                    message={t('delivery:drivers.drivers.hire_confirm_message')}
+                    onConfirm={confirmHire}
+                    onCancel={() => {
+                        setIsHireModalOpen(false);
+                        setHireId(null);
                     }}
                 />
             )}

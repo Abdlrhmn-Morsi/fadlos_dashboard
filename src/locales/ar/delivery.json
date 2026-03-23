@@ -26,12 +26,16 @@
     "drivers": {
       "cancel_hiring_success": "تم إلغاء طلب التوظيف بنجاح",
       "cancel_hiring_failed": "فشل إلغاء طلب التوظيف",
+      "cancel_hiring_title": "إلغاء طلب التوظيف",
+      "confirm_cancel_hiring": "هل أنت متأكد من رغبتك في إلغاء طلب التوظيف هذا؟",
       "accept_resignation_title": "قبول الاستقالة",
       "accept_resignation_confirm": "هل أنت متأكد من رغبتك في قبول استقالة هذا السائق؟",
       "reject_resignation_title": "رفض الاستقالة",
       "reject_resignation_confirm": "هل أنت متأكد من رغبتك في رفض استقالة هذا السائق؟",
       "accept_confirm_title": "الموافقة على الطلب",
-      "accept_confirm_message": "هل أنت متأكد أنك تريد الموافقة على طلب هذا السائق؟ سيؤدي ذلك إلى إضافته إلى قائمة مناديب متجرك."
+      "accept_confirm_message": "هل أنت متأكد أنك تريد الموافقة على طلب هذا السائق؟ سيؤدي ذلك إلى إضافته إلى قائمة مناديب متجرك.",
+      "hire_confirm_title": "إرسال طلب توظيف",
+      "hire_confirm_message": "هل أنت متأكد من رغبتك في إرسال طلب توظيف لهذا المناديب المستقل؟"
     },
     "identity_verification": "التحقق من الهوية",
     "id_front": "الهوية (الأمام)",

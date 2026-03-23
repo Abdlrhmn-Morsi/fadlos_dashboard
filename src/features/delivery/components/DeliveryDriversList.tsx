@@ -531,7 +531,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             <div className="flex flex-col text-sm">
-                                                <span>{driver.email}</span>
+                                                <span className="text-slate-900 dark:text-white">{driver.email}</span>
                                                 <span className="text-slate-500">{driver.phone}</span>
                                             </div>
                                         </td>
@@ -635,7 +635,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                             ) : (
                                 <tr>
                                     <td colSpan={5} className="px-6 py-12 text-center text-slate-400 text-sm">
-                                        {t('common.no_results')}
+                                        {t('common:no_results')}
                                     </td>
                                 </tr>
                             )}

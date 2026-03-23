@@ -142,7 +142,7 @@ const FollowerList = () => {
 
                     <div className="hidden md:flex items-center gap-2 p-2 px-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm">
                         <Users size={16} className="text-primary" />
-                        <span className="font-black text-[10px] uppercase tracking-tight">{t('communityReach')}</span>
+                        <span className="font-black text-[10px] uppercase tracking-tight text-slate-900 dark:text-white">{t('communityReach')}</span>
                     </div>
 
                     {hasPermission(Permissions.PROMOTION_ADS_VIEW) && (
