@@ -13,13 +13,14 @@ import { useNavigate } from 'react-router-dom';
 import { UserRole } from '../../types/user-role';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
+import { AdminPermissions } from '../../types/admin-permissions';
 import clsx from 'clsx';
 
 const Settings = () => {
     const { t } = useTranslation(['common', 'stores']);
     const { isRTL } = useLanguage();
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, hasAdminPermission } = useAuth();
     const isSeller = user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE;
 
     const navItems = [
@@ -61,7 +62,7 @@ const Settings = () => {
             path: '/app-updates',
             color: 'text-purple-500',
             bgColor: 'bg-purple-50',
-            visible: !isSeller // Only visible to Admins/Super Admins
+            visible: !isSeller && hasAdminPermission(AdminPermissions.APP_UPDATES_MANAGE)
         },
 
     ];

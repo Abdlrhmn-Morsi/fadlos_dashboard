@@ -7,6 +7,8 @@ import clsx from 'clsx';
 import api from '../../services/api';
 import { toast } from 'react-hot-toast';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { useAuth } from '../../contexts/AuthContext';
+import { AdminPermissions } from '../../types/admin-permissions';
 
 enum PlatformType {
     ANDROID = 'android',
@@ -42,6 +44,9 @@ const AppUpdateSettings: React.FC = () => {
     const [activeApp, setActiveApp] = useState<AppType>(AppType.CUSTOMER);
     const [loading, setLoading] = useState(false);
     const [config, setConfig] = useState<AppVersionResponse | null>(null);
+    const { hasAdminPermission } = useAuth();
+
+    const canManageAppUpdates = hasAdminPermission(AdminPermissions.APP_UPDATES_MANAGE);
 
     // Local state for editing form
     const [formData, setFormData] = useState<AppVersionConfig>({
@@ -134,6 +139,20 @@ const AppUpdateSettings: React.FC = () => {
 
     if (!config && loading) {
         return <LoadingSpinner />;
+    }
+
+    if (!canManageAppUpdates) {
+        return (
+            <div className="p-6 flex flex-col items-center justify-center min-h-[60vh]">
+                <AlertTriangle className="w-16 h-16 text-yellow-500 mb-4" />
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                    {t('accessDenied', { defaultValue: 'Access Denied' })}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 text-center max-w-md">
+                    {t('noPermissionToManageAppUpdates', { defaultValue: 'You do not have permission to manage app updates and version controls.' })}
+                </p>
+            </div>
+        );
     }
 
     return (
