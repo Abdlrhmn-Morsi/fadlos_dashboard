@@ -142,8 +142,10 @@ const ProductList = () => {
             await productsApi.deleteProduct(deleteId);
             toast.success(t('deleteSuccess'));
 
-            // Immediately remove the product from the list for better UX
-            setProducts(prevProducts => prevProducts.filter(p => p.id !== deleteId));
+            // Update the product status locally instead of removing it
+            setProducts(prevProducts =>
+                prevProducts.map(p => p.id === deleteId ? { ...p, isActive: false } : p)
+            );
 
             // Invalidate products cache to force refresh on next load
             invalidateCache('products');
