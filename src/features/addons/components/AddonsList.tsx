@@ -16,7 +16,7 @@ import { Addon } from '../models/addon.model';
 const AddonsList = () => {
     const { hasPermission } = useAuth();
     const navigate = useNavigate();
-    const { t } = useTranslation(['addons', 'common']);
+    const { t } = useTranslation(['addons', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
     const { getCache, setCache, invalidateCache } = useCache();
 
@@ -140,6 +140,7 @@ const AddonsList = () => {
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('addonName')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('dashboard:totalProducts')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('price')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('inventory')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('isActive')}</th>
@@ -155,6 +156,7 @@ const AddonsList = () => {
                                 [...Array(3)].map((_, i) => (
                                     <tr key={i} className="animate-pulse">
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-12"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-12"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
@@ -163,7 +165,7 @@ const AddonsList = () => {
                                 ))
                             ) : addons.length === 0 ? (
                                 <tr>
-                                    <td colSpan={5} className="px-6 py-12 text-center">
+                                    <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
                                             <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full mb-4">
                                                 <PackageOpen size={48} strokeWidth={1} className="text-slate-300 dark:text-slate-600" />
@@ -193,6 +195,11 @@ const AddonsList = () => {
                                                     </p>
                                                 </div>
                                             </div>
+                                        </td>
+                                        <td className="px-6 py-4">
+                                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
+                                                {(addon as any).productCount || 0}
+                                            </span>
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">
                                             {addon.price.toFixed(2)} {t('common:currencySymbol')}

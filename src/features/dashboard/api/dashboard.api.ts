@@ -123,26 +123,10 @@ export const fetchDashboardStats = async (user: any) => {
                 promises.push(apiService.get(`/stores/my-store`).then(res => ({ key: 'rating', val: res.averageRating || 0, extra: res })).catch(() => ({ key: 'rating', val: 0 })));
             }
 
-            // Hiring Stats (delivery_drivers.create or delivery_drivers.update or delivery_drivers.view)
-            if (hasPerm(Permissions.DELIVERY_DRIVERS_VIEW)) {
-                promises.push(apiService.get('/delivery-drivers/hiring-requests/me').then(res => {
-                    const data = (res as any).data || {};
-                    const incomingRequests = data.incomingRequests || [];
-                    const sentInvitations = data.sentInvitations || [];
-                    return {
-                        key: 'hiring-requests-full',
-                        val: {
-                            incomingRequests,
-                            sentInvitations,
-                            pendingCount: incomingRequests.filter((r: any) => r.status === 'PENDING').length
-                        }
-                    };
-                }).catch(() => ({ key: 'hiring-requests-full', val: { incomingRequests: [], sentInvitations: [], pendingCount: 0 } })));
-                promises.push(apiService.get('/delivery-drivers/store-drivers').then(res => ({ key: 'hired-drivers', val: (res.data || res).filter((d: any) => d.driverType === 'FREELANCER').length })).catch(() => ({ key: 'hired-drivers', val: 0 })));
-            }
 
-            // Top Rated Products (Default for all employees)
-            promises.push(apiService.get('/products/seller-products?sortBy=averageRating&sort=DESC&limit=3').then(res => ({ key: 'topProducts', val: (res as any).data || [] })).catch(() => ({ key: 'topProducts', val: [] })));
+
+            // Top Products by Units Sold (Default for all employees)
+            promises.push(apiService.get('/products/seller-products?sortBy=unitsSold&sort=DESC&limit=3').then(res => ({ key: 'topProducts', val: (res as any).data || [] })).catch(() => ({ key: 'topProducts', val: [] })));
 
             // Top Categories (Default for all employees)
             promises.push(apiService.get('/categories/seller-categories?limit=3').then(res => ({ key: 'topCategories', val: (res as any).data || [] })).catch(() => ({ key: 'topCategories', val: [] })));
@@ -165,13 +149,6 @@ export const fetchDashboardStats = async (user: any) => {
                         stats.pendingHiringRequests = stats.pendingHiringRequests || 0; // Backup
                     }
                 }
-                if (res.key === 'hiring-requests-full') {
-                    stats.incomingRequests = res.val.incomingRequests;
-                    stats.sentInvitations = res.val.sentInvitations;
-                    stats.pendingHiringRequests = res.val.pendingCount;
-                }
-                if (res.key === 'hiring-requests') stats.pendingHiringRequests = res.val;
-                if (res.key === 'hired-drivers') stats.totalHiredDrivers = res.val;
                 if (res.key === 'topProducts') stats.topRatedProducts = res.val;
                 if (res.key === 'topCategories') stats.topCategories = res.val;
                 if (res.key === 'topAddons') stats.topAddons = res.val;

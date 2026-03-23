@@ -1,5 +1,6 @@
 {
     "no_results": "لم يتم العثور على نتائج",
+    "noResults": "لا توجد نتائج",
     "noDataFound": "لم يتم العثور على سجلات",
     "showingResults": "عرض {{count}} نتيجة",
     "click_to_upload": "اضغط للرفع",
