@@ -118,5 +118,6 @@
     "totalPendingRevenue": "إجمالي الأرباح المعلقة",
     "confirmedRevenue": "الأرباح المؤكدة",
     "adjustSearch": "حاول تعديل البحث",
-    "showingResults": "عرض {{start}}-{{end}} من أصل {{total}} نتيجة"
+    "showingResults": "عرض {{start}}-{{end}} من أصل {{total}} نتيجة",
+    "orderLimitReached": "لقد وصلت إلى الحد الأقصى للطلبات الشهرية. يرجى ترقية باقتك للاستمرار في استقبال المزيد من الطلبات."
 }

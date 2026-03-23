@@ -118,5 +118,6 @@
     "totalPendingRevenue": "Total Pending Revenue",
     "confirmedRevenue": "Confirmed Revenue",
     "adjustSearch": "Try adjusting your search",
-    "showingResults": "Showing {{start}}-{{end}} of {{total}} results"
+    "showingResults": "Showing {{start}}-{{end}} of {{total}} results",
+    "orderLimitReached": "You have reached your monthly order limit. Please upgrade your plan to continue receiving more orders."
 }

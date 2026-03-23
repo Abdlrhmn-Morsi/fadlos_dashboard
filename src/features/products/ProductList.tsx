@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, Star, Eye, ShieldAlert, MoreVertical } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, Star, Eye, ShieldAlert, MoreVertical, Crown } from 'lucide-react';
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import clsx from 'clsx';
 import { Link, useNavigate } from 'react-router-dom';
@@ -16,6 +16,7 @@ import { Permissions } from '../../types/permissions';
 import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
+import { useSubscription } from '../../hooks/useSubscription';
 
 const ProductList = () => {
     const { hasPermission } = useAuth();
@@ -23,6 +24,7 @@ const ProductList = () => {
     const { t } = useTranslation(['products', 'common']);
     const { isRTL } = useLanguage();
     const { getCache, setCache, invalidateCache } = useCache();
+    const { usage } = useSubscription();
     const [products, setProducts] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -169,24 +171,36 @@ const ProductList = () => {
                     </p>
                 </div>
                 {hasPermission(Permissions.PRODUCTS_CREATE) && (
-                    <button
-                        onClick={async () => {
-                            try {
-                                const usage = await getMySubscriptionUsage();
-                                if (usage.limits.products !== -1 && usage.limits.products <= products.length) { // Note: this might need totalItems from meta
-                                    toast.error(t('common:upgradeRequired', { feature: t('common:productsLimit') }));
-                                    return;
+                    usage && usage.limits.products !== -1 && products.length >= usage.limits.products ? (
+                        <button
+                            onClick={() => navigate('/subscription')}
+                            className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-5 py-2.5 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-colors w-full sm:w-auto font-medium shadow-sm hover:shadow"
+                            title={t('common:upgradeRequired', { feature: t('common:productsLimit', { defaultValue: 'products' }) })}
+                        >
+                            <Crown size={20} className="text-amber-100" />
+                            <span>{t('addProduct')}</span>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const usageData = await getMySubscriptionUsage();
+                                    if (usageData.limits.products !== -1 && usageData.limits.products <= products.length) { // Note: this might need totalItems from meta
+                                        toast.error(t('common:upgradeRequired', { feature: t('common:productsLimit', { defaultValue: 'products' }) }));
+                                        navigate('/subscription');
+                                        return;
+                                    }
+                                    navigate('/products/new');
+                                } catch (e) {
+                                    toast.error(t('common:errorCheckingLimits'));
                                 }
-                                navigate('/products/new');
-                            } catch (e) {
-                                toast.error(t('common:errorCheckingLimits'));
-                            }
-                        }}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                    >
-                        <Plus size={20} />
-                        <span>{t('addProduct')}</span>
-                    </button>
+                            }}
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                        >
+                            <Plus size={20} />
+                            <span>{t('addProduct')}</span>
+                        </button>
+                    )
                 )}
             </div>
 

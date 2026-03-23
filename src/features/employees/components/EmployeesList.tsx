@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Users, Power, PowerOff, ShieldAlert, MapPin } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Users, Power, PowerOff, ShieldAlert, MapPin, Crown } from 'lucide-react';
 import clsx from 'clsx';
 import { useNavigate } from 'react-router-dom';
 import { EmployeesService } from '../api/employees.api';
@@ -11,12 +11,14 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import { useCache } from '../../../contexts/CacheContext';
 import { Employee } from '../models/employee.model';
 import { Pagination } from '../../../components/common/Pagination';
+import { useSubscription } from '../../../hooks/useSubscription';
 
 const EmployeesList = () => {
     const navigate = useNavigate();
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
     const { getCache, setCache, invalidateCache } = useCache();
+    const { usage } = useSubscription();
     const [employees, setEmployees] = useState<Employee[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -196,24 +198,36 @@ const EmployeesList = () => {
                         {t('manageEmployeesDesc', { defaultValue: 'Manage store staff and their access' })}
                     </p>
                 </div>
-                <button
-                    onClick={async () => {
-                        try {
-                            const usage = await getMySubscriptionUsage();
-                            if (usage.limits.staff_accounts !== -1 && usage.limits.staff_accounts <= employees.length) {
-                                toast.error(t('common:upgradeRequired', { feature: t('common:staffAccountsLimit', { defaultValue: 'staff accounts' }) }));
-                                return;
+                {usage && usage.limits.staff_accounts !== -1 && usage.usage.staff_accounts >= usage.limits.staff_accounts ? (
+                    <button
+                        onClick={() => navigate('/subscription')}
+                        className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-5 py-2.5 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-colors w-full sm:w-auto font-medium shadow-sm hover:shadow"
+                        title={t('common:upgradeRequired', { feature: t('common:staffAccountsLimit') })}
+                    >
+                        <Crown size={20} className="text-amber-100" />
+                        <span>{t('addEmployee', { defaultValue: 'Add Employee' })}</span>
+                    </button>
+                ) : (
+                    <button
+                        onClick={async () => {
+                            try {
+                                const usage = await getMySubscriptionUsage();
+                                if (usage.limits.staff_accounts !== -1 && usage.limits.staff_accounts <= usage.usage.staff_accounts) {
+                                    toast.error(t('common:upgradeRequired', { feature: t('common:staffAccountsLimit', { defaultValue: 'staff accounts' }) }));
+                                    navigate('/subscription');
+                                    return;
+                                }
+                                navigate('/employees/new');
+                            } catch (err) {
+                                toast.error(t('common:errorCheckingLimits'));
                             }
-                            navigate('/employees/new');
-                        } catch (err) {
-                            toast.error(t('common:errorCheckingLimits'));
-                        }
-                    }}
-                    className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                >
-                    <Plus size={20} />
-                    <span>{t('addEmployee', { defaultValue: 'Add Employee' })}</span>
-                </button>
+                        }}
+                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                    >
+                        <Plus size={20} />
+                        <span>{t('addEmployee', { defaultValue: 'Add Employee' })}</span>
+                    </button>
+                )}
             </div>
 
             {/* Search Bar */}

@@ -607,5 +607,14 @@
     "sendRequest": "إرسال طلب",
     "requestSent": "تم إرسال الطلب",
     "alreadyHired": "تم التوظيف مسبقاً",
-    "adjustSearch": "حاول تعديل معايير البحث للعثور على سائقين مستقلين متاحين."
+    "adjustSearch": "حاول تعديل معايير البحث للعثور على سائقين مستقلين متاحين.",
+    "notAvailableInPlan": "غير متاح في باقتك الحالية",
+    "staffAccountsLimit": "حسابات الموظفين",
+    "branchesLimit": "الفروع",
+    "productsLimit": "المنتجات",
+    "categoriesLimit": "الأصناف",
+    "storeDriversLimit": "مناديب المتجر",
+    "customRolesFeature": "الأدوار المخصصة",
+    "upgradeRequired": "يرجى ترقية باقتك لإضافة المزيد من {{feature}}.",
+    "upgradeNow": "ترقية الآن"
 }

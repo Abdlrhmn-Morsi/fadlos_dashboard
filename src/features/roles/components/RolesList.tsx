@@ -156,9 +156,9 @@ const RolesList = () => {
                     </Link>
                 ) : (
                     <button
-                        onClick={() => navigate('/subscriptions')}
+                        onClick={() => navigate('/subscription')}
                         className="flex items-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                        title={t('upgradeToAddCustomRoles', { defaultValue: 'Upgrade to Pro/Premium to add custom roles' })}
+                        title={t('common:upgradeRequired', { feature: t('common:customRolesFeature', { defaultValue: 'custom roles' }) })}
                     >
                         <Crown size={20} className="text-amber-100" />
                         <span>{t('addRole', { defaultValue: 'Add Role' })}</span>
@@ -266,7 +266,7 @@ const RolesList = () => {
                                                     </>
                                                 ) : (
                                                     <button
-                                                        onClick={() => navigate('/subscriptions')}
+                                                        onClick={() => navigate('/subscription')}
                                                         className="p-2 text-amber-500 hover:text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-900/30 rounded-lg transition-all"
                                                         title={t('upgradeToEdit', { defaultValue: 'Upgrade to edit custom roles' })}
                                                     >

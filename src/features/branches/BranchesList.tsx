@@ -7,16 +7,20 @@ import { Branch, CreateBranchDto, UpdateBranchDto } from '../../types/branch';
 import { BranchForm } from './components/BranchForm';
 import { Modal } from '../../components/ui/Modal';
 import ConfirmationModal from '../../components/ui/ConfirmationModal';
-import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe, Star, ExternalLink, ShieldAlert } from 'lucide-react';
+import { Pencil, Trash2, Plus, MapPin, Search, Phone, Home, Globe, Star, ExternalLink, ShieldAlert, Crown } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 import toast from 'react-hot-toast';
 import clsx from 'clsx';
 import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
+import { useSubscription } from '../../hooks/useSubscription';
 
 export const BranchesList: React.FC = () => {
     const { t } = useTranslation(['branches', 'common']);
     const { isRTL } = useLanguage();
+    const navigate = useNavigate();
     const { getCache, setCache, invalidateCache } = useCache();
+    const { usage } = useSubscription();
     const [branches, setBranches] = useState<Branch[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -178,6 +182,7 @@ export const BranchesList: React.FC = () => {
             const usage = await getMySubscriptionUsage();
             if (usage.limits.branches !== -1 && branches.length >= usage.limits.branches) {
                 toast.error(t('common:upgradeRequired', { feature: t('common:branchesLimit') }));
+                navigate('/subscription');
                 return;
             }
             setEditingBranch(null);
@@ -228,15 +233,28 @@ export const BranchesList: React.FC = () => {
                         </p>
                     </div>
 
-                    <button
-                        type="button"
-                        onClick={openCreateModal}
-                        className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                        <Plus size={18} className={clsx(isRTL ? "ml-2" : "mr-2")} />
-                        {t('addBranch')}
-                    </button>
+                    {usage && usage.limits.branches !== -1 && branches.length >= usage.limits.branches ? (
+                        <button
+                            type="button"
+                            onClick={() => navigate('/subscription')}
+                            className="group relative inline-flex items-center justify-center rounded bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
+                            title={t('common:upgradeRequired', { feature: t('common:branchesLimit') })}
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                            <Crown size={18} className={clsx(isRTL ? "ml-2" : "mr-2")} />
+                            <span>{t('addBranch')}</span>
+                        </button>
+                    ) : (
+                        <button
+                            type="button"
+                            onClick={openCreateModal}
+                            className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                            <Plus size={18} className={clsx(isRTL ? "ml-2" : "mr-2")} />
+                            {t('addBranch')}
+                        </button>
+                    )}
                 </div>
             </div>
 
@@ -434,16 +452,30 @@ export const BranchesList: React.FC = () => {
                             </p>
 
                             {!searchTerm && (
-                                <button
-                                    onClick={openCreateModal}
-                                    className="group relative px-12 py-5 bg-indigo-600 text-white text-lg font-bold rounded-2xl hover:bg-indigo-700 transition-all duration-300 shadow-2xl shadow-indigo-600/30 hover:shadow-indigo-600/50 active:scale-95 overflow-hidden"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
-                                    <span className="relative z-10 flex items-center gap-3">
-                                        <Plus className="w-6 h-6" />
-                                        {t('addBranch')}
-                                    </span>
-                                </button>
+                                usage && usage.limits.branches !== -1 && branches.length >= usage.limits.branches ? (
+                                    <button
+                                        onClick={() => navigate('/subscription')}
+                                        className="group relative px-12 py-5 bg-gradient-to-r from-amber-500 to-amber-600 text-white text-lg font-bold rounded-2xl hover:from-amber-600 hover:to-amber-700 transition-all duration-300 shadow-2xl shadow-amber-600/30 hover:shadow-amber-600/50 active:scale-95 overflow-hidden"
+                                        title={t('common:upgradeRequired', { feature: t('common:branchesLimit') })}
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                        <span className="relative z-10 flex items-center gap-3">
+                                            <Crown className="w-6 h-6" />
+                                            {t('addBranch')}
+                                        </span>
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={openCreateModal}
+                                        className="group relative px-12 py-5 bg-indigo-600 text-white text-lg font-bold rounded-2xl hover:bg-indigo-700 transition-all duration-300 shadow-2xl shadow-indigo-600/30 hover:shadow-indigo-600/50 active:scale-95 overflow-hidden"
+                                    >
+                                        <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
+                                        <span className="relative z-10 flex items-center gap-3">
+                                            <Plus className="w-6 h-6" />
+                                            {t('addBranch')}
+                                        </span>
+                                    </button>
+                                )
                             )}
                         </div>
                     </div>

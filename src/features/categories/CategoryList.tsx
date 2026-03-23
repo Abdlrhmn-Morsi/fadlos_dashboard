@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Tag, LayoutGrid, ArrowUpDown, MoreHorizontal, ShieldAlert } from 'lucide-react';
+import { Plus, Search, Edit, Trash2, Tag, LayoutGrid, ArrowUpDown, MoreHorizontal, ShieldAlert, Crown } from 'lucide-react';
 import categoriesApi from './api/categories.api';
 import CategoryFormModal from './components/CategoryFormModal';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -12,12 +12,17 @@ import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import { Pagination } from '../../components/common/Pagination';
 import clsx from 'clsx';
+import { useNavigate } from 'react-router-dom';
+import { useSubscription } from '../../hooks/useSubscription';
+import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 
 const CategoryList = () => {
     const { t } = useTranslation(['categories', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
     const { hasPermission } = useAuth();
+    const navigate = useNavigate();
     const { getCache, setCache, invalidateCache } = useCache();
+    const { usage } = useSubscription();
     const [categories, setCategories] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
@@ -181,13 +186,36 @@ const CategoryList = () => {
                     </p>
                 </div>
                 {hasPermission(Permissions.CATEGORIES_CREATE) && (
-                    <button
-                        onClick={handleAdd}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                    >
-                        <Plus size={20} />
-                        <span>{t('addCategory')}</span>
-                    </button>
+                    usage && usage.limits.categories !== -1 && categories.length >= usage.limits.categories ? (
+                        <button
+                            onClick={() => navigate('/subscription')}
+                            className="flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-5 py-2.5 rounded-lg hover:from-amber-600 hover:to-amber-700 transition-colors w-full sm:w-auto font-medium shadow-sm hover:shadow"
+                            title={t('common:upgradeRequired', { feature: t('common:categoriesLimit', { defaultValue: 'categories' }) })}
+                        >
+                            <Crown size={20} className="text-amber-100" />
+                            <span>{t('addCategory')}</span>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const usageData = await getMySubscriptionUsage();
+                                    if (usageData.limits.categories !== -1 && categories.length >= usageData.limits.categories) {
+                                        toast.error(t('common:upgradeRequired', { feature: t('common:categoriesLimit', { defaultValue: 'categories' }) }));
+                                        navigate('/subscription');
+                                        return;
+                                    }
+                                    handleAdd();
+                                } catch (error) {
+                                    toast.error(t('common:errorCheckingLimits'));
+                                }
+                            }}
+                            className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
+                        >
+                            <Plus size={20} />
+                            <span>{t('addCategory')}</span>
+                        </button>
+                    )
                 )}
             </div>
 

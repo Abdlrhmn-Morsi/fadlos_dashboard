@@ -4,6 +4,8 @@ import { Eye, Search, Filter, Clock, CheckCircle, Package, Truck, AlertTriangle,
 import ordersApi from './api/orders.api';
 import { branchesApi } from '../branches/api/branches.api';
 import { OrderStatus } from '../../types/order-status';
+import { useSubscription } from '../../hooks/useSubscription';
+import { PlanLimit } from '../../types/plan-limit';
 
 import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -19,7 +21,12 @@ const OrderList = () => {
     const { isRTL } = useLanguage();
     const { getCache, setCache } = useCache();
     const { user } = useAuth();
+    const { usage } = useSubscription();
     const [orders, setOrders] = useState<any[]>([]);
+
+    const isOrderLimitReached = usage && usage.limits?.[PlanLimit.ORDERS_PER_MONTH] !== -1 && 
+        (usage.usage?.[PlanLimit.ORDERS_PER_MONTH] || 0) >= (usage.limits?.[PlanLimit.ORDERS_PER_MONTH] || 0);
+
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState('');
     const [branchFilter, setBranchFilter] = useState('');
@@ -180,6 +187,34 @@ const OrderList = () => {
 
     return (
         <div className="p-6">
+            {/* Limit Reached Warning */}
+            {isOrderLimitReached && (
+                <div 
+                    dir={isRTL ? 'rtl' : 'ltr'}
+                    className="mb-8 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm animate-in fade-in slide-in-from-top-4 duration-500"
+                >
+                    <div className={clsx("flex items-center gap-4 text-center", isRTL ? "md:text-right" : "md:text-left")}>
+                        <div className="w-12 h-12 rounded-full bg-amber-100 dark:bg-amber-900/40 flex items-center justify-center shrink-0">
+                            <AlertTriangle className="text-amber-600 dark:text-amber-400" size={24} />
+                        </div>
+                        <div>
+                            <h4 className="font-black text-amber-900 dark:text-amber-100 uppercase tracking-tight text-sm">
+                                {t('common:notAvailableInPlan')}
+                            </h4>
+                            <p className="text-amber-700 dark:text-amber-300 text-xs font-medium">
+                                {t('orders:orderLimitReached')}
+                            </p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => navigate('/subscription')}
+                        className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all hover:shadow-lg hover:shadow-amber-500/20 active:scale-95"
+                    >
+                        {t('common:upgradeNow')}
+                    </button>
+                </div>
+            )}
+
             {/* Status Counts Grid */}
             <div className="space-y-4 mb-8">
                 {/* First Row: 4 cards */}

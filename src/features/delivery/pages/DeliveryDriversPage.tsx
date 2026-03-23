@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { DeliveryDriversList, FreelancerMarketplace } from '../components';
 import { useTranslation } from 'react-i18next';
-import { Truck, Globe, Clock, Plus } from 'lucide-react';
+import { Truck, Globe, Clock, Plus, Crown } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { getSentHiringRequests, getReceivedHiringRequests, respondToHiringRequest, cancelHiringRequest, respondToTransition, getPendingCounts } from '../api/delivery-drivers.api';
@@ -11,6 +11,7 @@ import { useNavigate, useSearchParams, useLocation } from 'react-router-dom';
 import { Permissions } from '../../../types/permissions';
 import { getMySubscriptionUsage } from '../../subscriptions/api/subscriptions.api';
 import { toast } from '../../../utils/toast';
+import { useSubscription } from '../../../hooks/useSubscription';
 
 const DeliveryDriversPage = () => {
     const { t } = useTranslation(['common', 'dashboard', 'delivery']);
@@ -18,6 +19,7 @@ const DeliveryDriversPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { hasPermission } = useAuth();
+    const { usage } = useSubscription();
     const [searchParams, setSearchParams] = useSearchParams();
     
     const mainTabParam = searchParams.get('mainTab');
@@ -187,25 +189,36 @@ const DeliveryDriversPage = () => {
             <div className="flex items-center justify-between mb-4">
                 <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{t('delivery:drivers.title')}</h1>
                 {hasPermission(Permissions.DELIVERY_DRIVERS_CREATE) && (
-                    <button
-                        onClick={async () => {
-                            try {
-                                const usage = await getMySubscriptionUsage();
-                                // We need the current count of drivers. 
-                                // Since we don't have it here easily without fetching, 
-                                // we might want to just navigate or fetch briefly.
-                                // For now, let's just navigate and let the new page handle it or check again.
-                                // Alternatively, we can pass a callback to DeliveryDriversList.
-                                navigate('/delivery-drivers/new', { state: { from: location.pathname + location.search } });
-                            } catch (err) {
-                                navigate('/delivery-drivers/new', { state: { from: location.pathname + location.search } });
-                            }
-                        }}
-                        className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-all shadow-sm flex items-center gap-2"
-                    >
-                        <Plus size={18} />
-                        {t('delivery:drivers.add_new')}
-                    </button>
+                    usage && usage.limits.drivers !== -1 && (usage.usage?.drivers || 0) >= usage.limits.drivers ? (
+                        <button
+                            onClick={() => navigate('/subscription')}
+                            className="px-6 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-bold rounded-lg transition-all shadow-sm flex items-center justify-center gap-2"
+                            title={t('common:upgradeRequired', { feature: t('common:storeDriversLimit', { defaultValue: 'store drivers' }) })}
+                        >
+                            <Crown size={18} className="text-amber-100" />
+                            <span>{t('delivery:drivers.add_new')}</span>
+                        </button>
+                    ) : (
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const usageData = await getMySubscriptionUsage();
+                                    if (usageData.limits.drivers !== -1 && (usageData.usage?.drivers || 0) >= usageData.limits.drivers) {
+                                        toast.error(t('common:upgradeRequired', { feature: t('common:storeDriversLimit', { defaultValue: 'store drivers' }) }));
+                                        navigate('/subscription');
+                                        return;
+                                    }
+                                    navigate('/delivery-drivers/new', { state: { from: location.pathname + location.search } });
+                                } catch (err) {
+                                    navigate('/delivery-drivers/new', { state: { from: location.pathname + location.search } });
+                                }
+                            }}
+                            className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-lg transition-all shadow-sm flex items-center gap-2"
+                        >
+                            <Plus size={18} />
+                            {t('delivery:drivers.add_new')}
+                        </button>
+                    )
                 )}
             </div>
 

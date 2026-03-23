@@ -535,5 +535,14 @@
     "sendRequest": "Send Request",
     "requestSent": "Request Sent",
     "alreadyHired": "Already Hired",
-    "adjustSearch": "Try adjusting your search criteria to find available freelancers."
+    "adjustSearch": "Try adjusting your search criteria to find available freelancers.",
+    "notAvailableInPlan": "Not available in your current plan",
+    "staffAccountsLimit": "staff accounts",
+    "branchesLimit": "branches",
+    "productsLimit": "products",
+    "categoriesLimit": "categories",
+    "storeDriversLimit": "store drivers",
+    "customRolesFeature": "custom roles",
+    "upgradeRequired": "Please upgrade your plan to add more {{feature}}.",
+    "upgradeNow": "Upgrade Now"
 }
