@@ -873,14 +873,14 @@ const OrderDetail = () => {
                                             {(order.deliveryAddress.phone || order.deliveryAddress.email) && (
                                                 <div className="pt-2 border-t border-slate-100 dark:border-slate-800 space-y-2">
                                                     <p className="text-xs font-semibold text-slate-400 uppercase">{t('orders:contactForDelivery')}</p>
-                                                    {order.deliveryAddress.phone && (
-                                                        <div className="flex items-center gap-3">
+                                                     {order.deliveryAddress.phone && (
+                                                        <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                                                             <Phone size={14} className="text-slate-400" />
                                                             <span>{order.deliveryAddress.phone}</span>
                                                         </div>
                                                     )}
                                                     {order.deliveryAddress.email && (
-                                                        <div className="flex items-center gap-3">
+                                                        <div className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
                                                             <Mail size={14} className="text-slate-400" />
                                                             <span>{order.deliveryAddress.email}</span>
                                                         </div>
