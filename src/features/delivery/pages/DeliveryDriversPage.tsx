@@ -121,11 +121,13 @@ const DeliveryDriversPage = () => {
         setLoading(true);
         try {
             await cancelHiringRequest(cancellingRequestId);
+            toast.success(t('delivery:drivers.drivers.cancel_hiring_success', 'Hiring request cancelled successfully'));
             fetchIncomingRequests();
             fetchSentRequests();
             fetchCounts();
-        } catch (error) {
+        } catch (error: any) {
             console.error(`Failed to cancel hiring request:`, error);
+            toast.error(error.response?.data?.message || t('common.error'));
         } finally {
             setLoading(false);
             setCancellingRequestId(null);
@@ -136,25 +138,25 @@ const DeliveryDriversPage = () => {
 
     const confirmReject = async () => {
         if (!rejectingRequestId || !activeActionRequest) return;
+        
+        if (!rejectionReason.trim()) {
+            toast.error(t('common:rejection_reason_required'));
+            return;
+        }
+
         setLoading(true);
         try {
             if (activeActionRequest.status === 'TRANSITION_OFFER') {
-                if (!rejectionReason.trim()) {
-                    toast.error(t('common:rejection_reason_required'));
-                    return;
-                }
                 await respondToTransition(rejectingRequestId, false, rejectionReason);
             } else {
-                if (!rejectionReason.trim()) {
-                    toast.error(t('common:rejection_reason_required'));
-                    return;
-                }
                 await respondToHiringRequest(rejectingRequestId, 'REJECTED', rejectionReason);
             }
+            toast.success(t('common:rejectedSuccessfully', 'Rejected successfully'));
             fetchIncomingRequests();
             fetchCounts();
-        } catch (error) {
+        } catch (error: any) {
             console.error(`Failed to reject request:`, error);
+            toast.error(error.response?.data?.message || t('common.error'));
         } finally {
             setLoading(false);
             setRejectingRequestId(null);
@@ -172,11 +174,13 @@ const DeliveryDriversPage = () => {
             } else {
                 await respondToHiringRequest(acceptingRequestId, 'ACCEPTED');
             }
+            toast.success(t('common:acceptedSuccessfully', 'Accepted successfully'));
             fetchIncomingRequests();
             fetchSentRequests();
             fetchCounts();
-        } catch (error) {
+        } catch (error: any) {
             console.error(`Failed to accept request:`, error);
+            toast.error(error.response?.data?.message || t('common.error'));
         } finally {
             setLoading(false);
             setAcceptingRequestId(null);
@@ -433,9 +437,9 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                             <thead>
                                 <tr className="bg-slate-50 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 text-xs font-semibold uppercase tracking-wider text-start">
                                     <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.name')}</th>
-                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common.hiringStatus')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:hiringStatus')}</th>
                                     <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.notes')}</th>
-                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common.driverVerification')}</th>
+                                    <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('common:driverVerification')}</th>
                                     <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start">{t('fields.date')}</th>
                                     <th className="px-6 py-4 border-b border-slate-200 dark:border-slate-700 text-start"></th>
                                 </tr>
@@ -503,7 +507,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                             : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                                                     )}>
-                                                        {String(t(`delivery.drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
+                                                        {String(t(`delivery:drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
                                                     </span>
                                                     {req.status === 'REJECTED' && (req.responseReason || req.rejectionReason) && (
                                                         <span className="text-[10px] text-rose-500 max-w-[200px] break-words line-clamp-2" title={req.responseReason || req.rejectionReason}>
@@ -526,7 +530,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                         : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                                                 )}>
-                                                    {verificationStatus === 'VERIFIED' ? t('common.verified') : verificationStatus}
+                                                    {verificationStatus === 'VERIFIED' ? t('common:verified') : verificationStatus}
                                                 </span>
                                             </td>
                                             <td className="px-6 py-4 text-slate-500 text-start">

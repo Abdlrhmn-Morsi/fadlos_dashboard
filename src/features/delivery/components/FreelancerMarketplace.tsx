@@ -74,11 +74,13 @@ const FreelancerMarketplace = () => {
         try {
             const response = await searchFreelancers({
                 ...filters,
+                available: true,
                 search: debouncedSearch,
                 page,
                 limit: 12
             });
-            setFreelancers(response?.data || []);
+            const filteredFreelancers = (response?.data || []).filter((f: any) => f.isAvailableForHiring !== false);
+            setFreelancers(filteredFreelancers);
             setTotalPages(response?.meta?.totalPages || 1);
         } catch (error) {
             console.error('Failed to fetch freelancers', error);

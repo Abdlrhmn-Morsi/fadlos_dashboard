@@ -9,10 +9,15 @@ const api = axios.create({
     withCredentials: true, // If using cookies
 });
 
-// Request interceptor for adding the bearer token
+// Request interceptor for adding the bearer token and language header
 api.interceptors.request.use(
     (config) => {
         // Token is now handled by HttpOnly cookies automatically by the browser
+        
+        // Add language header for backend translations
+        const language = localStorage.getItem('language') || 'ar';
+        config.headers['lang'] = language;
+        
         return config;
     },
     (error) => {

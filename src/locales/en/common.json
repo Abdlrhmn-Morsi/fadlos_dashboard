@@ -1,4 +1,17 @@
 {
+    "common": {
+        "hiringStatus": "Hiring Status",
+        "driverVerification": "Driver Verification",
+        "verified": "Verified",
+        "status": "Status",
+        "error": "An error occurred",
+        "error_occurred": "An error occurred",
+        "rejection_reason": "Rejection Reason",
+        "transitionToFreelancerMsg": "Become Freelancer Request",
+        "cancel": "Cancel",
+        "update": "Update",
+        "success": "Updated successfully"
+    },
     "no_results": "No results found",
     "noResults": "No results found",
     "noDataFound": "No records found",
@@ -78,6 +91,7 @@
     "employee": "Employee",
     "delivery": "Delivery",
     "status": "Status",
+    "hiringStatus": "Hiring Status",
     "confirmed": "Confirmed",
     "unitsSold": "Units Sold",
     "thisMonth": "This Month",
