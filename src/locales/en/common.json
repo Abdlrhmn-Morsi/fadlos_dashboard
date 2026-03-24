@@ -32,6 +32,8 @@
     "save": "Save",
     "updateChanges": "Update Changes",
     "confirmUnassignMessage": "Are you sure you want to unassign this driver from the order?",
+    "confirmAssignTitle": "Confirm Assignment",
+    "confirmAssignMessage": "Are you sure you want to assign this driver to the order?",
     "from": "From",
     "to": "To",
     "verified": "Verified",

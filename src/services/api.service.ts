@@ -12,7 +12,10 @@ const apiService = {
         // Unwrap if response follows the { success, statusCode, data } pattern
         if (body && body.success !== undefined && body.data !== undefined) {
             if (body.meta) {
-                return { data: body.data, meta: body.meta } as any;
+                return { data: body.data, meta: body.meta, message: body.message, success: body.success } as any;
+            }
+            if (typeof body.data === 'object' && body.data !== null && !Array.isArray(body.data)) {
+                return { ...body.data, message: body.message, success: body.success };
             }
             return body.data;
         }
@@ -27,7 +30,10 @@ const apiService = {
         const body = response.data;
         if (body && body.success !== undefined && body.data !== undefined) {
             if (body.meta) {
-                return { data: body.data, meta: body.meta } as any;
+                return { data: body.data, meta: body.meta, message: body.message, success: body.success } as any;
+            }
+            if (typeof body.data === 'object' && body.data !== null && !Array.isArray(body.data)) {
+                return { ...body.data, message: body.message, success: body.success };
             }
             return body.data;
         }
@@ -42,7 +48,10 @@ const apiService = {
         const body = response.data;
         if (body && body.success !== undefined && body.data !== undefined) {
             if (body.meta) {
-                return { data: body.data, meta: body.meta } as any;
+                return { data: body.data, meta: body.meta, message: body.message, success: body.success } as any;
+            }
+            if (typeof body.data === 'object' && body.data !== null && !Array.isArray(body.data)) {
+                return { ...body.data, message: body.message, success: body.success };
             }
             return body.data;
         }
@@ -54,7 +63,10 @@ const apiService = {
         const body = response.data;
         if (body && body.success !== undefined && body.data !== undefined) {
             if (body.meta) {
-                return { data: body.data, meta: body.meta } as any;
+                return { data: body.data, meta: body.meta, message: body.message, success: body.success } as any;
+            }
+            if (typeof body.data === 'object' && body.data !== null && !Array.isArray(body.data)) {
+                return { ...body.data, message: body.message, success: body.success };
             }
             return body.data;
         }
