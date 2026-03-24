@@ -51,6 +51,7 @@
       "resignation_pending": "استقالة قيد الانتظار",
       "accepted": "مقبول",
       "rejected": "مرفوض",
+      "cancelled": "ملغي",
       "transition_offer": "عرض انتقال"
     },
     "marketplace": "سوق المناديب",

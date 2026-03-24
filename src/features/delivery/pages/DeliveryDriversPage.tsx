@@ -503,6 +503,8 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                         "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
                                                         req.status === 'REJECTED' 
                                                             ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
+                                                            : req.status === 'CANCELLED'
+                                                            ? "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
                                                             : req.status === 'ACCEPTED'
                                                             ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                             : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"

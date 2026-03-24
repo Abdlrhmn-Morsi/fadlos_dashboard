@@ -51,6 +51,7 @@
       "resignation_pending": "Resignation Pending",
       "accepted": "Accepted",
       "rejected": "Rejected",
+      "cancelled": "Cancelled",
       "transition_offer": "Transition Offer"
     },
     "marketplace": "Marketplace",
