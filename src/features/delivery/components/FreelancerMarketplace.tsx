@@ -145,10 +145,18 @@ const FreelancerMarketplace = () => {
         setHiringId(hireId);
         setIsHireModalOpen(false);
         try {
-            await hireFreelancer(hireId);
+            const response = await hireFreelancer(hireId);
             toast.success(t('delivery:drivers.hire_success'));
             invalidateCache('delivery_drivers');
-            setFreelancers(prev => prev.map(f => f.id === hireId ? { ...f, hiringStatus: 'PENDING' } : f));
+            
+            // Extract the request ID from the response (relation is returned from backend)
+            const requestId = response?.relation?.id || response?.id || (response as any)?.data?.id;
+            
+            setFreelancers(prev => prev.map(f => f.id === hireId ? { 
+                ...f, 
+                hiringStatus: 'PENDING', 
+                hiringRequestId: requestId 
+            } : f));
         } catch (error: any) {
             console.error('Failed to hire freelancer', error);
             const errorData = error.response?.data?.message;
