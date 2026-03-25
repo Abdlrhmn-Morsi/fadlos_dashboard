@@ -92,5 +92,6 @@
     "totalSpent": "إجمالي المصروفات",
     "lastOrder": "آخر طلب",
     "noItemsFound": "لم يتم العثور على نتائج",
-    "done": "تم"
+    "done": "تم",
+    "showingResults": "عرض {{count}} نتيجة"
 }

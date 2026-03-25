@@ -331,11 +331,7 @@ const PromoCodeList = () => {
                 <div className="px-6 py-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/30">
                     <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
                         <p className="text-sm text-slate-500">
-                            {t('common:showingResults', {
-                                start: (page - 1) * limit + 1,
-                                end: Math.min(page * limit, totalItems),
-                                total: totalItems
-                            })}
+                            {t('showingResults', { count: totalItems })}
                         </p>
                         <Pagination
                             currentPage={page}

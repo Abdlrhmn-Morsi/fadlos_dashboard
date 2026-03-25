@@ -92,5 +92,6 @@
     "totalSpent": "Total Spent",
     "lastOrder": "Last Order",
     "noItemsFound": "No items found",
-    "done": "Done"
+    "done": "Done",
+    "showingResults": "Showing {{count}} results"
 }
