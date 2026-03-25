@@ -26,6 +26,18 @@
     "discount": "Discount (Promo)",
     "orderNotes": "Order Notes",
     "orderProgress": "Order Progress",
+    "statusDesc": {
+        "pending": "Waiting for store acceptance",
+        "confirmed": "Order confirmed",
+        "preparing": "Being prepared",
+        "ready": "Ready for delivery",
+        "driver_assigned": "Driver assigned",
+        "driver_rejected": "Order rejected by driver",
+        "out_for_delivery": "Driver is on the way",
+        "delivered": "Delivered successfully",
+        "cancelled": "Order was cancelled",
+        "returned": "Order was returned"
+    },
     "currentStatus": "Current Status",
     "completed": "Completed",
     "invoice": "Invoice",
@@ -119,5 +131,11 @@
     "confirmedRevenue": "Confirmed Revenue",
     "adjustSearch": "Try adjusting your search",
     "showingResults": "Showing {{start}}-{{end}} of {{total}} results",
-    "orderLimitReached": "You have reached your monthly order limit. Please upgrade your plan to continue receiving more orders."
+    "orderLimitReached": "You have reached your monthly order limit. Please upgrade your plan to continue receiving more orders.",
+    "storeCommission": "Store Commission",
+    "storeCommissionAdded": "Store Commission (Added)",
+    "driverProfit": "Driver Profit",
+    "commissionFixed": "Fixed",
+    "commissionPercentage": "Percentage",
+    "commissionNone": "None"
 }

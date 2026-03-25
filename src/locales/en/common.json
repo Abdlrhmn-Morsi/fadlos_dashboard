@@ -34,6 +34,7 @@
     "confirmUnassignMessage": "Are you sure you want to unassign this driver from the order?",
     "confirmAssignTitle": "Confirm Assignment",
     "confirmAssignMessage": "Are you sure you want to assign this driver to the order?",
+    "cannotAssignPendingOrderUntilConfirmed": "Order must be confirmed before assigning a driver.",
     "from": "From",
     "to": "To",
     "verified": "Verified",
@@ -145,6 +146,11 @@
     "driverTypes": {
         "STORE_DRIVER": "Store Driver",
         "FREELANCER": "Freelancer"
+    },
+    "driver_status": {
+        "available": "Available",
+        "unavailable": "Unavailable",
+        "busy": "Busy"
     },
     "vehicle_types": {
         "BICYCLE": "Bicycle",

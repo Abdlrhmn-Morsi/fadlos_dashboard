@@ -26,6 +26,20 @@
     "discount": "الخصم (برومو)",
     "orderNotes": "ملاحظات الطلب",
     "orderProgress": "مراحل الطلب",
+    "statusDesc": {
+        "pending": "في انتظار قبول المتجر",
+        "confirmed": "تم تأكيد الطلب",
+        "preparing": "يتم تحضير الطلب",
+        "ready": "الطلب جاهز للتوصيل",
+        "driver_assigned": "تم تعيين سائق",
+        "driver_rejected": "تم رفض الطلب من قبل السائق",
+        "out_for_delivery": "السائق في الطريق إليك",
+        "delivered": "تم التوصيل بنجاح",
+        "cancelled": "تم إلغاء الطلب",
+        "returned": "تم إرجاع الطلب"
+    },
+    "driverRejected": "السائق رفض الطلب",
+    "driverUnassigned": "تم إلغاء تعيين السائق",
     "currentStatus": "الحالة الحالية",
     "completed": "تم",
     "invoice": "فاتورة",
@@ -119,5 +133,11 @@
     "confirmedRevenue": "الأرباح المؤكدة",
     "adjustSearch": "حاول تعديل البحث",
     "showingResults": "عرض {{start}}-{{end}} من أصل {{total}} نتيجة",
-    "orderLimitReached": "لقد وصلت إلى الحد الأقصى للطلبات الشهرية. يرجى ترقية باقتك للاستمرار في استقبال المزيد من الطلبات."
+    "orderLimitReached": "لقد وصلت إلى الحد الأقصى للطلبات الشهرية. يرجى ترقية باقتك للاستمرار في استقبال المزيد من الطلبات.",
+    "storeCommission": "عمولة المتجر",
+    "storeCommissionAdded": "عمولة المتجر (مضافة)",
+    "driverProfit": "أرباح السائق",
+    "commissionFixed": "مبلغ ثابت",
+    "commissionPercentage": "نسبة مئوية",
+    "commissionNone": "بدون عمولة"
 }

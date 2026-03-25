@@ -673,7 +673,16 @@ const OrderDetail = () => {
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center justify-between gap-2 mb-1">
                                                     <h4 className="font-bold text-sm text-slate-900 dark:text-white">
-                                                        {getStatusLabel(entry.status)}
+                                                        {(() => {
+                                                            try {
+                                                                if (entry.notes) {
+                                                                    const parsed = JSON.parse(entry.notes);
+                                                                    if (parsed.type === 'driver_rejected') return t('orders:driverRejected');
+                                                                    if (parsed.type === 'driver_unassigned') return t('orders:driverUnassigned');
+                                                                }
+                                                            } catch (e) { }
+                                                            return getStatusLabel(entry.status);
+                                                        })()}
                                                     </h4>
                                                     <span className="text-xs text-slate-500 whitespace-nowrap">
                                                         {new Date(entry.timestamp).toLocaleString(isRTL ? 'ar-EG' : 'en-US', {
@@ -751,7 +760,10 @@ const OrderDetail = () => {
                                                     <h4 className={`font-bold text-sm ${isCompleted || isCurrent ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-600'}`}>
                                                         {getStatusLabel(status)}
                                                     </h4>
-                                                    <p className="text-xs text-slate-500">
+                                                    <p className="text-xs text-slate-500 mb-1">
+                                                        {t(`orders:statusDesc.${status.toLowerCase()}`)}
+                                                    </p>
+                                                    <p className="text-[10px] text-slate-400 uppercase font-medium">
                                                         {isCurrent ? t('orders:currentStatus') : isCompleted ? t('orders:completed') : t('orders:pending')}
                                                     </p>
                                                 </div>
@@ -1006,8 +1018,8 @@ const OrderDetail = () => {
                                                             )} />
                                                             <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
                                                                 {order.driver.deliveryProfile?.isBusy
-                                                                    ? (t('orders:driverStatusBusy', 'Busy') as string)
-                                                                    : (t('orders:driverStatusAvailable', 'Available') as string)}
+                                                                    ? (t('common:driver_status.busy', 'Busy') as string)
+                                                                    : (t('common:driver_status.available', 'Available') as string)}
                                                             </span>
                                                         </div>
                                                         {(order.driver.phone || order.driver.deliveryProfile?.profile?.user?.phone) && (
@@ -1019,6 +1031,44 @@ const OrderDetail = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {/* Commission & Earnings (Freelancer) */}
+                                            {order.driverCommissionType && (
+                                                <div className="flex items-center justify-between p-3 mt-1 mb-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-800">
+                                                    <div>
+                                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                                                            {t('orders:storeCommission', 'Store Commission')}
+                                                        </div>
+                                                        <div className="flex items-baseline gap-1">
+                                                            <span className="font-bold text-slate-700 dark:text-slate-300">
+                                                                {order.driverCommissionType === 'fixed' 
+                                                                    ? `${Number(order.driverCommissionValue || 0).toFixed(2)} ${t('common:currencySymbol')}`
+                                                                    : order.driverCommissionType === 'none'
+                                                                        ? '0%'
+                                                                        : `${order.driverCommissionValue || 0}%`}
+                                                            </span>
+                                                            <span className="text-[10px] text-slate-500 font-medium bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                                                                {order.driverCommissionType === 'fixed' 
+                                                                    ? t('orders:commissionFixed', 'Fixed')
+                                                                    : order.driverCommissionType === 'none'
+                                                                        ? t('orders:commissionNone', 'None')
+                                                                        : t('orders:commissionPercentage', 'Percentage')}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div className="text-end">
+                                                        <div className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-500/70 uppercase tracking-wider mb-0.5">
+                                                            {t('orders:driverProfit', 'Driver Profit')}
+                                                        </div>
+                                                        <div className="flex items-baseline gap-1 justify-end text-emerald-600 dark:text-emerald-400">
+                                                            <span className="font-black">
+                                                                {Number(order.driverNetEarnings ?? 0).toFixed(2)}
+                                                            </span>
+                                                            <span className="text-xs font-bold opacity-80">{t('common:currencySymbol')}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            )}
 
                                             {/* Action Buttons at the bottom of the card */}
                                             {order.status !== OrderStatus.OUT_FOR_DELIVERY &&
@@ -1422,10 +1472,10 @@ const OrderDetail = () => {
                                                                 )} />
                                                                 <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
                                                                     {isUnavailable
-                                                                        ? (t('common:delivery.drivers.status.unavailable', 'Unavailable') as string)
+                                                                        ? (t('common:driver_status.unavailable', 'Unavailable') as string)
                                                                         : isBusy
-                                                                            ? (t('common:delivery.drivers.status.busy', 'Busy') as string)
-                                                                            : (t('common:delivery.drivers.status.available', 'Available') as string)}
+                                                                            ? (t('common:driver_status.busy', 'Busy') as string)
+                                                                            : (t('common:driver_status.available', 'Available') as string)}
                                                                 </span>
                                                             </div>
                                                             {(driver.activeDeliveriesCount > 0) && (
@@ -1464,9 +1514,9 @@ const OrderDetail = () => {
                                                     <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                                                         <ShieldAlert size={12} />
                                                         {isUnavailable
-                                                            ? (t('common:delivery.drivers.status.unavailable', 'Unavailable') as string)
+                                                            ? (t('common:driver_status.unavailable', 'Unavailable') as string)
                                                             : isBusy
-                                                                ? (t('orders:driverStatusBusy', 'Busy') as string)
+                                                                ? (t('common:driver_status.busy', 'Busy') as string)
                                                                 : t('orders:unverified', 'Unverified')}
                                                     </div>
                                                 ) : null}

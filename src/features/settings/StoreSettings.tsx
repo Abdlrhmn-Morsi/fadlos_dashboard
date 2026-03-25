@@ -115,10 +115,11 @@ const StoreSettings = () => {
         acceptOrdersIfOffDay: false,
         acceptOrdersInClosedHours: false,
         isAcceptingOrders: true,
-        enableStoreReviews: true,
         enableProductReviews: true,
         maxOrdersPerDriver: 5,
-        isHiringDrivers: false
+        isHiringDrivers: false,
+        driverCommissionType: 'none',
+        driverCommissionValue: 0,
     });
 
     const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -177,7 +178,9 @@ const StoreSettings = () => {
                 enableStoreReviews: store.enableStoreReviews === false ? false : true,
                 enableProductReviews: store.enableProductReviews === false ? false : true,
                 maxOrdersPerDriver: store.maxOrdersPerDriver || 5,
-                isHiringDrivers: store.isHiringDrivers || false
+                isHiringDrivers: store.isHiringDrivers || false,
+                driverCommissionType: store.driverCommissionType || 'none',
+                driverCommissionValue: Number(store.driverCommissionValue) || 0,
             });
 
             setLogoPreview(store.logo);
@@ -362,6 +365,8 @@ const StoreSettings = () => {
             data.append('enableProductReviews', String(formData.enableProductReviews));
             data.append('maxOrdersPerDriver', String(formData.maxOrdersPerDriver));
             data.append('isHiringDrivers', String(formData.isHiringDrivers));
+            data.append('driverCommissionType', formData.driverCommissionType);
+            data.append('driverCommissionValue', String(formData.driverCommissionValue));
 
             if (formData.workingDays.length > 0) {
                 data.append('workingDays', JSON.stringify(formData.workingDays));
@@ -1202,6 +1207,65 @@ const StoreSettings = () => {
                                                     />
                                                     <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary dark:peer-checked:bg-primary shadow-sm disabled:opacity-50"></div>
                                                 </label>
+                                            </div>
+                                        </div>
+
+                                        {/* Commission Settings - Full width */}
+                                        <div className="md:col-span-2 space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                            <div className="space-y-1">
+                                                <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
+                                                    <CreditCard size={14} className="text-secondary" /> {t('driverCommission')}
+                                                </h4>
+                                                <p className="text-slate-500 text-[10px] italic leading-relaxed max-w-2xl">
+                                                    {t('driverCommissionDesc')}
+                                                </p>
+                                            </div>
+
+                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                                <div className="space-y-4">
+                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                                        {t('commissionType')}
+                                                    </label>
+                                                    <select
+                                                        name="driverCommissionType"
+                                                        value={formData.driverCommissionType}
+                                                        onChange={handleChange}
+                                                        disabled={isReadOnly}
+                                                        className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed appearance-none"
+                                                    >
+                                                        <option value="none">{t('commissionNone')}</option>
+                                                        <option value="percentage">{t('commissionPercentage')}</option>
+                                                        <option value="fixed">{t('commissionFixed')}</option>
+                                                    </select>
+                                                </div>
+
+                                                {formData.driverCommissionType !== 'none' && (
+                                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                                            {t('commissionValue')}
+                                                        </label>
+                                                        <div className="relative">
+                                                            <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none">
+                                                                <span className="text-slate-400 font-bold">
+                                                                    {formData.driverCommissionType === 'percentage' ? '%' : ''}
+                                                                </span>
+                                                            </div>
+                                                            <input
+                                                                type="number"
+                                                                name="driverCommissionValue"
+                                                                value={formData.driverCommissionValue}
+                                                                onChange={handleChange}
+                                                                min={0}
+                                                                step="0.01"
+                                                                disabled={isReadOnly}
+                                                                className={`w-full py-4 pr-6 ${formData.driverCommissionType === 'percentage' ? 'pl-10' : 'px-6'} bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed`}
+                                                            />
+                                                        </div>
+                                                        <p className="text-[10px] text-slate-500 italic mt-2 ps-1">
+                                                            {t('commissionExample')} (e.g., Deliveries: 20 → Driver Gets: {formData.driverCommissionType === 'percentage' ? `20 - (20 * ${formData.driverCommissionValue || 0} / 100)` : `20 - ${formData.driverCommissionValue || 0}`})
+                                                        </p>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     </div>

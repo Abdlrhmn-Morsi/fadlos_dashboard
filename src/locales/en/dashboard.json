@@ -5,6 +5,8 @@
     "pendingOrders": "Pending Orders",
     "needsAction": "Waiting for action",
     "newOrderReceived": "🎉 New Order Received!",
+    "driverRejectedOrder": "Driver Rejected Order",
+    "orderUpdated": "Order Updated",
     "totalRevenue": "Total Revenue",
     "totalOrders": "Total Orders",
     "avgOrderValue": "Avg Order Value",

@@ -34,6 +34,7 @@
     "confirmUnassignMessage": "هل أنت متأكد من رغبتك في إلغاء تعيين هذا السائق من الطلب؟",
     "confirmAssignTitle": "تأكيد التعيين",
     "confirmAssignMessage": "هل أنت متأكد من رغبتك في تعيين هذا السائق للطلب؟",
+    "cannotAssignPendingOrderUntilConfirmed": "يجب تأكيد الطلب قبل تعيين سائق.",
     "from": "من",
     "to": "إلى",
     "verified": "موثق",
@@ -146,6 +147,11 @@
     "driverTypes": {
         "STORE_DRIVER": "سائق متجر",
         "FREELANCER": "مستقل"
+    },
+    "driver_status": {
+        "available": "متاح",
+        "unavailable": "غير متاح",
+        "busy": "مشغول"
     },
     "vehicle_types": {
         "BICYCLE": "دراجة هوائية",

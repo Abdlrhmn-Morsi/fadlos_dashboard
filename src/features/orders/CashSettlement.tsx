@@ -153,8 +153,12 @@ const CashSettlement = () => {
                                 )}
                             >
                                 <div className="flex items-center gap-4 mb-6">
-                                    <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
-                                        <Truck className="text-primary w-6 h-6" />
+                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-700">
+                                        {collection.driverAvatar ? (
+                                            <img src={collection.driverAvatar} alt={collection.driverName} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Truck className="text-primary w-6 h-6" />
+                                        )}
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-slate-800 dark:text-white">
@@ -186,15 +190,23 @@ const CashSettlement = () => {
                                     {collection.driverType === 'FREELANCER' && (
                                         <div className="text-xs text-slate-500 mt-2 space-y-1 border-t border-slate-200 dark:border-slate-700 pt-2">
                                             <div className="flex justify-between">
-                                                <span>{t('ordersTotal')}</span>
+                                                <span>{t('orders:subtotal')}</span>
                                                 <span className="font-medium text-slate-700 dark:text-slate-300">
-                                                    {Number(collection.totalOrderAmount || 0).toFixed(2)} {t('common:currencySymbol')}
+                                                    {(Number(collection.totalOrderAmount || 0) - Number(collection.totalDeliveryFee || 0)).toFixed(2)} {t('common:currencySymbol')}
                                                 </span>
                                             </div>
-                                            <div className="flex justify-between text-green-600 dark:text-green-500">
-                                                <span>{t('driverEarningsSubtracted')}</span>
-                                                <span className="font-medium">
-                                                    -{Number(collection.totalDeliveryFee || 0).toFixed(2)} {t('common:currencySymbol')}
+                                            {(collection.totalCommission || 0) > 0 && (
+                                                <div className="flex justify-between text-blue-600 dark:text-blue-500">
+                                                    <span>{t('storeCommissionAdded')}</span>
+                                                    <span className="font-medium">
+                                                        +{Number(collection.totalCommission).toFixed(2)} {t('common:currencySymbol')}
+                                                    </span>
+                                                </div>
+                                            )}
+                                            <div className="flex justify-between text-indigo-600 dark:text-indigo-400 font-bold">
+                                                <span>{t('orders:driverProfit')}</span>
+                                                <span>
+                                                    {Number(collection.totalDriverNetEarnings ?? (collection.totalDeliveryFee || 0)).toFixed(2)} {t('common:currencySymbol')}
                                                 </span>
                                             </div>
                                         </div>
@@ -207,41 +219,91 @@ const CashSettlement = () => {
                     {/* Selected Driver Orders */}
                     {selectedDriver && (
                         <div className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col min-h-[500px]">
-                            <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
-                                <div>
-                                    <h3 className="text-lg font-bold text-slate-800 dark:text-white">
-                                        {selectedDriver.driverName} - {t('common:orders')}
-                                    </h3>
-                                    <p className="text-sm text-slate-500">
-                                        {selectedOrderIds.length} {t('common:selected')} / {driverOrders.length} {t('common:total')}
-                                    </p>
-                                </div>
+                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50/50 dark:bg-slate-800/50">
                                 <div className="flex items-center gap-4">
-                                    <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
-                                        <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('ordersTotal')}</div>
-                                        <div className="text-xl font-black text-slate-700 dark:text-slate-300">
-                                            {driverOrders
-                                                .filter(o => selectedOrderIds.includes(o.id))
-                                                .reduce((sum, o) => sum + Number(o.total || 0), 0)
-                                                .toFixed(2)}
-                                            <span className="text-xs ml-1 opacity-70">{t('common:currencySymbol')}</span>
-                                        </div>
+                                    <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center overflow-hidden border border-slate-200 dark:border-slate-700 shadow-sm">
+                                        {selectedDriver.driverAvatar ? (
+                                            <img src={selectedDriver.driverAvatar} alt={selectedDriver.driverName} className="w-full h-full object-cover" />
+                                        ) : (
+                                            <Truck className="text-primary w-6 h-6" />
+                                        )}
                                     </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-slate-800 dark:text-white">
+                                            {selectedDriver.driverName} - {t('common:orders')}
+                                        </h3>
+                                        <p className="text-sm text-slate-500">
+                                            {selectedOrderIds.length} {t('common:selected')} / {driverOrders.length} {t('common:total')}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-6">
+                                    {selectedDriver.driverType === 'FREELANCER' ? (
+                                        <>
+                                            <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders:subtotal')}</div>
+                                                <div className="text-sm font-bold text-slate-600 dark:text-slate-400">
+                                                    {driverOrders
+                                                        .filter(o => selectedOrderIds.includes(o.id))
+                                                        .reduce((sum, o) => sum + (Number(o.total || 0) - Number(o.deliveryFee || 0)), 0)
+                                                        .toFixed(2)}
+                                                    <span className="text-[10px] ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                                </div>
+                                            </div>
+                                            <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('storeCommission')}</div>
+                                                <div className="text-sm font-bold text-blue-600">
+                                                    +
+                                                    {driverOrders
+                                                        .filter(o => selectedOrderIds.includes(o.id))
+                                                        .reduce((sum, o) => {
+                                                            const commission = Number(o.deliveryFee || 0) - (o.driverNetEarnings != null ? Number(o.driverNetEarnings) : Number(o.deliveryFee || 0));
+                                                            return sum + commission;
+                                                        }, 0)
+                                                        .toFixed(2)}
+                                                    <span className="text-[10px] ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                                </div>
+                                            </div>
+                                            <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
+                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders:driverProfit')}</div>
+                                                <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                                                    {driverOrders
+                                                        .filter(o => selectedOrderIds.includes(o.id))
+                                                        .reduce((sum, o) => sum + (o.driverNetEarnings != null ? Number(o.driverNetEarnings) : Number(o.deliveryFee || 0)), 0)
+                                                        .toFixed(2)}
+                                                    <span className="text-[10px] ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
+                                            <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('ordersTotal')}</div>
+                                            <div className="text-xl font-black text-slate-700 dark:text-slate-300">
+                                                {driverOrders
+                                                    .filter(o => selectedOrderIds.includes(o.id))
+                                                    .reduce((sum, o) => sum + Number(o.total || 0), 0)
+                                                    .toFixed(2)}
+                                                <span className="text-xs ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                            </div>
+                                        </div>
+                                    )}
+                                    <div className="h-8 w-px bg-slate-200 dark:bg-slate-700 mx-2" />
+
                                     <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
                                         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('amountToCollect')}</div>
-                                        <div className="text-xl font-black text-emerald-600">
+                                        <div className="text-2xl font-black text-emerald-600">
                                             {driverOrders
                                                 .filter(o => selectedOrderIds.includes(o.id))
                                                 .reduce((sum, o) => {
                                                     const orderTotal = Number(o.total || 0);
                                                     if (selectedDriver.driverType === 'FREELANCER') {
-                                                        const deliveryFee = Number(o.deliveryFee || 0);
-                                                        return sum + (orderTotal - deliveryFee);
+                                                        const driverNetEarnings = o.driverNetEarnings != null ? Number(o.driverNetEarnings) : Number(o.deliveryFee || 0);
+                                                        return sum + (orderTotal - driverNetEarnings);
                                                     }
                                                     return sum + orderTotal;
                                                 }, 0)
                                                 .toFixed(2)}
-                                            <span className="text-xs ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                            <span className="text-sm ml-1 opacity-70">{t('common:currencySymbol')}</span>
                                         </div>
                                     </div>
                                     {hasPermission(Permissions.CASH_SETTLEMENT_MANAGE) && (
@@ -305,7 +367,7 @@ const CashSettlement = () => {
                                                                 <div className="font-bold text-slate-800 dark:text-white">
                                                                     {selectedDriver.driverType === 'FREELANCER' ? (
                                                                         <span>
-                                                                            {(Number(order.total || 0) - Number(order.deliveryFee || 0)).toFixed(2)}
+                                                                            {(Number(order.total || 0) - (order.driverNetEarnings != null ? Number(order.driverNetEarnings) : Number(order.deliveryFee || 0))).toFixed(2)}
                                                                         </span>
                                                                     ) : (
                                                                         <span>{Number(order.total || 0).toFixed(2)}</span>

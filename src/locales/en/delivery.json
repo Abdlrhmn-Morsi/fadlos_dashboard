@@ -14,6 +14,9 @@
       "offer_sent": "Store driver offer sent successfully",
       "request_sent": "Request to become freelancer sent",
       "title": "Transition Action",
+      "make_store_driver": "Make Store Driver",
+      "resend_store_driver_offer": "Resend Store Driver Offer",
+      "offer_pending": "Offer Pending Response",
       "make_store_driver_confirm": "Are you sure you want to invite this driver to become a Store Driver?",
       "convert_to_freelancer_confirm": "Are you sure you want to transition this store driver to freelancer status?"
     },
@@ -35,7 +38,15 @@
       "accept_confirm_title": "Approve Application",
       "accept_confirm_message": "Are you sure you want to approve this driver's application? This will add them to your store's drivers list.",
       "hire_confirm_title": "Send Hiring Request",
-      "hire_confirm_message": "Are you sure you want to send a hiring request to this freelancer?"
+      "hire_confirm_message": "Are you sure you want to send a hiring request to this freelancer?",
+      "pending_freelancer_docs_msg": "Identity documents will be visible once the hiring request status is ACCEPTED."
+    },
+    "stats": {
+      "on_the_way_orders": "On The Way Orders",
+      "delivered_orders": "Delivered Orders",
+      "returned_orders": "Returned Orders",
+      "cancelled_orders": "Cancelled Orders",
+      "total_orders": "Total Orders"
     },
     "identity_verification": "Identity Verification",
     "id_front": "ID Front",
@@ -103,6 +114,10 @@
     "online": "Online",
     "offline": "Offline",
     "busy": "Busy",
-    "available": "Available"
+    "available": "Available",
+    "online_desc": "The driver is currently online and receiving orders.",
+    "offline_desc": "The driver is currently offline and not receiving any orders.",
+    "available_desc": "The driver is currently available to start new deliveries.",
+    "busy_desc": "The driver is currently working on active deliveries."
   }
 }

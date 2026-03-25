@@ -244,11 +244,6 @@ const FreelancerMarketplace = () => {
                                                 profile.profile?.user?.name?.charAt(0) || '?'
                                             )}
                                         </div>
-                                        <div className={clsx(
-                                            "absolute -bottom-1 -inset-inline-end-1 w-5 h-5 rounded-full border-4 border-white dark:border-slate-900 shadow-sm",
-                                            (profile.isBusy || profile.activeDeliveriesCount > 0) ? "bg-amber-500" :
-                                                profile.isAvailableForWork ? "bg-emerald-500" : "bg-slate-400"
-                                        )} />
                                     </div>
                                     <div>
                                         <h3 className="font-bold text-slate-900 dark:text-white text-lg leading-tight">{profile.profile?.user?.name || t('delivery:drivers.unknown_driver')}</h3>
@@ -258,14 +253,6 @@ const FreelancerMarketplace = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <span className={clsx(
-                                    "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest",
-                                    (profile.isBusy || profile.activeDeliveriesCount > 0) ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" :
-                                        profile.isAvailableForWork ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400" : "bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400"
-                                )}>
-                                    {(profile.isBusy || profile.activeDeliveriesCount > 0) ? t('delivery:status.busy') :
-                                        profile.isAvailableForWork ? t('delivery:status.online') : t('delivery:status.offline')}
-                                </span>
                             </div>
 
                             <div className="space-y-4 mb-6">

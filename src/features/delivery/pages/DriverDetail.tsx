@@ -378,7 +378,7 @@ const DriverDetail: React.FC = () => {
                                                     ? "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800/50"
                                                     : "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-900/30 dark:text-amber-400 dark:border-amber-800/50"
                                         )}>
-                                            {t(`delivery.drivers.hiring_status.${driver.storeDriverStatus.toLowerCase()}`, driver.storeDriverStatus) as string}
+                                            {t(`delivery:drivers.hiring_status.${driver.storeDriverStatus.toLowerCase()}`, driver.storeDriverStatus) as string}
                                         </span>
                                     </>
                                 )}

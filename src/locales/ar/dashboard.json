@@ -5,6 +5,8 @@
     "pendingOrders": "طلبات قيد الانتظار",
     "needsAction": "بانتظار إجراء",
     "newOrderReceived": "🎉 تم استلام طلب جديد!",
+    "driverRejectedOrder": "السائق رفض الطلب",
+    "orderUpdated": "تم تحديث الطلب",
     "totalRevenue": "إجمالي الإيرادات",
     "totalOrders": "إجمالي الطلبات",
     "avgOrderValue": "متوسط قيمة الطلب",

@@ -288,7 +288,15 @@ export const NotificationProvider: React.FC<{ children: React.ReactNode }> = ({ 
                     let soundToPlay = '/notification_sound.mp3';
                     if (data && (data.type === 'order' || data.trigger === 'new_order' || data.isOrder === true)) {
                         soundToPlay = '/notification_sound_order.mp3';
-                        toast.success(t('dashboard:newOrderReceived'));
+
+                        if (data.trigger === 'new_order') {
+                            toast.success(t('dashboard:newOrderReceived'));
+                        } else if (data.actionType === 'DRIVER_ORDER_REJECTED') {
+                            toast.error(notification.title || t('dashboard:driverRejectedOrder'));
+                        } else {
+                            // General order update
+                            toast(notification.title || t('dashboard:orderUpdated'));
+                        }
                     }
 
                     playNotificationSound(soundToPlay);
