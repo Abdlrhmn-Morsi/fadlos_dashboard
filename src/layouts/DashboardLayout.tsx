@@ -386,6 +386,9 @@ const DashboardLayout: React.FC = () => {
                     {(hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.ORDERS_UPDATE)) && (
                       <SidebarItem to="/orders" icon={Briefcase} label={t('orders')} collapsed={collapsed} end={true} />
                     )}
+                    {hasPermission(Permissions.ORDERS_UPDATE) && (
+                      <SidebarItem to="/orders/batch-assign" icon={Truck} label={t('orders:batchAssign')} collapsed={collapsed} />
+                    )}
                     {hasPermission(Permissions.CASH_SETTLEMENT_READ) && (
                       <SidebarItem to="/orders/settlement" icon={DollarSign} label={t('settlements', 'Cash Settlement')} collapsed={collapsed} />
                     )}

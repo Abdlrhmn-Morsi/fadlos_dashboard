@@ -4,7 +4,7 @@ import {
     ArrowLeft, Clock, MapPin, User, Phone, Save,
     Printer, Mail, AlertCircle, FileText, CheckCircle, Package, Globe, Truck, Camera,
     Search, X, ChevronLeft, ChevronRight, ShieldCheck, ShieldAlert, BadgeCheck, DollarSign,
-    RefreshCw, UserMinus
+    RefreshCw, UserMinus, Sparkles
 } from 'lucide-react';
 import ordersApi from './api/orders.api';
 import settlementsApi from './api/settlements.api';
@@ -23,7 +23,7 @@ import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 import { toast } from '../../utils/toast';
 
 const OrderDetail = () => {
-    const { id } = useParams();
+    const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
     const { t } = useTranslation(['orders', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
@@ -39,49 +39,17 @@ const OrderDetail = () => {
     const [statusModal, setStatusModal] = useState<{ isOpen: boolean; status: string }>({ isOpen: false, status: '' });
     const [cancelModal, setCancelModal] = useState(false);
     const [returnModal, setReturnModal] = useState(false);
-    const [assignDriverModal, setAssignDriverModal] = useState(false);
+    const [storeReturnModal, setStoreReturnModal] = useState(false);
     const [confirmDeliveryModal, setConfirmDeliveryModal] = useState(false);
-    const [confirmAssignModal, setConfirmAssignModal] = useState<{isOpen: boolean, driverId: string | null}>({isOpen: false, driverId: null});
     const [confirmUnassignModal, setConfirmUnassignModal] = useState(false);
     const [deliveryPin, setDeliveryPin] = useState('');
     const [proofImage, setProofImage] = useState<File | null>(null);
-    const [availableDrivers, setAvailableDrivers] = useState<any[]>([]);
-    const [driverSearch, setDriverSearch] = useState('');
-    const [driverPage, setDriverPage] = useState(1);
-    const [driverTotal, setDriverTotal] = useState(0);
-    const [driverLoading, setDriverLoading] = useState(false);
-    const [maxOrdersPerDriver, setMaxOrdersPerDriver] = useState(5);
-
-    const [filterByTown, setFilterByTown] = useState(true);
-    const [filterByPlace, setFilterByPlace] = useState(false);
-
-    const [storeReturnModal, setStoreReturnModal] = useState(false);
 
     useEffect(() => {
         fetchOrder();
     }, [id]);
 
-    useEffect(() => {
-        if (assignDriverModal) {
-            setDriverPage(1);
-            setDriverSearch('');
-            const hasTown = !!order?.branch?.town;
-            setFilterByTown(hasTown);
-            setFilterByPlace(false);
-            fetchAvailableDrivers(1, '', hasTown, false);
-        }
-    }, [assignDriverModal]);
 
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            if (assignDriverModal) fetchAvailableDrivers(1, driverSearch, filterByTown, filterByPlace);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, [driverSearch]);
-
-    useEffect(() => {
-        if (assignDriverModal && driverPage > 1) fetchAvailableDrivers(driverPage, driverSearch, filterByTown, filterByPlace);
-    }, [driverPage]);
 
     const fetchOrder = async () => {
         try {
@@ -110,65 +78,7 @@ const OrderDetail = () => {
         }
     };
 
-    const fetchAvailableDrivers = async (page = 1, search = '', byTown = filterByTown, byPlace = filterByPlace) => {
-        try {
-            setDriverLoading(true);
-            const { getStoreDrivers } = await import('../delivery/api/delivery-drivers.api');
-            const params: any = { page, limit: 5, search, storeId: order?.storeId };
-            if (byTown && order?.branch?.town?.id) {
-                params.townId = order.branch.town.id;
-            }
-            if (byPlace && order?.branch?.place?.id) {
-                params.placeId = order.branch.place.id;
-            }
-            const response: any = await getStoreDrivers(params);
-            const drivers = Array.isArray(response) ? response : (response.data || []);
-            const meta = response.meta || {};
-            setAvailableDrivers(drivers);
-            setDriverTotal(meta.total || drivers.length);
-            if (meta.maxOrdersPerDriver) setMaxOrdersPerDriver(meta.maxOrdersPerDriver);
-        } catch (error) {
-            console.error('Failed to fetch available drivers', error);
-        } finally {
-            setDriverLoading(false);
-        }
-    };
 
-    const handleBranchFilterChange = (filter: 'town' | 'place') => {
-        const newTown = filter === 'town' ? !filterByTown : filterByTown;
-        const newPlace = filter === 'place' ? !filterByPlace : filterByPlace;
-        setFilterByTown(newTown);
-        setFilterByPlace(newPlace);
-        setDriverPage(1);
-        fetchAvailableDrivers(1, driverSearch, newTown, newPlace);
-    };
-
-    const handleAssignDriver = (driverId: string) => {
-        setConfirmAssignModal({ isOpen: true, driverId });
-    };
-
-    const confirmAssignDriver = async () => {
-        if (!confirmAssignModal.driverId) return;
-        try {
-            setUpdating(true);
-            const method = order.driverId ? ordersApi.reassignDriver : ordersApi.assignDriver;
-            const response = await method(id!, confirmAssignModal.driverId);
-            setAssignDriverModal(false);
-            setConfirmAssignModal({ isOpen: false, driverId: null });
-            fetchOrder(); // Refresh order data
-            const msgKey = response?.data?.message || response?.message;
-            const successMsg = msgKey ? String(t(`common:${msgKey}`, msgKey)) : t('common:driverAssignedSuccessfully', 'Driver assigned successfully');
-            toast.success(successMsg);
-        } catch (error: any) {
-            console.error('Failed to assign driver', error);
-            const errorData = error?.response?.data?.message;
-            const errorKey = typeof errorData === 'string' ? errorData : Array.isArray(errorData) ? errorData[0] : null;
-            const message = errorKey ? String(t(`common:${errorKey}`, errorKey)) : t('common:error', 'Failed to assign driver');
-            toast.error(message);
-        } finally {
-            setUpdating(false);
-        }
-    };
 
     const handleUnassignDriver = async () => {
         try {
@@ -1078,7 +988,7 @@ const OrderDetail = () => {
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
-                                                                setAssignDriverModal(true);
+                                                                navigate(`/orders/batch-assign?orderId=${id}`);
                                                             }}
                                                             className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 rounded-xl transition-all active:scale-95 border border-indigo-100 dark:border-indigo-800/50"
                                                         >
@@ -1122,7 +1032,7 @@ const OrderDetail = () => {
                                             <>
                                                 <p className="text-sm text-slate-500">{t('orders:noDriverAssigned', 'No driver assigned to this order yet.')}</p>
                                                 <button
-                                                    onClick={() => setAssignDriverModal(true)}
+                                                    onClick={() => navigate(`/orders/batch-assign?orderId=${id}`)}
                                                     className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                                                 >
                                                     <Truck size={18} />
@@ -1323,252 +1233,7 @@ const OrderDetail = () => {
                 isLoading={updating}
             />
 
-            {/* Custom Assign Driver Modal */}
-            {assignDriverModal && (
-                <div className="fixed inset-0 z-[1200] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200" dir={isRTL ? 'rtl' : 'ltr'}>
-                    <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in-95 duration-200 flex flex-col max-h-[80vh]">
-                        {/* Header */}
-                        <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between bg-white dark:bg-slate-900 sticky top-0 z-10">
-                            <div>
-                                <h3 className="text-xl font-bold text-slate-900 dark:text-white">
-                                    {order.driverId ? t('orders:reassignDriver', 'Reassign Driver') : t('orders:assignDriver', 'Assign Driver')}
-                                </h3>
-                                <p className="text-sm text-slate-500 mt-1">{t('orders:selectDriverMessage', 'Select a driver to handle this delivery:')}</p>
-                            </div>
-                            <button
-                                onClick={() => setAssignDriverModal(false)}
-                                className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                            >
-                                <X size={24} />
-                            </button>
-                        </div>
 
-                        {/* Search Bar */}
-                        <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-900/50">
-                            <div className="relative">
-                                <Search className={clsx("absolute top-3 text-slate-400", isRTL ? "right-4" : "left-4")} size={20} />
-                                <input
-                                    type="text"
-                                    placeholder={t('orders:searchDriverPlaceholder', 'Search by name, email or phone...')}
-                                    value={driverSearch}
-                                    onChange={(e) => setDriverSearch(e.target.value)}
-                                    className={clsx(
-                                        "w-full py-2.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all text-sm",
-                                        isRTL ? "pr-12 pl-4" : "pl-12 pr-4"
-                                    )}
-                                />
-                            </div>
-                        </div>
-
-                        {/* Branch Filter Buttons */}
-                        {order.branch && (order.branch.town || order.branch.place) && (
-                            <div className="px-4 pb-3 flex gap-2 flex-wrap">
-                                {order.branch.town && (
-                                    <button
-                                        onClick={() => handleBranchFilterChange('town')}
-                                        className={clsx(
-                                            "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5",
-                                            filterByTown
-                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:text-indigo-600"
-                                        )}
-                                    >
-                                        <Globe size={12} />
-                                        {isRTL
-                                            ? (order.branch.town?.arName || order.branch.town?.enName)
-                                            : (order.branch.town?.enName || order.branch.town?.arName)}
-                                    </button>
-                                )}
-                                {order.branch.place && (
-                                    <button
-                                        onClick={() => handleBranchFilterChange('place')}
-                                        className={clsx(
-                                            "px-3 py-1.5 rounded-lg text-xs font-bold border transition-all flex items-center gap-1.5",
-                                            filterByPlace
-                                                ? "bg-indigo-600 text-white border-indigo-600 shadow-sm"
-                                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700 hover:border-indigo-300 hover:text-indigo-600"
-                                        )}
-                                    >
-                                        <MapPin size={12} />
-                                        {isRTL
-                                            ? (order.branch.place?.arName || order.branch.place?.enName)
-                                            : (order.branch.place?.enName || order.branch.place?.arName)}
-                                    </button>
-                                )}
-                            </div>
-                        )}
-
-                        {/* Driver List */}
-                        <div className="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
-                            {driverLoading ? (
-                                <div className="flex flex-col items-center justify-center py-12 space-y-3 opacity-60">
-                                    <div className="w-8 h-8 border-4 border-indigo-600/30 border-t-indigo-600 rounded-full animate-spin" />
-                                    <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{t('common:loading', 'Loading...')}</p>
-                                </div>
-                            ) : availableDrivers.length > 0 ? (
-                                availableDrivers.map((driver) => {
-                                    const isVerified = ['VERIFIED', 'Verified', 'verified'].includes(driver.deliveryProfile?.verificationStatus);
-                                    const isSelected = order.driverId === driver.id;
-                                    const isBusy = driver.deliveryProfile?.isBusy
-                                        || (driver.activeDeliveriesCount >= maxOrdersPerDriver);
-                                    const isUnavailable = !driver.deliveryProfile?.isAvailableForWork || (driver as any).isAvailableForCurrentStore === false;
-                                    const isOverLimit = (driver as any).isOverLimit === true;
-                                    const isDisabled = !isVerified || isBusy || isOverLimit || isUnavailable;
-
-                                    return (
-                                        <div
-                                            key={driver.id}
-                                            onClick={() => !isDisabled && handleAssignDriver(driver.id)}
-                                            className={clsx(
-                                                "relative w-full flex flex-col p-4 rounded-xl border transition-all text-start group",
-                                                isDisabled
-                                                    ? "opacity-60 bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-800 cursor-not-allowed grayscale-[0.5]"
-                                                    : isSelected
-                                                        ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-1 ring-indigo-500/30 cursor-default"
-                                                        : "bg-white border-slate-200 hover:border-indigo-300 dark:bg-slate-900 dark:border-slate-800 dark:hover:border-indigo-700 hover:shadow-md cursor-pointer"
-                                            )}
-                                        >
-                                            <div className="flex items-center justify-between">
-                                                <div className="flex items-center gap-4">
-                                                    <div className={clsx(
-                                                        "w-12 h-12 rounded-full overflow-hidden flex items-center justify-center font-bold text-lg shadow-inner",
-                                                        isVerified ? "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" : "bg-slate-200 dark:bg-slate-800 text-slate-500"
-                                                    )}>
-                                                        {driver.deliveryProfile?.avatarUrl ? (
-                                                            <ImageWithFallback
-                                                                src={driver.deliveryProfile.avatarUrl}
-                                                                alt={driver.name}
-                                                                className="w-full h-full object-cover"
-                                                            />
-                                                        ) : (
-                                                            driver.name ? driver.name.charAt(0) : '?'
-                                                        )}
-                                                    </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <h4 className="font-bold text-slate-900 dark:text-white">{driver.name}</h4>
-                                                            {isVerified ? (
-                                                                <div className="flex items-center gap-1 text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400 px-1.5 py-0.5 rounded">
-                                                                    <BadgeCheck size={12} />
-                                                                    {t('orders:verified', 'Verified')}
-                                                                </div>
-                                                            ) : (
-                                                                <div className={clsx(
-                                                                    "px-1.5 py-0.5 rounded text-[10px] font-black uppercase tracking-wider whitespace-nowrap",
-                                                                    driver.deliveryProfile?.verificationStatus === 'VERIFIED'
-                                                                        ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
-                                                                        : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
-                                                                )}>
-                                                                    {t(`common:verificationStatuses.${driver.deliveryProfile?.verificationStatus || 'UNKNOWN'}`, driver.deliveryProfile?.verificationStatus || 'Unknown') as string}
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                        <div className="flex items-center gap-3 mt-1">
-                                                            <div className="flex items-center gap-1.5">
-                                                                <span className={clsx(
-                                                                    "w-2 h-2 rounded-full",
-                                                                    isUnavailable ? "bg-slate-400" :
-                                                                        isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500"
-                                                                )} />
-                                                                <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">
-                                                                    {isUnavailable
-                                                                        ? (t('common:driver_status.unavailable', 'Unavailable') as string)
-                                                                        : isBusy
-                                                                            ? (t('common:driver_status.busy', 'Busy') as string)
-                                                                            : (t('common:driver_status.available', 'Available') as string)}
-                                                                </span>
-                                                            </div>
-                                                            {(driver.activeDeliveriesCount > 0) && (
-                                                                <>
-                                                                    <span className="text-slate-300 dark:text-slate-700">•</span>
-                                                                    <div className="flex items-center gap-1 text-orange-600 bg-orange-50 dark:text-orange-400 dark:bg-orange-900/20 px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                                                        <Package size={12} />
-                                                                        <span>{driver.activeDeliveriesCount} {t('orders:activeTasks', 'Active')}</span>
-                                                                    </div>
-                                                                </>
-                                                            )}
-                                                            <span className="text-slate-300 dark:text-slate-700">•</span>
-                                                            <span className="text-xs text-slate-500">{driver.phone}</span>
-                                                            {driver.deliveryProfile?.vehicleType && (
-                                                                <>
-                                                                    <span className="text-slate-300 dark:text-slate-700">•</span>
-                                                                    <span className="text-[10px] text-indigo-500 bg-indigo-50 dark:bg-indigo-900/20 px-1.5 py-0.5 rounded font-black uppercase tracking-wider">
-                                                                        {t(`common:vehicle_types.${driver.deliveryProfile.vehicleType}`, driver.deliveryProfile.vehicleType) as string}
-                                                                    </span>
-                                                                </>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
-
-                                                {isSelected ? (
-                                                    <div className="flex items-center gap-2 text-indigo-600 font-bold text-xs uppercase tracking-widest bg-indigo-100 dark:bg-indigo-900/30 px-3 py-1 rounded-full">
-                                                        <CheckCircle size={14} />
-                                                        {t('orders:selected', 'Selected')}
-                                                    </div>
-                                                ) : isVerified && !isBusy && !isOverLimit ? (
-                                                    <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-indigo-600 text-white px-4 py-2 rounded-lg text-xs font-bold shadow-lg shadow-indigo-200 dark:shadow-none">
-                                                        {t('orders:assign', 'Assign')}
-                                                    </div>
-                                                ) : !isOverLimit ? (
-                                                    <div className="flex items-center gap-1 text-slate-400 text-[10px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
-                                                        <ShieldAlert size={12} />
-                                                        {isUnavailable
-                                                            ? (t('common:driver_status.unavailable', 'Unavailable') as string)
-                                                            : isBusy
-                                                                ? (t('common:driver_status.busy', 'Busy') as string)
-                                                                : t('orders:unverified', 'Unverified')}
-                                                    </div>
-                                                ) : null}
-                                            </div>
-
-                                            {isOverLimit && (
-                                                <div className="mt-2 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg">
-                                                    <ShieldAlert size={14} />
-                                                    {t('common:notAvailableInPlan', 'Not available in your current plan')}
-                                                </div>
-                                            )}
-                                        </div>
-                                    );
-                                })
-                            ) : (
-                                <div className="flex flex-col items-center justify-center py-16 text-center">
-                                    <div className="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-full flex items-center justify-center mb-4">
-                                        <Truck size={32} className="text-slate-300" />
-                                    </div>
-                                    <p className="text-slate-500 font-medium">{t('orders:noDriversFound', 'No drivers found')}</p>
-                                    <p className="text-xs text-slate-400 mt-1">{t('orders:adjustSearch', 'Try adjusting your search')}</p>
-                                </div>
-                            )}
-                        </div>
-
-                        {/* Pagination Footer */}
-                        {driverTotal > 5 && (
-                            <div className="p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between">
-                                <span className="text-xs text-slate-500 font-medium">
-                                    {t('orders:showingResults', { start: (driverPage - 1) * 5 + 1, end: Math.min(driverPage * 5, driverTotal), total: driverTotal })}
-                                </span>
-                                <div className="flex gap-2">
-                                    <button
-                                        onClick={() => setDriverPage(p => Math.max(1, p - 1))}
-                                        disabled={driverPage === 1}
-                                        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        <ChevronLeft size={16} />
-                                    </button>
-                                    <button
-                                        onClick={() => setDriverPage(p => p + 1)}
-                                        disabled={driverPage * 5 >= driverTotal}
-                                        className="p-2 rounded-lg border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-                                    >
-                                        <ChevronRight size={16} className={isRTL ? "rotate-180" : ""} />
-                                    </button>
-                                </div>
-                            </div>
-                        )}
-                    </div>
-                </div>
-            )}
 
             {/* Print-Only Invoice Layout */}
             <div className="hidden print:block bg-white text-black p-8 w-full max-w-4xl mx-auto font-sans" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -1812,15 +1477,7 @@ const OrderDetail = () => {
                 </div>
             </ConfirmationModal>
 
-            <ConfirmationModal
-                isOpen={confirmAssignModal.isOpen}
-                title={t('common:confirmAssignTitle', 'Confirm Assignment')}
-                message={t('common:confirmAssignMessage', 'Are you sure you want to assign this driver to the order?')}
-                onConfirm={confirmAssignDriver}
-                onCancel={() => setConfirmAssignModal({ isOpen: false, driverId: null })}
-                confirmLabel={t('common:confirm', 'Confirm')}
-                isLoading={updating}
-            />
+
 
             <ConfirmationModal
                 isOpen={confirmUnassignModal}

@@ -12,6 +12,13 @@ export const ordersApi = {
     },
 
     /**
+     * Fetch unassigned orders for batching workflow
+     */
+    getUnassignedBatches: async (params: any = {}) => {
+        return apiService.get('/orders/unassigned-batches', { params });
+    },
+
+    /**
      * Fetch a single order by ID
      */
     getOrder: async (id: string) => {
@@ -58,6 +65,13 @@ export const ordersApi = {
      */
     getStatusCounts: async () => {
         return apiService.get('/orders/stats/status-counts');
+    },
+
+    /**
+     * Batch assign multiple orders to a driver
+     */
+    batchAssignDriver: async (orderIds: string[], deliveryId: string) => {
+        return apiService.post('/orders/batch-assign-driver', { orderIds, deliveryId });
     },
 
     /**

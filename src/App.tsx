@@ -19,6 +19,7 @@ import ProductForm from './features/products/ProductForm';
 import ProductDetail from './features/products/ProductDetail';
 import OrderList from './features/orders/OrderList';
 import OrderDetail from './features/orders/OrderDetail';
+import BatchAssign from './features/orders/BatchAssign';
 import CashSettlement from './features/orders/CashSettlement';
 import PromoCodeList from './features/promocodes/PromoCodeList';
 import PromoCodeForm from './features/promocodes/PromoCodeForm';
@@ -140,6 +141,7 @@ const AppContent = () => {
             <Route path="categories" element={<CategoryList />} />
 
             <Route path="orders" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderList /></PermissionGate>} />
+            <Route path="orders/batch-assign" element={<PermissionGate permission={Permissions.ORDERS_UPDATE}><BatchAssign /></PermissionGate>} />
             <Route path="orders/settlement" element={<PermissionGate permission={Permissions.CASH_SETTLEMENT_READ}><CashSettlement /></PermissionGate>} />
             <Route path="orders/:id" element={
               (hasPermission(Permissions.ORDERS_VIEW) || hasPermission(Permissions.CLIENTS_VIEW))

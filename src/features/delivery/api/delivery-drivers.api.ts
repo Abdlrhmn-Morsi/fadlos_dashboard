@@ -10,6 +10,15 @@ export const getStoreDrivers = async (params: { page?: number; limit?: number; s
     }
 };
 
+export const getSuggestedNextDriver = async (params: { townId?: string; placeId?: string; search?: string; page?: number; limit?: number } = {}) => {
+    try {
+        const response = await apiService.get('/delivery-drivers/store-drivers/suggest-next', { params });
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const createStoreDriver = async (data: any) => {
     try {
         const formData = new FormData();
