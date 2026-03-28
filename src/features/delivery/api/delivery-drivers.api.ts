@@ -92,14 +92,6 @@ export const toggleDriverAvailability = async () => {
     }
 };
 
-export const toggleDriverBusy = async () => {
-    try {
-        const response = await apiService.patch('/delivery-drivers/toggle-busy');
-        return response.data || response;
-    } catch (error) {
-        throw error;
-    }
-};
 
 export const getAllDrivers = async (params: { page?: number; limit?: number; search?: string; verificationStatus?: string } = {}) => {
     try {
@@ -128,18 +120,19 @@ export const toggleStoreDriverStatus = async (driverId: string) => {
     }
 };
 
-export const adminToggleDriverBusy = async (driverId: string) => {
+
+export const adminToggleDriverAvailability = async (driverId: string) => {
     try {
-        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-busy`);
+        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-availability`);
         return response.data || response;
     } catch (error) {
         throw error;
     }
 };
 
-export const adminToggleDriverAvailability = async (driverId: string) => {
+export const adminToggleDriverBusy = async (driverId: string) => {
     try {
-        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-availability`);
+        const response = await apiService.patch(`/delivery-drivers/store-drivers/${driverId}/toggle-busy`);
         return response.data || response;
     } catch (error) {
         throw error;

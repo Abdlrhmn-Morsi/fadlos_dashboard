@@ -28,8 +28,8 @@ import {
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { 
     getDriverById, 
-    adminToggleDriverBusy, 
     adminToggleDriverAvailability, 
+    adminToggleDriverBusy,
     cancelHiringRequest,
     respondToResignation,
     initiateTransition,
@@ -112,27 +112,11 @@ const DriverDetail: React.FC = () => {
     const canEdit = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
         (isSystemAdmin || driver?.deliveryProfile?.driverType === 'STORE_DRIVER');
 
-    const canToggleBusy = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
-        driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
-
     const canToggleAvailability = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
         driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
 
-    const handleToggleBusy = async () => {
-        if (!id) return;
-        setToggling(true);
-        try {
-            await adminToggleDriverBusy(id);
-            const response: any = await getDriverById(id);
-            setDriver(response.data || response);
-            toast.success(t('statusUpdated', 'Status updated successfully'));
-        } catch (err) {
-            console.error("Failed to toggle busy status:", err);
-            toast.error(t('errorUpdatingStatus', 'Failed to update status'));
-        } finally {
-            setToggling(false);
-        }
-    };
+    const canToggleBusy = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE);
+
 
     const handleToggleAvailability = async () => {
         if (!id) return;
@@ -144,6 +128,22 @@ const DriverDetail: React.FC = () => {
             toast.success(t('statusUpdated', 'Status updated successfully'));
         } catch (err) {
             console.error("Failed to toggle availability status:", err);
+            toast.error(t('errorUpdatingStatus', 'Failed to update status'));
+        } finally {
+            setToggling(false);
+        }
+    };
+
+    const handleToggleBusy = async () => {
+        if (!id) return;
+        setToggling(true);
+        try {
+            await adminToggleDriverBusy(id);
+            const response: any = await getDriverById(id);
+            setDriver(response.data || response);
+            toast.success(t('statusUpdated', 'Status updated successfully'));
+        } catch (err) {
+            console.error("Failed to toggle busy status:", err);
             toast.error(t('errorUpdatingStatus', 'Failed to update status'));
         } finally {
             setToggling(false);
@@ -519,7 +519,7 @@ const DriverDetail: React.FC = () => {
                                                     onChange={handleToggleAvailability}
                                                     disabled={toggling}
                                                 />
-                                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 shadow-sm transition-all"></div>
+                                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500 dark:peer-checked:bg-emerald-500 shadow-sm transition-all"></div>
                                             </label>
                                         )}
                                         <div className={clsx(
@@ -547,26 +547,26 @@ const DriverDetail: React.FC = () => {
                                                 <input
                                                     type="checkbox"
                                                     className="sr-only peer"
-                                                    checked={driver.deliveryProfile?.isBusy}
+                                                    checked={driver.isBusy}
                                                     onChange={handleToggleBusy}
                                                     disabled={toggling}
                                                 />
-                                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 shadow-sm transition-all"></div>
+                                                <div className="w-12 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer dark:bg-slate-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-500 dark:peer-checked:bg-amber-500 shadow-sm transition-all"></div>
                                             </label>
                                         )}
                                         <div className={clsx(
                                             "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
-                                            driver.deliveryProfile?.isBusy
-                                                ? "bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/20 dark:border-amber-800/50"
+                                            driver.isBusy
+                                                ? "bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/20 dark:border-emerald-800/50"
                                                 : "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50"
                                         )}>
-                                            <span className={clsx("w-2 h-2 rounded-full", driver.deliveryProfile?.isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500")} />
-                                            {driver.deliveryProfile?.isBusy ? t('delivery:status.busy') : t('delivery:status.available')}
+                                            <span className={clsx("w-2 h-2 rounded-full", driver.isBusy ? "bg-amber-500 animate-pulse" : "bg-emerald-500")} />
+                                            {driver.isBusy ? t('delivery:status.busy') : t('delivery:status.available')}
                                         </div>
                                     </div>
                                 </div>
                                 <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">
-                                    {driver.deliveryProfile?.isBusy ? t('delivery:status.busy_desc') : t('delivery:status.available_desc')}
+                                    {driver.isBusy ? t('delivery:status.busy_desc') : t('delivery:status.available_desc')}
                                 </div>
                             </div>
                         </div>

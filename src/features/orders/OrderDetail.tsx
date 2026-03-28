@@ -927,10 +927,10 @@ const OrderDetail = () => {
                                                         <div className="flex items-center gap-2">
                                                             <div className={clsx(
                                                                 "w-2.5 h-2.5 rounded-full ring-4",
-                                                                order.driver.deliveryProfile?.isBusy ? "bg-amber-500 ring-amber-500/20 animate-pulse" : "bg-emerald-500 ring-emerald-500/20"
+                                                                (order.status === OrderStatus.DRIVER_ASSIGNED || order.status === OrderStatus.OUT_FOR_DELIVERY) ? "bg-amber-500 ring-amber-500/20 animate-pulse" : "bg-emerald-500 ring-emerald-500/20"
                                                             )} />
                                                             <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
-                                                                {order.driver.deliveryProfile?.isBusy
+                                                                {(order.status === OrderStatus.DRIVER_ASSIGNED || order.status === OrderStatus.OUT_FOR_DELIVERY)
                                                                     ? (t('common:driver_status.busy', 'Busy') as string)
                                                                     : (t('common:driver_status.available', 'Available') as string)}
                                                             </span>

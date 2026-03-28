@@ -151,6 +151,7 @@
     "queuePosition": "#{{position}} in queue",
     "nextInQueue": "Next in Queue",
     "onDelivery": "On Delivery",
+    "outForDelivery": "Out for Delivery",
     "driverHasTooManyActiveOrders": "Warning: This driver has many active orders. Consider splitting among other drivers for faster delivery.",
     "noAvailableDrivers": "All drivers are currently on delivery",
     "lastAssigned": "Last assigned",

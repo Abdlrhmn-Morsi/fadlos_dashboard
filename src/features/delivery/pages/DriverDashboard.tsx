@@ -9,7 +9,7 @@ import {
     ChevronRight,
     Map
 } from 'lucide-react';
-import { getDriverProfile, toggleDriverAvailability, toggleDriverBusy } from '../api/delivery-drivers.api';
+import { getDriverProfile, toggleDriverAvailability } from '../api/delivery-drivers.api';
 import { ordersApi } from '../../orders/api/orders.api';
 import { OrderStatus } from '../../../types/order-status';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -70,22 +70,6 @@ const DriverDashboard = () => {
         }
     };
 
-    const handleToggleBusy = async () => {
-        try {
-            setTogglingStatus(true);
-            const updatedProfile = await toggleDriverBusy();
-            setProfile(updatedProfile);
-            toast.success(updatedProfile.isBusy
-                ? t('delivery:status.busy_on', 'You are now busy')
-                : t('delivery:status.available_on', 'You are now available')
-            );
-        } catch (error) {
-            console.error('Failed to toggle busy status', error);
-            toast.error(t('common.error', 'Failed to update status'));
-        } finally {
-            setTogglingStatus(false);
-        }
-    };
 
     const getStatusLabel = (status: string) => {
         return t(`dashboard:status.${status.toLowerCase()}`, { defaultValue: status.replace(/_/g, ' ') });
@@ -118,11 +102,11 @@ const DriverDashboard = () => {
                             <div className="flex items-center gap-2 mt-0.5">
                                 <span className={clsx(
                                     "w-2 h-2 rounded-full",
-                                    (profile?.isBusy || orders.length > 0) ? "bg-amber-500 animate-pulse" :
+                                    orders.length > 0 ? "bg-amber-500 animate-pulse" :
                                         profile?.isAvailableForWork ? "bg-emerald-500" : "bg-slate-300"
                                 )} />
                                 <span className="text-sm text-slate-500 font-medium">
-                                    {(profile?.isBusy || orders.length > 0)
+                                    {orders.length > 0
                                         ? t('delivery:status.busy', 'Busy')
                                         : profile?.isAvailableForWork
                                             ? t('delivery:status.online', 'Online & Available')
@@ -133,21 +117,6 @@ const DriverDashboard = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                        {profile?.driverType === 'FREELANCER' && profile?.isAvailableForWork && (
-                            <button
-                                onClick={handleToggleBusy}
-                                disabled={togglingStatus}
-                                className={clsx(
-                                    "flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all",
-                                    profile?.isBusy
-                                        ? "bg-amber-50 text-amber-600 hover:bg-amber-100 dark:bg-amber-900/20 dark:text-amber-400"
-                                        : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400"
-                                )}
-                            >
-                                <Clock size={18} />
-                                {profile?.isBusy ? t('delivery:status.busy', 'Busy') : t('delivery:status.available', 'Available')}
-                            </button>
-                        )}
 
                         <button
                             onClick={handleToggleAvailability}

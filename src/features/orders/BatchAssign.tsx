@@ -680,6 +680,11 @@ const BatchAssign: React.FC = () => {
                                   {t('orders:onDelivery')}
                                 </span>
                               )}
+                              {driver.isBusy && (
+                                <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-amber-100 dark:bg-amber-900/30 text-amber-600 animate-pulse">
+                                  {t('orders:outForDelivery', 'Out for Delivery')}
+                                </span>
+                              )}
                               <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">
                                 {driver.todayOrdersCount || 0} {t('orders:today', 'Today')}
                               </span>

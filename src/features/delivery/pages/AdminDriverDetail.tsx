@@ -28,7 +28,6 @@ import {
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import {
     getDriverById,
-    adminToggleDriverBusy,
     adminToggleDriverAvailability,
     cancelHiringRequest,
     respondToResignation,
@@ -113,27 +112,9 @@ const DriverDetail: React.FC = () => {
     const canEdit = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
         (isSystemAdmin || driver?.deliveryProfile?.driverType === 'STORE_DRIVER');
 
-    const canToggleBusy = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
-        driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
 
     const canToggleAvailability = hasPermission(Permissions.DELIVERY_DRIVERS_UPDATE) &&
         driver?.deliveryProfile?.driverType === 'STORE_DRIVER';
-
-    const handleToggleBusy = async () => {
-        if (!id) return;
-        setToggling(true);
-        try {
-            await adminToggleDriverBusy(id);
-            const response: any = await getDriverById(id, isSystemAdmin);
-            setDriver(response.data || response);
-            toast.success(t('statusUpdated', 'Status updated successfully'));
-        } catch (err) {
-            console.error("Failed to toggle busy status:", err);
-            toast.error(t('errorUpdatingStatus', 'Failed to update status'));
-        } finally {
-            setToggling(false);
-        }
-    };
 
     const handleToggleAvailability = async () => {
         if (!id) return;
