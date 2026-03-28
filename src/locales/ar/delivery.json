@@ -110,6 +110,9 @@
   "performanceSummary": "ملخص الأداء",
   "onTheWay": "في الطريق",
   "totalOrders": "إجمالي الطلبات",
+  "metrics": {
+    "today": "اليوم"
+  },
   "status": {
     "online": "متاح",
     "offline": "غير متاح",

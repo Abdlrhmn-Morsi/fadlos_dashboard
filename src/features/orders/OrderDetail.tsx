@@ -42,6 +42,7 @@ const OrderDetail = () => {
     const [storeReturnModal, setStoreReturnModal] = useState(false);
     const [confirmDeliveryModal, setConfirmDeliveryModal] = useState(false);
     const [confirmUnassignModal, setConfirmUnassignModal] = useState(false);
+    const [mustConfirmOrderModal, setMustConfirmOrderModal] = useState(false);
     const [deliveryPin, setDeliveryPin] = useState('');
     const [proofImage, setProofImage] = useState<File | null>(null);
 
@@ -450,7 +451,7 @@ const OrderDetail = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     {/* Main Content */}
                     <div className="lg:col-span-2 space-y-6">
-                        {/* Order Items */}
+                                                {/* Order Items */}
                         <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden">
                             <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center">
                                 <h2 className="font-bold text-lg text-slate-900 dark:text-white flex items-center gap-2">
@@ -886,6 +887,8 @@ const OrderDetail = () => {
                                     {t('logistics', 'Logistics')}
                                 </h3>
 
+
+
                                 {order.driver ? (
                                     <div className="space-y-4">
                                         <div className="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-100 dark:border-slate-800 transition-all hover:border-indigo-100 dark:hover:border-indigo-900/30">
@@ -1032,7 +1035,13 @@ const OrderDetail = () => {
                                             <>
                                                 <p className="text-sm text-slate-500">{t('orders:noDriverAssigned', 'No driver assigned to this order yet.')}</p>
                                                 <button
-                                                    onClick={() => navigate(`/orders/batch-assign?orderId=${id}`)}
+                                                    onClick={() => {
+                                                        if (order.status === OrderStatus.PENDING) {
+                                                            setMustConfirmOrderModal(true);
+                                                        } else {
+                                                            navigate(`/orders/batch-assign?orderId=${id}`);
+                                                        }
+                                                    }}
                                                     className="w-full py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors flex items-center justify-center gap-2"
                                                 >
                                                     <Truck size={18} />
@@ -1485,8 +1494,22 @@ const OrderDetail = () => {
                 message={t('common:confirmUnassignMessage', 'Are you sure you want to unassign this driver from the order?')}
                 onConfirm={handleUnassignDriver}
                 onCancel={() => setConfirmUnassignModal(false)}
-                confirmLabel={t('common:confirm', 'Confirm')}
+                confirmLabel={t('orders:unassignDriver', 'Unassign Driver')}
                 isLoading={updating}
+                type="danger"
+            />
+
+            <ConfirmationModal
+                isOpen={mustConfirmOrderModal}
+                title={t('orders:mustConfirmFirst', 'Confirm Order First')}
+                message={t('orders:mustConfirmFirstMessage', 'You must confirm the order before assigning a driver.')}
+                onConfirm={() => {
+                    setMustConfirmOrderModal(false);
+                    setStatusModal({ isOpen: true, status: OrderStatus.CONFIRMED });
+                }}
+                confirmLabel={t('orders:confirmOrderNow', 'Confirm Order Now')}
+                onCancel={() => setMustConfirmOrderModal(false)}
+                type="warning"
             />
         </div>
     );

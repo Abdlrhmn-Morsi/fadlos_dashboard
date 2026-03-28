@@ -51,6 +51,9 @@
     "qty": "الكمية",
     "price": "السعر",
     "driver": "السائق",
+    "all": "الكل",
+    "today": "اليوم",
+    "select_store": "اختر متجر",
     "notes": "ملاحظات",
     "store": "المتجر",
     "thankYou": "شكراً لتعاملك معنا!",
@@ -76,6 +79,9 @@
     "deliveryPin": "رمز التسليم",
     "noDriverAssigned": "لم يتم تعيين سائق لهذا الطلب بعد",
     "assignDriver": "تعيين سائق",
+    "mustConfirmFirst": "يجب تأكيد الطلب أولاً",
+    "mustConfirmFirstMessage": "يجب عليك تأكيد الطلب قبل إسناد سائق.",
+    "confirmOrderNow": "تأكيد الطلب الآن",
     "driverActions": "إجراءات التوصيل",
     "pickupPrompt": "هل قمت باستلام الطلب من المتجر؟",
     "pickupOrder": "بدء التوصيل",
@@ -163,5 +169,7 @@
     "confirmedForDelivery": "هذه الطلبات مؤكدة للتوصيل",
     "batchAssignConfirmTitle": "تأكيد التعيين",
     "batchAssignConfirmMessage": "هل أنت متأكد من رغبتك في تعيين {{count}} طلبات إلى {{driverName}}؟",
+    "batchAssignDriverWarning": "ملاحظة: لا يمكنك تعيين أي طلبات إضافية لهذا السائق حتى يقوم بتسليم الطلبات الحالية أولاً.",
+    "assignmentRule": "قاعدة الخدمات اللوجستية",
     "searchOrders": "ابحث عن الطلبات بالاسم أو رقم الهاتف..."
 }

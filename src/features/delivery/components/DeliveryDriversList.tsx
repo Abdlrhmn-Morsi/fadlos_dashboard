@@ -571,7 +571,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                         )}
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             {(driver.storeDriverStatus === 'ACCEPTED' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') ? (
-                                                <div className="flex flex-col items-center gap-1">
+                                                <div className="flex flex-col items-center gap-1.5">
                                                     <span className={clsx(
                                                         "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
                                                         (driver.activeDeliveriesCount || 0) >= (meta?.maxOrdersPerDriver || 5)
@@ -579,6 +579,9 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                             : "bg-emerald-50 text-emerald-600 border-emerald-200"
                                                     )}>
                                                         {driver.activeDeliveriesCount || 0} / {meta?.maxOrdersPerDriver || 5}
+                                                    </span>
+                                                    <span className="text-[9px] text-slate-500 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-full font-bold tracking-wider uppercase">
+                                                        {driver.todayOrdersCount || 0} {t('delivery:metrics.today', 'Today')}
                                                     </span>
                                                 </div>
                                             ) : (

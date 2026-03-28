@@ -110,6 +110,9 @@
   "performanceSummary": "Performance Summary",
   "onTheWay": "On the way",
   "totalOrders": "Total Orders",
+  "metrics": {
+    "today": "Today"
+  },
   "status": {
     "online": "Online",
     "offline": "Offline",

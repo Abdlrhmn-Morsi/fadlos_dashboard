@@ -76,6 +76,9 @@
     "deliveryPin": "Delivery PIN",
     "noDriverAssigned": "No driver assigned to this order yet.",
     "assignDriver": "Assign Driver",
+    "mustConfirmFirst": "Confirm Order First",
+    "mustConfirmFirstMessage": "You must confirm the order before assigning a driver.",
+    "confirmOrderNow": "Confirm Order Now",
     "driverActions": "Delivery Actions",
     "pickupPrompt": "Have you picked up the order from the store?",
     "pickupOrder": "Start Delivery",
@@ -88,6 +91,9 @@
     "driverStatusBusy": "BUSY",
     "driverStatusAvailable": "AVAILABLE",
     "noDriversFound": "No drivers available. Add drivers in the Delivery section first.",
+    "all": "All",
+    "today": "Today",
+    "select_store": "Select Store",
     "assign": "Assign",
     "selected": "Selected",
     "unverified": "Unverified",
@@ -163,5 +169,7 @@
     "confirmedForDelivery": "These orders are confirmed for delivery",
     "batchAssignConfirmTitle": "Confirm Assignment",
     "batchAssignConfirmMessage": "Are you sure you want to assign {{count}} orders to {{driverName}}?",
+    "batchAssignDriverWarning": "Note: You cannot assign any more orders to this driver until they deliver the current ones first.",
+    "assignmentRule": "Logistics Rule",
     "searchOrders": "Search orders by customer name or phone..."
 }

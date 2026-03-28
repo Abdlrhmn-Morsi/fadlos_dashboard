@@ -15,21 +15,27 @@ import {
   ArrowRight,
   ArrowLeft,
   User,
-  Check
+  Check,
+  ExternalLink
 } from 'lucide-react';
 import { toast } from '../../utils/toast';
 import { ordersApi } from './api/orders.api';
 import * as deliveryDriversApi from '../delivery/api/delivery-drivers.api';
 import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmModal } from '../../components/ConfirmModal';
+import { OrderStatus } from '../../types/order-status';
+import { Permissions } from '../../types/permissions';
+import { UserRole } from '../../types/user-role';
 
 type Order = any;
 type StoreDeliveryDriver = any;
 
 const BatchAssign: React.FC = () => {
-  const { t } = useTranslation(['orders', 'common']);
+  const { t } = useTranslation(['orders', 'common', 'dashboard']);
   const { isRTL } = useLanguage();
+  const { hasPermission, user } = useAuth();
   const [searchParams] = useSearchParams();
   const initialOrderId = searchParams.get('orderId');
   
@@ -38,6 +44,9 @@ const BatchAssign: React.FC = () => {
   const [availableDrivers, setAvailableDrivers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [dispatching, setDispatching] = useState(false);
+  const [confirmModal, setConfirmModal] = useState({ isOpen: false, driverId: '', driverName: '' });
+  const [statusConfirmModal, setStatusConfirmModal] = useState({ isOpen: false, orderId: '', status: '' });
+  const [updatingOrderIds, setUpdatingOrderIds] = useState<string[]>([]);
   
   const [selectedOrderIds, setSelectedOrderIds] = useState<string[]>([]);
   const [townFilter, setTownFilter] = useState('');
@@ -54,11 +63,6 @@ const BatchAssign: React.FC = () => {
   const [driverMeta, setDriverMeta] = useState<any>(null);
   const [driverTownFilter, setDriverTownFilter] = useState('');
   const [driverPlaceFilter, setDriverPlaceFilter] = useState('');
-  const [confirmModal, setConfirmModal] = useState<{ isOpen: boolean; driverId: string | null; driverName: string | null }>({
-    isOpen: false,
-    driverId: null,
-    driverName: null
-  });
 
   // Debounce order search
   useEffect(() => {
@@ -145,6 +149,30 @@ const BatchAssign: React.FC = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  const handleStatusUpdate = (e: React.MouseEvent, orderId: string, status: string) => {
+    e.stopPropagation();
+    if (updatingOrderIds.includes(orderId)) return;
+    setStatusConfirmModal({ isOpen: true, orderId, status });
+  };
+
+  const executeStatusUpdate = async () => {
+    const { orderId, status } = statusConfirmModal;
+    if (!orderId || !status) return;
+
+    setStatusConfirmModal(prev => ({ ...prev, isOpen: false }));
+    setUpdatingOrderIds(prev => [...prev, orderId]);
+    try {
+      await ordersApi.updateOrderStatus(orderId, status);
+      setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status } : o));
+      toast.success(t('orders:updateSuccess'));
+    } catch (error) {
+      console.error('Failed to update status', error);
+      toast.error(t('common:error_updating_status'));
+    } finally {
+      setUpdatingOrderIds(prev => prev.filter(id => id !== orderId));
+    }
+  };
 
   const handleToggleOrder = (orderId: string) => {
     setSelectedOrderIds(prev => 
@@ -235,10 +263,6 @@ const BatchAssign: React.FC = () => {
       fetchData(prev);
     }
   };
-
-  const filteredDrivers = availableDrivers.filter(d => 
-    d.name?.toLowerCase().includes(driverSearch.toLowerCase())
-  );
 
   // Extract unique towns and places for filter suggestions
   const uniqueTowns = Array.from(new Set(orders.map(o => {
@@ -387,9 +411,19 @@ const BatchAssign: React.FC = () => {
                         
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between mb-1">
-                            <span className="font-black text-slate-900 dark:text-white uppercase tracking-tight text-sm">
-                              #{order.orderNumber}
-                            </span>
+                            <h3 className="text-sm font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                              <span className="text-primary">#{order.orderNumber || order.id.substring(0, 8)}</span>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  window.open(`/orders/${order.id}`, '_blank');
+                                }}
+                                className="p-1 hover:bg-slate-100 dark:hover:bg-slate-800 rounded transition-colors text-slate-400 hover:text-primary"
+                                title={t('orders:viewDetails')}
+                              >
+                                <ExternalLink size={12} />
+                              </button>
+                            </h3>
                             <span className="text-xs font-bold text-slate-400 capitalize bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                               {t(`orders:statusDesc.${order.status.toLowerCase()}`)}
                             </span>
@@ -412,6 +446,72 @@ const BatchAssign: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-1">
                               <span className="font-bold text-primary">{order.totalAmount} {order.currency}</span>
+                            </div>
+                          </div>
+
+                          {/* Order Progress Stepper */}
+                          <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/50">
+                            <div className="flex items-center justify-between relative px-1">
+                              {[OrderStatus.PENDING, OrderStatus.CONFIRMED, OrderStatus.PREPARING, OrderStatus.READY].map((status, index, array) => {
+                                const statusesOrder = [
+                                  OrderStatus.PENDING, 
+                                  OrderStatus.CONFIRMED, 
+                                  OrderStatus.PREPARING, 
+                                  OrderStatus.READY,
+                                  OrderStatus.DRIVER_ASSIGNED,
+                                  OrderStatus.OUT_FOR_DELIVERY,
+                                  OrderStatus.DELIVERED
+                                ];
+                                
+                                const currentIndex = statusesOrder.indexOf(order.status);
+                                const targetIndex = statusesOrder.indexOf(status);
+                                
+                                const isCompleted = currentIndex >= targetIndex;
+                                const isCurrent = order.status === status;
+                                const isNext = currentIndex === targetIndex - 1;
+                                const isClickable = isNext && hasPermission(Permissions.ORDERS_UPDATE);
+                                const isUpdating = updatingOrderIds.includes(order.id);
+
+                                return (
+                                  <React.Fragment key={status}>
+                                    <div className="flex flex-col items-center gap-1.5 relative z-10">
+                                      <button
+                                        onClick={(e) => isClickable ? handleStatusUpdate(e, order.id, status) : e.stopPropagation()}
+                                        disabled={isUpdating || !isClickable}
+                                        className={clsx(
+                                          "w-6 h-6 rounded-full flex items-center justify-center border-2 transition-all cursor-default",
+                                          isCompleted 
+                                            ? "bg-primary border-primary text-white" 
+                                            : isClickable
+                                              ? "bg-white dark:bg-slate-900 border-primary text-primary cursor-pointer hover:scale-110"
+                                              : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-700 text-slate-300"
+                                        )}
+                                        title={t(`orders:statusDesc.${status.toLowerCase()}`)}
+                                      >
+                                        {isUpdating && isClickable ? (
+                                          <div className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                        ) : isCompleted ? (
+                                          <Check size={12} strokeWidth={3} />
+                                        ) : (
+                                          <span className="text-[10px] font-bold">{index + 1}</span>
+                                        )}
+                                      </button>
+                                      <span className={clsx(
+                                        "text-[10px] font-bold whitespace-nowrap",
+                                        isCurrent ? "text-primary" : isCompleted ? "text-slate-600 dark:text-slate-400" : "text-slate-300 dark:text-slate-600"
+                                      )}>
+                                        {t(`dashboard:status.${status.toLowerCase()}`)}
+                                      </span>
+                                    </div>
+                                    {index < array.length - 1 && (
+                                      <div className={clsx(
+                                        "flex-1 h-0.5 mx-1 mb-4",
+                                        statusesOrder.indexOf(order.status) > targetIndex ? "bg-primary" : "bg-slate-100 dark:bg-slate-800"
+                                      )} />
+                                    )}
+                                  </React.Fragment>
+                                );
+                              })}
                             </div>
                           </div>
                         </div>
@@ -575,11 +675,14 @@ const BatchAssign: React.FC = () => {
                               )}>
                                 {driver.activeOrdersCount || 0} {t('orders:activeTasks')}
                               </span>
-                              {driver.lastBatchAssignedAt && (
-                                <span className="text-[10px] text-slate-400 font-bold tabular-nums">
-                                  {new Date(driver.lastBatchAssignedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                              {(driver.activeOrdersCount || 0) > 0 && (
+                                <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-rose-100 dark:bg-rose-900/30 text-rose-600 animate-pulse">
+                                  {t('orders:onDelivery')}
                                 </span>
                               )}
+                              <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">
+                                {driver.todayOrdersCount || 0} {t('orders:today', 'Today')}
+                              </span>
                             </div>
                           </div>
 
@@ -638,12 +741,22 @@ const BatchAssign: React.FC = () => {
       <ConfirmModal
         isOpen={confirmModal.isOpen}
         title={t('orders:batchAssignConfirmTitle')}
-        message={t('orders:batchAssignConfirmMessage', { 
+        message={`${t('orders:batchAssignConfirmMessage', { 
           count: selectedOrderIds.length, 
           driverName: confirmModal.driverName 
-        })}
+        })}\n\n${t('orders:batchAssignDriverWarning')}`}
         onConfirm={executeBatchAssign}
         onCancel={() => setConfirmModal({ ...confirmModal, isOpen: false })}
+      />
+
+      <ConfirmModal
+        isOpen={statusConfirmModal.isOpen}
+        title={t('orders:updateStatusTitle')}
+        message={t('orders:updateStatusConfirm', { 
+          status: t(`dashboard:status.${statusConfirmModal.status.toLowerCase()}`) 
+        })}
+        onConfirm={executeStatusUpdate}
+        onCancel={() => setStatusConfirmModal({ ...statusConfirmModal, isOpen: false })}
       />
     </div>
   );
