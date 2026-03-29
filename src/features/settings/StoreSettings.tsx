@@ -30,7 +30,9 @@ import {
     Layout,
     ChevronRight,
     AtSign,
-    ShieldCheck
+    ShieldCheck,
+    Crown,
+    Zap
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -46,6 +48,8 @@ import { Permissions } from '../../types/permissions';
 import { useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { UserRole } from '../../types/user-role';
+import { useSubscription } from '../../hooks/useSubscription';
+import { PlanFeature } from '../../types/plan-feature';
 
 
 
@@ -61,7 +65,7 @@ const SOCIAL_PLATFORMS = [
 ];
 
 const StoreSettings = () => {
-    const { t, i18n } = useTranslation(['stores', 'common']);
+    const { t, i18n } = useTranslation(['stores', 'common', 'subscriptions']);
     const { isRTL } = useLanguage();
     const currentLng = i18n.language;
     const [loading, setLoading] = useState(true);
@@ -71,6 +75,8 @@ const StoreSettings = () => {
     const [availableCategories, setAvailableCategories] = useState<any[]>([]);
     const { user, hasPermission } = useAuth();
     const navigate = useNavigate();
+    const { hasFeature } = useSubscription();
+    const canEditCommission = hasFeature(PlanFeature.FREELANCER_COMMISSION);
 
     const TABS = [
         { id: 'branding', label: t('branding'), icon: ImageIcon, desc: t('brandingDesc', 'Logo and banner') },
@@ -115,6 +121,7 @@ const StoreSettings = () => {
         acceptOrdersIfOffDay: false,
         acceptOrdersInClosedHours: false,
         isAcceptingOrders: true,
+        enableStoreReviews: true,
         enableProductReviews: true,
         maxOrdersPerDriver: 5,
         isHiringDrivers: false,
@@ -1211,7 +1218,7 @@ const StoreSettings = () => {
                                         </div>
 
                                         {/* Commission Settings - Full width */}
-                                        <div className="md:col-span-2 space-y-6 pt-6 border-t border-slate-100 dark:border-slate-800">
+                                        <div className="md:col-span-2 space-y-4 pt-6 border-t border-slate-100 dark:border-slate-800">
                                             <div className="space-y-1">
                                                 <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
                                                     <CreditCard size={14} className="text-secondary" /> {t('driverCommission')}
@@ -1221,26 +1228,60 @@ const StoreSettings = () => {
                                                 </p>
                                             </div>
 
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                                                <div className="space-y-4">
-                                                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
-                                                        {t('commissionType')}
-                                                    </label>
-                                                    <select
-                                                        name="driverCommissionType"
-                                                        value={formData.driverCommissionType}
-                                                        onChange={handleChange}
-                                                        disabled={isReadOnly}
-                                                        className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed appearance-none"
-                                                    >
-                                                        <option value="none">{t('commissionNone')}</option>
-                                                        <option value="percentage">{t('commissionPercentage')}</option>
-                                                        <option value="fixed">{t('commissionFixed')}</option>
-                                                    </select>
-                                                </div>
+                                            <div className={clsx("relative rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-700/50 bg-white dark:bg-slate-900/50 transition-all duration-300", !canEditCommission && "min-h-[400px]")}>
+                                                {!canEditCommission && (
+                                                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/70 dark:bg-slate-900/80 backdrop-blur-md p-6">
+                                                        <div className="bg-white dark:bg-slate-900 shadow-2xl border border-amber-200/50 dark:border-amber-900/50 rounded-2xl p-8 max-w-md w-full flex flex-col items-center text-center gap-5 relative overflow-hidden animate-in fade-in zoom-in-95 duration-500">
+                                                            <div className="absolute -top-12 -right-12 w-32 h-32 bg-amber-400/20 dark:bg-amber-500/10 blur-3xl rounded-full"></div>
+                                                            <div className="absolute -bottom-12 -left-12 w-32 h-32 bg-orange-400/20 dark:bg-orange-500/10 blur-3xl rounded-full"></div>
+                                                            
+                                                            <div className="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-50 dark:from-amber-900/40 dark:to-orange-900/20 rounded-2xl flex items-center justify-center shadow-inner border border-amber-200/50 dark:border-amber-800/30 relative z-10 rotate-3 transition-transform hover:rotate-6">
+                                                                <Crown size={32} className="text-amber-500 drop-shadow-md" />
+                                                            </div>
+                                                            
+                                                            <div className="space-y-2 relative z-10">
+                                                                <h5 className="font-extrabold text-slate-900 dark:text-white text-lg tracking-tight">
+                                                                    {t('subscriptions:premiumFeature', 'Premium Feature')}
+                                                                </h5>
+                                                                <p className="text-sm font-medium text-slate-500 dark:text-slate-400 leading-relaxed max-w-[280px]">
+                                                                    {t('subscriptions:upgradeToCustomizeCommission', 'Unlock custom commission rules for freelancer drivers. Choose between fixed amounts or dynamic percentage splits.')}
+                                                                </p>
+                                                            </div>
+                                                            
+                                                            <button 
+                                                                type="button"
+                                                                onClick={(e) => { 
+                                                                    e.preventDefault(); 
+                                                                    navigate('/subscription'); 
+                                                                }}
+                                                                className="relative z-10 w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-amber-500/20 transition-all hover:shadow-amber-500/40 hover:-translate-y-0.5 group"
+                                                            >
+                                                                <Zap size={15} className="fill-current group-hover:scale-110 transition-transform" />
+                                                                {t('subscriptions:upgradePlan', 'Upgrade Plan')}
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                )}
 
-                                                {formData.driverCommissionType !== 'none' && (
-                                                    <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                                <div className={clsx("p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative z-0 transition-opacity duration-300", !canEditCommission && "opacity-30 select-none grayscale-[0.8] blur-[2px]")}>
+                                                    <div className="space-y-4">
+                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                                            {t('commissionType')}
+                                                        </label>
+                                                        <select
+                                                            name="driverCommissionType"
+                                                            value={formData.driverCommissionType}
+                                                            onChange={handleChange}
+                                                            disabled={isReadOnly || !canEditCommission}
+                                                            className="w-full px-6 py-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed appearance-none"
+                                                        >
+                                                            <option value="none">{t('commissionNone')}</option>
+                                                            <option value="percentage">{t('commissionPercentage')}</option>
+                                                            <option value="fixed">{t('commissionFixed')}</option>
+                                                        </select>
+                                                    </div>
+
+                                                    <div className={clsx("space-y-4 transition-all duration-500", formData.driverCommissionType === 'none' ? "opacity-50 pointer-events-none grayscale" : "")}>
                                                         <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                             {t('commissionValue')}
                                                         </label>
@@ -1257,15 +1298,15 @@ const StoreSettings = () => {
                                                                 onChange={handleChange}
                                                                 min={0}
                                                                 step="0.01"
-                                                                disabled={isReadOnly}
-                                                                className={`w-full py-4 pr-6 ${formData.driverCommissionType === 'percentage' ? 'pl-10' : 'px-6'} bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed`}
+                                                                disabled={isReadOnly || !canEditCommission || formData.driverCommissionType === 'none'}
+                                                                className={`w-full py-4 pr-6 ${formData.driverCommissionType === 'percentage' ? 'pl-10' : 'px-6'} bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed`}
                                                             />
                                                         </div>
                                                         <p className="text-[10px] text-slate-500 italic mt-2 ps-1">
                                                             {t('commissionExample')} (e.g., Deliveries: 20 → Driver Gets: {formData.driverCommissionType === 'percentage' ? `20 - (20 * ${formData.driverCommissionValue || 0} / 100)` : `20 - ${formData.driverCommissionValue || 0}`})
                                                         </p>
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

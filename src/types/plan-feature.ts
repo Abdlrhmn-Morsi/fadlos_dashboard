@@ -13,4 +13,5 @@ export enum PlanFeature {
     PRIORITY_SUPPORT = 'priority_support',
     PRODUCT_DISCOUNTS_OFFERS = 'product_discounts_offers',
     FREQUENTLY_BOUGHT_TOGETHER = 'frequently_bought_together',
+    FREELANCER_COMMISSION = 'freelancer_commission',
 }

@@ -13,6 +13,7 @@
         "success": "Updated successfully"
     },
     "no_results": "No results found",
+    "page": "Page",
     "noResults": "No results found",
     "noDataFound": "No records found",
     "showingResults": "Showing {{count}} results",

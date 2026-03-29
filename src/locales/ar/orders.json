@@ -5,6 +5,7 @@
     "orderId": "رقم الطلب",
     "customer": "العميل",
     "total": "الإجمالي",
+    "currency": "ج.م",
     "status": "الحالة",
     "date": "التاريخ",
     "actions": "الإجراءات",

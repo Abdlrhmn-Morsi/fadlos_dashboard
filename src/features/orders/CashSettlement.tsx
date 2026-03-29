@@ -135,11 +135,11 @@ const CashSettlement = () => {
                     </p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
                     {/* Drivers List */}
                     <div className={clsx(
                         "grid gap-4",
-                        selectedDriver ? "lg:col-span-4" : "lg:col-span-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                        selectedDriver ? "lg:col-span-4 sticky top-6" : "lg:col-span-12 grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
                     )}>
                         {pendingCollections.map((collection) => (
                             <div

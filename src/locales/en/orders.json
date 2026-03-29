@@ -5,6 +5,7 @@
     "orderId": "Order ID",
     "customer": "Customer",
     "total": "Total",
+    "currency": "LE",
     "status": "Status",
     "date": "Date",
     "actions": "Actions",

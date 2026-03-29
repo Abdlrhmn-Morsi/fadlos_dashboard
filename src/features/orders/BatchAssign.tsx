@@ -103,18 +103,33 @@ const BatchAssign: React.FC = () => {
 
       // Unwrap generic response or paginated response
       let data = [];
-      let meta = null;
+      let total = 0;
+      let totalPages = 1;
       
       if (ordersRes && ordersRes.data && Array.isArray(ordersRes.data)) {
         data = ordersRes.data;
-        meta = ordersRes.meta;
+        total = ordersRes.meta?.total || data.length;
+        totalPages = ordersRes.meta?.totalPages || 1;
+      } else if (ordersRes && ordersRes.orders) {
+        data = ordersRes.orders;
+        total = ordersRes.total || data.length;
+        totalPages = Math.ceil(total / 10);
       } else if (Array.isArray(ordersRes)) {
         data = ordersRes;
+        total = data.length;
+        totalPages = Math.ceil(total / 10);
       }
       
       setOrders(data);
-      setOrderMeta(meta);
-      console.log(`[BatchAssign] Fetched ${data.length} orders`, { meta });
+      const limit = 10;
+      totalPages = totalPages || Math.ceil(total / limit);
+      setOrderMeta({
+        total,
+        page,
+        limit,
+        totalPages
+      });
+      console.log(`[BatchAssign] Fetched ${data.length} orders`, { total, totalPages });
 
       // Fetch suggested driver and available drivers together
       const suggestedRes: any = await deliveryDriversApi.getSuggestedNextDriver({
@@ -292,10 +307,8 @@ const BatchAssign: React.FC = () => {
             <Truck className="text-primary w-8 h-8" />
             {t('orders:batchAssign')}
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 font-medium flex items-center gap-2">
+          <p className="text-slate-500 dark:text-slate-400 font-medium">
             {t('orders:selectOrdersToDispatch')}
-            <span className="text-slate-300">•</span>
-            <span className="text-xs font-bold text-slate-400">{orders.length} {t('orders:total')}</span>
           </p>
         </div>
         <div className="flex items-center gap-4">
@@ -325,7 +338,16 @@ const BatchAssign: React.FC = () => {
                   <Package className="w-5 h-5 text-primary" />
                   {t('orders:unassignedOrders')}
                   <span className="bg-primary/10 text-primary text-xs px-2 py-0.5 rounded-full">
-                    {filteredOrders.length}
+                    {orderMeta?.total || 0}
+                  </span>
+                  <span className="text-slate-300 mx-1">•</span>
+                  <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                    ({(orderPage - 1) * 10 + orders.length} / {orderMeta?.total || 0})
+                    {orderMeta && orderMeta.total > 0 && (
+                      <span className="text-primary/70 ml-1">
+                        ({orderPage} / {orderMeta.totalPages})
+                      </span>
+                    )}
                   </span>
                 </h3>
                 <button 
@@ -445,9 +467,43 @@ const BatchAssign: React.FC = () => {
                               <span>{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
                             <div className="flex items-center gap-1">
-                              <span className="font-bold text-primary">{order.totalAmount} {order.currency}</span>
+                              <span className="text-xs font-bold text-slate-400">{t('orders:total')}:</span>
+                              <span className="font-black text-primary">{order.total} {t('orders:currency')}</span>
                             </div>
                           </div>
+
+                          {/* Product List Row */}
+                          {order.items && order.items.length > 0 && (
+                            <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                              {order.items.map((item: any) => (
+                                <div 
+                                  key={item.id}
+                                  className="flex-shrink-0 flex items-center gap-2 bg-slate-50 dark:bg-slate-800/80 border border-slate-100 dark:border-slate-800 px-2.5 py-1.5 rounded-lg"
+                                >
+                                  {item.product?.coverImage && (
+                                    <img 
+                                      src={item.product.coverImage} 
+                                      alt="" 
+                                      className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700" 
+                                    />
+                                  )}
+                                  <div className="flex flex-col">
+                                    <div className="flex items-center gap-1 mb-0.5">
+                                      <span className="text-[10px] font-black text-primary leading-none">
+                                        {item.quantity}x
+                                      </span>
+                                      <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate max-w-[120px] leading-none">
+                                        {isRTL ? item.product?.nameAr || item.product?.name : item.product?.name}
+                                      </span>
+                                    </div>
+                                    <span className="text-[9px] font-bold text-slate-400 leading-none">
+                                      {item.price} {t('orders:currency')} {t('orders:each')}
+                                    </span>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
 
                           {/* Order Progress Stepper */}
                           <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/50">
@@ -523,25 +579,32 @@ const BatchAssign: React.FC = () => {
             </div>
 
             {/* Pagination footer */}
-            {orderMeta && orderMeta.totalPages > 1 && (
+            {orderMeta && orderMeta.total > 0 && (
               <div className="p-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between bg-slate-50/30 dark:bg-slate-900/30">
-                <button
-                  onClick={handlePrevPage}
-                  disabled={orderPage === 1}
-                  className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30 flex items-center gap-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
-                >
-                  <ChevronLeft className="w-4 h-4" /> {t('common:previous')}
-                </button>
-                <span className="text-xs font-bold text-slate-400">
-                  {orderPage} / {orderMeta.totalPages}
-                </span>
-                <button
-                  onClick={handleNextPage}
-                  disabled={orderPage >= orderMeta.totalPages}
-                  className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30 flex items-center gap-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
-                >
-                  {t('common:next')} <ChevronRight className="w-4 h-4" />
-                </button>
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={orderPage === 1}
+                    className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30 flex items-center gap-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
+                  >
+                    {isRTL ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+                    {t('common:previous')}
+                  </button>
+                <div className="flex flex-col items-center">
+                  <span className="text-[10px] font-black text-primary/40 uppercase mb-0.5">
+                    {t('common:page')} {orderPage} / {orderMeta.totalPages}
+                  </span>
+                  <span className="text-[9px] font-bold text-slate-400">
+                    {t('orders:total')}: {orderMeta.total}
+                  </span>
+                </div>
+                  <button
+                    onClick={handleNextPage}
+                    disabled={orderPage >= orderMeta.totalPages}
+                    className="px-3 py-1.5 text-xs font-bold text-slate-600 dark:text-slate-400 disabled:opacity-30 flex items-center gap-1 hover:bg-white dark:hover:bg-slate-800 rounded-lg transition-all"
+                  >
+                    {t('common:next')}
+                    {isRTL ? <ChevronLeft className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                  </button>
               </div>
             )}
           </div>
@@ -602,7 +665,7 @@ const BatchAssign: React.FC = () => {
               <div className="w-full bg-slate-200 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden">
                 <div 
                   className="bg-primary h-full transition-all duration-500 ease-out" 
-                  style={{ width: `${(selectedOrderIds.length / (filteredOrders.length || 1)) * 100}%` }}
+                  style={{ width: `${(selectedOrderIds.length / (orders.length || 1)) * 100}%` }}
                 />
               </div>
             </div>

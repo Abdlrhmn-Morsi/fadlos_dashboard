@@ -34,6 +34,9 @@
     "planEndingAlert": "انتهت صلاحية خطتك. لديك وقت محدود للتجديد قبل فقدان الوصول إلى ميزات خطتك:",
     "noPlans": "لا توجد خطط متاحة حاليًا",
     "noPlansDesc": "يرجى المحاولة لاحقًا أو الاتصال بالدعم إذا استمرت المشكلة.",
+    "premiumFeature": "ميزة بريميوم",
+    "upgradeToCustomizeCommission": "افتح قواعد العمولة المخصصة للسائقين المستقلين. اختر بين المبالغ الثابتة أو نسب العمولة المتغيرة.",
+    "upgradePlan": "ترقية الخطة",
     "everythingIn": "كل شيء في {{name}} و:",
     "includes": "يتضمن:",
     "branches": "الفروع",
@@ -103,7 +106,8 @@
         "reviews_management": "إدارة مراجعات العملاء",
         "priority_support": "دعم ذو أولوية",
         "product_discounts_offers": "خصومات وعروض المنتجات",
-        "frequently_bought_together": "منتجات تُشترى معًا بشكل متكرر"
+        "frequently_bought_together": "منتجات تُشترى معًا بشكل متكرر",
+        "freelancer_commission": "عمولة السائق المستقل"
     },
     "admin": {
         "title": "باقات الاشتراك",
@@ -140,7 +144,8 @@
             "frequently_bought_together": "منتجات تُشترى معًا بشكل متكرر",
             "basic_dashboard": "لوحة تحكم أساسية",
             "order_management": "إدارة الطلبات",
-            "promotion_ads_per_month": "إعلانات ترويجية"
+            "promotion_ads_per_month": "إعلانات ترويجية",
+            "freelancer_commission": "عمولة السائق المستقل"
         },
         "limitKeys": {
             "branches": "الفروع",

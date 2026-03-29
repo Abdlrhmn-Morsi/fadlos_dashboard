@@ -34,6 +34,9 @@
     "planEndingAlert": "Your plan has ended. You have a limited time to renew before losing access to your plan features:",
     "noPlans": "No plans available right now",
     "noPlansDesc": "Please check back later or contact support if the issue persists.",
+    "premiumFeature": "Premium Feature",
+    "upgradeToCustomizeCommission": "Unlock custom commission rules for freelancer drivers. Choose between fixed amounts or dynamic percentage splits.",
+    "upgradePlan": "Upgrade Plan",
     "everythingIn": "Everything in {{name}} and:",
     "includes": "Includes:",
     "branches": "Branches",
@@ -103,7 +106,8 @@
         "reviews_management": "Customer Reviews management",
         "priority_support": "Priority Support",
         "product_discounts_offers": "Product Discounts & Offers",
-        "frequently_bought_together": "Frequently Bought Together Products"
+        "frequently_bought_together": "Frequently Bought Together Products",
+        "freelancer_commission": "Freelancer Commission"
     },
     "admin": {
         "title": "Subscription Bundles",
@@ -140,7 +144,8 @@
             "frequently_bought_together": "Frequently Bought Together Products",
             "basic_dashboard": "Basic Dashboard",
             "order_management": "Order Management",
-            "promotion_ads_per_month": "Promotional Ads"
+            "promotion_ads_per_month": "Promotional Ads",
+            "freelancer_commission": "Freelancer Commission"
         },
         "limitKeys": {
             "branches": "Branches",
