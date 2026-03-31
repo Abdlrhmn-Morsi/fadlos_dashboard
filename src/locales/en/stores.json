@@ -113,6 +113,8 @@
     "commissionPercentage": "Percentage (%)",
     "commissionFixed": "Fixed Amount",
     "commissionValue": "Commission Value",
+    "deliveryFee": "Delivery Fee",
+    "driverGets": "Driver Gets",
     "commissionExample": "Example calculation:",
     "verification": "Verification",
     "verificationDesc": "Store identity validation",

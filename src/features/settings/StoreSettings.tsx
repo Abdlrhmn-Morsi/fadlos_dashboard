@@ -1303,7 +1303,11 @@ const StoreSettings = () => {
                                                             />
                                                         </div>
                                                         <p className="text-[10px] text-slate-500 italic mt-2 ps-1">
-                                                            {t('commissionExample')} (e.g., Deliveries: 20 → Driver Gets: {formData.driverCommissionType === 'percentage' ? `20 - (20 * ${formData.driverCommissionValue || 0} / 100)` : `20 - ${formData.driverCommissionValue || 0}`})
+                                                            {t('commissionExample')} (e.g., {t('deliveryFee')}: 20 → {t('driverGets')}: {
+                                                                formData.driverCommissionType === 'percentage' 
+                                                                    ? (20 - (20 * (Number(formData.driverCommissionValue) || 0) / 100)).toFixed(2)
+                                                                    : Math.max(0, (20 - (Number(formData.driverCommissionValue) || 0))).toFixed(2)
+                                                            })
                                                         </p>
                                                     </div>
                                                 </div>

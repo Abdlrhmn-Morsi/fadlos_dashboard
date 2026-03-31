@@ -113,6 +113,8 @@
     "commissionPercentage": "نسبة مئوية (%)",
     "commissionFixed": "مبلغ ثابت",
     "commissionValue": "قيمة العمولة",
+    "deliveryFee": "رسوم التوصيل",
+    "driverGets": "السائق يحصل على",
     "commissionExample": "مثال للحساب:",
     "verification": "التوثيق",
     "verificationDesc": "التحقق من هوية المتجر",
