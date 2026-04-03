@@ -37,7 +37,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
                 "border-current border-t-transparent animate-spin rounded-full shrink-0"
             )} />
             {message && (
-                <p className="text-slate-500 font-bold uppercase tracking-widest text-[10px]">
+                <p className="text-slate-500 font-bold uppercase tracking-widest text-[0.625rem]">
                     {message}
                 </p>
             )}

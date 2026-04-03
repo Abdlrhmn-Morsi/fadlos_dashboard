@@ -74,7 +74,7 @@ const Login = () => {
                 <ThemeToggle />
             </div>
 
-            <div className="w-full max-w-[440px] relative z-10 animate-in slide-in-from-bottom-5 duration-500">
+            <div className="w-full max-w-[440px] relative z-10 animate-in slide-in-from-bottom-5 duration-500 glass p-8 md:p-10">
                 <div className="flex flex-col items-center mb-8">
                     <img
                         src={appLogo}
@@ -147,7 +147,7 @@ const Login = () => {
                             <input
                                 type="checkbox"
                                 defaultChecked
-                                className="w-4 h-4 rounded-none border-slate-300 dark:border-slate-600 text-primary focus:ring-primary appearance-none checked:bg-primary checked:border-primary checked:after:content-['✓'] checked:after:text-white checked:after:text-[10px] checked:after:flex checked:after:items-center checked:after:justify-center border bg-slate-50 dark:bg-slate-900"
+                                className="w-4 h-4 rounded-none border-slate-300 dark:border-slate-600 text-primary focus:ring-primary appearance-none checked:bg-primary checked:border-primary checked:after:content-['✓'] checked:after:text-white checked:after:text-[0.625rem] checked:after:flex checked:after:items-center checked:after:justify-center border bg-slate-50 dark:bg-slate-900"
                             />
                             <span className="font-medium group-hover:text-primary transition-colors">{t('rememberMe')}</span>
                         </label>
@@ -158,7 +158,7 @@ const Login = () => {
 
                     <button
                         type="submit"
-                        className="w-full py-3.5 bg-primary text-white font-bold rounded-none hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-2"
+                        className="w-full py-3.5 bg-primary text-white font-bold rounded-none hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active-push disabled:opacity-70 disabled:pointer-events-none flex items-center justify-center gap-2"
                         disabled={loading}
                     >
                         {loading ? (

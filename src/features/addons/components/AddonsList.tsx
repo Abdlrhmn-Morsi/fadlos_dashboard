@@ -182,7 +182,7 @@ const AddonsList = () => {
                                             <div className="flex items-center gap-3">
                                                 {addon.image ? (
                                                     <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 flex-shrink-0">
-                                                        <img src={addon.image} alt="" className="w-full h-full object-cover" />
+                                                        <img src={addon.image} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
                                                     </div>
                                                 ) : (
                                                     <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 flex-shrink-0">

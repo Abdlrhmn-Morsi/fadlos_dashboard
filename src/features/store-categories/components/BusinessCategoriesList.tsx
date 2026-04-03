@@ -122,7 +122,7 @@ const BusinessCategoriesList = () => {
                     <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Tags size={24} className="text-primary" />
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
                 <div className={clsx("flex flex-wrap gap-3")}>
                     <div className="relative group">
@@ -131,7 +131,7 @@ const BusinessCategoriesList = () => {
                             type="text"
                             placeholder={t('searchPlaceholder')}
                             className={clsx(
-                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- text-slate-900 dark:text-slate-100",
                                 isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                             value={search}
@@ -144,7 +144,7 @@ const BusinessCategoriesList = () => {
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
                             className={clsx(
-                                "py-3 w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                "py-3 w-full md:w-64 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- text-slate-900 dark:text-slate-100",
                                 isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                         >
@@ -203,7 +203,7 @@ const BusinessCategoriesList = () => {
                                     filteredCategories.map((category: any) => (
                                         <tr key={category.id} className="table-row group">
                                             <td className="table-cell">
-                                                <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{category.name}</div>
+                                                <div className="text-[15px] font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{category.name}</div>
                                             </td>
                                             <td className="table-cell">
                                                 <div className="text-sm text-slate-600 dark:text-slate-400 font-bold">{category.nameAr}</div>
@@ -214,7 +214,7 @@ const BusinessCategoriesList = () => {
                                                 </div>
                                             </td>
                                             <td className="table-cell">
-                                                <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-[4px] text-[10px] font-black tracking-widest uppercase">
+                                                <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-[4px] text-[0.625rem] font-extrabold tracking-widest uppercase">
                                                     {category.code}
                                                 </code>
                                             </td>
@@ -222,7 +222,7 @@ const BusinessCategoriesList = () => {
                                                 <button
                                                     onClick={() => handleToggleStatus(category)}
                                                     className={clsx(
-                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[0.625rem] font-extrabold uppercase tracking-widest transition-all",
                                                         category.isActive
                                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-900'
                                                             : 'bg-slate-50 text-slate-400 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700'
@@ -272,7 +272,7 @@ const BusinessCategoriesList = () => {
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                            <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('nameEn')}
                             </label>
                             <input
@@ -287,7 +287,7 @@ const BusinessCategoriesList = () => {
                             />
                         </div>
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                            <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('nameAr')}
                             </label>
                             <input
@@ -303,7 +303,7 @@ const BusinessCategoriesList = () => {
                         </div>
                     </div>
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                        <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('businessType')}
                         </label>
                         <select
@@ -323,7 +323,7 @@ const BusinessCategoriesList = () => {
                         </select>
                     </div>
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                        <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('sortOrder')}
                         </label>
                         <input

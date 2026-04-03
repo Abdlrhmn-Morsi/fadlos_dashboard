@@ -219,13 +219,13 @@ const DeliveryAreas = () => {
             {/* Add New Delivery Area Section */}
             {canUpdate && (
                 <div className="bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col">
-                    <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
+                    <h4 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
                         <Plus size={14} className="text-primary" />
                         {t('addDeliveryCity')}
                     </h4>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('common:city')}</label>
+                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest block">{t('common:city')}</label>
                             <select
                                 value={selectedCityId}
                                 onChange={(e) => setSelectedCityId(e.target.value)}
@@ -240,7 +240,7 @@ const DeliveryAreas = () => {
                             </select>
                         </div>
                         <div className="space-y-1">
-                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">{t('defaultPrice')}</label>
+                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest block">{t('defaultPrice')}</label>
                             <div className="relative">
                                 <input
                                     type="number"
@@ -259,7 +259,7 @@ const DeliveryAreas = () => {
                                 type="button"
                                 onClick={handleAssignCity}
                                 disabled={!selectedCityId || saving || selectedPlaceIds.length === 0}
-                                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
+                                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-extrabold uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
                             >
                                 {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
                                 {t('addArea')}
@@ -271,21 +271,21 @@ const DeliveryAreas = () => {
                     {selectedCityId && (
                         <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
                             <div className="flex items-center justify-between mb-4">
-                                <h5 className="text-[10px] font-black text-slate-400 uppercase tracking-widest block">
+                                <h5 className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest block">
                                     {t('selectPlaces')} ({selectedPlaceIds.length}/{places.length})
                                 </h5>
                                 <div className="flex gap-4">
                                     <button
                                         type="button"
                                         onClick={() => setSelectedPlaceIds(places.map(p => p.id))}
-                                        className="text-[10px] font-black text-primary uppercase tracking-widest hover:underline"
+                                        className="text-[0.625rem] font-extrabold text-primary uppercase tracking-widest hover:underline"
                                     >
                                         {t('common:selectAll')}
                                     </button>
                                     <button
                                         type="button"
                                         onClick={() => setSelectedPlaceIds([])}
-                                        className="text-[10px] font-black text-slate-500 uppercase tracking-widest hover:underline"
+                                        className="text-[0.625rem] font-extrabold text-slate-500 uppercase tracking-widest hover:underline"
                                     >
                                         {t('common:deselectAll')}
                                     </button>
@@ -326,7 +326,7 @@ const DeliveryAreas = () => {
                                                 )}>
                                                     {isSelected && <Plus size={10} className="text-white" />}
                                                 </div>
-                                                <span className="text-[11px] font-bold truncate">
+                                                <span className="text-[0.6875rem] font-bold truncate">
                                                     {currentLng.startsWith('ar') ? place.arName : place.enName}
                                                 </span>
                                             </button>
@@ -337,7 +337,7 @@ const DeliveryAreas = () => {
                         </div>
                     )}
 
-                    <p className="mt-4 text-[10px] text-slate-500 font-medium">
+                    <p className="mt-4 text-[0.625rem] text-slate-500 font-medium">
                         {t('addAreaNote')}
                     </p>
                 </div>
@@ -348,11 +348,11 @@ const DeliveryAreas = () => {
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                     <div className="flex items-center gap-4">
                         <div className="flex items-center gap-4">
-                            <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs flex items-center gap-2">
+                            <h4 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs flex items-center gap-2">
                                 <Truck size={14} className="text-primary" />
                                 {t('activeDeliveryAreas')}
                             </h4>
-                            <div className="text-[10px] font-black px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-none">
+                            <div className="text-[0.625rem] font-extrabold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-none">
                                 {filteredAreas.length}
                             </div>
                         </div>
@@ -365,7 +365,7 @@ const DeliveryAreas = () => {
                             <select
                                 value={filterTownId}
                                 onChange={(e) => setFilterTownId(e.target.value)}
-                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4"
+                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[0.625rem] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4"
                             >
                                 <option value="all">{t('allTowns')}</option>
                                 {uniqueTowns.map(town => (
@@ -384,7 +384,7 @@ const DeliveryAreas = () => {
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 placeholder={t('common:search')}
-                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[10px] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4 min-w-[150px]"
+                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[0.625rem] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4 min-w-[150px]"
                             />
                         </div>
 
@@ -394,7 +394,7 @@ const DeliveryAreas = () => {
                                 type="button"
                                 onClick={() => setShowResetConfirm(true)}
                                 disabled={deliveryAreas.length === 0}
-                                className="flex items-center gap-2 px-4 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-bold text-[10px] uppercase tracking-widest disabled:opacity-30"
+                                className="flex items-center gap-2 px-4 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-bold text-[0.625rem] uppercase tracking-widest disabled:opacity-30"
                             >
                                 <RotateCcw size={14} />
                                 {t('resetAll')}
@@ -432,10 +432,10 @@ const DeliveryAreas = () => {
                             .map((group) => (
                                 <div key={group.id} className="space-y-4">
                                     <div className="flex items-center gap-3 pb-3 border-b-2 border-slate-200 dark:border-slate-800">
-                                        <h5 className="font-black text-slate-900 dark:text-slate-100 text-base uppercase tracking-widest">
+                                        <h5 className="font-extrabold text-slate-900 dark:text-slate-100 text-base uppercase tracking-widest">
                                             {currentLng.startsWith('ar') ? group.arName : group.enName}
                                         </h5>
-                                        <span className="text-sm font-black px-3 py-1 bg-primary text-white rounded-none shadow-sm">
+                                        <span className="text-sm font-extrabold px-3 py-1 bg-primary text-white rounded-none shadow-sm">
                                             {group.areas.length}
                                         </span>
                                     </div>
@@ -448,7 +448,7 @@ const DeliveryAreas = () => {
                                                 <div className="space-y-1">
                                                     <div className="flex items-center gap-2">
                                                         <MapPin size={14} className="text-primary" />
-                                                        <span className="font-black text-slate-900 dark:text-slate-100 text-sm italic">
+                                                        <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm italic">
                                                             {currentLng.startsWith('ar') ? area.place?.arName : area.place?.enName}
                                                         </span>
                                                     </div>

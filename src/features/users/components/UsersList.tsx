@@ -139,7 +139,7 @@ const UsersList: React.FC = () => {
                     <div className="p-3 bg-primary-light rounded-none animate-float">
                         <Users size={24} className="text-primary" />
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
@@ -148,7 +148,7 @@ const UsersList: React.FC = () => {
                         <input
                             type="text"
                             placeholder={t('searchUsersPlaceholder')}
-                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md ps-11 pe-4"
+                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- ps-11 pe-4"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -157,7 +157,7 @@ const UsersList: React.FC = () => {
                     <div className="relative group">
                         <Filter size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none start-4" />
                         <select
-                            className="appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group-hover:shadow-md ps-11 pe-12"
+                            className="appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group- ps-11 pe-12"
                             value={filters.role}
                             onChange={(e) => {
                                 setFilters((prev: any) => ({ ...prev, role: e.target.value }));
@@ -176,7 +176,7 @@ const UsersList: React.FC = () => {
                     <div className="relative group">
                         <Filter size={18} className="absolute top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors pointer-events-none start-4" />
                         <select
-                            className="appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group-hover:shadow-md ps-11 pe-12"
+                            className="appearance-none py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none cursor-pointer transition-all shadow-sm group- ps-11 pe-12"
                             value={filters.status || ''}
                             onChange={(e) => {
                                 setFilters((prev: any) => ({ ...prev, status: e.target.value }));
@@ -215,11 +215,11 @@ const UsersList: React.FC = () => {
                                         <tr key={user.id} className="table-row group">
                                             <td className="table-cell">
                                                 <div className="flex items-center gap-4">
-                                                    <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform overflow-hidden">
+                                                    <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-extrabold shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform overflow-hidden">
                                                         {(user.profileImage || (user.deliveryProfile && user.deliveryProfile.avatarUrl)) ? (
                                                             <img
                                                                 src={user.profileImage || user.deliveryProfile.avatarUrl}
-                                                                alt=""
+                                                                alt="Image" aria-hidden="true"
                                                                 className="w-full h-full object-cover"
                                                                 onError={(e) => {
                                                                     (e.target as HTMLImageElement).style.display = 'none';
@@ -230,8 +230,8 @@ const UsersList: React.FC = () => {
                                                         )}
                                                     </div>
                                                     <div className="text-start">
-                                                        <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{user.name}</div>
-                                                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">@{user.username}</div>
+                                                        <div className="text-[15px] font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{user.name}</div>
+                                                        <div className="text-[0.6875rem] font-bold text-slate-400 uppercase tracking-tight">@{user.username}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -256,7 +256,7 @@ const UsersList: React.FC = () => {
                                                             ? "bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)] group-hover/status:scale-125"
                                                             : "bg-slate-300 group-hover/status:bg-slate-400"
                                                     )} />
-                                                    <span className="text-[10px] font-black uppercase tracking-widest">
+                                                    <span className="text-[0.625rem] font-extrabold uppercase tracking-widest">
                                                         {user.isActive ? t('common:active') : t('common:inactive')}
                                                     </span>
                                                 </button>
@@ -305,11 +305,11 @@ const UsersList: React.FC = () => {
             >
                 {userToToggle && (
                     <div className="flex justify-center my-4">
-                        <div className="w-20 h-20 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white text-2xl font-black shadow-xl overflow-hidden border-2 border-primary">
+                        <div className="w-20 h-20 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white text-2xl font-extrabold shadow-xl overflow-hidden border-2 border-primary">
                             {(userToToggle.profileImage || (userToToggle.deliveryProfile && userToToggle.deliveryProfile.avatarUrl)) ? (
                                 <img
                                     src={userToToggle.profileImage || userToToggle.deliveryProfile.avatarUrl}
-                                    alt=""
+                                    alt="Image" aria-hidden="true"
                                     className="w-full h-full object-cover"
                                 />
                             ) : (

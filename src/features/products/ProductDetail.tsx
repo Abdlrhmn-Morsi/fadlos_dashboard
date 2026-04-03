@@ -81,7 +81,7 @@ const ProductDetail = () => {
                             <h5 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                                 {t('products:coverImage')}
                             </h5>
-                            <p className="text-[10px] text-slate-500 mb-2 leading-tight">
+                            <p className="text-[0.625rem] text-slate-500 mb-2 leading-tight">
                                 {t('products:coverImageSubtitle')}
                             </p>
                             {product.coverImage ? (
@@ -103,7 +103,7 @@ const ProductDetail = () => {
                                 <h5 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                                     {t('products:galleryImages')}
                                 </h5>
-                                <p className="text-[10px] text-slate-500 mb-2 leading-tight">
+                                <p className="text-[0.625rem] text-slate-500 mb-2 leading-tight">
                                     {t('products:galleryImagesSubtitle')}
                                 </p>
                                 <div className="grid grid-cols-4 gap-2">
@@ -128,7 +128,7 @@ const ProductDetail = () => {
                                     {language === 'ar' && product.nameAr ? product.nameAr : product.name}
                                 </h2>
                                 {product.isOffer && (
-                                    <span className="px-2 py-1 bg-amber-500 text-white text-[10px] font-bold rounded-lg uppercase tracking-wider animate-pulse">
+                                    <span className="px-2 py-1 bg-amber-500 text-white text-[0.625rem] font-bold rounded-lg uppercase tracking-wider animate-pulse">
                                         {t('products:offer')}
                                     </span>
                                 )}
@@ -243,7 +243,7 @@ const ProductDetail = () => {
                                         <div key={addon.id} className="flex items-center gap-3 bg-slate-50 dark:bg-slate-800 p-3 rounded hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
                                             <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0 border border-slate-200 dark:border-slate-700">
                                                 {addon.image ? (
-                                                    <img src={addon.image} className="w-full h-full object-cover" alt="" />
+                                                    <img src={addon.image} className="w-full h-full object-cover" alt="Image" aria-hidden="true" />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                         <Package size={18} />

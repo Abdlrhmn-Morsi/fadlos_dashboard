@@ -16,7 +16,7 @@ const DeliveryAreasPage = () => {
                     <Truck size={40} className="text-primary" />
                 </div>
                 <div>
-                    <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight uppercase">
+                    <h2 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight uppercase">
                         {t('deliveryAreas')}
                     </h2>
                     <p className="text-slate-500 font-medium mt-1">

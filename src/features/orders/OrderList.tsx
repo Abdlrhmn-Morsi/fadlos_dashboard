@@ -198,7 +198,7 @@ const OrderList = () => {
                             <AlertTriangle className="text-amber-600 dark:text-amber-400" size={24} />
                         </div>
                         <div>
-                            <h4 className="font-black text-amber-900 dark:text-amber-100 uppercase tracking-tight text-sm">
+                            <h4 className="font-extrabold text-amber-900 dark:text-amber-100 uppercase tracking-tight text-sm">
                                 {t('common:notAvailableInPlan')}
                             </h4>
                             <p className="text-amber-700 dark:text-amber-300 text-xs font-medium">
@@ -208,7 +208,7 @@ const OrderList = () => {
                     </div>
                     <button 
                         onClick={() => navigate('/subscription')}
-                        className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black uppercase tracking-widest rounded-xl transition-all hover:shadow-lg hover:shadow-amber-500/20 active:scale-95"
+                        className="px-6 py-2.5 bg-amber-600 hover:bg-amber-700 text-white text-xs font-extrabold uppercase tracking-widest rounded-xl transition-all hover:shadow-lg hover:shadow-amber-500/20 active:scale-95"
                     >
                         {t('common:upgradeNow')}
                     </button>
@@ -222,14 +222,14 @@ const OrderList = () => {
                     <div
                         onClick={() => setStatusFilter('')}
                         className={clsx(
-                            "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                            "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all  cursor-pointer",
                             statusFilter === ''
                                 ? "bg-indigo-50 border-indigo-200 dark:bg-indigo-900/20 dark:border-indigo-800 ring-2 ring-indigo-500/20"
                                 : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800"
                         )}
                     >
                         <span className="text-slate-500 text-xs font-bold uppercase tracking-wider">{t('total')}</span>
-                        <span className="text-2xl font-black text-slate-800 dark:text-slate-100">
+                        <span className="text-2xl font-extrabold text-slate-800 dark:text-slate-100">
                             {Object.values(OrderStatus).reduce((total, s) => total + (Number(statusCounts[s]) || 0), 0)}
                         </span>
                     </div>
@@ -243,7 +243,7 @@ const OrderList = () => {
                             key={status}
                             onClick={() => setStatusFilter(status)}
                             className={clsx(
-                                "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                                "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all  cursor-pointer",
                                 getStatusColor(status).replace('text-', 'border-').replace('bg-', 'bg-opacity-10 bg-') + ' border bg-opacity-5',
                                 statusFilter === status && getStatusColor(status).split(' ')[0],
                                 statusFilter === status && "ring-2 ring-offset-2 dark:ring-offset-slate-950 ring-current shadow-lg scale-[1.02]"
@@ -252,7 +252,7 @@ const OrderList = () => {
                             <span className={clsx("text-xs font-bold uppercase tracking-wider opacity-80", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
                                 {getLocalizedStatus(status)}
                             </span>
-                            <span className={clsx("text-2xl font-black", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                            <span className={clsx("text-2xl font-extrabold", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
                                 {statusCounts[status] || 0}
                             </span>
                         </div>
@@ -272,7 +272,7 @@ const OrderList = () => {
                             key={status}
                             onClick={() => setStatusFilter(status)}
                             className={clsx(
-                                "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all hover:shadow-md cursor-pointer",
+                                "p-4 rounded-xl border shadow-sm flex flex-col items-center justify-center gap-1 transition-all  cursor-pointer",
                                 getStatusColor(status).replace('text-', 'border-').replace('bg-', 'bg-opacity-10 bg-') + ' border bg-opacity-5',
                                 statusFilter === status && getStatusColor(status).split(' ')[0],
                                 statusFilter === status && "ring-2 ring-offset-2 dark:ring-offset-slate-950 ring-current shadow-lg scale-[1.02]"
@@ -281,7 +281,7 @@ const OrderList = () => {
                             <span className={clsx("text-xs font-bold uppercase tracking-wider opacity-80", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
                                 {getLocalizedStatus(status)}
                             </span>
-                            <span className={clsx("text-2xl font-black", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
+                            <span className={clsx("text-2xl font-extrabold", statusFilter !== status && getStatusColor(status).split(' ')[0])}>
                                 {statusCounts[status] || 0}
                             </span>
                         </div>

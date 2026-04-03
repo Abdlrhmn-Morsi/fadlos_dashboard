@@ -218,7 +218,7 @@ const PlansManagement: React.FC = () => {
                                 <div className="space-y-4">
                                     <div className="group relative">
                                         <label className={clsx(
-                                            "text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block",
+                                            "text-[0.625rem] font-bold text-slate-500 uppercase tracking-wider mb-1 block",
                                             isPremium ? "text-slate-400" : "text-slate-500"
                                         )}>{t('admin.monthlyPrice')}</label>
                                         <div className="relative">
@@ -237,7 +237,7 @@ const PlansManagement: React.FC = () => {
 
                                     <div className="group relative">
                                         <label className={clsx(
-                                            "text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1 block",
+                                            "text-[0.625rem] font-bold text-slate-500 uppercase tracking-wider mb-1 block",
                                             isPremium ? "text-slate-400" : "text-slate-500"
                                         )}>{t('admin.yearlyPrice')}</label>
                                         <div className="relative">
@@ -337,7 +337,7 @@ const PlansManagement: React.FC = () => {
                                                 </div>
                                             </div>
                                         ))}
-                                        <p className="text-[10px] text-slate-500 font-medium italic mt-2">{t('admin.unlimitedHint')}</p>
+                                        <p className="text-[0.625rem] text-slate-500 font-medium italic mt-2">{t('admin.unlimitedHint')}</p>
                                     </div>
                                 </div>
                             </div>

@@ -104,7 +104,7 @@ const BusinessTypesList = () => {
                     <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Briefcase size={24} className="text-primary" />
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
                 <div className={clsx("flex flex-wrap gap-3")}>
                     <div className="relative group">
@@ -113,7 +113,7 @@ const BusinessTypesList = () => {
                             type="text"
                             placeholder={t('searchPlaceholder')}
                             className={clsx(
-                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- text-slate-900 dark:text-slate-100",
                                 isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                             value={search}
@@ -158,13 +158,13 @@ const BusinessTypesList = () => {
                                     filteredTypes.map((type: any) => (
                                         <tr key={type.id} className="table-row group">
                                             <td className="table-cell">
-                                                <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{type.en_name}</div>
+                                                <div className="text-[15px] font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{type.en_name}</div>
                                             </td>
                                             <td className="table-cell">
                                                 <div className="text-sm text-slate-600 dark:text-slate-400 font-bold">{type.ar_name}</div>
                                             </td>
                                             <td className="table-cell">
-                                                <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-[4px] text-[10px] font-black tracking-widest uppercase">
+                                                <code className="px-3 py-1 bg-slate-900 border border-slate-700 text-primary-light rounded-[4px] text-[0.625rem] font-extrabold tracking-widest uppercase">
                                                     {type.code}
                                                 </code>
                                             </td>
@@ -172,7 +172,7 @@ const BusinessTypesList = () => {
                                                 <button
                                                     onClick={() => handleToggleStatus(type)}
                                                     className={clsx(
-                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[0.625rem] font-extrabold uppercase tracking-widest transition-all",
                                                         type.is_active
                                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-900'
                                                             : 'bg-slate-50 text-slate-400 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700'
@@ -222,7 +222,7 @@ const BusinessTypesList = () => {
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                            <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('identityEn')}
                             </label>
                             <input
@@ -237,7 +237,7 @@ const BusinessTypesList = () => {
                             />
                         </div>
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                            <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('identityAr')}
                             </label>
                             <input
@@ -254,7 +254,7 @@ const BusinessTypesList = () => {
                     </div>
                     {!modal.isEditing && (
                         <div className="space-y-3">
-                            <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                            <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                                 {t('systemCode')}
                             </label>
                             <div className={clsx(
@@ -265,7 +265,7 @@ const BusinessTypesList = () => {
                                     .replace(/[^a-z0-9]+/g, '_')
                                     .replace(/^_+|_+$/g, '') || t('codePlaceholder')}
                             </div>
-                            <p className={clsx("text-[10px] font-bold text-slate-400 uppercase tracking-tight block mt-1")}>
+                            <p className={clsx("text-[0.625rem] font-bold text-slate-400 uppercase tracking-tight block mt-1")}>
                                 {t('codeWarning')}
                             </p>
                         </div>

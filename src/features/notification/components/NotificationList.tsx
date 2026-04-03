@@ -100,7 +100,7 @@ export const NotificationList = () => {
                                 <div className="flex items-start space-x-3 rtl:space-x-reverse">
                                     <div className="flex-shrink-0 mt-1">
                                         {notification.imageUrl ? (
-                                            <img src={notification.imageUrl} alt="" className="h-8 w-8 rounded-full object-cover" />
+                                            <img src={notification.imageUrl} alt="Image" aria-hidden="true" className="h-8 w-8 rounded-full object-cover" />
                                         ) : (
                                             getIcon(notification.type?.toLowerCase() || 'info')
                                         )}

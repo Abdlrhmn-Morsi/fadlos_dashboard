@@ -42,6 +42,7 @@
     "reportedReviews": "التقييمات المُبلغ عنها",
     "reportedReviewsSubtitle": "الإشراف على المحتوى المُبلغ عنه على مستوى المنصة",
     "noReportedReviews": "لا توجد تقييمات مُبلغ عنها للإشراف عليها",
+    "manageReportedContent": "إدارة ومراجعة المحتوى المُبلغ عنه",
     "inactive": "غير نشط",
     "activate": "تنشيط",
     "reviewActivatedSuccessfully": "تم تنشيط التقييم بنجاح",

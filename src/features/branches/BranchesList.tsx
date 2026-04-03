@@ -237,7 +237,7 @@ export const BranchesList: React.FC = () => {
                         <button
                             type="button"
                             onClick={() => navigate('/subscription')}
-                            className="group relative inline-flex items-center justify-center rounded bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
+                            className="group relative inline-flex items-center justify-center rounded bg-gradient-to-r from-amber-500 to-amber-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-amber-500/20 transition-all duration-300 hover:from-amber-600 hover:to-amber-700  active:scale-95 overflow-hidden"
                             title={t('common:upgradeRequired', { feature: t('common:branchesLimit') })}
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
@@ -248,7 +248,7 @@ export const BranchesList: React.FC = () => {
                         <button
                             type="button"
                             onClick={openCreateModal}
-                            className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 overflow-hidden"
+                            className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-8 py-4 text-base font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700  active:scale-95 overflow-hidden"
                         >
                             <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                             <Plus size={18} className={clsx(isRTL ? "ml-2" : "mr-2")} />
@@ -291,7 +291,7 @@ export const BranchesList: React.FC = () => {
                             <div className="p-4 flex-1">
                                 <div className="flex justify-between items-center mb-4">
                                     <div className={clsx(
-                                        "flex items-center gap-2 rounded px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest",
+                                        "flex items-center gap-2 rounded px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-widest",
                                         branch.isActive
                                             ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
                                             : 'bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400'
@@ -304,7 +304,7 @@ export const BranchesList: React.FC = () => {
                                     </div>
 
                                     {branch.isMainBranch && (
-                                        <div className="flex items-center gap-1.5 rounded bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest">
+                                        <div className="flex items-center gap-1.5 rounded bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400 px-3 py-1.5 text-[0.625rem] font-bold uppercase tracking-widest">
                                             <Star size={10} className="fill-amber-500" />
                                             {t('mainBranch')}
                                         </div>
@@ -335,7 +335,7 @@ export const BranchesList: React.FC = () => {
                                             <MapPin className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('branchLocation')}</p>
+                                            <p className="text-[9px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('branchLocation')}</p>
                                             <h3 className="text-lg font-bold text-gray-900 dark:text-white leading-snug group-hover:text-indigo-600 transition-colors">
                                                 {branch.town ? (isRTL ? branch.town.arName : branch.town.enName) : '...'}
                                                 {branch.place && ` - ${isRTL ? branch.place.arName : branch.place.enName}`}
@@ -355,7 +355,7 @@ export const BranchesList: React.FC = () => {
                                             <Home className="h-5 w-5 text-sky-600 dark:text-sky-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('address') || t('common:address')}</p>
+                                            <p className="text-[9px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('address') || t('common:address')}</p>
                                             <p className="text-sm font-medium text-gray-900 dark:text-white leading-relaxed">
                                                 {isRTL ? branch.addressAr : (branch.addressEn || branch.addressAr)}
                                             </p>
@@ -368,7 +368,7 @@ export const BranchesList: React.FC = () => {
                                             <Phone className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
                                         </div>
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('contactDetails')}</p>
+                                            <p className="text-[9px] font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-[0.2em] mb-1">{t('contactDetails')}</p>
                                             <p className="text-base font-bold text-gray-900 dark:text-white tabular-nums tracking-wide">
                                                 {branch.phone}
                                             </p>
@@ -384,7 +384,7 @@ export const BranchesList: React.FC = () => {
                                         href={branch.link}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-[10px] font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-[0.625rem] font-bold text-gray-700 dark:text-gray-200 hover:bg-indigo-600 dark:hover:bg-indigo-600 hover:text-white dark:hover:text-white hover:border-indigo-600 dark:hover:border-indigo-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
                                         title={t('visitMapLink')}
                                     >
                                         <ExternalLink size={14} className="text-indigo-500 group-hover/btn:text-white transition-colors" />
@@ -397,7 +397,7 @@ export const BranchesList: React.FC = () => {
                                         href={`https://www.google.com/maps/search/?api=1&query=${branch.latitude},${branch.longitude}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-[10px] font-bold text-gray-700 dark:text-gray-200 hover:bg-amber-600 dark:hover:bg-amber-600 hover:text-white dark:hover:text-white hover:border-amber-600 dark:hover:border-amber-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 rounded text-[0.625rem] font-bold text-gray-700 dark:text-gray-200 hover:bg-amber-600 dark:hover:bg-amber-600 hover:text-white dark:hover:text-white hover:border-amber-600 dark:hover:border-amber-600 transition-all duration-300 group/btn shadow-sm active:scale-95"
                                         title={t('verifyOnMap')}
                                     >
                                         <MapPin size={14} className="text-amber-500 group-hover/btn:text-white transition-colors" />
@@ -406,7 +406,7 @@ export const BranchesList: React.FC = () => {
                                 ) : (
                                     <button
                                         disabled
-                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 rounded text-[10px] font-bold text-gray-400 cursor-not-allowed opacity-50"
+                                        className="flex items-center justify-center gap-2 py-3 px-4 bg-gray-100 dark:bg-gray-800/50 border-2 border-gray-100 dark:border-gray-700 rounded text-[0.625rem] font-bold text-gray-400 cursor-not-allowed opacity-50"
                                     >
                                         <MapPin size={14} />
                                         <span>{t('verifyOnMap')}</span>
@@ -439,7 +439,7 @@ export const BranchesList: React.FC = () => {
                                 </div>
                             </div>
 
-                            <h3 className="text-4xl font-black text-slate-900 dark:text-white mb-6 tracking-tight leading-tight">
+                            <h3 className="text-4xl font-extrabold text-slate-900 dark:text-white mb-6 tracking-tight leading-tight">
                                 {searchTerm
                                     ? t('common:no_results_for', { term: searchTerm })
                                     : t('noBranches')}

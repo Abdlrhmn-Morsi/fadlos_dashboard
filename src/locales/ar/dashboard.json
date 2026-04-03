@@ -1,5 +1,8 @@
 {
     "title": "نظرة عامة على لوحة التحكم",
+    "needsAttention": "يتطلب اهتماماً",
+    "platformAnalytics": "إحصائيات المنصة",
+    "systemMetadata": "مقاييس البنية التحتية للنظام",
     "platformOverview": "نظرة عامة على المنصة",
     "orderSummary": "ملخص الطلبات",
     "pendingOrders": "طلبات قيد الانتظار",

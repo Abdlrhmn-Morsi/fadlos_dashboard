@@ -94,7 +94,7 @@ export const ResendConfirmationModal: React.FC<ResendConfirmationModalProps> = (
                                     else if (val.includes('individual') || val.includes('pick')) label = t('promotions.targetTypes.pick_one_by_one', 'Pick one by one');
 
                                     return label ? (
-                                        <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                                        <span className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider">
                                             {label}
                                         </span>
                                     ) : null;

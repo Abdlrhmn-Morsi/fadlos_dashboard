@@ -94,7 +94,7 @@ export const NotificationPage = () => {
                             >
                                 <div className="flex-shrink-0 mt-1">
                                     {notification.imageUrl ? (
-                                        <img src={notification.imageUrl} alt="" className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700" />
+                                        <img src={notification.imageUrl} alt="Image" aria-hidden="true" className="w-10 h-10 rounded-full object-cover border border-gray-200 dark:border-slate-700" />
                                     ) : (
                                         <div className={clsx(
                                             "w-10 h-10 rounded-full flex items-center justify-center",

@@ -140,7 +140,7 @@ const StoresList = () => {
                     <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Store size={24} className="text-primary" />
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
@@ -180,7 +180,7 @@ const StoresList = () => {
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
-                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100 ps-11 pe-4"
+                            className="py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- text-slate-900 dark:text-slate-100 ps-11 pe-4"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -196,8 +196,8 @@ const StoresList = () => {
                             <CheckCircle size={20} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('activeMerchants')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.active || 0}</h4>
+                            <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest leading-none mb-1">{t('activeMerchants')}</p>
+                            <h4 className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">{statsSummary?.active || 0}</h4>
                         </div>
                     </div>
                 </div>
@@ -208,8 +208,8 @@ const StoresList = () => {
                             <Clock size={20} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:pending')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.pending || 0}</h4>
+                            <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:pending')}</p>
+                            <h4 className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">{statsSummary?.pending || 0}</h4>
                         </div>
                     </div>
                 </div>
@@ -220,8 +220,8 @@ const StoresList = () => {
                             <ShieldAlert size={20} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:suspended')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.suspended || 0}</h4>
+                            <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:suspended')}</p>
+                            <h4 className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">{statsSummary?.suspended || 0}</h4>
                         </div>
                     </div>
                 </div>
@@ -232,8 +232,8 @@ const StoresList = () => {
                             <XCircle size={20} />
                         </div>
                         <div>
-                            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:inactive')}</p>
-                            <h4 className="text-xl font-black text-slate-900 dark:text-white leading-none">{statsSummary?.inactive || 0}</h4>
+                            <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest leading-none mb-1">{t('common:inactive')}</p>
+                            <h4 className="text-xl font-extrabold text-slate-900 dark:text-white leading-none">{statsSummary?.inactive || 0}</h4>
                         </div>
                     </div>
                 </div>
@@ -265,9 +265,9 @@ const StoresList = () => {
                                             <td className="table-cell">
                                                 <div className="flex items-center gap-4">
                                                     {store.logo ? (
-                                                        <img src={store.logo} alt="" className="w-11 h-11 rounded-[4px] object-cover shadow-lg shadow-slate-200 dark:shadow-slate-900/50 border border-white dark:border-slate-700" />
+                                                        <img src={store.logo} alt="Image" aria-hidden="true" className="w-11 h-11 rounded-[4px] object-cover shadow-lg shadow-slate-200 dark:shadow-slate-900/50 border border-white dark:border-slate-700" />
                                                     ) : (
-                                                        <div className="w-11 h-11 rounded-[4px] bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-black shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
+                                                        <div className="w-11 h-11 rounded-[4px] bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-extrabold shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform">
                                                             {(isRTL ? store.nameAr || store.name : store.name || store.nameAr).charAt(0).toUpperCase()}
                                                         </div>
                                                     )}
@@ -276,12 +276,12 @@ const StoresList = () => {
                                                         onClick={() => navigate(`/stores/${store.id}`)}
                                                     >
                                                         <div className="flex items-center gap-1.5 group">
-                                                            <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors hover:underline">
+                                                            <div className="text-[15px] font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors hover:underline">
                                                                 {isRTL ? store.nameAr || store.name : store.name || store.nameAr}
                                                             </div>
                                                             {store.isVerified && <BadgeCheck size={16} className="text-blue-500 fill-blue-500/10" />}
                                                         </div>
-                                                        <div className="text-[11px] font-bold text-slate-400 uppercase tracking-tighter">{isRTL ? store.businessType?.ar_name || store.businessType?.en_name : store.businessType?.en_name}</div>
+                                                        <div className="text-[0.6875rem] font-bold text-slate-400 uppercase tracking-tight">{isRTL ? store.businessType?.ar_name || store.businessType?.en_name : store.businessType?.en_name}</div>
                                                     </div>
                                                 </div>
                                             </td>
@@ -298,8 +298,8 @@ const StoresList = () => {
                                             </td>
                                             <td className="table-cell">{getStatusBadge(store.status)}</td>
                                             <td className="table-cell">
-                                                <div className="text-sm font-black text-slate-900 dark:text-slate-100">{store.totalOrders || 0} {t('orders')}</div>
-                                                <div className="text-[11px] font-bold text-slate-400 mt-0.5">${(store.totalRevenue || 0).toLocaleString()} {t('revenue')}</div>
+                                                <div className="text-sm font-extrabold text-slate-900 dark:text-slate-100">{store.totalOrders || 0} {t('orders')}</div>
+                                                <div className="text-[0.6875rem] font-bold text-slate-400 mt-0.5">${(store.totalRevenue || 0).toLocaleString()} {t('revenue')}</div>
                                             </td>
                                             <td className="table-cell text-end">
                                                 <div className="flex items-center gap-1 justify-end">

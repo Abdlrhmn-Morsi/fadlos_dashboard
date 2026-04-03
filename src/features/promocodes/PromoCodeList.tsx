@@ -224,15 +224,15 @@ const PromoCodeList = () => {
                                                 </div>
                                                 <div>
                                                     <div className="flex items-center gap-2">
-                                                        <span className="block font-black font-mono text-slate-900 dark:text-white tracking-widest">{promo.code}</span>
+                                                        <span className="block font-extrabold font-mono text-slate-900 dark:text-white tracking-widest">{promo.code}</span>
                                                         {promo.isAutoApply && (
-                                                            <span className="bg-indigo-100 text-indigo-700 text-[10px] px-1.5 py-0.5 rounded font-bold uppercase">
+                                                            <span className="bg-indigo-100 text-indigo-700 text-[0.625rem] px-1.5 py-0.5 rounded font-bold uppercase">
                                                                 {t('autoApply')}
                                                             </span>
                                                         )}
                                                     </div>
                                                     <div className="flex items-center gap-2 mt-0.5">
-                                                        <span className="text-[10px] text-slate-400 block uppercase font-bold truncate max-w-[150px]">
+                                                        <span className="text-[0.625rem] text-slate-400 block uppercase font-bold truncate max-w-[150px]">
                                                             {language === 'ar' ? (promo.descriptionAr || promo.description) : (promo.descriptionEn || promo.description)}
                                                         </span>
                                                         {promo.ruleType && promo.ruleType !== 'none' && (
@@ -255,7 +255,7 @@ const PromoCodeList = () => {
                                                     {promo.type === 'percentage' ? `${promo.value}%` : `${Number(promo.value).toFixed(2)} ${t('common:currencySymbol')}`}
                                                 </span>
                                             </div>
-                                            <span className="text-[10px] text-slate-400 block">{t('minOrder')}: {Number(promo.minOrderAmount || 0)} {t('common:currencySymbol')}</span>
+                                            <span className="text-[0.625rem] text-slate-400 block">{t('minOrder')}: {Number(promo.minOrderAmount || 0)} {t('common:currencySymbol')}</span>
                                         </td>
                                         <td className="px-6 py-5">
                                             <div className="space-y-1">
@@ -270,7 +270,7 @@ const PromoCodeList = () => {
                                         <td className="px-6 py-5">
                                             <div className="w-32">
                                                 <div className="flex justify-between items-end mb-1">
-                                                    <span className="text-[10px] font-bold text-slate-500 uppercase">{t('usage')}</span>
+                                                    <span className="text-[0.625rem] font-bold text-slate-500 uppercase">{t('usage')}</span>
                                                     <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
                                                         {promo.currentUses} / {promo.maxUses || '∞'}
                                                     </span>
@@ -284,7 +284,7 @@ const PromoCodeList = () => {
                                             </div>
                                         </td>
                                         <td className="px-6 py-5">
-                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border ${getStatusColor(promo.isActive, promo.expiresAt)}`}>
+                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-wider border ${getStatusColor(promo.isActive, promo.expiresAt)}`}>
                                                 <span className={`w-1.5 h-1.5 rounded-full ${promo.isActive ? 'bg-current' : 'bg-slate-400'}`} />
                                                 {new Date(promo.expiresAt) < new Date() ? t('expired') : promo.isActive ? t('active') : t('inactive')}
                                             </span>

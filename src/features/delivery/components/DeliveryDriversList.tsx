@@ -380,7 +380,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                     >
                         {t('delivery:drivers.resignations')}
                         {view !== 'resignations' && pendingCounts?.resignations ? (
-                            <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full">
+                            <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[0.625rem] font-bold rounded-full">
                                 {pendingCounts.resignations}
                             </span>
                         ) : view !== 'resignations' && drivers.some(d => d.deliveryProfile?.hiringRequestStatus === 'RESIGNATION_PENDING') && (
@@ -477,7 +477,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                     <div className="flex items-center gap-2">
                                                         <span className="font-bold text-slate-900 dark:text-white uppercase tracking-tight leading-tight">{driver.name}</span>
                                                     </div>
-                                                    <span className="text-[10px] text-slate-500 lowercase font-medium">@{driver.username}</span>
+                                                    <span className="text-[0.625rem] text-slate-500 lowercase font-medium">@{driver.username}</span>
                                                     {driver.isOverLimit && driver.storeDriverStatus === 'ACCEPTED' && (
                                                         <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
                                                             <ShieldAlert size={14} />
@@ -498,7 +498,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                                         e.stopPropagation();
                                                                         handleResignationClick(driver.id, true);
                                                                     }}
-                                                                    className="px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 rounded text-[10px] font-bold uppercase transition-colors flex items-center gap-1 shadow-sm"
+                                                                    className="px-3 py-1 bg-emerald-600 text-white hover:bg-emerald-700 rounded text-[0.625rem] font-bold uppercase transition-colors flex items-center gap-1 shadow-sm"
                                                                 >
                                                                     <CheckCircle size={12} />
                                                                     {t('accept', 'Accept')}
@@ -508,7 +508,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                                         e.stopPropagation();
                                                                         handleResignationClick(driver.id, false);
                                                                     }}
-                                                                    className="px-3 py-1 bg-rose-600 text-white hover:bg-rose-700 rounded text-[10px] font-bold uppercase transition-colors flex items-center gap-1 shadow-sm"
+                                                                    className="px-3 py-1 bg-rose-600 text-white hover:bg-rose-700 rounded text-[0.625rem] font-bold uppercase transition-colors flex items-center gap-1 shadow-sm"
                                                                 >
                                                                     <XCircle size={12} />
                                                                     {t('reject', 'Reject')}
@@ -521,7 +521,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                         </td>
                                         <td className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 text-start">
                                             <span className={clsx(
-                                                "px-2 py-1 rounded text-[10px] font-black uppercase tracking-widest border",
+                                                "px-2 py-1 rounded text-[0.625rem] font-extrabold uppercase tracking-widest border",
                                                 driver.deliveryProfile?.driverType === 'FREELANCER'
                                                     ? "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-900/20 dark:text-indigo-400 dark:border-indigo-800"
                                                     : "bg-slate-50 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700"
@@ -554,12 +554,12 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                                         {driver.resignationReason || '-'}
                                                     </span>
                                                     {driver.resignationDate && (
-                                                        <span className="text-[10px] text-slate-400">
+                                                        <span className="text-[0.625rem] text-slate-400">
                                                             {new Date(driver.resignationDate).toLocaleDateString()}
                                                         </span>
                                                     )}
                                                     {view === 'history' && driver.removedAt && (
-                                                        <span className="text-[10px] text-rose-500 font-medium">
+                                                        <span className="text-[0.625rem] text-rose-500 font-medium">
                                                             {t('delivery:drivers.history.access_expires', {
                                                                 defaultValue: 'Access expires in {{days}} days',
                                                                 days: Math.max(0, 60 - Math.floor((new Date().getTime() - new Date(driver.removedAt).getTime()) / (1000 * 60 * 60 * 24)))
@@ -573,7 +573,7 @@ const DeliveryDriversList = ({ pendingCounts }: { pendingCounts?: { incoming: nu
                                             {(driver.storeDriverStatus === 'ACCEPTED' || driver.deliveryProfile?.driverType === 'STORE_DRIVER') ? (
                                                 <div className="flex flex-col items-center gap-1.5">
                                                     <span className={clsx(
-                                                        "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[10px] border",
+                                                        "inline-flex items-center justify-center w-max px-2.5 py-1 rounded-full font-bold text-[0.625rem] border",
                                                         (driver.activeDeliveriesCount || 0) >= (meta?.maxOrdersPerDriver || 5)
                                                             ? "bg-amber-50 text-amber-600 border-amber-200 animate-pulse"
                                                             : "bg-emerald-50 text-emerald-600 border-emerald-200"

@@ -55,12 +55,12 @@ const StatCard = ({ title, value, icon: Icon, color, trend }: any) => {
 
     return (
         <div className={clsx(
-            "relative overflow-hidden bg-white dark:bg-slate-900 p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:shadow-md hover:-translate-y-1 group rounded-[4px]",
+            "relative overflow-hidden bg-white dark:bg-slate-900 p-5 border border-slate-200 dark:border-slate-800 shadow-sm transition-all   group rounded-[4px]",
         )}>
             <div className="flex justify-between items-start relative z-10">
                 <div>
-                    <p className="text-slate-500 dark:text-slate-400 text-[11px] font-bold uppercase tracking-wider mb-1">{title}</p>
-                    <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 tabular-nums tracking-tight">{value}</h3>
+                    <p className="text-slate-500 dark:text-slate-400 text-[0.6875rem] font-bold uppercase tracking-wider mb-1">{title}</p>
+                    <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums tracking-tight">{value}</h3>
                 </div>
                 <div className={clsx("p-2 rounded-[4px] bg-gradient-to-br", colorClasses[color] || colorClasses.indigo)}>
                     <Icon size={20} strokeWidth={2.5} />
@@ -263,7 +263,7 @@ const DriverDetail: React.FC = () => {
     }, [id, t]);
 
     const getStatusBadge = (status: string) => {
-        const baseClass = "inline-flex items-center gap-1.5 px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-[4px] border transition-all";
+        const baseClass = "inline-flex items-center gap-1.5 px-3 py-1 text-[0.625rem] font-bold uppercase tracking-widest rounded-[4px] border transition-all";
         switch (status) {
             case 'VERIFIED':
                 return <span className={`${baseClass} bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50`}><ShieldCheck size={12} strokeWidth={2.5} /> {t('delivery:drivers.verification.verified')}</span>;
@@ -343,7 +343,7 @@ const DriverDetail: React.FC = () => {
                                 {driver.deliveryProfile?.avatarUrl ? (
                                     <img src={driver.deliveryProfile.avatarUrl} alt={driver.name} className="w-full h-full object-cover" />
                                 ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-slate-300 text-5xl font-black bg-slate-50 dark:bg-slate-800">
+                                    <div className="w-full h-full flex items-center justify-center text-slate-300 text-5xl font-extrabold bg-slate-50 dark:bg-slate-800">
                                         {driver.name?.charAt(0)}
                                     </div>
                                 )}
@@ -358,20 +358,20 @@ const DriverDetail: React.FC = () => {
 
                         <div className="flex-1 text-center md:text-start">
                             <div className="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-2">
-                                <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tighter uppercase leading-tight">{driver.name}</h1>
+                                <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight uppercase leading-tight">{driver.name}</h1>
                                 {getStatusBadge(driver.deliveryProfile?.verificationStatus || driver.storeDriverStatus)}
                             </div>
                             <p className="text-slate-500 lowercase font-medium text-lg flex items-center justify-center md:justify-start gap-2">
                                 <span className="opacity-50">@</span>{driver.username}
                                 <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
-                                <span className="text-xs uppercase tracking-widest font-black text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
+                                <span className="text-xs uppercase tracking-widest font-extrabold text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded">
                                     {driver.deliveryProfile?.driverType === 'FREELANCER' ? t('driverTypes.FREELANCER') : t('driverTypes.STORE_DRIVER')}
                                 </span>
                                 {driver.storeDriverStatus && (
                                     <>
                                         <span className="w-1 h-1 rounded-full bg-slate-300 dark:bg-slate-700" />
                                         <span className={clsx(
-                                            "text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded border transition-all",
+                                            "text-[0.625rem] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded border transition-all",
                                             driver.storeDriverStatus === 'ACCEPTED'
                                                 ? "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-900/30 dark:text-emerald-400 dark:border-emerald-800/50"
                                                 : (driver.storeDriverStatus === 'REMOVED' || driver.storeDriverStatus === 'REJECTED')
@@ -387,7 +387,7 @@ const DriverDetail: React.FC = () => {
                             <div className="mt-6 flex flex-wrap items-center justify-center md:justify-start gap-6">
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-[4px] border border-slate-100 dark:border-slate-700/50">
                                     <Calendar size={14} className="text-indigo-500" />
-                                    <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest leading-none">
+                                    <div className="text-[0.625rem] text-slate-400 uppercase font-extrabold tracking-widest leading-none">
                                         {t('fields.joined_at')}
                                         <div className="text-xs text-slate-700 dark:text-slate-200 mt-0.5 font-bold">
                                             {new Date(driver.joinedAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'short' })}
@@ -396,7 +396,7 @@ const DriverDetail: React.FC = () => {
                                 </div>
                                 <div className="flex items-center gap-2 px-4 py-2 bg-slate-50 dark:bg-slate-800/50 rounded-[4px] border border-slate-100 dark:border-slate-700/50">
                                     <Phone size={14} className="text-indigo-500" />
-                                    <div className="text-[10px] text-slate-400 uppercase font-black tracking-widest leading-none">
+                                    <div className="text-[0.625rem] text-slate-400 uppercase font-extrabold tracking-widest leading-none">
                                         {t('fields.phone')}
                                         <div className="text-xs text-slate-700 dark:text-slate-200 mt-0.5 font-bold">{driver.phone}</div>
                                     </div>
@@ -405,7 +405,7 @@ const DriverDetail: React.FC = () => {
                                     <button
                                         onClick={handleCancelHiringRequest}
                                         disabled={cancelling}
-                                        className="flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 rounded-[4px] border border-rose-100 dark:border-rose-900/30 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                                        className="flex items-center gap-2 px-4 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 rounded-[4px] border border-rose-100 dark:border-rose-900/30 transition-all text-[0.625rem] font-extrabold uppercase tracking-widest disabled:opacity-50"
                                     >
                                         {cancelling ? <LoadingSpinner size="sm" fullHeight={false} /> : <XCircle size={14} />}
                                         {t('delivery:drivers.drivers.cancel_hiring', 'Cancel Application')}
@@ -416,7 +416,7 @@ const DriverDetail: React.FC = () => {
                                         <button
                                             onClick={() => setActionModal({ isOpen: true, type: 'CONVERT_TO_STORE_DRIVER' })}
                                             disabled={transitioning}
-                                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:text-indigo-400 rounded-[4px] border border-indigo-100 dark:border-indigo-900/30 transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-50"
+                                            className="flex items-center gap-2 px-4 py-2 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 dark:text-indigo-400 rounded-[4px] border border-indigo-100 dark:border-indigo-900/30 transition-all text-[0.625rem] font-extrabold uppercase tracking-widest disabled:opacity-50"
                                         >
                                             {transitioning ? <LoadingSpinner size="sm" fullHeight={false} /> : <ArrowRightLeft size={14} />}
                                             {driver.pendingTransition 
@@ -424,7 +424,7 @@ const DriverDetail: React.FC = () => {
                                                 : t('delivery:drivers.transition.make_store_driver', 'Make Store Driver')}
                                         </button>
                                         {driver.pendingTransition && (
-                                            <div className="text-[10px] text-indigo-500 font-bold flex items-center gap-1">
+                                            <div className="text-[0.625rem] text-indigo-500 font-bold flex items-center gap-1">
                                                 <Clock size={12} />
                                                 {t('delivery:drivers.transition.offer_pending', 'Offer Pending Response')}
                                             </div>
@@ -437,7 +437,7 @@ const DriverDetail: React.FC = () => {
                                 <div className="mt-6 p-4 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-900/50 rounded-[4px] max-w-2xl">
                                     <div className="flex items-center gap-2 text-rose-700 dark:text-rose-400 mb-3">
                                         <ShieldAlert size={18} />
-                                        <span className="text-sm font-black uppercase tracking-wider">{t('delivery:drivers.resignation.request_received')}</span>
+                                        <span className="text-sm font-extrabold uppercase tracking-wider">{t('delivery:drivers.resignation.request_received')}</span>
                                     </div>
                                     {driver.resignationReason && (
                                         <div className="mb-4 p-3 bg-white/80 dark:bg-slate-900/80 rounded border border-rose-200/50 dark:border-rose-900/30 text-sm text-slate-700 dark:text-slate-300 italic border-s-4 border-s-rose-500">
@@ -447,13 +447,13 @@ const DriverDetail: React.FC = () => {
                                     <div className="flex flex-wrap items-center gap-3">
                                         <button
                                             onClick={() => setActionModal({ isOpen: true, type: 'APPROVE_RESIGNATION' })}
-                                            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest rounded transition-all shadow-md shadow-emerald-500/20 active:scale-95"
+                                            className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold uppercase tracking-widest rounded transition-all shadow-md shadow-emerald-500/20 active:scale-95"
                                         >
                                             {t('accept')}
                                         </button>
                                         <button
                                             onClick={() => setActionModal({ isOpen: true, type: 'REJECT_RESIGNATION' })}
-                                            className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-black uppercase tracking-widest rounded transition-all shadow-md shadow-rose-500/20 active:scale-95"
+                                            className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white text-xs font-extrabold uppercase tracking-widest rounded transition-all shadow-md shadow-rose-500/20 active:scale-95"
                                         >
                                             {t('reject')}
                                         </button>
@@ -508,7 +508,7 @@ const DriverDetail: React.FC = () => {
                         <div className="space-y-6">
                             <div className="group/item">
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('fields.availability')}</span>
+                                    <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('fields.availability')}</span>
                                     <div className="flex items-center gap-3">
                                         {canToggleAvailability && (
                                             <label className={clsx("relative inline-flex items-center", !toggling ? "cursor-pointer" : "cursor-default")}>
@@ -523,7 +523,7 @@ const DriverDetail: React.FC = () => {
                                             </label>
                                         )}
                                         <div className={clsx(
-                                            "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
+                                            "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[0.625rem] font-extrabold uppercase tracking-widest transition-all",
                                             (driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false)
                                                 ? "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50"
                                                 : "bg-slate-100 text-slate-500 border border-slate-200 dark:bg-slate-800 dark:border-slate-700"
@@ -533,14 +533,14 @@ const DriverDetail: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">
+                                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[0.6875rem] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">
                                     {(driver.deliveryProfile?.isAvailableForWork && driver.isAvailableForCurrentStore !== false) ? t('delivery:status.online_desc') : t('delivery:status.offline_desc')}
                                 </div>
                             </div>
 
                             <div className="group/item pt-6 border-t border-slate-50 dark:border-slate-800">
                                 <div className="flex items-center justify-between mb-3">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('delivery:status.busy')}</span>
+                                    <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('delivery:status.busy')}</span>
                                     <div className="flex items-center gap-3">
                                         {canToggleBusy && (
                                             <label className={clsx("relative inline-flex items-center", !toggling ? "cursor-pointer" : "cursor-default")}>
@@ -555,7 +555,7 @@ const DriverDetail: React.FC = () => {
                                             </label>
                                         )}
                                         <div className={clsx(
-                                            "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
+                                            "flex items-center gap-2 px-2.5 py-1 rounded-[4px] text-[0.625rem] font-extrabold uppercase tracking-widest transition-all",
                                             driver.isBusy
                                                 ? "bg-amber-50 text-amber-600 border border-amber-100 dark:bg-amber-900/20 dark:border-emerald-800/50"
                                                 : "bg-emerald-50 text-emerald-600 border border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800/50"
@@ -565,7 +565,7 @@ const DriverDetail: React.FC = () => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">
+                                <div className="p-3 bg-slate-50 dark:bg-slate-800/80 rounded-[4px] border border-slate-100 dark:border-slate-800/50 text-[0.6875rem] text-slate-500 dark:text-slate-400 leading-relaxed transition-colors group-hover/item:border-indigo-100 dark:group-hover/item:border-indigo-900/40">
                                     {driver.isBusy ? t('delivery:status.busy_desc') : t('delivery:status.available_desc')}
                                 </div>
                             </div>
@@ -576,17 +576,17 @@ const DriverDetail: React.FC = () => {
                     <DetailCard title={t('delivery:drivers.vehicle_details')} icon={Truck}>
                         <div className="space-y-4">
                             <div className="flex justify-between items-center group/v">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('delivery:drivers.vehicle_type')}</span>
+                                <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('delivery:drivers.vehicle_type')}</span>
                                 <div className="flex items-center gap-2 group-hover/v:translate-x-[-4px] transition-transform">
-                                    <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-tight tabular-nums">
+                                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-tight tabular-nums">
                                         {driver.deliveryProfile?.vehicleType ? t('vehicle_types.' + driver.deliveryProfile.vehicleType) : t('notSet')}
                                     </span>
                                 </div>
                             </div>
                             <div className="flex justify-between items-center group/v pt-4 border-t border-slate-50 dark:border-slate-800">
-                                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('delivery:drivers.plate_number')}</span>
+                                <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('delivery:drivers.plate_number')}</span>
                                 <div className="flex items-center gap-2 group-hover/v:translate-x-[-4px] transition-transform">
-                                    <span className="text-xs font-black text-slate-800 dark:text-slate-200 uppercase tracking-widest tabular-nums bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
+                                    <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-widest tabular-nums bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">
                                         {driver.deliveryProfile?.vehiclePlateNumber || t('notSet')}
                                     </span>
                                 </div>
@@ -597,7 +597,7 @@ const DriverDetail: React.FC = () => {
                     {/* Contact Card (Dark Theme) */}
                     <div className="bg-slate-900 text-white p-6 rounded-[4px] shadow-lg relative overflow-hidden group">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rotate-45 translate-x-1/2 -translate-y-1/2 group-hover:bg-indigo-500/20 transition-all duration-1000" />
-                        <h3 className="text-xs font-black uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-white/10 pb-4 relative z-10">
+                        <h3 className="text-xs font-extrabold uppercase tracking-widest mb-6 flex items-center gap-2 border-b border-white/10 pb-4 relative z-10">
                             <User size={16} className="text-indigo-400" strokeWidth={2.5} /> {t('fields.contact')}
                         </h3>
                         <div className="space-y-5 relative z-10">
@@ -606,7 +606,7 @@ const DriverDetail: React.FC = () => {
                                     <Mail size={16} strokeWidth={2} />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">{t('fields.email')}</p>
+                                    <p className="text-[9px] font-extrabold text-white/30 uppercase tracking-widest">{t('fields.email')}</p>
                                     <p className="text-xs font-bold mt-0.5 break-all opacity-90">{driver.email}</p>
                                 </div>
                                 <ExternalLink size={12} className="ml-auto opacity-0 group-hover/e:opacity-40 transition-opacity" />
@@ -616,7 +616,7 @@ const DriverDetail: React.FC = () => {
                                     <Phone size={16} strokeWidth={2} />
                                 </div>
                                 <div>
-                                    <p className="text-[9px] font-black text-white/30 uppercase tracking-widest">{t('fields.phone')}</p>
+                                    <p className="text-[9px] font-extrabold text-white/30 uppercase tracking-widest">{t('fields.phone')}</p>
                                     <p className="text-xs font-bold mt-0.5 opacity-90">{driver.phone}</p>
                                 </div>
                                 <ExternalLink size={12} className="ml-auto opacity-0 group-hover/p:opacity-40 transition-opacity" />
@@ -640,7 +640,7 @@ const DriverDetail: React.FC = () => {
                                         <p className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider mb-1">
                                             {t('delivery:drivers.identity_verification')}
                                         </p>
-                                        <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto leading-relaxed">
+                                        <p className="text-[0.6875rem] text-slate-500 dark:text-slate-400 font-medium max-w-sm mx-auto leading-relaxed">
                                             {t('delivery:drivers.drivers.pending_freelancer_docs_msg', 'Identity documents will be visible once the hiring request status is ACCEPTED.')}
                                         </p>
                                     </div>
@@ -649,7 +649,7 @@ const DriverDetail: React.FC = () => {
                                 <>
                                     <div className="space-y-3 group/doc">
                                         <div className="flex items-center justify-between">
-                                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery:drivers.id_front')}</p>
+                                            <p className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest leading-none">{t('delivery:drivers.id_front')}</p>
                                             <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
                                         </div>
                                         <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
@@ -660,7 +660,7 @@ const DriverDetail: React.FC = () => {
                                             ) : (
                                                 <div className="flex flex-col items-center gap-2 text-slate-300">
                                                     <ShieldCheck size={32} strokeWidth={1.5} />
-                                                    <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">
+                                                    <span className="text-[9px] font-extrabold uppercase tracking-tight opacity-70">
                                                         {t('noDocument', 'No Document')}
                                                     </span>
                                                 </div>
@@ -669,7 +669,7 @@ const DriverDetail: React.FC = () => {
                                     </div>
                                     <div className="space-y-3 group/doc">
                                         <div className="flex items-center justify-between">
-                                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery:drivers.id_back')}</p>
+                                            <p className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest leading-none">{t('delivery:drivers.id_back')}</p>
                                             <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
                                         </div>
                                         <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
@@ -680,7 +680,7 @@ const DriverDetail: React.FC = () => {
                                             ) : (
                                                 <div className="flex flex-col items-center gap-2 text-slate-300">
                                                     <ShieldCheck size={32} strokeWidth={1.5} />
-                                                    <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">
+                                                    <span className="text-[9px] font-extrabold uppercase tracking-tight opacity-70">
                                                         {t('noDocument', 'No Document')}
                                                     </span>
                                                 </div>
@@ -689,7 +689,7 @@ const DriverDetail: React.FC = () => {
                                     </div>
                                     <div className="space-y-3 group/doc">
                                         <div className="flex items-center justify-between">
-                                            <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('delivery:drivers.selfie')}</p>
+                                            <p className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest leading-none">{t('delivery:drivers.selfie')}</p>
                                             <div className="p-1 bg-slate-100 dark:bg-slate-800 rounded opacity-0 group-hover/doc:opacity-100 transition-opacity"><ExternalLink size={10} /></div>
                                         </div>
                                         <div className="aspect-[3/2] rounded-[4px] overflow-hidden border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 flex items-center justify-center relative shadow-sm group-hover/doc:shadow-md transition-all group-hover/doc:border-indigo-200 dark:group-hover/doc:border-indigo-900/50">
@@ -700,7 +700,7 @@ const DriverDetail: React.FC = () => {
                                             ) : (
                                                 <div className="flex flex-col items-center gap-2 text-slate-300">
                                                     <ShieldCheck size={32} strokeWidth={1.5} />
-                                                    <span className="text-[9px] font-black uppercase tracking-tighter opacity-70">
+                                                    <span className="text-[9px] font-extrabold uppercase tracking-tight opacity-70">
                                                         {t('noDocument', 'No Document')}
                                                     </span>
                                                 </div>
@@ -717,7 +717,7 @@ const DriverDetail: React.FC = () => {
                                     <XCircle size={18} />
                                 </div>
                                 <div>
-                                    <h4 className="text-xs font-black uppercase text-rose-800 dark:text-rose-300 tracking-widest mb-1">{t('delivery:drivers.rejection_reason')}</h4>
+                                    <h4 className="text-xs font-extrabold uppercase text-rose-800 dark:text-rose-300 tracking-widest mb-1">{t('delivery:drivers.rejection_reason')}</h4>
                                     <p className="text-sm text-rose-700 dark:text-rose-400 font-medium leading-relaxed">{driver.deliveryProfile.rejectionReason}</p>
                                 </div>
                             </div>
@@ -727,13 +727,13 @@ const DriverDetail: React.FC = () => {
                             <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 flex items-center justify-end gap-3">
                                 <button
                                     onClick={() => setVerificationModal({ isOpen: true, status: 'VERIFIED', rejectionReason: '', notes: '' })}
-                                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black uppercase tracking-widest rounded transition-all shadow-md shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
+                                    className="px-6 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-extrabold uppercase tracking-widest rounded transition-all shadow-md shadow-emerald-500/20 active:scale-95 flex items-center gap-2"
                                 >
                                     <CheckCircle size={14} /> {t('approve', 'Approve')}
                                 </button>
                                 <button
                                     onClick={() => setVerificationModal({ isOpen: true, status: 'REJECTED', rejectionReason: '', notes: '' })}
-                                    className="px-6 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 dark:border-rose-900/30 text-xs font-black uppercase tracking-widest rounded transition-all active:scale-95 flex items-center gap-2"
+                                    className="px-6 py-2 bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 dark:text-rose-400 dark:border-rose-900/30 text-xs font-extrabold uppercase tracking-widest rounded transition-all active:scale-95 flex items-center gap-2"
                                 >
                                     <XCircle size={14} /> {t('reject', 'Reject')}
                                 </button>
@@ -747,19 +747,19 @@ const DriverDetail: React.FC = () => {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <MapPin size={14} className="text-indigo-500" />
-                                    <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('towns')}</h4>
+                                    <h4 className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest leading-none">{t('towns')}</h4>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {driver.deliveryProfile?.towns && driver.deliveryProfile.towns.length > 0 ? (
                                         driver.deliveryProfile.towns.map((town: any) => (
-                                            <span key={town.id} className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-300 rounded-[4px] shadow-sm hover:border-indigo-300 dark:hover:border-indigo-900/50 transition-all cursor-default group/chip">
+                                            <span key={town.id} className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[0.6875rem] font-bold text-slate-700 dark:text-slate-300 rounded-[4px] shadow-sm hover:border-indigo-300 dark:hover:border-indigo-900/50 transition-all cursor-default group/chip">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 group-hover/chip:scale-125 transition-transform" />
                                                 {isRTL ? town.arName : town.enName}
                                             </span>
                                         ))
                                     ) : (
                                         <div className="w-full p-4 bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 rounded text-center">
-                                            <span className="text-[10px] text-slate-400 italic font-black uppercase tracking-widest leading-none">{t('notSet')}</span>
+                                            <span className="text-[0.625rem] text-slate-400 italic font-extrabold uppercase tracking-widest leading-none">{t('notSet')}</span>
                                         </div>
                                     )}
                                 </div>
@@ -768,19 +768,19 @@ const DriverDetail: React.FC = () => {
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 mb-2">
                                     <MapPin size={14} className="text-emerald-500" />
-                                    <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest leading-none">{t('places')}</h4>
+                                    <h4 className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest leading-none">{t('places')}</h4>
                                 </div>
                                 <div className="flex flex-wrap gap-2">
                                     {driver.deliveryProfile?.places && driver.deliveryProfile.places.length > 0 ? (
                                         driver.deliveryProfile.places.map((place: any) => (
-                                            <span key={place.id} className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[11px] font-bold text-slate-700 dark:text-slate-300 rounded-[4px] shadow-sm hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all cursor-default group/chip">
+                                            <span key={place.id} className="inline-flex items-center gap-2 px-3 py-1.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[0.6875rem] font-bold text-slate-700 dark:text-slate-300 rounded-[4px] shadow-sm hover:border-emerald-300 dark:hover:border-emerald-900/50 transition-all cursor-default group/chip">
                                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 group-hover/chip:scale-125 transition-transform" />
                                                 {isRTL ? place.arName : place.enName}
                                             </span>
                                         ))
                                     ) : (
                                         <div className="w-full p-4 bg-slate-50 dark:bg-slate-800/30 border border-dashed border-slate-200 dark:border-slate-800 rounded text-center">
-                                            <span className="text-[10px] text-slate-400 italic font-black uppercase tracking-widest leading-none">{t('notSet')}</span>
+                                            <span className="text-[0.625rem] text-slate-400 italic font-extrabold uppercase tracking-widest leading-none">{t('notSet')}</span>
                                         </div>
                                     )}
                                 </div>
@@ -803,7 +803,7 @@ const DriverDetail: React.FC = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[4px] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300">
                         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                 <ArrowRightLeft size={16} className="text-indigo-500" />
                                 {actionModal.type?.includes('RESIGNATION') ? t('delivery:drivers.resignation.title', 'Resignation Action') : t('delivery:drivers.transition.title', 'Transition Action')}
                             </h3>
@@ -821,7 +821,7 @@ const DriverDetail: React.FC = () => {
 
                             {(actionModal.type === 'CONVERT_TO_STORE_DRIVER' || actionModal.type === 'CONVERT_TO_FREELANCER') && (
                                 <div className="space-y-2 mb-6">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                    <label className="text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                         <MessageSquare size={12} /> {t('fields.notes', 'Notes')}
                                     </label>
                                     <textarea
@@ -835,7 +835,7 @@ const DriverDetail: React.FC = () => {
 
                             {actionModal.type === 'REJECT_RESIGNATION' && (
                                 <div className="space-y-2 mb-6">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+                                    <label className="text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-400 flex items-center gap-2">
                                         <MessageSquare size={12} /> {t('rejection_reason', 'Reason for rejection')} <span className="text-rose-500">*</span>
                                     </label>
                                     <textarea
@@ -851,7 +851,7 @@ const DriverDetail: React.FC = () => {
                             <div className="flex items-center gap-3 mt-8">
                                 <button
                                     onClick={() => setActionModal({ isOpen: false, type: null })}
-                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[4px] font-black uppercase tracking-widest text-xs transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95"
+                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[4px] font-extrabold uppercase tracking-widest text-xs transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95"
                                 >
                                     {t('common.cancel')}
                                 </button>
@@ -859,7 +859,7 @@ const DriverDetail: React.FC = () => {
                                     onClick={handleTransition}
                                     disabled={transitioning || (actionModal.type === 'REJECT_RESIGNATION' && !actionModal.rejectionReason)}
                                     className={clsx(
-                                        "flex-[2] py-3 px-4 text-white rounded-[4px] font-black uppercase tracking-widest text-xs transition-all shadow-sm shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2",
+                                        "flex-[2] py-3 px-4 text-white rounded-[4px] font-extrabold uppercase tracking-widest text-xs transition-all shadow-sm shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2",
                                         actionModal.type?.includes('REJECT') ? "bg-rose-600 hover:bg-rose-700" : "bg-indigo-600 hover:bg-indigo-700"
                                     )}
                                 >
@@ -876,7 +876,7 @@ const DriverDetail: React.FC = () => {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
                     <div className="bg-white dark:bg-slate-900 w-full max-w-md rounded-[4px] shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden animate-in zoom-in-95 duration-300">
                         <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
-                            <h3 className="text-sm font-black uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                            <h3 className="text-sm font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200 flex items-center gap-2">
                                 <ShieldCheck size={16} className="text-indigo-500" />
                                 {verificationModal.status === 'VERIFIED' ? t('approve', 'Approve') : t('reject', 'Reject')} {driver?.name}
                             </h3>
@@ -893,7 +893,7 @@ const DriverDetail: React.FC = () => {
 
                             {verificationModal.status === 'REJECTED' && (
                                 <div className="space-y-2 mb-4">
-                                    <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('rejection_reason', 'Rejection Reason')}</label>
+                                    <label className="text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-400">{t('rejection_reason', 'Rejection Reason')}</label>
                                     <textarea
                                         className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px] text-xs focus:ring-2 focus:ring-rose-500/20 focus:border-rose-500 outline-none transition-all placeholder:text-slate-400"
                                         rows={3}
@@ -905,7 +905,7 @@ const DriverDetail: React.FC = () => {
                             )}
 
                             <div className="space-y-2 mb-6">
-                                <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">{t('admin_notes', 'Admin Notes')} ({t('optional', 'Optional')})</label>
+                                <label className="text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-400">{t('admin_notes', 'Admin Notes')} ({t('optional', 'Optional')})</label>
                                 <textarea
                                     className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[4px] text-xs focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all placeholder:text-slate-400"
                                     rows={2}
@@ -918,7 +918,7 @@ const DriverDetail: React.FC = () => {
                             <div className="flex items-center gap-3">
                                 <button
                                     onClick={() => setVerificationModal({ ...verificationModal, isOpen: false })}
-                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[4px] font-black uppercase tracking-widest text-xs transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95"
+                                    className="flex-1 py-3 px-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-[4px] font-extrabold uppercase tracking-widest text-xs transition-colors hover:bg-slate-200 dark:hover:bg-slate-700 active:scale-95"
                                 >
                                     {t('cancel', 'Cancel')}
                                 </button>
@@ -926,7 +926,7 @@ const DriverDetail: React.FC = () => {
                                     onClick={confirmVerification}
                                     disabled={verifying || (verificationModal.status === 'REJECTED' && !verificationModal.rejectionReason)}
                                     className={clsx(
-                                        "flex-[2] py-3 px-4 text-white rounded-[4px] font-black uppercase tracking-widest text-xs transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2",
+                                        "flex-[2] py-3 px-4 text-white rounded-[4px] font-extrabold uppercase tracking-widest text-xs transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 flex items-center justify-center gap-2",
                                         verificationModal.status === 'VERIFIED'
                                             ? "bg-emerald-600 hover:bg-emerald-700 shadow-emerald-600/20"
                                             : "bg-rose-600 hover:bg-rose-700 shadow-rose-600/20"

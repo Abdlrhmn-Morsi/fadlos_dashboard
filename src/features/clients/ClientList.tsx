@@ -271,8 +271,8 @@ const ClientList = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
-                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded uppercase tracking-widest">
+                        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
+                        <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[0.625rem] font-extrabold rounded uppercase tracking-widest">
                             {totalItems} {t('common:results')}
                         </span>
                     </div>
@@ -325,7 +325,7 @@ const ClientList = () => {
                     {hasPermission(Permissions.PROMOTION_ADS_SEND) && (
                         <button
                             onClick={() => navigate('/send-promotion?source=clients')}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-extrabold uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 whitespace-nowrap"
                         >
                             <Megaphone size={16} />
                             {t('subscriptions:promotions.send')}
@@ -350,7 +350,7 @@ const ClientList = () => {
                         {sortBy === 'totalSpent' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalSpent' ? "text-white/70" : "text-slate-400")}>{t('highestSpenders')}</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white">{t('sortByTotalSpent')}</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white">{t('sortByTotalSpent')}</p>
                 </button>
 
                 <button
@@ -366,7 +366,7 @@ const ClientList = () => {
                         {sortBy === 'totalOrders' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'totalOrders' ? "text-white/70" : "text-slate-400")}>{t('mostActive')}</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white">{t('sortByTotalOrders')}</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white">{t('sortByTotalOrders')}</p>
                 </button>
 
                 <button
@@ -382,7 +382,7 @@ const ClientList = () => {
                         {sortBy === 'deliveredOrders' && (order === 'DESC' ? <TrendingUp size={16} /> : <TrendingDown size={16} />)}
                     </div>
                     <p className={clsx("text-xs font-bold uppercase tracking-wider mb-1", sortBy === 'deliveredOrders' ? "text-white/70" : "text-slate-400")}>{t('mostDelivered')}</p>
-                    <p className="text-sm font-black text-slate-900 dark:text-white">{t('sortByDeliveredOrders')}</p>
+                    <p className="text-sm font-extrabold text-slate-900 dark:text-white">{t('sortByDeliveredOrders')}</p>
                 </button>
             </div>
 
@@ -393,23 +393,23 @@ const ClientList = () => {
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-4">
-                                    <button onClick={() => toggleSort('firstName')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
+                                    <button onClick={() => toggleSort('firstName')} className="flex items-center gap-2 group text-xs font-extrabold text-slate-400 uppercase tracking-widest">
                                         {t('clientInformation')}
                                         <ArrowUpDown size={14} className="opacity-0 group-hover:opacity-100 transition-opacity" />
                                     </button>
                                 </th>
-                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('clientSince')}</th>
+                                <th className="px-6 py-4 text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t('clientSince')}</th>
                                  <th className="px-6 py-4">
-                                    <button onClick={() => toggleSort('totalOrders')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
+                                    <button onClick={() => toggleSort('totalOrders')} className="flex items-center gap-2 group text-xs font-extrabold text-slate-400 uppercase tracking-widest">
                                         {t('totalOrders')}
                                         <ArrowUpDown size={14} className={clsx("transition-opacity", sortBy === 'totalOrders' ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100")} />
                                     </button>
                                 </th>
-                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('deliveredOrders')}</th>
-                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('cancelledOrders')}</th>
-                                <th className="px-6 py-4 text-xs font-black text-slate-400 uppercase tracking-widest">{t('returnedOrders')}</th>
+                                <th className="px-6 py-4 text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t('deliveredOrders')}</th>
+                                <th className="px-6 py-4 text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t('cancelledOrders')}</th>
+                                <th className="px-6 py-4 text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t('returnedOrders')}</th>
                                 <th className="px-6 py-4">
-                                    <button onClick={() => toggleSort('totalSpent')} className="flex items-center gap-2 group text-xs font-black text-slate-400 uppercase tracking-widest">
+                                    <button onClick={() => toggleSort('totalSpent')} className="flex items-center gap-2 group text-xs font-extrabold text-slate-400 uppercase tracking-widest">
                                         {t('totalSpent')}
                                         <ArrowUpDown size={14} className={clsx("transition-opacity", sortBy === 'totalSpent' ? "opacity-100 text-primary" : "opacity-0 group-hover:opacity-100")} />
                                     </button>
@@ -429,7 +429,7 @@ const ClientList = () => {
                                 </tr>
                             ) : clients.length === 0 ? (
                                 <tr>
-                                    <td colSpan={7} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-tighter">{t('noClientsMatch')}</td>
+                                    <td colSpan={7} className="px-6 py-12 text-center text-slate-500 font-bold uppercase tracking-tight">{t('noClientsMatch')}</td>
                                 </tr>
                             ) : (
                                 clients.map((item) => {
@@ -451,7 +451,7 @@ const ClientList = () => {
                                                         )}
                                                     </div>
                                                     <div>
-                                                        <h3 className="font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                                        <h3 className="font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                                             {client?.name || t('anonymousUser')}
                                                         </h3>
 
@@ -467,33 +467,33 @@ const ClientList = () => {
                                             <td className="px-6 py-5">
                                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-slate-100 dark:bg-slate-800 rounded-lg group-hover:bg-indigo-50 dark:group-hover:bg-indigo-900/20 transition-colors">
                                                     <ShoppingBag size={14} className="text-slate-400 group-hover:text-indigo-500" />
-                                                    <span className="font-black text-slate-900 dark:text-white">{stats?.totalOrders || 0}</span>
+                                                    <span className="font-extrabold text-slate-900 dark:text-white">{stats?.totalOrders || 0}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-50 dark:bg-emerald-900/10 rounded-lg">
                                                     <Package size={14} className="text-emerald-500" />
-                                                    <span className="font-black text-emerald-700 dark:text-emerald-400">{stats?.deliveredOrders || 0}</span>
+                                                    <span className="font-extrabold text-emerald-700 dark:text-emerald-400">{stats?.deliveredOrders || 0}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-rose-50 dark:bg-rose-900/10 rounded-lg">
                                                     <X size={14} className="text-rose-500" />
-                                                    <span className="font-black text-rose-700 dark:text-rose-400">{stats?.cancelledOrders || 0}</span>
+                                                    <span className="font-extrabold text-rose-700 dark:text-rose-400">{stats?.cancelledOrders || 0}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-amber-50 dark:bg-amber-900/10 rounded-lg">
                                                     <ArrowLeft size={14} className="text-amber-500" />
-                                                    <span className="font-black text-amber-700 dark:text-amber-400">{stats?.returnedOrders || 0}</span>
+                                                    <span className="font-extrabold text-amber-700 dark:text-amber-400">{stats?.returnedOrders || 0}</span>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
                                                 <div className="flex flex-col">
-                                                    <span className="text-primary font-black text-lg tracking-tight">
+                                                    <span className="text-primary font-extrabold text-lg tracking-tight">
                                                         {Number(stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}
                                                     </span>
-                                                    <span className="text-[10px] font-bold text-slate-400 uppercase">{t('avg')} {Number(stats?.averageOrderValue || 0).toFixed(2)} {t('common:currencySymbol')}</span>
+                                                    <span className="text-[0.625rem] font-bold text-slate-400 uppercase">{t('avg')} {Number(stats?.averageOrderValue || 0).toFixed(2)} {t('common:currencySymbol')}</span>
                                                 </div>
                                             </td>
 
@@ -541,7 +541,7 @@ const ClientList = () => {
                                     </button>
                                 )}
                                 <div>
-                                    <h2 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">
+                                    <h2 className="text-xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                         {viewMode === 'list' ? t('orderHistory') : t('orderDetails')}
                                     </h2>
                                     <p className="text-xs font-bold text-primary uppercase tracking-widest">{selectedClient?.client?.name}</p>
@@ -562,7 +562,7 @@ const ClientList = () => {
                                 loadingOrders ? (
                                     <div className="flex flex-col items-center justify-center h-full gap-3">
                                         <Loader2 size={32} className="text-primary animate-spin" />
-                                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('retrievingPurchases')}</p>
+                                        <p className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em]">{t('retrievingPurchases')}</p>
                                     </div>
                                 ) : clientOrders.length === 0 ? (
                                     <div className="text-center py-20">
@@ -579,24 +579,24 @@ const ClientList = () => {
                                             <div className="flex justify-between items-start mb-4">
                                                 <div>
                                                     <div className="flex items-center gap-2 mb-1">
-                                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono text-[10px] font-bold text-slate-500 uppercase tracking-tighter">
+                                                        <span className="px-2 py-0.5 bg-slate-100 dark:bg-slate-800 rounded font-mono text-[0.625rem] font-bold text-slate-500 uppercase tracking-tight">
                                                             #{order.id.slice(0, 8)}
                                                         </span>
                                                         <span className={clsx(
-                                                            "px-2 py-0.5 rounded text-[10px] font-black uppercase tracking-wider",
+                                                            "px-2 py-0.5 rounded text-[0.625rem] font-extrabold uppercase tracking-wider",
                                                             getStatusColor(order.status)
                                                         )}>
                                                             {getStatusLabel(order.status)}
                                                         </span>
                                                     </div>
-                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-tighter">
+                                                    <div className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-tight">
                                                         <Clock size={12} />
                                                         <span>{new Date(order.createdAt).toLocaleDateString()}</span>
                                                     </div>
                                                 </div>
                                                 <div className={clsx(isRTL ? "text-left" : "text-right")}>
-                                                    <p className="text-lg font-black text-slate-900 dark:text-white leading-tight">{Number(order.total).toFixed(2)} {t('common:currencySymbol')}</p>
-                                                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">{t('orders:itemsCount', { count: order.items?.length || 0 })}</p>
+                                                    <p className="text-lg font-extrabold text-slate-900 dark:text-white leading-tight">{Number(order.total).toFixed(2)} {t('common:currencySymbol')}</p>
+                                                    <p className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-tight">{t('orders:itemsCount', { count: order.items?.length || 0 })}</p>
                                                 </div>
                                             </div>
 
@@ -612,13 +612,13 @@ const ClientList = () => {
                                                         </div>
                                                     ))}
                                                     {order.items?.length > 3 && (
-                                                        <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[10px] font-black text-slate-400">
+                                                        <div className="w-8 h-8 rounded-lg bg-slate-50 dark:bg-slate-800 border-2 border-white dark:border-slate-900 flex items-center justify-center text-[0.625rem] font-extrabold text-slate-400">
                                                             +{order.items.length - 3}
                                                         </div>
                                                     )}
                                                 </div>
                                                 <span className="flex-1" />
-                                                <button className="flex items-center gap-1 text-[10px] font-black text-primary uppercase tracking-widest group-hover:gap-2 transition-all">
+                                                <button className="flex items-center gap-1 text-[0.625rem] font-extrabold text-primary uppercase tracking-widest group-hover:gap-2 transition-all">
                                                     {t('orders:viewDetails')}
                                                     <ChevronRight size={14} className={isRTL ? "rotate-180" : ""} />
                                                 </button>
@@ -631,24 +631,24 @@ const ClientList = () => {
                                 loadingOrderDetail ? (
                                     <div className="flex flex-col items-center justify-center h-full gap-3">
                                         <Loader2 size={32} className="text-primary animate-spin" />
-                                        <p className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('common:loading')}</p>
+                                        <p className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em]">{t('common:loading')}</p>
                                     </div>
                                 ) : selectedOrder && (
                                     <div className="space-y-6 animate-in slide-in-from-right-4 duration-300">
                                         {/* Simplified Detail UI */}
                                         <div className="bg-slate-50 dark:bg-slate-800/30 p-4 rounded-xl border border-slate-100 dark:border-slate-800 flex justify-between items-center">
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('orderStatus')}</p>
+                                                <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('orderStatus')}</p>
                                                 <span className={clsx(
-                                                    "px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider border",
+                                                    "px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider border",
                                                     getStatusColor(selectedOrder.status)
                                                 )}>
                                                     {getStatusLabel(selectedOrder.status)}
                                                 </span>
                                             </div>
                                             <div className={clsx(isRTL ? "text-left" : "text-right")}>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('placedOn')}</p>
-                                                <p className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tighter">
+                                                <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('placedOn')}</p>
+                                                <p className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">
                                                     {new Date(selectedOrder.createdAt).toLocaleString()}
                                                 </p>
                                             </div>
@@ -656,7 +656,7 @@ const ClientList = () => {
 
                                         {(selectedOrder.status?.toUpperCase() === 'CANCELLED' || selectedOrder.status?.toUpperCase() === 'RETURNED') && (
                                             <div className="bg-rose-50 dark:bg-rose-900/20 p-4 rounded-xl border border-rose-100 dark:border-rose-900/50">
-                                                <p className="text-[10px] font-black text-rose-500 uppercase tracking-widest mb-1">
+                                                <p className="text-[0.625rem] font-extrabold text-rose-500 uppercase tracking-widest mb-1">
                                                     {selectedOrder.status?.toUpperCase() === 'CANCELLED' ? t('orders:cancellationReason') : t('orders:returnOrder')}
                                                 </p>
                                                 <p className="text-sm font-bold text-rose-700 dark:text-rose-400">
@@ -666,7 +666,7 @@ const ClientList = () => {
                                         )}
 
                                         <div className="space-y-4">
-                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('purchasedItems')}</h3>
+                                            <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em]">{t('purchasedItems')}</h3>
                                             <div className="space-y-2">
                                                 {selectedOrder.items?.map((item: any) => (
                                                     <div key={item.id} className="flex gap-4 p-3 bg-white dark:bg-slate-800 rounded-xl border border-slate-100 dark:border-slate-800">
@@ -679,10 +679,10 @@ const ClientList = () => {
                                                         </div>
                                                         <div className="flex-1 min-w-0">
                                                             <div className="flex justify-between items-start">
-                                                                <p className="font-bold text-slate-900 dark:text-white text-sm truncate uppercase tracking-tighter">{item.productName}</p>
-                                                                <p className="font-black text-slate-900 dark:text-white text-sm tracking-tighter">{Number(item.price * item.quantity).toFixed(2)} {t('common:currencySymbol')}</p>
+                                                                <p className="font-bold text-slate-900 dark:text-white text-sm truncate uppercase tracking-tight">{item.productName}</p>
+                                                                <p className="font-extrabold text-slate-900 dark:text-white text-sm tracking-tight">{Number(item.price * item.quantity).toFixed(2)} {t('common:currencySymbol')}</p>
                                                             </div>
-                                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-tighter">{t('qty')}: {item.quantity} × {Number(item.price).toFixed(2)} {t('common:currencySymbol')}</p>
+                                                            <p className="text-xs text-slate-400 font-bold uppercase tracking-tight">{t('qty')}: {item.quantity} × {Number(item.price).toFixed(2)} {t('common:currencySymbol')}</p>
                                                         </div>
                                                     </div>
                                                 ))}
@@ -691,31 +691,31 @@ const ClientList = () => {
 
                                         {/* Financial Summary */}
                                         <div className="p-4 bg-slate-50 dark:bg-slate-800/30 rounded-2xl border border-slate-100 dark:border-slate-800 space-y-3">
-                                            <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tighter">
+                                            <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tight">
                                                 <span>{t('subtotal')}</span>
                                                 <span className="text-slate-900 dark:text-white">{Number(selectedOrder.subtotal).toFixed(2)} {t('common:currencySymbol')}</span>
                                             </div>
                                             {Number(selectedOrder.promoDiscount) > 0 && (
-                                                <div className="flex justify-between text-xs font-bold text-emerald-500 uppercase tracking-tighter">
+                                                <div className="flex justify-between text-xs font-bold text-emerald-500 uppercase tracking-tight">
                                                     <span>{t('discount')}</span>
                                                     <span>-{Number(selectedOrder.promoDiscount).toFixed(2)} {t('common:currencySymbol')}</span>
                                                 </div>
                                             )}
                                             {Number(selectedOrder.deliveryFee) > 0 && (
-                                                <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tighter">
+                                                <div className="flex justify-between text-xs font-bold text-slate-500 uppercase tracking-tight">
                                                     <span>{t('delivery')}</span>
                                                     <span className="text-slate-900 dark:text-white">+{Number(selectedOrder.deliveryFee).toFixed(2)} {t('common:currencySymbol')}</span>
                                                 </div>
                                             )}
                                             <div className="pt-3 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
-                                                <span className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-[0.1em]">{t('totalPaid')}</span>
-                                                <span className="text-2xl font-black text-primary tracking-tighter">{Number(selectedOrder.total).toFixed(2)} {t('common:currencySymbol')}</span>
+                                                <span className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-[0.1em]">{t('totalPaid')}</span>
+                                                <span className="text-2xl font-extrabold text-primary tracking-tight">{Number(selectedOrder.total).toFixed(2)} {t('common:currencySymbol')}</span>
                                             </div>
                                         </div>
 
                                         {/* Delivery Info */}
                                         <div className="space-y-4">
-                                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('logistics')}</h3>
+                                            <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em]">{t('logistics')}</h3>
                                             <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
                                                 <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
                                                     <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center text-primary overflow-hidden">
@@ -741,7 +741,7 @@ const ClientList = () => {
                                                             ) : t('pickup')}
                                                         </span>
                                                         {selectedOrder.deliveryAddress?.addressDetails && (
-                                                            <span className="text-[11px] font-medium text-slate-500 normal-case leading-relaxed">
+                                                            <span className="text-[0.6875rem] font-medium text-slate-500 normal-case leading-relaxed">
                                                                 {selectedOrder.deliveryAddress.addressDetails}
                                                             </span>
                                                         )}
@@ -750,13 +750,13 @@ const ClientList = () => {
 
                                                 {selectedOrder.deliveryAddress && (selectedOrder.deliveryAddress.phone || selectedOrder.deliveryAddress.email) && (
                                                     <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
-                                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">{t('orders:contactForDelivery')}</p>
+                                                        <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest leading-none mb-1">{t('orders:contactForDelivery')}</p>
                                                         {selectedOrder.deliveryAddress.phone && (
                                                             <div className="flex items-center gap-3 text-sm font-bold text-slate-700 dark:text-slate-300">
                                                                 <div className="p-2 bg-primary/10 rounded-lg text-primary shrink-0">
                                                                     <Phone size={14} />
                                                                 </div>
-                                                                <span className="tracking-tighter">{selectedOrder.deliveryAddress.phone}</span>
+                                                                <span className="tracking-tight">{selectedOrder.deliveryAddress.phone}</span>
                                                             </div>
                                                         )}
                                                         {selectedOrder.deliveryAddress.email && (
@@ -776,7 +776,7 @@ const ClientList = () => {
                                         {/* Order Notes */}
                                         {selectedOrder.notes && (
                                             <div className="space-y-3">
-                                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-[0.2em]">{t('orders:orderNotes')}</h3>
+                                                <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em]">{t('orders:orderNotes')}</h3>
                                                 <div className="p-4 bg-amber-50 dark:bg-amber-950/20 border border-amber-100 dark:border-amber-900/10 rounded-2xl relative overflow-hidden group">
                                                     <div className="absolute top-0 bottom-0 left-0 w-1 bg-amber-400/50" />
                                                     <p className="text-sm font-medium text-amber-950 dark:text-amber-200 leading-relaxed italic">
@@ -794,24 +794,24 @@ const ClientList = () => {
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                 <div className="grid grid-cols-5 gap-2">
                                     <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('lifetimeValue')}</p>
-                                        <p className="text-lg font-black text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}</p>
+                                        <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('lifetimeValue')}</p>
+                                        <p className="text-lg font-extrabold text-primary">{Number(selectedClient?.stats?.totalSpent || 0).toFixed(2)} {t('common:currencySymbol')}</p>
                                     </div>
                                     <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('totalOrders')}</p>
-                                        <p className="text-lg font-black text-slate-900 dark:text-white uppercase">{selectedClient?.stats?.totalOrders || 0}</p>
+                                        <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('totalOrders')}</p>
+                                        <p className="text-lg font-extrabold text-slate-900 dark:text-white uppercase">{selectedClient?.stats?.totalOrders || 0}</p>
                                     </div>
                                     <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('deliveredOrders')}</p>
-                                        <p className="text-lg font-black text-emerald-600 dark:text-emerald-400 uppercase">{selectedClient?.stats?.deliveredOrders || 0}</p>
+                                        <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('deliveredOrders')}</p>
+                                        <p className="text-lg font-extrabold text-emerald-600 dark:text-emerald-400 uppercase">{selectedClient?.stats?.deliveredOrders || 0}</p>
                                     </div>
                                     <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('cancelledOrders')}</p>
-                                        <p className="text-lg font-black text-rose-600 dark:text-rose-400 uppercase">{selectedClient?.stats?.cancelledOrders || 0}</p>
+                                        <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('cancelledOrders')}</p>
+                                        <p className="text-lg font-extrabold text-rose-600 dark:text-rose-400 uppercase">{selectedClient?.stats?.cancelledOrders || 0}</p>
                                     </div>
                                     <div className="p-3 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t('returnedOrders')}</p>
-                                        <p className="text-lg font-black text-amber-600 dark:text-amber-400 uppercase">{selectedClient?.stats?.returnedOrders || 0}</p>
+                                        <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('returnedOrders')}</p>
+                                        <p className="text-lg font-extrabold text-amber-600 dark:text-amber-400 uppercase">{selectedClient?.stats?.returnedOrders || 0}</p>
                                     </div>
                                 </div>
                             </div>
@@ -821,7 +821,7 @@ const ClientList = () => {
                             <div className="p-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/50">
                                 <button
                                     onClick={() => navigate(`/orders/${selectedOrder.id}`)}
-                                    className="w-full py-3 bg-slate-900 dark:bg-primary text-white font-black uppercase tracking-[0.2em] text-xs rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                                    className="w-full py-3 bg-slate-900 dark:bg-primary text-white font-extrabold uppercase tracking-[0.2em] text-xs rounded-xl hover:opacity-90 transition-all flex items-center justify-center gap-2"
                                 >
                                     <Eye size={16} />
                                     {t('goToOrderFulfillment')}

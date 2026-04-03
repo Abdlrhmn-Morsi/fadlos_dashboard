@@ -393,7 +393,7 @@ const SendPromotionPage: React.FC = () => {
                 </button>
                 <div className="flex-1">
                     <div className="flex items-center justify-between">
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                             {t('promotions.title')}
                         </h1>
                         <button
@@ -406,7 +406,7 @@ const SendPromotionPage: React.FC = () => {
                     </div>
                     <div className="flex items-center gap-2 mt-1">
                         <span className={clsx(
-                            "px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-widest",
+                            "px-2.5 py-0.5 rounded-full text-[0.625rem] font-extrabold uppercase tracking-widest",
                             source === 'followers'
                                 ? "bg-violet-100 text-violet-600 dark:bg-violet-900/20 dark:text-violet-400"
                                 : "bg-blue-100 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400"
@@ -445,7 +445,7 @@ const SendPromotionPage: React.FC = () => {
                             {fetchingCredits ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                             ) : (
-                                <p className="text-sm font-black text-slate-900 dark:text-white">
+                                <p className="text-sm font-extrabold text-slate-900 dark:text-white">
                                     {t('promotions.count', {
                                         used: credits?.used ?? 0,
                                         total: credits?.total === -1 ? '∞' : credits?.total || 0
@@ -456,12 +456,12 @@ const SendPromotionPage: React.FC = () => {
                     </div>
                     {isAtLimit && (
                         <div className="text-end">
-                            <p className="text-[10px] font-bold text-rose-500 uppercase tracking-tighter">
+                            <p className="text-[0.625rem] font-bold text-rose-500 uppercase tracking-tight">
                                 {t('promotions.noCredits')}
                             </p>
                             <button
                                 onClick={() => navigate('/subscription')}
-                                className="text-[10px] font-black text-rose-600 underline uppercase mt-0.5"
+                                className="text-[0.625rem] font-extrabold text-rose-600 underline uppercase mt-0.5"
                             >
                                 {t('promotions.upgrade')}
                             </button>
@@ -471,7 +471,7 @@ const SendPromotionPage: React.FC = () => {
 
                 {/* Target Mode Selection */}
                 <div className="space-y-3">
-                    <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <h2 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.target')}
                     </h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -494,12 +494,12 @@ const SendPromotionPage: React.FC = () => {
                                     targetMode === key ? "text-primary" : "text-slate-400"
                                 )} />
                                 <p className={clsx(
-                                    "text-sm font-black uppercase tracking-tight",
+                                    "text-sm font-extrabold uppercase tracking-tight",
                                     targetMode === key ? "text-primary" : "text-slate-900 dark:text-white"
                                 )}>
                                     {label}
                                 </p>
-                                <p className="text-[10px] font-bold text-slate-400 mt-0.5">{desc}</p>
+                                <p className="text-[0.625rem] font-bold text-slate-400 mt-0.5">{desc}</p>
                             </button>
                         ))}
                     </div>
@@ -508,7 +508,7 @@ const SendPromotionPage: React.FC = () => {
                 {/* Count Input for First N / Last N */}
                 {['first_n', 'last_n', 'first_n_spent', 'last_n_spent', 'first_n_orders', 'last_n_orders', 'first_n_delivered', 'last_n_delivered'].includes(targetMode) && (
                     <div className="p-4 bg-white dark:bg-slate-900 rounded-xl border border-slate-100 dark:border-slate-800 space-y-3">
-                        <label className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                        <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">
                             {source === 'clients' ? t('promotions.selectCountClients', 'Number of clients') : t('promotions.selectCount', 'Number of followers')}
                         </label>
                         <div className="flex items-center gap-4">
@@ -518,7 +518,7 @@ const SendPromotionPage: React.FC = () => {
                                 max={1000}
                                 value={selectCount}
                                 onChange={(e) => setSelectCount(Math.max(1, Math.min(1000, parseInt(e.target.value) || 50)))}
-                                className="w-32 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl p-3 text-center text-lg font-black focus:border-primary focus:ring-0 transition-all"
+                                className="w-32 bg-slate-50 dark:bg-slate-800 border-2 border-slate-100 dark:border-slate-700 rounded-xl p-3 text-center text-lg font-extrabold focus:border-primary focus:ring-0 transition-all"
                             />
                             <p className="text-sm text-slate-500 font-medium">
                                 {targetMode === 'first_n' && t('promotions.firstNHint', 'Oldest {{count}} followers (first to follow)', { count: selectCount })}
@@ -554,12 +554,12 @@ const SendPromotionPage: React.FC = () => {
                             </div>
                             {selectedIds.length > 0 && (
                                 <div className="mt-2 flex items-center gap-2">
-                                    <span className="px-2.5 py-1 bg-primary/10 text-primary text-[10px] font-black rounded-full uppercase tracking-widest">
+                                    <span className="px-2.5 py-1 bg-primary/10 text-primary text-[0.625rem] font-extrabold rounded-full uppercase tracking-widest">
                                         {t('promotions.selectedCount', '{{count}} selected', { count: selectedIds.length })}
                                     </span>
                                     <button
                                         onClick={() => setSelectedIds([])}
-                                        className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-rose-500 transition-colors"
+                                        className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest hover:text-rose-500 transition-colors"
                                     >
                                         {t('common:clearAll', 'Clear all')}
                                     </button>
@@ -612,7 +612,7 @@ const SendPromotionPage: React.FC = () => {
                                                         {follower.name || follower.username || t('common:unnamed', 'Unnamed')}
                                                     </p>
                                                     {follower.followedAt && (
-                                                        <p className="text-[10px] font-medium text-slate-400 flex items-center gap-1">
+                                                        <p className="text-[0.625rem] font-medium text-slate-400 flex items-center gap-1">
                                                             <Clock size={10} />
                                                             {new Date(follower.followedAt).toLocaleDateString()}
                                                         </p>
@@ -628,7 +628,7 @@ const SendPromotionPage: React.FC = () => {
                                     )}
                                     {!hasMoreFollowers && followers.length > 0 && (
                                         <div className="p-3 text-center">
-                                            <p className="text-[10px] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">
+                                            <p className="text-[0.625rem] font-bold text-slate-300 dark:text-slate-700 uppercase tracking-widest">
                                                 {followerTotal} {t('promotions.sourceFollowers', 'followers')}
                                             </p>
                                         </div>
@@ -642,7 +642,7 @@ const SendPromotionPage: React.FC = () => {
                 {/* Promotional Images Section */}
                 <div className="bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden">
                     <div className="p-4 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20">
-                        <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                        <h2 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">
                             {t('promotions.promoImages', 'Promotional Images')}
                         </h2>
                     </div>
@@ -657,10 +657,10 @@ const SendPromotionPage: React.FC = () => {
                                 />
                             </div>
                             <div>
-                                <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                     {t('promotions.largeIcon', 'Large Icon')}
                                 </h3>
-                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
+                                <p className="text-[0.625rem] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
                                     {t('promotions.logoHint', 'Your store logo is used automatically')}
                                 </p>
                             </div>
@@ -670,10 +670,10 @@ const SendPromotionPage: React.FC = () => {
                         <div className="space-y-3 pt-4 border-t border-slate-50 dark:border-slate-800">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                    <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                         {t('promotions.coverImage', 'Cover Image (Big Picture)')}
                                     </h3>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                    <p className="text-[0.625rem] text-slate-400 font-bold uppercase tracking-wider">
                                         {t('promotions.coverImageDesc', 'Shown when notification is expanded')}
                                     </p>
                                 </div>
@@ -709,7 +709,7 @@ const SendPromotionPage: React.FC = () => {
                                     <div className="p-4 bg-white dark:bg-slate-900 rounded-2xl shadow-sm group-hover:shadow group-hover:text-primary transition-all">
                                         <ImagePlus size={32} className="text-slate-400 group-hover:text-primary transition-colors" />
                                     </div>
-                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">
+                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">
                                         {t('promotions.addCoverImage', 'Choose Cover Image')}
                                     </span>
                                 </button>
@@ -735,7 +735,7 @@ const SendPromotionPage: React.FC = () => {
 
                 {/* Title Input (Arabic) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.titleAr', 'Title (Arabic)')}
                     </label>
                     <input
@@ -751,7 +751,7 @@ const SendPromotionPage: React.FC = () => {
 
                 {/* Title Input (English) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.titleEn', 'Title (English)')}
                     </label>
                     <input
@@ -768,7 +768,7 @@ const SendPromotionPage: React.FC = () => {
 
                 {/* Message Input (Arabic) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.messageAr')}
                     </label>
                     <div className="relative">
@@ -782,7 +782,7 @@ const SendPromotionPage: React.FC = () => {
                             className="w-full bg-white dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl p-4 text-sm focus:border-primary focus:ring-0 transition-all resize-none disabled:opacity-50"
                         />
                         <div className={clsx(
-                            "absolute bottom-3 end-3 text-[10px] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
+                            "absolute bottom-3 end-3 text-[0.625rem] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
                             messageAr.length >= 180 ? "text-rose-500 border-rose-100" : "text-slate-400 border-slate-100"
                         )}>
                             {t('promotions.characterLimit', { count: messageAr.length })}
@@ -792,7 +792,7 @@ const SendPromotionPage: React.FC = () => {
 
                 {/* Message Input (English) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.messageEn')}
                     </label>
                     <div className="relative">
@@ -806,7 +806,7 @@ const SendPromotionPage: React.FC = () => {
                             dir="ltr"
                         />
                         <div className={clsx(
-                            "absolute bottom-3 end-3 text-[10px] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
+                            "absolute bottom-3 end-3 text-[0.625rem] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
                             message.length >= 180 ? "text-rose-500 border-rose-100" : "text-slate-400 border-slate-100"
                         )}>
                             {t('promotions.characterLimit', { count: message.length })}
@@ -836,7 +836,7 @@ const SendPromotionPage: React.FC = () => {
                         onClick={handleSend}
                         disabled={!canSend}
                         className={clsx(
-                            "w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:translate-y-0",
+                            "w-full py-4 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:translate-y-0",
                             !canSend
                                 ? "bg-slate-100 text-slate-400 shadow-none cursor-not-allowed"
                                 : "bg-primary text-white hover:bg-primary/90"

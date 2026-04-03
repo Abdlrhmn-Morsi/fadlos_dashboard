@@ -146,7 +146,7 @@ const CashSettlement = () => {
                                 key={collection.deliveryId}
                                 onClick={() => handleDriverClick(collection)}
                                 className={clsx(
-                                    "bg-white dark:bg-slate-900 rounded-2xl border transition-all cursor-pointer overflow-hidden p-6 shadow-sm hover:shadow-md",
+                                    "bg-white dark:bg-slate-900 rounded-2xl border transition-all cursor-pointer overflow-hidden p-6 shadow-sm ",
                                     selectedDriver?.deliveryId === collection.deliveryId
                                         ? "border-primary ring-1 ring-primary"
                                         : "border-slate-200 dark:border-slate-800"
@@ -177,12 +177,12 @@ const CashSettlement = () => {
                                             {t('orders:pendingRevenue')}
                                         </div>
                                         {collection.driverType === 'FREELANCER' && (
-                                            <div className="text-[10px] font-bold text-amber-600 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded">
+                                            <div className="text-[0.625rem] font-bold text-amber-600 bg-amber-50 dark:bg-amber-500/10 px-2 py-0.5 rounded">
                                                 {t('common:driverTypes.FREELANCER')}
                                             </div>
                                         )}
                                     </div>
-                                    <div className="text-2xl font-black text-primary flex items-baseline gap-1">
+                                    <div className="text-2xl font-extrabold text-primary flex items-baseline gap-1">
                                         {Number(collection.totalAmountToCollect || collection.totalAmount || 0).toFixed(2)}
                                         <span className="text-sm font-bold opacity-70">{t('common:currencySymbol')}</span>
                                     </div>
@@ -241,17 +241,17 @@ const CashSettlement = () => {
                                     {selectedDriver.driverType === 'FREELANCER' ? (
                                         <>
                                             <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders:subtotal')}</div>
+                                                <div className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider">{t('orders:subtotal')}</div>
                                                 <div className="text-sm font-bold text-slate-600 dark:text-slate-400">
                                                     {driverOrders
                                                         .filter(o => selectedOrderIds.includes(o.id))
                                                         .reduce((sum, o) => sum + (Number(o.total || 0) - Number(o.deliveryFee || 0)), 0)
                                                         .toFixed(2)}
-                                                    <span className="text-[10px] ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                                    <span className="text-[0.625rem] ml-1 opacity-70">{t('common:currencySymbol')}</span>
                                                 </div>
                                             </div>
                                             <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('storeCommission')}</div>
+                                                <div className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider">{t('storeCommission')}</div>
                                                 <div className="text-sm font-bold text-blue-600">
                                                     +
                                                     {driverOrders
@@ -261,24 +261,24 @@ const CashSettlement = () => {
                                                             return sum + commission;
                                                         }, 0)
                                                         .toFixed(2)}
-                                                    <span className="text-[10px] ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                                    <span className="text-[0.625rem] ml-1 opacity-70">{t('common:currencySymbol')}</span>
                                                 </div>
                                             </div>
                                             <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
-                                                <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">{t('orders:driverProfit')}</div>
+                                                <div className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider">{t('orders:driverProfit')}</div>
                                                 <div className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
                                                     {driverOrders
                                                         .filter(o => selectedOrderIds.includes(o.id))
                                                         .reduce((sum, o) => sum + (o.driverNetEarnings != null ? Number(o.driverNetEarnings) : Number(o.deliveryFee || 0)), 0)
                                                         .toFixed(2)}
-                                                    <span className="text-[10px] ml-1 opacity-70">{t('common:currencySymbol')}</span>
+                                                    <span className="text-[0.625rem] ml-1 opacity-70">{t('common:currencySymbol')}</span>
                                                 </div>
                                             </div>
                                         </>
                                     ) : (
                                         <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
                                             <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('ordersTotal')}</div>
-                                            <div className="text-xl font-black text-slate-700 dark:text-slate-300">
+                                            <div className="text-xl font-extrabold text-slate-700 dark:text-slate-300">
                                                 {driverOrders
                                                     .filter(o => selectedOrderIds.includes(o.id))
                                                     .reduce((sum, o) => sum + Number(o.total || 0), 0)
@@ -291,7 +291,7 @@ const CashSettlement = () => {
 
                                     <div className={clsx(isRTL ? 'text-left' : 'text-right')}>
                                         <div className="text-xs font-bold text-slate-400 uppercase tracking-wider">{t('amountToCollect')}</div>
-                                        <div className="text-2xl font-black text-emerald-600">
+                                        <div className="text-2xl font-extrabold text-emerald-600">
                                             {driverOrders
                                                 .filter(o => selectedOrderIds.includes(o.id))
                                                 .reduce((sum, o) => {
@@ -374,7 +374,7 @@ const CashSettlement = () => {
                                                                     )}{' '}
                                                                     {t('common:currencySymbol')}
                                                                 </div>
-                                                                <div className="text-[10px] text-slate-400 font-bold uppercase">
+                                                                <div className="text-[0.625rem] text-slate-400 font-bold uppercase">
                                                                     {new Date(order.createdAt).toLocaleDateString()}
                                                                 </div>
                                                             </div>

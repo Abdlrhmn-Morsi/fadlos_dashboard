@@ -112,7 +112,7 @@ const BillingHistory: React.FC = () => {
     return (
         <div className="p-6 space-y-6">
             <div className="flex flex-col gap-1">
-                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
                     <CreditCard className="text-primary" size={28} />
                     {t('billingHistory.title')}
                 </h1>
@@ -126,37 +126,37 @@ const BillingHistory: React.FC = () => {
                     <table className={clsx("w-full border-collapse", isRTL ? "text-right" : "text-left")} dir={isRTL ? 'rtl' : 'ltr'}>
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-100 dark:border-slate-800">
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <th className="px-6 py-4 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">
                                     <div className="flex items-center gap-2">
                                         <Calendar size={12} />
                                         {t('billingHistory.date')}
                                     </div>
                                 </th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <th className="px-6 py-4 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">
                                     <div className="flex items-center gap-2">
                                         <CreditCard size={12} />
                                         {t('billingHistory.plan')}
                                     </div>
                                 </th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <th className="px-6 py-4 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">
                                     <div className="flex items-center gap-2">
                                         <RefreshCcw size={12} />
                                         {t('billingHistory.cycle')}
                                     </div>
                                 </th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <th className="px-6 py-4 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">
                                     <div className="flex items-center gap-2">
                                         <Clock size={12} />
                                         {t('billingHistory.period')}
                                     </div>
                                 </th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <th className="px-6 py-4 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">
                                     <div className="flex items-center gap-2">
                                         <DollarSign size={12} />
                                         {t('billingHistory.amount')}
                                     </div>
                                 </th>
-                                <th className="px-6 py-4 text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">
+                                <th className="px-6 py-4 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">
                                     <div className="flex items-center gap-2">
                                         <Clock size={12} />
                                         {t('billingHistory.status')}
@@ -172,12 +172,12 @@ const BillingHistory: React.FC = () => {
                                             <div className="text-sm font-bold text-slate-700 dark:text-slate-200">
                                                 {new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', { month: 'short', day: '2-digit', year: 'numeric' }).format(new Date(item.createdAt))}
                                             </div>
-                                            <div className="text-[10px] text-slate-400 font-medium">
+                                            <div className="text-[0.625rem] text-slate-400 font-medium">
                                                 {new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', { hour: '2-digit', minute: '2-digit', hour12: true }).format(new Date(item.createdAt))}
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-black uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
+                                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-extrabold uppercase tracking-wider bg-primary/10 text-primary border border-primary/20">
                                                 {t(`plans.${item.plan.toLowerCase()}.name`, { defaultValue: item.plan })}
                                             </span>
                                         </td>
@@ -192,7 +192,7 @@ const BillingHistory: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4">
                                             {item.periodStart && item.periodEnd ? (
-                                                <div className="text-[10px] font-bold text-slate-500 dark:text-slate-400 flex flex-col">
+                                                <div className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 flex flex-col">
                                                     <span>{new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', { month: 'short', day: '2-digit' }).format(new Date(item.periodStart))}</span>
                                                     <span className="opacity-40">-</span>
                                                     <span>{new Intl.DateTimeFormat(isRTL ? 'ar-EG' : 'en-US', { month: 'short', day: '2-digit', year: 'numeric' }).format(new Date(item.periodEnd))}</span>
@@ -202,18 +202,18 @@ const BillingHistory: React.FC = () => {
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
-                                            <div className="text-sm font-black text-slate-900 dark:text-white">
+                                            <div className="text-sm font-extrabold text-slate-900 dark:text-white">
                                                 {Number(item.amount).toFixed(2)} {t('subscriptions:currencySymbol')}
                                             </div>
                                             {item.paddleTransactionId && (
-                                                <div className="text-[10px] text-slate-400 font-medium group-hover:text-primary transition-colors truncate max-w-[120px]">
+                                                <div className="text-[0.625rem] text-slate-400 font-medium group-hover:text-primary transition-colors truncate max-w-[120px]">
                                                     ID: {item.paddleTransactionId}
                                                 </div>
                                             )}
                                         </td>
                                         <td className="px-6 py-4">
                                             <div className={clsx(
-                                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider border transition-all duration-300",
+                                                "inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-wider border transition-all duration-300",
                                                 getStatusClass(item.status)
                                             )}>
                                                 {getStatusIcon(item.status)}

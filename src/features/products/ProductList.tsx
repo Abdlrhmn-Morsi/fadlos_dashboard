@@ -407,7 +407,7 @@ const ProductList = () => {
                                                 <span className="text-xs font-bold text-yellow-700 dark:text-yellow-400">
                                                     {Number(product.averageRating || 0).toFixed(1)}
                                                 </span>
-                                                <span className="text-[10px] text-yellow-600/60 dark:text-yellow-400/50 uppercase font-medium">
+                                                <span className="text-[0.625rem] text-yellow-600/60 dark:text-yellow-400/50 uppercase font-medium">
                                                     ({product.totalReviews || 0})
                                                 </span>
                                             </div>

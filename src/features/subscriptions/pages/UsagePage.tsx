@@ -72,7 +72,7 @@ const UsagePage: React.FC = () => {
         <div className={clsx("p-6 space-y-8", isRTL && "text-right")}>
             {/* Header */}
             <div>
-                <h1 className="text-2xl font-black text-slate-900 dark:text-white tracking-tight">
+                <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white tracking-tight">
                     {t('usage.title')}
                 </h1>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
@@ -97,7 +97,7 @@ const UsagePage: React.FC = () => {
                             <p className="text-white/70 text-xs font-bold uppercase tracking-widest">
                                 {t('usage.currentPlan')}
                             </p>
-                            <p className="text-2xl font-black text-white uppercase tracking-tight">
+                            <p className="text-2xl font-extrabold text-white uppercase tracking-tight">
                                 {t(`plans.${planKey}.name`, data.plan)}
                             </p>
                         </div>
@@ -106,7 +106,7 @@ const UsagePage: React.FC = () => {
                     {!isPremium && (
                         <button
                             onClick={() => navigate('/subscription')}
-                            className="px-6 py-3 bg-white text-slate-900 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white/90 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-lg flex items-center gap-2"
+                            className="px-6 py-3 bg-white text-slate-900 rounded-xl text-xs font-extrabold uppercase tracking-widest hover:bg-white/90 transition-all hover:-translate-y-0.5 active:translate-y-0 shadow-lg flex items-center gap-2"
                         >
                             {t('usage.upgradeForMore')}
                             <ArrowUpRight size={14} />
@@ -138,7 +138,7 @@ const UsagePage: React.FC = () => {
                             <div
                                 key={key}
                                 className={clsx(
-                                    "bg-white dark:bg-slate-900 rounded-xl border p-5 transition-all hover:shadow-md",
+                                    "bg-white dark:bg-slate-900 rounded-xl border p-5 transition-all ",
                                     isAtLimit
                                         ? "border-rose-200 dark:border-rose-800"
                                         : isNearLimit
@@ -159,7 +159,7 @@ const UsagePage: React.FC = () => {
                                                 {t(`admin.limitKeys.${key}`, key)}
                                             </p>
                                             {key === 'orders_per_month' && (
-                                                <p className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">
+                                                <p className="text-[0.625rem] text-slate-400 uppercase tracking-wider font-bold">
                                                     {t('usage.ordersThisMonth')}
                                                 </p>
                                             )}
@@ -170,14 +170,14 @@ const UsagePage: React.FC = () => {
                                         {isUnlimited ? (
                                             <div className="flex items-center gap-1.5 text-emerald-500">
                                                 <Infinity size={18} />
-                                                <span className="text-xs font-black uppercase tracking-wider">
+                                                <span className="text-xs font-extrabold uppercase tracking-wider">
                                                     {t('usage.unlimited')}
                                                 </span>
                                             </div>
                                         ) : (
                                             <div>
                                                 <span className={clsx(
-                                                    "text-lg font-black",
+                                                    "text-lg font-extrabold",
                                                     isAtLimit ? "text-rose-500" : isNearLimit ? "text-amber-500" : "text-slate-900 dark:text-white"
                                                 )}>
                                                     {used}
@@ -210,10 +210,10 @@ const UsagePage: React.FC = () => {
                                         "mt-4 flex flex-col gap-1",
                                         isAtLimit ? "text-rose-500" : isNearLimit ? "text-amber-500" : "text-slate-400"
                                     )}>
-                                        <p className="text-[13px] font-black leading-none uppercase tracking-wider">
+                                        <p className="text-[13px] font-extrabold leading-none uppercase tracking-wider">
                                             {Math.round(percentage)}%
                                         </p>
-                                        <p className="text-[10px] font-bold uppercase tracking-widest opacity-80 mt-0.5">
+                                        <p className="text-[0.625rem] font-bold uppercase tracking-widest opacity-80 mt-0.5">
                                             {t('usage.used', { count: used })}
                                         </p>
                                     </div>

@@ -77,11 +77,11 @@ const SidebarItem: React.FC<SidebarItemProps> = ({ to, icon: Icon, label, collap
       to={to}
       replace={replace}
       className={clsx(
-        'flex items-center rounded-[4px] transition-all duration-200 group relative',
+        'flex items-center rounded-[4px] transition duration-200 group relative',
         collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
         isActive
-          ? 'bg-primary text-white shadow-lg shadow-primary/20 scale-[1.02]'
-          : 'text-slate-500 hover:bg-primary-light hover:text-primary'
+          ? 'bg-primary text-white shadow-xl shadow-primary/10 border-l-[3px] border-primary-hover'
+          : 'text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary-light hover:bg-slate-100 dark:hover:bg-slate-800'
       )}
     >
       <Icon
@@ -130,9 +130,9 @@ const LockedSidebarItem: React.FC<LockedSidebarItemProps> = ({ icon: Icon, label
     <button
       onClick={() => navigate('/subscription')}
       className={clsx(
-        'flex items-center rounded-[4px] transition-all duration-200 group relative w-full',
+        'flex items-center rounded-[4px] transition duration-200 group relative w-full',
         collapsed ? 'justify-center px-2 py-3' : 'gap-3 px-4 py-3',
-        'text-slate-300 dark:text-slate-500 cursor-pointer hover:bg-amber-50/50 dark:hover:bg-amber-900/10'
+        'text-slate-400 dark:text-slate-500 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800'
       )}
     >
       <Icon
@@ -173,7 +173,7 @@ interface SidebarHeaderProps {
 const SidebarHeader: React.FC<SidebarHeaderProps> = ({ label, collapsed }) => {
   if (collapsed) return <div className="h-[1px] bg-slate-100 dark:bg-slate-800 my-4" />;
   return (
-    <div className="pt-6 pb-2 px-4 text-[10px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">
+    <div className="pt-6 pb-2 px-4 text-[0.625rem] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-[0.15em]">
       {label}
     </div>
   );
@@ -219,7 +219,7 @@ const DashboardLayout: React.FC = () => {
   return (
     <div
       dir={isRTL ? 'rtl' : 'ltr'}
-      className={clsx('flex h-screen overflow-hidden bg-slate-50 font-inter print:h-auto print:overflow-visible')}
+      className={clsx('flex h-screen overflow-hidden bg-slate-50 relative h-auto print:overflow-visible')}
     >
       {/* Mobile Overlay */}
       {mobileOpen && (
@@ -533,12 +533,12 @@ const DashboardLayout: React.FC = () => {
 
       {/* Main Content */}
       <div className={clsx(
-        "flex-1 flex flex-col min-w-0 overflow-hidden relative transition-all duration-300 print:overflow-visible print:bg-white print:!m-0",
+        "flex-1 flex flex-col min-w-0 overflow-hidden relative transition-[margin] duration-300 ease-in-out print:overflow-visible print:bg-white print:!m-0 bg-slate-50 dark:bg-slate-950",
         isRTL
           ? (collapsed ? 'lg:mr-20' : 'lg:mr-64')
           : (collapsed ? 'lg:ml-20' : 'lg:ml-64')
       )}>
-        <header className="h-[70px] bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between px-6 shrink-0 relative z-30 transition-colors print:hidden">
+        <header className="h-[70px] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800/80 flex items-center justify-between px-6 shrink-0 relative z-30 transition-colors shadow-sm dark:shadow-slate-900/50 print:hidden">
           <div className="flex items-center gap-4">
             <button
               className="lg:hidden p-2 -mx-2 text-slate-500 hover:text-primary transition-colors"
@@ -549,8 +549,8 @@ const DashboardLayout: React.FC = () => {
             <div className="flex items-center gap-3">
               {user?.store?.logo && (
                 <div className="relative">
-                  <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-800 flex-shrink-0 bg-white">
-                    <img src={user.store.logo} alt="" className="w-full h-full object-contain" />
+                  <div className="w-10 h-10 rounded-full overflow-hidden bg-slate-100 dark:bg-slate-800 flex items-center justify-center shadow-md dark:shadow-slate-900/50 border border-slate-200 dark:border-slate-700 shrink-0">
+                    <img src={user.store.logo} alt={`${user.store.name || 'Store'} logo`} className="w-full h-full object-contain" />
                   </div>
                   {user?.store?.isVerified && (
                     <div className={clsx(
@@ -582,14 +582,14 @@ const DashboardLayout: React.FC = () => {
               }}
             >
               <div className={clsx("flex flex-col mx-3")}>
-                <span className="text-xs font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none mb-1">
+                <span className="text-xs font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-tight leading-none mb-1">
                   {user?.name}
                 </span>
-                <span className="text-[10px] font-black text-primary uppercase tracking-[0.2em] leading-none">
+                <span className="text-[0.625rem] font-extrabold text-primary uppercase tracking-[0.2em] leading-none">
                   {getRoleLabel()}
                 </span>
               </div>
-              <div className="w-10 h-10 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center font-black shadow-lg shadow-primary/20 border-2 border-white dark:border-slate-800">
+              <div className="w-10 h-10 rounded-full overflow-hidden bg-primary text-white flex items-center justify-center font-extrabold shadow-lg shadow-primary/20 border-2 border-white dark:border-slate-800">
                 {user?.profileImage ? (
                   <img src={user.profileImage} alt={user.name} className="w-full h-full object-cover" />
                 ) : (

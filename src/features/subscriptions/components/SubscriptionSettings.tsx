@@ -197,7 +197,7 @@ const SubscriptionSettings = () => {
                     </button>
                     <div className="flex items-center gap-2">
                         <span className={clsx("text-sm font-bold", billingCycle === 'yearly' ? "text-slate-900 dark:text-white" : "text-slate-400")}>{t('subscriptions:yearly')}</span>
-                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 text-[10px] rounded-[4px] uppercase tracking-wider font-black whitespace-nowrap">
+                        <span className="px-2 py-0.5 bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-400 text-[0.625rem] rounded-[4px] uppercase tracking-wider font-extrabold whitespace-nowrap">
                             {t('subscriptions:save')} 17%
                         </span>
                     </div>
@@ -234,7 +234,7 @@ const SubscriptionSettings = () => {
                                     )}>
                                         <Shield size={24} className={isMax ? "text-white" : (isPro ? "text-orange-500" : "text-primary")} />
                                     </div>
-                                    <h3 className="text-3xl font-black tracking-tight">{planName}</h3>
+                                    <h3 className="text-3xl font-extrabold tracking-tight">{planName}</h3>
                                     <p className={clsx("text-sm font-medium leading-relaxed opacity-80", isMax ? "text-slate-300" : "text-slate-500")}>
                                         {planDesc}
                                     </p>
@@ -242,7 +242,7 @@ const SubscriptionSettings = () => {
 
                                 <div className="mb-10">
                                     <div className="flex items-baseline gap-2">
-                                        <span className="text-5xl font-black tracking-tighter">
+                                        <span className="text-5xl font-extrabold tracking-tight">
                                             {billingCycle === 'yearly' ? (plan.pricing.yearly / 12).toFixed(2).replace(/\.00$/, '') : plan.pricing.monthly}
                                         </span>
                                         <span className={clsx("text-sm font-bold opacity-70", isMax ? "text-slate-400" : "text-slate-500 uppercase")}>
@@ -250,12 +250,12 @@ const SubscriptionSettings = () => {
                                         </span>
                                     </div>
                                     {billingCycle === 'yearly' && plan.pricing.monthly > 0 && (
-                                        <p className="text-[11px] font-black uppercase tracking-widest mt-2 opacity-60">{t('subscriptions:billedAnnually')}</p>
+                                        <p className="text-[0.6875rem] font-extrabold uppercase tracking-widest mt-2 opacity-60">{t('subscriptions:billedAnnually')}</p>
                                     )}
                                 </div>
 
                                 {plan.id === 'free' && !isCurrentPlan ? (
-                                    <div className="w-full h-[60px] rounded-[4px] font-black uppercase tracking-[0.15em] text-xs flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 mb-12">
+                                    <div className="w-full h-[60px] rounded-[4px] font-extrabold uppercase tracking-[0.15em] text-xs flex items-center justify-center border-2 border-dashed border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 mb-12">
                                         {t('subscriptions:defaultPlan')}
                                     </div>
                                 ) : (
@@ -263,7 +263,7 @@ const SubscriptionSettings = () => {
                                         onClick={() => handleSubscribe(plan.id)}
                                         disabled={processingId === plan.id || processingId === 'cancel' || (isCurrentPlan && usage?.cancelAtPeriodEnd) || (isCurrentPlan && plan.id === 'free')}
                                         className={clsx(
-                                            "w-full h-[60px] rounded-[4px] font-black uppercase tracking-[0.15em] text-xs transition-all duration-300 flex items-center justify-center gap-2 mb-12",
+                                            "w-full h-[60px] rounded-[4px] font-extrabold uppercase tracking-[0.15em] text-xs transition-all duration-300 flex items-center justify-center gap-2 mb-12",
                                             isCurrentPlan && plan.id !== 'free' && usage?.cancelAtPeriodEnd ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-2 border-slate-200 dark:border-slate-700 cursor-default" :
                                                 isCurrentPlan && plan.id !== 'free' ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 shadow-xl shadow-red-500/5" :
                                                     isCurrentPlan && plan.id === 'free' ? "bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500/20 cursor-default" :
@@ -294,7 +294,7 @@ const SubscriptionSettings = () => {
 
                                 <div className="space-y-6 flex-1">
                                     <div className={clsx(
-                                        "text-[10px] font-black uppercase tracking-[0.2em] mb-4 opacity-40",
+                                        "text-[0.625rem] font-extrabold uppercase tracking-[0.2em] mb-4 opacity-40",
                                         isMax ? "text-slate-400" : "text-slate-500"
                                     )}>
                                         {isPro ? t('subscriptions:everythingIn', { name: t('subscriptions:plans.free.name') }) : isMax ? t('subscriptions:everythingIn', { name: t('subscriptions:plans.pro.name') }) : t('subscriptions:includes')}
@@ -342,24 +342,24 @@ const SubscriptionSettings = () => {
                                     )}>
                                         <div className="grid grid-cols-2 gap-y-4">
                                             <div className="space-y-1">
-                                                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:branches')}</div>
-                                                <div className="text-sm font-black">{plan.limits.branches === -1 ? t('subscriptions:unlimited') : plan.limits.branches}</div>
+                                                <div className="text-[9px] font-extrabold uppercase tracking-widest opacity-40">{t('subscriptions:branches')}</div>
+                                                <div className="text-sm font-extrabold">{plan.limits.branches === -1 ? t('subscriptions:unlimited') : plan.limits.branches}</div>
                                             </div>
                                             <div className="space-y-1 text-right">
-                                                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:products')}</div>
-                                                <div className="text-sm font-black">{plan.limits.products === -1 ? t('subscriptions:unlimited') : plan.limits.products}</div>
+                                                <div className="text-[9px] font-extrabold uppercase tracking-widest opacity-40">{t('subscriptions:products')}</div>
+                                                <div className="text-sm font-extrabold">{plan.limits.products === -1 ? t('subscriptions:unlimited') : plan.limits.products}</div>
                                             </div>
                                             <div className="space-y-1">
-                                                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:orders')}</div>
-                                                <div className="text-sm font-black">{plan.limits.orders_per_month === -1 ? t('subscriptions:unlimited') : plan.limits.orders_per_month}</div>
+                                                <div className="text-[9px] font-extrabold uppercase tracking-widest opacity-40">{t('subscriptions:orders')}</div>
+                                                <div className="text-sm font-extrabold">{plan.limits.orders_per_month === -1 ? t('subscriptions:unlimited') : plan.limits.orders_per_month}</div>
                                             </div>
                                             <div className="space-y-1 text-right">
-                                                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:drivers')}</div>
-                                                <div className="text-sm font-black">{plan.limits.drivers === -1 ? t('subscriptions:unlimited') : plan.limits.drivers}</div>
+                                                <div className="text-[9px] font-extrabold uppercase tracking-widest opacity-40">{t('subscriptions:drivers')}</div>
+                                                <div className="text-sm font-extrabold">{plan.limits.drivers === -1 ? t('subscriptions:unlimited') : plan.limits.drivers}</div>
                                             </div>
                                             <div className="space-y-1">
-                                                <div className="text-[9px] font-black uppercase tracking-widest opacity-40">{t('subscriptions:categories')}</div>
-                                                <div className="text-sm font-black">{plan.limits.categories === -1 ? t('subscriptions:unlimited') : plan.limits.categories}</div>
+                                                <div className="text-[9px] font-extrabold uppercase tracking-widest opacity-40">{t('subscriptions:categories')}</div>
+                                                <div className="text-sm font-extrabold">{plan.limits.categories === -1 ? t('subscriptions:unlimited') : plan.limits.categories}</div>
                                             </div>
                                         </div>
                                     </div>
@@ -372,7 +372,7 @@ const SubscriptionSettings = () => {
                         <div className="p-4 bg-slate-100 dark:bg-slate-800 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 text-slate-400">
                             <Zap size={32} />
                         </div>
-                        <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2">{t('subscriptions:noPlans')}</h3>
+                        <h3 className="text-xl font-extrabold text-slate-900 dark:text-white mb-2">{t('subscriptions:noPlans')}</h3>
                         <p className="text-slate-500 font-medium">{t('subscriptions:noPlansDesc')}</p>
                     </div>
                 )}

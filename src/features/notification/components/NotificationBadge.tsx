@@ -32,7 +32,7 @@ export const NotificationBadge = () => {
             </button>
 
             {isAudioBlocked && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 text-white text-[10px] p-2 rounded shadow-lg z-50 pointer-events-none animate-bounce">
+                <div className="absolute top-full right-0 mt-2 w-48 bg-gray-800 text-white text-[0.625rem] p-2 rounded shadow-lg z-50 pointer-events-none animate-bounce">
                     🔔 Click bell to enable sounds
                     <div className="absolute top-0 right-4 -mt-1 w-2 h-2 bg-gray-800 transform rotate-45"></div>
                 </div>

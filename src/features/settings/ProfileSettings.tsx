@@ -149,7 +149,7 @@ const ProfileSettings = () => {
                     <User size={32} className="text-primary" />
                 </div>
                 <div>
-                    <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                    <h2 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                         {activeTab === 'profile' ? t('common:accountSettings') : t('common:updatePassword')}
                     </h2>
                     <p className="text-slate-500 font-medium">
@@ -166,7 +166,7 @@ const ProfileSettings = () => {
                 <section className="max-w-4xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                         <User size={20} className="text-primary" />
-                        <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:personalInformation')}</h3>
+                        <h3 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:personalInformation')}</h3>
                     </div>
 
                     <form onSubmit={handleProfileSubmit} className="p-8 space-y-8">
@@ -204,7 +204,7 @@ const ProfileSettings = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <User size={14} /> {t('common:fullName')}
                                 </label>
                                 <input
@@ -218,7 +218,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <User size={14} /> {t('common:username')}
                                 </label>
                                 <input
@@ -232,7 +232,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <Mail size={14} /> {t('common:email')}
                                 </label>
                                 <input
@@ -244,7 +244,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <Phone size={14} /> {t('common:phone')}
                                 </label>
                                 <input
@@ -261,7 +261,7 @@ const ProfileSettings = () => {
                             <button
                                 type="submit"
                                 disabled={savingProfile}
-                                className="flex items-center gap-3 px-8 py-4 bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-1 transition-all disabled:opacity-50"
+                                className="flex items-center gap-3 px-8 py-4 bg-primary text-white font-extrabold uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20  transition-all disabled:opacity-50"
                             >
                                 {savingProfile ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                 {t('common:save')}
@@ -276,12 +276,12 @@ const ProfileSettings = () => {
                 <section className="max-w-4xl mx-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
                     <div className="p-6 border-b border-slate-100 dark:border-slate-800 flex items-center gap-3">
                         <Lock size={20} className="text-primary" />
-                        <h3 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:updatePassword')}</h3>
+                        <h3 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-widest text-sm">{t('common:updatePassword')}</h3>
                     </div>
 
                     <form onSubmit={handlePasswordSubmit} className="p-8 space-y-6">
                         <div className="space-y-2">
-                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                            <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                 <Lock size={14} /> {t('common:oldPassword')}
                             </label>
                             <div className="relative">
@@ -304,7 +304,7 @@ const ProfileSettings = () => {
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <Lock size={14} /> {t('common:newPassword')}
                                 </label>
                                 <div className="relative">
@@ -327,7 +327,7 @@ const ProfileSettings = () => {
                             </div>
 
                             <div className="space-y-2">
-                                <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                     <Lock size={14} /> {t('common:confirmPassword')}
                                 </label>
                                 <div className="relative">
@@ -354,7 +354,7 @@ const ProfileSettings = () => {
                             <button
                                 type="submit"
                                 disabled={savingPassword}
-                                className="flex items-center gap-3 px-8 py-4 bg-slate-900 dark:bg-primary text-white font-black uppercase tracking-widest text-xs rounded-none shadow-lg hover:-translate-y-1 transition-all disabled:opacity-50"
+                                className="flex items-center gap-3 px-8 py-4 bg-slate-900 dark:bg-primary text-white font-extrabold uppercase tracking-widest text-xs rounded-none shadow-lg  transition-all disabled:opacity-50"
                             >
                                 {savingPassword ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
                                 {t('common:updatePassword')}

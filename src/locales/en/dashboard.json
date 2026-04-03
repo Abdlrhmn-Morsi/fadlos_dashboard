@@ -1,5 +1,8 @@
 {
     "title": "Dashboard Overview",
+    "needsAttention": "Needs Attention",
+    "platformAnalytics": "Platform Analytics",
+    "systemMetadata": "System Infrastructure Metrics",
     "platformOverview": "Platform Overview",
     "orderSummary": "Order Summary",
     "pendingOrders": "Pending Orders",

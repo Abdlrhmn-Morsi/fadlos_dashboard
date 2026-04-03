@@ -237,7 +237,7 @@ const RoleForm = () => {
                                     const isSomeSelected = groupKeys.some(k => formData.permissions.includes(k));
 
                                     return (
-                                        <div key={group.category} className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-shadow">
+                                        <div key={group.category} className="border border-slate-200 dark:border-slate-700 rounded-2xl overflow-hidden shadow-sm  transition-shadow">
                                             <div
                                                 className="bg-slate-50 dark:bg-slate-800/80 px-6 py-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between cursor-pointer hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                                                 onClick={() => toggleGroup(groupKeys)}

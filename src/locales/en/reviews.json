@@ -42,6 +42,7 @@
     "reportedReviews": "Reported Reviews",
     "reportedReviewsSubtitle": "Platform-wide moderation of flagged content",
     "noReportedReviews": "No reported reviews to moderate",
+    "manageReportedContent": "Manage and moderate reported content",
     "inactive": "Inactive",
     "activate": "Activate",
     "reviewActivatedSuccessfully": "Review activated successfully",

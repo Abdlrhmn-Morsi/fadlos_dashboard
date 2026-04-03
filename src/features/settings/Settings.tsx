@@ -77,7 +77,7 @@ const Settings = () => {
                         <SettingsIcon size={32} className="text-primary animate-spin-slow" />
                     </div>
                     <div>
-                        <h2 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">
+                        <h2 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">
                             {t('settings')}
                         </h2>
                         <p className="text-slate-500 font-medium">
@@ -102,7 +102,7 @@ const Settings = () => {
                             <item.icon className={`${item.color} w-8 h-8`} />
                         </div>
 
-                        <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 uppercase tracking-tight mb-2 group-hover:text-primary transition-colors">
+                        <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-tight mb-2 group-hover:text-primary transition-colors">
                             {item.title}
                         </h3>
 
@@ -121,7 +121,7 @@ const Settings = () => {
             {/* Visual Guide / Illustration section (Optional) */}
             <div className="mt-20 p-12 bg-slate-100 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col md:flex-row items-center gap-12">
                 <div className="flex-1">
-                    <h4 className="text-3xl font-black text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
+                    <h4 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 mb-4 tracking-tight">
                         {t('needHelpTitle', { defaultValue: 'System Configuration' })}
                     </h4>
                     <p className="text-slate-500 font-medium mb-6">

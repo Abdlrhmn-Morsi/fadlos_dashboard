@@ -138,7 +138,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                             {fetchingCredits ? (
                                 <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
                             ) : (
-                                <p className="text-sm font-black text-slate-900 dark:text-white">
+                                <p className="text-sm font-extrabold text-slate-900 dark:text-white">
                                     {t('promotions.count', {
                                         used: credits?.used ?? 0,
                                         total: credits?.total === -1 ? '∞' : credits?.total || 0
@@ -150,12 +150,12 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
 
                     {isAtLimit && (
                         <div className="text-end">
-                            <p className="text-[10px] font-bold text-rose-500 uppercase tracking-tighter">
+                            <p className="text-[0.625rem] font-bold text-rose-500 uppercase tracking-tight">
                                 {t('promotions.noCredits')}
                             </p>
                             <button
                                 onClick={() => { onClose(); /* navigate to sub */ }}
-                                className="text-[10px] font-black text-rose-600 underline uppercase mt-0.5"
+                                className="text-[0.625rem] font-extrabold text-rose-600 underline uppercase mt-0.5"
                             >
                                 {t('promotions.upgrade')}
                             </button>
@@ -166,7 +166,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                 {/* Promotional Images Section */}
                 <div className="bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden">
                     <div className="p-4 border-b border-slate-50 dark:border-slate-800 bg-slate-50/30 dark:bg-slate-800/20">
-                        <h2 className="text-xs font-black text-slate-500 uppercase tracking-widest">
+                        <h2 className="text-xs font-extrabold text-slate-500 uppercase tracking-widest">
                             {t('promotions.promoImages', 'Promotional Images')}
                         </h2>
                     </div>
@@ -181,10 +181,10 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                                 />
                             </div>
                             <div>
-                                <h3 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                <h3 className="text-[13px] font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                     {t('promotions.largeIcon', 'Large Icon')}
                                 </h3>
-                                <p className="text-[10px] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
+                                <p className="text-[0.625rem] font-bold text-emerald-500 uppercase tracking-widest mt-0.5">
                                     {t('promotions.logoHint', 'Your store logo is used automatically')}
                                 </p>
                             </div>
@@ -194,10 +194,10 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                         <div className="space-y-3 pt-4 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <h3 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                    <h3 className="text-[13px] font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                         {t('promotions.coverImage', 'Cover Image (Big Picture)')}
                                     </h3>
-                                    <p className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">
+                                    <p className="text-[0.625rem] text-slate-400 font-bold uppercase tracking-wider">
                                         {t('promotions.coverImageDesc', 'Shown when notification is expanded')}
                                     </p>
                                 </div>
@@ -233,7 +233,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                                     <div className="p-3 bg-slate-50 dark:bg-slate-900 rounded-xl shadow-sm group-hover:shadow group-hover:text-primary transition-all">
                                         <ImagePlus size={24} className="text-slate-400 group-hover:text-primary transition-colors" />
                                     </div>
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">
+                                    <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">
                                         {t('promotions.addCoverImage', 'Choose Cover Image')}
                                     </span>
                                 </button>
@@ -259,7 +259,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
 
                 {/* Title Input (Arabic) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.titleAr', 'Title (Arabic)')}
                     </label>
                     <div className="relative">
@@ -277,7 +277,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
 
                 {/* Title Input (English) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.titleEn', 'Title (English)')}
                     </label>
                     <div className="relative">
@@ -296,7 +296,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
 
                 {/* Message Input (Arabic) */}
                 <div className="space-y-2 text-right">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.messageAr')}
                     </label>
                     <div className="relative">
@@ -310,7 +310,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                             className="w-full bg-slate-50 dark:bg-slate-900 border-2 border-slate-100 dark:border-slate-800 rounded-xl p-4 text-sm focus:border-primary focus:ring-0 transition-all resize-none disabled:opacity-50"
                         />
                         <div className={clsx(
-                            "absolute bottom-3 end-3 text-[10px] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
+                            "absolute bottom-3 end-3 text-[0.625rem] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
                             messageAr.length >= 180 ? "text-rose-500 border-rose-100" : "text-slate-400 border-slate-100"
                         )}>
                             {t('promotions.characterLimit', { count: messageAr.length })}
@@ -320,7 +320,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
 
                 {/* Message Input (English) */}
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-slate-500 uppercase tracking-widest px-1">
+                    <label className="text-xs font-extrabold text-slate-500 uppercase tracking-widest px-1">
                         {t('promotions.messageEn')}
                     </label>
                     <div className="relative">
@@ -334,7 +334,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                             dir="ltr"
                         />
                         <div className={clsx(
-                            "absolute bottom-3 end-3 text-[10px] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
+                            "absolute bottom-3 end-3 text-[0.625rem] font-bold px-2 py-1 rounded bg-white dark:bg-slate-800 border shadow-sm",
                             message.length >= 180 ? "text-rose-500 border-rose-100" : "text-slate-400 border-slate-100"
                         )}>
                             {t('promotions.characterLimit', { count: message.length })}
@@ -349,7 +349,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                     <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
                         {t('promotions.target')}: <span className="font-bold text-slate-900 dark:text-white uppercase">{t(`promotions.${targetType}`)}</span>
                         {(targetType === PromotionTargetType.INDIVIDUAL_CLIENTS || targetType === PromotionTargetType.INDIVIDUAL_FOLLOWERS) && (
-                            <span className="ms-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-black">
+                            <span className="ms-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary font-extrabold">
                                 {initialTargetIds.length}
                             </span>
                         )}
@@ -361,7 +361,7 @@ export const PromotionAdModal: React.FC<PromotionAdModalProps> = ({
                     onClick={handleSend}
                     disabled={loading || !message || isAtLimit}
                     className={clsx(
-                        "w-full py-4 rounded-xl text-xs font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:translate-y-0",
+                        "w-full py-4 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all flex items-center justify-center gap-2 shadow-lg hover:-translate-y-0.5 active:translate-y-0 disabled:translate-y-0",
                         isAtLimit || !message
                             ? "bg-slate-100 text-slate-400 shadow-none cursor-not-allowed"
                             : "bg-primary text-white hover:bg-primary/90"

@@ -10,15 +10,19 @@ export default {
         extend: {
             colors: {
                 primary: {
-                    DEFAULT: '#0bc16a',
-                    hover: '#09a057',
-                    light: '#daf5e8',
+                    DEFAULT: '#d97757',
+                    hover: '#c86342',
+                    light: '#fadece',
                 },
                 secondary: {
-                    DEFAULT: '#22A699',
-                    hover: '#1B8E82',
-                    light: '#E0F2F1',
+                    DEFAULT: '#8b6f63',
+                    hover: '#70564b',
+                    light: '#f2eae5',
                 },
+            },
+            fontFamily: {
+                sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
+                arabic: ['"Cairo"', '"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
             },
             borderRadius: {
                 '3xl': '0px',

@@ -424,7 +424,7 @@ const PromoCodeForm = () => {
                                             required
                                         />
                                         <div className={clsx(
-                                            "absolute bottom-2 text-[10px] font-medium transition-colors",
+                                            "absolute bottom-2 text-[0.625rem] font-medium transition-colors",
                                             isRTL ? "left-3" : "right-3",
                                             formData.descriptionAr.length >= 250 ? "text-rose-500" : "text-slate-400"
                                         )}>
@@ -450,7 +450,7 @@ const PromoCodeForm = () => {
                                             dir="ltr"
                                         />
                                         <div className={clsx(
-                                            "absolute bottom-2 text-[10px] font-medium transition-colors",
+                                            "absolute bottom-2 text-[0.625rem] font-medium transition-colors",
                                             isRTL ? "left-3" : "right-3",
                                             formData.description.length >= 250 ? "text-rose-500" : "text-slate-400"
                                         )}>
@@ -552,7 +552,7 @@ const PromoCodeForm = () => {
                                 <div className="flex items-center justify-between">
                                     <div className="flex flex-col">
                                         <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('autoApply')}</label>
-                                        <p className="text-[10px] text-slate-400 max-w-[120px]">{t('autoApplySubtitle')}</p>
+                                        <p className="text-[0.625rem] text-slate-400 max-w-[120px]">{t('autoApplySubtitle')}</p>
                                     </div>
                                     <label className="relative inline-flex items-center cursor-pointer">
                                         <input
@@ -682,7 +682,7 @@ const PromoCodeForm = () => {
                                                 <p className="text-xs text-slate-500 truncate">{item.subtitle}</p>
 
                                                 {item.stats && (
-                                                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
+                                                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[0.625rem]">
                                                         <span className="flex items-center gap-1 text-slate-500">
                                                             <span className="font-medium text-slate-700 dark:text-slate-300">{t('totalOrders')}:</span>
                                                             {item.stats.totalOrders}

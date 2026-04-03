@@ -411,12 +411,12 @@ const StoreSettings = () => {
                     <XCircle size={64} strokeWidth={1.5} />
                 </div>
                 <div className="text-center px-4">
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-slate-100">{t('common:accessDenied')}</h2>
+                    <h2 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{t('common:accessDenied')}</h2>
                     <p className="text-slate-500 font-medium mt-2">{t('common:noPermissionViewStore')}</p>
                 </div>
                 <button
                     onClick={() => navigate(-1)}
-                    className="px-8 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded font-bold uppercase tracking-widest text-[10px]"
+                    className="px-8 py-3 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded font-bold uppercase tracking-widest text-[0.625rem]"
                 >
                     {t('common:goBack')}
                 </button>
@@ -470,10 +470,10 @@ const StoreSettings = () => {
                                 <Store size={26} className="text-white" />
                             </div>
                             <div>
-                                <h1 className="text-xl sm:text-2xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">
+                                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-none">
                                     {t('common:settings')}
                                 </h1>
-                                <p className="text-slate-500 text-[10px] sm:text-xs font-bold uppercase tracking-widest mt-2 opacity-70 italic">
+                                <p className="text-slate-500 text-[0.625rem] sm:text-xs font-bold uppercase tracking-widest mt-2 opacity-70 italic">
                                     {t('updateStoreSettings')}
                                 </p>
                             </div>
@@ -484,7 +484,7 @@ const StoreSettings = () => {
                                 <button
                                     type="submit"
                                     disabled={saving}
-                                    className="flex items-center justify-center gap-3 px-8 py-3.5 bg-primary text-white font-black uppercase tracking-widest text-[11px] rounded shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all disabled:opacity-50 group"
+                                    className="flex items-center justify-center gap-3 px-8 py-3.5 bg-primary text-white font-extrabold uppercase tracking-widest text-[0.6875rem] rounded shadow-xl shadow-primary/25 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all disabled:opacity-50 group"
                                 >
                                     {saving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} className="group-hover:rotate-12 transition-transform" />}
                                     {t('common:save')}
@@ -499,7 +499,7 @@ const StoreSettings = () => {
                     <aside className="w-full lg:w-80 shrink-0 lg:sticky lg:top-36 self-start">
                         <div className="bg-white dark:bg-slate-900 lg:rounded-2xl border-y lg:border border-slate-200/60 dark:border-slate-800/60 shadow-xl shadow-slate-200/10 dark:shadow-none overflow-hidden">
                             <div className="hidden lg:block p-6 border-b border-slate-100 dark:border-slate-800/50 bg-slate-50/50 dark:bg-slate-800/20">
-                                <h2 className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">{t('menu', 'Navigation')}</h2>
+                                <h2 className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-[0.2em]">{t('menu', 'Navigation')}</h2>
                             </div>
                             <nav className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible no-scrollbar p-2 lg:p-3 gap-1">
                                 {TABS.map(tab => (
@@ -517,7 +517,7 @@ const StoreSettings = () => {
                                         <tab.icon size={20} className={clsx("shrink-0 transition-transform", activeTab === tab.id ? "scale-110" : "grayscale opacity-70")} />
                                         <div className="hidden lg:block text-start">
                                             <div className="text-sm leading-none">{tab.label}</div>
-                                            <div className="text-[10px] font-medium opacity-50 mt-1 lines-1">{tab.desc}</div>
+                                            <div className="text-[0.625rem] font-medium opacity-50 mt-1 lines-1">{tab.desc}</div>
                                         </div>
                                         {activeTab === tab.id && (
                                             <div className="lg:hidden absolute bottom-0 inset-x-5 h-0.5 bg-primary rounded-t-full" />
@@ -543,13 +543,13 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <ImageIcon size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('visualIdentity')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('visualIdentity')}</h3>
                                     </div>
 
                                     <div className="p-8 space-y-8">
                                         {/* Banner */}
                                         <div className="relative group">
-                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ps-1">{t('banner')}</label>
+                                            <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-4 ps-1">{t('banner')}</label>
                                             <div
                                                 className={clsx(
                                                     "w-full h-64 bg-slate-100 dark:bg-slate-800 rounded overflow-hidden relative shadow-inner",
@@ -570,7 +570,7 @@ const StoreSettings = () => {
                                                             <div className="p-3 bg-white/20 rounded-full border border-white/30">
                                                                 <Camera className="text-white" size={24} />
                                                             </div>
-                                                            <span className="text-white font-black text-xs uppercase tracking-widest">{t('changeBanner')}</span>
+                                                            <span className="text-white font-extrabold text-xs uppercase tracking-widest">{t('changeBanner')}</span>
                                                         </div>
                                                     </div>
                                                 )}
@@ -581,7 +581,7 @@ const StoreSettings = () => {
                                         {/* Logo */}
                                         <div className="flex flex-col md:flex-row items-start gap-10">
                                             <div className="relative group/logo">
-                                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4 ps-1">{t('logo')}</label>
+                                                <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-4 ps-1">{t('logo')}</label>
                                                 <div
                                                     className={clsx(
                                                         "w-32 h-32 rounded-3xl overflow-hidden border-4 border-white dark:border-slate-800 shadow-xl relative",
@@ -606,7 +606,7 @@ const StoreSettings = () => {
                                             </div>
 
                                             <div className="flex-1 space-y-4 pt-10">
-                                                <h4 className="font-black text-slate-800 dark:text-slate-200 text-lg">{t('brandAesthetics')}</h4>
+                                                <h4 className="font-extrabold text-slate-800 dark:text-slate-200 text-lg">{t('brandAesthetics')}</h4>
                                                 <p className="text-slate-500 text-sm leading-relaxed max-w-xl">
                                                     {t('brandAestheticsDesc')}
                                                 </p>
@@ -625,12 +625,12 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <Store size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('primaryInformation')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('primaryInformation')}</h3>
                                     </div>
 
                                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                 <Store size={14} /> {t('storeNameAr')}
                                             </label>
                                             <input
@@ -646,7 +646,7 @@ const StoreSettings = () => {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                 <Store size={14} /> {t('storeNameEn')}
                                             </label>
                                             <input
@@ -668,12 +668,12 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <Languages size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('common:description')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('common:description')}</h3>
                                     </div>
 
                                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="md:col-span-2 space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ps-1">
                                                 {t('descriptionAr')}
                                             </label>
                                             <textarea
@@ -688,7 +688,7 @@ const StoreSettings = () => {
                                         </div>
 
                                         <div className="md:col-span-2 space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ps-1">
                                                 {t('descriptionEn')}
                                             </label>
                                             <textarea
@@ -709,17 +709,17 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <Briefcase size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('common:businessTypes')} & {t('common:businessCategories')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('common:businessTypes')} & {t('common:businessCategories')}</h3>
                                     </div>
 
                                     <div className="p-8 space-y-12">
                                         {/* Redesigned Business Types Selection */}
                                         <div className="space-y-6">
                                             <div className="flex flex-col gap-1">
-                                                <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                                                     <Layout size={14} className="text-primary" /> {t('common:businessTypes')}
                                                 </label>
-                                                <p className="text-[10px] text-slate-500 font-medium">{t('selectType', 'Select your primary business model')}</p>
+                                                <p className="text-[0.625rem] text-slate-500 font-medium">{t('selectType', 'Select your primary business model')}</p>
                                             </div>
 
                                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -746,7 +746,7 @@ const StoreSettings = () => {
                                                             </div>
                                                             <div className="space-y-1">
                                                                 <h4 className={clsx(
-                                                                    "font-black text-sm transition-colors",
+                                                                    "font-extrabold text-sm transition-colors",
                                                                     formData.businessTypeId === type.id ? "text-primary dark:text-white" : "text-slate-700 dark:text-slate-300"
                                                                 )}>
                                                                     {localStorage.getItem('i18nextLng') === 'ar' ? type.ar_name : type.en_name}
@@ -766,10 +766,10 @@ const StoreSettings = () => {
                                         {/* Redesigned Business Categories Selection */}
                                         <div className="space-y-6">
                                             <div className="flex flex-col gap-1 border-t border-slate-100 dark:border-slate-800/50 pt-8">
-                                                <label className="text-xs font-black text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
+                                                <label className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.2em] flex items-center gap-2">
                                                     <Plus size={14} className="text-secondary" /> {t('common:businessCategories')}
                                                 </label>
-                                                <p className="text-[10px] text-slate-500 font-medium">{t('selectCategoriesDesc')}</p>
+                                                <p className="text-[0.625rem] text-slate-500 font-medium">{t('selectCategoriesDesc')}</p>
                                             </div>
 
                                             {loadingCategories ? (
@@ -778,7 +778,7 @@ const StoreSettings = () => {
                                                         <div className="absolute inset-0 border-4 border-primary/20 rounded-full"></div>
                                                         <div className="absolute inset-0 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                                                     </div>
-                                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest animate-pulse">{t('common:loading')}</span>
+                                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest animate-pulse">{t('common:loading')}</span>
                                                 </div>
                                             ) : availableCategories.length > 0 ? (
                                                 <div className="flex flex-wrap gap-3 animate-fadeIn">
@@ -812,12 +812,12 @@ const StoreSettings = () => {
                                             ) : formData.businessTypeId ? (
                                                 <div className="flex flex-col items-center justify-center py-12 px-6 bg-slate-50 dark:bg-slate-800/20 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                                                     <XCircle size={32} className="text-slate-300 mb-2" />
-                                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('common:noResults')}</span>
+                                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t('common:noResults')}</span>
                                                 </div>
                                             ) : (
                                                 <div className="flex flex-col items-center justify-center py-12 px-6 bg-slate-50 dark:bg-slate-800/20 rounded-2xl border-2 border-dashed border-slate-200 dark:border-slate-800">
                                                     <Layout size={32} className="text-slate-300 mb-2" />
-                                                    <span className="text-xs font-black text-slate-400 uppercase tracking-widest">{t('selectTypeFirst')}</span>
+                                                    <span className="text-xs font-extrabold text-slate-400 uppercase tracking-widest">{t('selectTypeFirst')}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -834,12 +834,12 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <Phone size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('contactSupport')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('contactSupport')}</h3>
                                     </div>
 
                                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                 <Phone size={14} /> {t('common:phone')}
                                             </label>
                                             <input
@@ -853,7 +853,7 @@ const StoreSettings = () => {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                 <AtSign size={14} /> {t('common:email')}
                                             </label>
                                             <input
@@ -867,7 +867,7 @@ const StoreSettings = () => {
                                         </div>
 
                                         <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                 <Phone size={14} /> {t('whatsapp')}
                                             </label>
                                             <input
@@ -890,14 +890,14 @@ const StoreSettings = () => {
                                             <div className="p-2.5 bg-primary/10 rounded-lg">
                                                 <Globe size={24} className="text-primary" />
                                             </div>
-                                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('socialMedia')}</h3>
+                                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('socialMedia')}</h3>
                                         </div>
 
                                         {!isReadOnly && (
                                             <div className="relative group/social-add">
                                                 <button
                                                     type="button"
-                                                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-slate-800 text-white text-[10px] font-black uppercase tracking-widest rounded hover:bg-primary transition-colors"
+                                                    className="flex items-center gap-2 px-4 py-2 bg-slate-900 dark:bg-slate-800 text-white text-[0.625rem] font-extrabold uppercase tracking-widest rounded hover:bg-primary transition-colors"
                                                 >
                                                     <Plus size={14} />
                                                     {t('addPlatform')}
@@ -971,7 +971,7 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <Clock size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('operatingHours')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('operatingHours')}</h3>
                                     </div>
 
                                     <div className="p-8 space-y-8">
@@ -993,7 +993,7 @@ const StoreSettings = () => {
                                         {!formData.is24Hours && (
                                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fadeIn">
                                                 <div className="space-y-2">
-                                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                    <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                                         <Clock size={14} /> {t('openingTime')}
                                                     </label>
                                                     <input
@@ -1006,7 +1006,7 @@ const StoreSettings = () => {
                                                     />
                                                 </div>
                                                 <div className="space-y-2">
-                                                    <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                                    <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                                         <Clock size={14} /> {t('closingTime')}
                                                     </label>
                                                     <input
@@ -1024,7 +1024,7 @@ const StoreSettings = () => {
                                         <hr className="border-slate-100 dark:border-slate-800" />
 
                                         <div className="space-y-4">
-                                            <label className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                            <label className="text-xs font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                                 <Calendar size={14} /> {t('workingDays')}
                                             </label>
                                             <div className="flex flex-wrap gap-3">
@@ -1056,12 +1056,12 @@ const StoreSettings = () => {
                                             <div className="p-2.5 bg-primary/10 rounded-lg">
                                                 <CheckCircle size={24} className="text-primary" />
                                             </div>
-                                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('orderAcceptance')}</h3>
+                                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('orderAcceptance')}</h3>
                                         </div>
 
                                         <div className="flex items-center gap-3">
                                             <span className={clsx(
-                                                "text-[10px] font-bold uppercase tracking-tight",
+                                                "text-[0.625rem] font-bold uppercase tracking-tight",
                                                 formData.isAcceptingOrders ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"
                                             )}>
                                                 {formData.isAcceptingOrders ? t('acceptingOrders') : t('notAcceptingOrders')}
@@ -1125,7 +1125,7 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <MessageSquare size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('reviewsAndFeedback')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('reviewsAndFeedback')}</h3>
                                     </div>
 
                                     <div className="p-8 space-y-6">
@@ -1173,12 +1173,12 @@ const StoreSettings = () => {
                                         <div className="p-2.5 bg-primary/10 rounded-lg">
                                             <Truck size={24} className="text-primary" />
                                         </div>
-                                        <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('deliverySettings')}</h3>
+                                        <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('deliverySettings')}</h3>
                                     </div>
 
                                     <div className="p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
                                         <div className="space-y-4">
-                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                 <Truck size={14} /> {t('maxOrdersPerDriver')}
                                             </label>
                                             <div className="relative">
@@ -1199,7 +1199,7 @@ const StoreSettings = () => {
                                             <div className="p-6 h-full bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded flex items-center justify-between transition-all">
                                                 <div className="space-y-1">
                                                     <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm">{t('isHiringDrivers')}</h4>
-                                                    <p className="text-slate-500 text-[10px] italic leading-relaxed pr-8">
+                                                    <p className="text-slate-500 text-[0.625rem] italic leading-relaxed pr-8">
                                                         {t('isHiringDriversDesc')}
                                                     </p>
                                                 </div>
@@ -1223,7 +1223,7 @@ const StoreSettings = () => {
                                                 <h4 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
                                                     <CreditCard size={14} className="text-secondary" /> {t('driverCommission')}
                                                 </h4>
-                                                <p className="text-slate-500 text-[10px] italic leading-relaxed max-w-2xl">
+                                                <p className="text-slate-500 text-[0.625rem] italic leading-relaxed max-w-2xl">
                                                     {t('driverCommissionDesc')}
                                                 </p>
                                             </div>
@@ -1254,7 +1254,7 @@ const StoreSettings = () => {
                                                                     e.preventDefault(); 
                                                                     navigate('/subscription'); 
                                                                 }}
-                                                                className="relative z-10 w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-black uppercase tracking-widest rounded-xl shadow-xl shadow-amber-500/20 transition-all hover:shadow-amber-500/40 hover:-translate-y-0.5 group"
+                                                                className="relative z-10 w-full mt-2 inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-xs font-extrabold uppercase tracking-widest rounded-xl shadow-xl shadow-amber-500/20 transition-all hover:shadow-amber-500/40 hover:-translate-y-0.5 group"
                                                             >
                                                                 <Zap size={15} className="fill-current group-hover:scale-110 transition-transform" />
                                                                 {t('subscriptions:upgradePlan', 'Upgrade Plan')}
@@ -1265,7 +1265,7 @@ const StoreSettings = () => {
 
                                                 <div className={clsx("p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8 relative z-0 transition-opacity duration-300", !canEditCommission && "opacity-30 select-none grayscale-[0.8] blur-[2px]")}>
                                                     <div className="space-y-4">
-                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                                        <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                             {t('commissionType')}
                                                         </label>
                                                         <select
@@ -1282,7 +1282,7 @@ const StoreSettings = () => {
                                                     </div>
 
                                                     <div className={clsx("space-y-4 transition-all duration-500", formData.driverCommissionType === 'none' ? "opacity-50 pointer-events-none grayscale" : "")}>
-                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
+                                                        <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2 ps-1">
                                                             {t('commissionValue')}
                                                         </label>
                                                         <div className="relative">
@@ -1302,7 +1302,7 @@ const StoreSettings = () => {
                                                                 className={`w-full py-4 pr-6 ${formData.driverCommissionType === 'percentage' ? 'pl-10' : 'px-6'} bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all font-bold text-slate-900 dark:text-slate-100 disabled:opacity-70 disabled:cursor-not-allowed`}
                                                             />
                                                         </div>
-                                                        <p className="text-[10px] text-slate-500 italic mt-2 ps-1">
+                                                        <p className="text-[0.625rem] text-slate-500 italic mt-2 ps-1">
                                                             {t('commissionExample')} (e.g., {t('deliveryFee')}: 20 → {t('driverGets')}: {
                                                                 formData.driverCommissionType === 'percentage' 
                                                                     ? (20 - (20 * (Number(formData.driverCommissionValue) || 0) / 100)).toFixed(2)
@@ -1326,12 +1326,12 @@ const StoreSettings = () => {
                                             <div className="p-2.5 bg-primary/10 rounded-lg">
                                                 <ShieldCheck size={24} className="text-primary" />
                                             </div>
-                                            <h3 className="font-black text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('storeVerification')}</h3>
+                                            <h3 className="font-extrabold text-slate-800 dark:text-slate-200 uppercase tracking-[0.15em] text-sm">{t('storeVerification')}</h3>
 
                                         </div>
                                         {verificationData && (
                                             <div className={clsx(
-                                                "px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border",
+                                                "px-4 py-1.5 rounded-full text-[0.625rem] font-extrabold uppercase tracking-widest border",
                                                 verificationData.status === StoreVerificationStatus.PENDING && "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-800",
                                                 verificationData.status === StoreVerificationStatus.APPROVED && "bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-800",
                                                 verificationData.status === StoreVerificationStatus.REJECTED && "bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-500/10 dark:text-rose-400 dark:border-rose-800"
@@ -1348,13 +1348,13 @@ const StoreSettings = () => {
                                                     <CheckCircle size={48} />
                                                 </div>
                                                 <div className="text-center">
-                                                    <h4 className="text-xl font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('storeVerifiedSuccessfully')}</h4>
+                                                    <h4 className="text-xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">{t('storeVerifiedSuccessfully')}</h4>
                                                     <p className="text-slate-500 text-sm mt-2 max-w-sm">{t('verificationApprovedMessage', 'Your store is now verified and has been granted the verified badge.')}</p>
                                                 </div>
                                                 <div className="bg-slate-50 dark:bg-slate-800/50 rounded-xl p-6 w-full max-w-md border border-slate-100 dark:border-slate-800">
                                                     <div className="flex justify-between items-center text-sm">
-                                                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[10px]">{t('crNumber')}</span>
-                                                        <span className="font-black text-slate-700 dark:text-slate-200">{verificationData.commercialRegisterNumber}</span>
+                                                        <span className="text-slate-400 font-bold uppercase tracking-widest text-[0.625rem]">{t('crNumber')}</span>
+                                                        <span className="font-extrabold text-slate-700 dark:text-slate-200">{verificationData.commercialRegisterNumber}</span>
                                                     </div>
                                                 </div>
                                             </div>
@@ -1368,7 +1368,7 @@ const StoreSettings = () => {
                                                     )}
                                                 </div>
                                                 <div className="text-center space-y-3">
-                                                    <h4 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight">
+                                                    <h4 className="text-2xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                                         {justSubmitted ? t('verificationSubmittedTitle') : t('verificationInReview')}
                                                     </h4>
                                                     <p className="text-slate-500 text-sm font-medium mt-2 max-w-sm mx-auto text-balance leading-relaxed">
@@ -1377,12 +1377,12 @@ const StoreSettings = () => {
                                                 </div>
                                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full mt-6">
                                                     <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/60 shadow-sm">
-                                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ps-1">{t('crNumber')}</label>
-                                                        <div className="font-black text-slate-800 dark:text-slate-200 text-lg tracking-tight">{verificationData.commercialRegisterNumber}</div>
+                                                        <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-2 ps-1">{t('crNumber')}</label>
+                                                        <div className="font-extrabold text-slate-800 dark:text-slate-200 text-lg tracking-tight">{verificationData.commercialRegisterNumber}</div>
                                                     </div>
                                                     {verificationData.commercialRegisterPhoto && (
                                                         <div className="bg-slate-50 dark:bg-slate-800/40 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/60 shadow-sm flex flex-col justify-center">
-                                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 ps-1">{t('submittedDocument')}</label>
+                                                            <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-2 ps-1">{t('submittedDocument')}</label>
                                                             <a href={verificationData.commercialRegisterPhoto} target="_blank" rel="noopener noreferrer" className="text-primary font-bold text-sm hover:underline flex items-center gap-2 group/doc">
                                                                 <ImageIcon size={18} className="group-hover:scale-110 transition-transform" /> {t('viewDocument')}
                                                             </a>
@@ -1398,7 +1398,7 @@ const StoreSettings = () => {
                                                            <AlertTriangle size={36} />
                                                        </div>
                                                        <div className="flex-1 text-center sm:text-start space-y-2">
-                                                           <h4 className="font-black text-rose-900 dark:text-rose-300 uppercase tracking-tight text-lg">{t('verificationRejected')}</h4>
+                                                           <h4 className="font-extrabold text-rose-900 dark:text-rose-300 uppercase tracking-tight text-lg">{t('verificationRejected')}</h4>
                                                            <div className="bg-white/60 dark:bg-black/20 p-4 rounded-xl border border-rose-100 dark:border-rose-900/30">
                                                                <p className="text-rose-700 dark:text-rose-400/90 text-sm font-bold leading-relaxed">
                                                                    {verificationData.rejectionReason || t('rejectionNoReason')}
@@ -1413,7 +1413,7 @@ const StoreSettings = () => {
                                                        <div className="p-1.5 bg-primary/10 rounded-lg">
                                                           <ShieldCheck size={18} className="text-primary" />
                                                        </div>
-                                                       <h4 className="font-black text-slate-900 dark:text-slate-100 uppercase tracking-[0.1em] text-sm">
+                                                       <h4 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-[0.1em] text-sm">
                                                           {verificationData?.status === StoreVerificationStatus.REJECTED ? t('resubmitHeader') : t('verificationSubmission')}
                                                        </h4>
                                                     </div>
@@ -1427,7 +1427,7 @@ const StoreSettings = () => {
                                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                                                     <div className="space-y-6">
                                                         <div className="space-y-4">
-                                                            <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1 flex items-center gap-2">
+                                                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ps-1 flex items-center gap-2">
                                                                 <Briefcase size={14} className="text-primary" /> {t('crNumberLabel', 'Commercial Register Number')}
                                                             </label>
                                                             <input
@@ -1445,19 +1445,19 @@ const StoreSettings = () => {
                                                                 type="button"
                                                                 onClick={() => handleSubmitVerification()}
                                                                 disabled={submittingVerification || !verificationForm.commercialRegisterNumber || (!verificationForm.commercialRegisterPhoto && !verificationData)}
-                                                                className="w-full flex items-center justify-center gap-4 px-8 py-5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-black uppercase tracking-widest text-xs rounded-xl shadow-2xl hover:bg-primary dark:hover:bg-primary-focus hover:text-white transition-all transform hover:-translate-y-1 active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
+                                                                className="w-full flex items-center justify-center gap-4 px-8 py-5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-extrabold uppercase tracking-widest text-xs rounded-xl shadow-2xl hover:bg-primary dark:hover:bg-primary-focus hover:text-white transition-all transform  active:scale-95 disabled:opacity-50 disabled:pointer-events-none group"
                                                             >
                                                                 {submittingVerification ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} className="group-hover:rotate-6 transition-transform" />}
                                                                 {verificationData ? t('reSubmitVerification') : t('submitForVerification')}
                                                             </button>
-                                                            <p className="text-slate-400 text-[10px] italic text-center font-medium leading-relaxed px-6">
+                                                            <p className="text-slate-400 text-[0.625rem] italic text-center font-medium leading-relaxed px-6">
                                                                 {t('verificationAcknowledge', 'By submitting, you certify that all information provided is accurate and legitimate.')}
                                                             </p>
                                                         </div>
                                                     </div>
 
                                                     <div className="space-y-4">
-                                                        <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1 flex items-center gap-2">
+                                                        <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ps-1 flex items-center gap-2">
                                                             <Camera size={14} className="text-secondary" /> {t('crPhotoLabel', 'Commercial Register Photo')}
                                                         </label>
                                                         <div
@@ -1473,7 +1473,7 @@ const StoreSettings = () => {
                                                                     <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-sm">
                                                                         <div className="flex flex-col items-center gap-2 text-white scale-90 group-hover:scale-100 transition-transform">
                                                                             <Camera size={24} />
-                                                                            <span className="font-black text-[10px] uppercase tracking-widest">{t('changeDocument')}</span>
+                                                                            <span className="font-extrabold text-[0.625rem] uppercase tracking-widest">{t('changeDocument')}</span>
                                                                         </div>
                                                                     </div>
                                                                 </>
@@ -1483,8 +1483,8 @@ const StoreSettings = () => {
                                                                         <ImageIcon size={48} strokeWidth={1} />
                                                                     </div>
                                                                     <div className="text-center space-y-1">
-                                                                        <span className="font-black text-xs uppercase tracking-widest text-slate-500 group-hover:text-primary">{t('uploadPhoto')}</span>
-                                                                        <p className="text-[10px] font-bold opacity-60">JPG, PNG or PDF (Max 10MB)</p>
+                                                                        <span className="font-extrabold text-xs uppercase tracking-widest text-slate-500 group-hover:text-primary">{t('uploadPhoto')}</span>
+                                                                        <p className="text-[0.625rem] font-bold opacity-60">JPG, PNG or PDF (Max 10MB)</p>
                                                                     </div>
                                                                 </div>
                                                             )}

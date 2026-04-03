@@ -114,7 +114,7 @@ const FollowerList = () => {
         <div className="p-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
                     <div className="flex items-center gap-2 mt-1">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                         <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">
@@ -142,7 +142,7 @@ const FollowerList = () => {
 
                     <div className="hidden md:flex items-center gap-2 p-2 px-3 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-sm">
                         <Users size={16} className="text-primary" />
-                        <span className="font-black text-[10px] uppercase tracking-tight text-slate-900 dark:text-white">{t('communityReach')}</span>
+                        <span className="font-extrabold text-[0.625rem] uppercase tracking-tight text-slate-900 dark:text-white">{t('communityReach')}</span>
                     </div>
 
                     {hasPermission(Permissions.PROMOTION_ADS_VIEW) && (
@@ -158,7 +158,7 @@ const FollowerList = () => {
                     {hasPermission(Permissions.PROMOTION_ADS_SEND) && (
                         <button
                             onClick={() => navigate('/send-promotion?source=followers')}
-                            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0"
+                            className="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-xl text-xs font-extrabold uppercase tracking-widest hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0"
                         >
                             <Megaphone size={16} />
                             <span className="hidden sm:inline">{t('subscriptions:promotions.send')}</span>
@@ -178,14 +178,14 @@ const FollowerList = () => {
                     {loading ? (
                         <div className="col-span-full flex flex-col items-center justify-center py-20 gap-4">
                             <Loader2 size={32} className="text-primary animate-spin" />
-                            <span className="text-xs font-black text-slate-400 uppercase tracking-[0.3em] font-mono">{t('common:loading')}</span>
+                            <span className="text-xs font-extrabold text-slate-400 uppercase tracking-[0.3em] font-mono">{t('common:loading')}</span>
                         </div>
                     ) : followers.length === 0 ? (
                         <div className="col-span-full py-24 text-center bg-slate-50 dark:bg-slate-900/50 rounded-[2.5rem] border-2 border-dashed border-slate-200 dark:border-slate-800">
                             <div className="w-20 h-20 bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/50 dark:shadow-none inline-flex items-center justify-center mb-6">
                                 <Users size={32} className="text-slate-200" />
                             </div>
-                            <h2 className="text-slate-900 dark:text-white font-black uppercase tracking-tighter text-xl mb-1">{t('evolveTitle')}</h2>
+                            <h2 className="text-slate-900 dark:text-white font-extrabold uppercase tracking-tight text-xl mb-1">{t('evolveTitle')}</h2>
                             <p className="text-slate-400 font-bold text-sm uppercase tracking-widest">{t('evolveSubtitle')}</p>
                         </div>
                     ) : (

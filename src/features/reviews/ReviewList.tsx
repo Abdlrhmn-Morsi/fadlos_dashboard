@@ -221,9 +221,9 @@ const ReviewList = () => {
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1">
                     <div className="flex items-center gap-3">
-                        <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter">{t('title')}</h1>
+                        <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">{t('title')}</h1>
                         {!loading && totalItems > 0 && (
-                            <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-black rounded-full border border-primary/20 animate-in zoom-in-50">
+                            <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-[0.625rem] font-extrabold rounded-full border border-primary/20 animate-in zoom-in-50">
                                 {totalItems}
                             </span>
                         )}
@@ -249,7 +249,7 @@ const ReviewList = () => {
                         <button
                             onClick={() => setType('STORE')}
                             className={clsx(
-                                "px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300",
+                                "px-6 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300",
                                 type === 'STORE'
                                     ? "bg-white dark:bg-slate-700 text-primary shadow-xl shadow-primary/5 active:scale-95"
                                     : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
@@ -260,7 +260,7 @@ const ReviewList = () => {
                         <button
                             onClick={() => setType('PRODUCT')}
                             className={clsx(
-                                "px-6 py-2.5 rounded-xl text-xs font-black uppercase tracking-widest transition-all duration-300",
+                                "px-6 py-2.5 rounded-xl text-xs font-extrabold uppercase tracking-widest transition-all duration-300",
                                 type === 'PRODUCT'
                                     ? "bg-white dark:bg-slate-700 text-primary shadow-xl shadow-primary/5 active:scale-95"
                                     : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
@@ -294,7 +294,7 @@ const ReviewList = () => {
                                         <div className="p-2 bg-rose-500/10 rounded-lg text-rose-500">
                                             <Flag size={18} />
                                         </div>
-                                        <h4 className="font-black text-lg text-slate-900 dark:text-white uppercase tracking-tighter">{t('reportingReview')}</h4>
+                                        <h4 className="font-extrabold text-lg text-slate-900 dark:text-white uppercase tracking-tight">{t('reportingReview')}</h4>
                                     </div>
                                     <p className="text-slate-500 text-xs mb-4 font-medium leading-relaxed">{t('reportInstruction')}</p>
                                     <textarea
@@ -309,7 +309,7 @@ const ReviewList = () => {
                                         <button
                                             disabled={isSubmittingReport}
                                             onClick={() => handleReport(review.id)}
-                                            className="flex-1 flex items-center justify-center gap-2 py-4 bg-rose-500 text-white font-black uppercase tracking-widest text-[11px] rounded-xl shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 transition-all disabled:opacity-50"
+                                            className="flex-1 flex items-center justify-center gap-2 py-4 bg-rose-500 text-white font-extrabold uppercase tracking-widest text-[0.6875rem] rounded-xl shadow-lg shadow-rose-500/25 hover:shadow-rose-500/40 transition-all disabled:opacity-50"
                                         >
                                             {isSubmittingReport ? <Loader2 size={16} className="animate-spin" /> : <Flag size={16} />}
                                             {t('submitReport')}
@@ -319,7 +319,7 @@ const ReviewList = () => {
                                                 setReportingId(null);
                                                 setReportReason('');
                                             }}
-                                            className="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-black uppercase tracking-widest text-[11px] rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
+                                            className="px-8 py-4 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 font-extrabold uppercase tracking-widest text-[0.6875rem] rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all"
                                         >
                                             {t('common:cancel')}
                                         </button>
@@ -337,10 +337,10 @@ const ReviewList = () => {
                                                 )}
                                             </div>
                                             <div className="flex-1">
-                                                <h3 className="text-[13px] font-black text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1">
+                                                <h3 className="text-[13px] font-extrabold text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1">
                                                     {review.customer?.name || t('common:anonymous')}
                                                 </h3>
-                                                <div className="flex items-center gap-2 text-[8px] font-black text-slate-400 uppercase tracking-widest">
+                                                <div className="flex items-center gap-2 text-[8px] font-extrabold text-slate-400 uppercase tracking-widest">
                                                     <Calendar size={9} className="text-slate-300" />
                                                     <span>{new Date(review.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                                 </div>
@@ -358,7 +358,7 @@ const ReviewList = () => {
                                                 className="flex items-center gap-2 p-1.5 pr-3 bg-slate-50 dark:bg-slate-800/80 rounded-lg border border-slate-100 dark:border-slate-700/50 group/tag hover:border-primary/40 hover:bg-primary/5 transition-all"
                                             >
                                                 <Package size={11} className="text-primary" />
-                                                <span className="text-[9px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-tighter group-hover/tag:text-primary transition-colors">
+                                                <span className="text-[9px] font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-tight group-hover/tag:text-primary transition-colors">
                                                     {language === 'ar' && review.product.nameAr ? review.product.nameAr : review.product.name}
                                                 </span>
                                             </button>
@@ -376,9 +376,9 @@ const ReviewList = () => {
                                         <div className="mb-4 p-3 bg-rose-50 dark:bg-rose-900/10 border border-rose-100 dark:border-rose-900/30 rounded-xl">
                                             <div className="flex items-center gap-2 mb-1.5">
                                                 <AlertCircle size={12} className="text-rose-500" />
-                                                <span className="text-[9px] font-black text-rose-500 uppercase tracking-widest">{t('reportReason')}</span>
+                                                <span className="text-[9px] font-extrabold text-rose-500 uppercase tracking-widest">{t('reportReason')}</span>
                                             </div>
-                                            <p className="text-[11px] font-bold text-rose-700 dark:text-rose-300">
+                                            <p className="text-[0.6875rem] font-bold text-rose-700 dark:text-rose-300">
                                                 {review.reportReason}
                                             </p>
                                         </div>
@@ -389,14 +389,14 @@ const ReviewList = () => {
                                             {!review.isReported ? (
                                                 <button
                                                     onClick={() => setReportingId(review.id)}
-                                                    className="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
+                                                    className="flex items-center gap-2 px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-500 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/10 rounded-lg transition-all border border-transparent hover:border-rose-100 dark:hover:border-rose-900/30"
                                                 >
                                                     <Flag size={14} />
                                                     {t('report')}
                                                 </button>
                                             ) : (
                                                 <div className="flex items-center gap-3">
-                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-500 text-white font-black text-[9px] uppercase tracking-widest shadow-md shadow-rose-500/10">
+                                                    <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-rose-500 text-white font-extrabold text-[9px] uppercase tracking-widest shadow-md shadow-rose-500/10">
                                                         <ShieldAlert size={12} />
                                                         {t('reported')}
                                                     </div>
@@ -404,7 +404,7 @@ const ReviewList = () => {
                                                     <button
                                                         disabled={actionLoading === review.id}
                                                         onClick={() => handleUnreport(review.id)}
-                                                        className="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-all border border-emerald-200 dark:border-emerald-900/30 disabled:opacity-50"
+                                                        className="flex items-center gap-2 px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-widest bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white rounded-lg transition-all border border-emerald-200 dark:border-emerald-900/30 disabled:opacity-50"
                                                     >
                                                         {actionLoading === review.id ? <Loader2 size={14} className="animate-spin" /> : <BadgeCheck size={14} />}
                                                         {t('unreport')}
@@ -415,7 +415,7 @@ const ReviewList = () => {
                                                             <button
                                                                 disabled={actionLoading === review.id}
                                                                 onClick={() => handleDeactivate(review.id)}
-                                                                className="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500 hover:text-white rounded-lg transition-all border border-yellow-200 dark:border-yellow-900/30 disabled:opacity-50"
+                                                                className="flex items-center gap-2 px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-widest bg-yellow-500/10 text-yellow-600 hover:bg-yellow-500 hover:text-white rounded-lg transition-all border border-yellow-200 dark:border-yellow-900/30 disabled:opacity-50"
                                                             >
                                                                 {actionLoading === review.id ? <Loader2 size={14} className="animate-spin" /> : <XCircle size={14} />}
                                                                 {t('deactivate')}
@@ -423,7 +423,7 @@ const ReviewList = () => {
                                                             <button
                                                                 disabled={actionLoading === review.id}
                                                                 onClick={() => handleDelete(review.id)}
-                                                                className="flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase tracking-widest bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white rounded-lg transition-all border border-rose-200 dark:border-rose-900/30 disabled:opacity-50"
+                                                                className="flex items-center gap-2 px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-widest bg-rose-500/10 text-rose-600 hover:bg-rose-500 hover:text-white rounded-lg transition-all border border-rose-200 dark:border-rose-900/30 disabled:opacity-50"
                                                             >
                                                                 {actionLoading === review.id ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
                                                                 {t('delete')}

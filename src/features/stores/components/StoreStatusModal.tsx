@@ -55,7 +55,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                         <div className="p-2 bg-primary/10 rounded-[4px]">
                             <Clock className="text-primary" size={20} />
                         </div>
-                        <h3 className="text-lg font-black text-slate-900 dark:text-white uppercase tracking-tight">{t('common:updateStatus')}</h3>
+                        <h3 className="text-lg font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">{t('common:updateStatus')}</h3>
                     </div>
                     <button onClick={onClose} className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
                         <X size={20} />
@@ -64,7 +64,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
 
                 <form onSubmit={handleSubmit} className="p-6 space-y-6">
                     <div className="space-y-3">
-                        <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest ms-1">{t('common:operationalState')}</label>
+                        <label className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest ms-1">{t('common:operationalState')}</label>
                         <div className="grid grid-cols-2 gap-3">
                             {statuses.map((s) => (
                                 <button
@@ -87,8 +87,8 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
 
                     <div className="space-y-3">
                         <div className="flex items-center justify-between ms-1">
-                            <label className="text-xs font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t('common:reasonNotes')}</label>
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter">{t('common:optional')}</span>
+                            <label className="text-xs font-extrabold text-slate-500 dark:text-slate-400 uppercase tracking-widest">{t('common:reasonNotes')}</label>
+                            <span className="text-[0.625rem] text-slate-400 font-bold uppercase tracking-tight">{t('common:optional')}</span>
                         </div>
                         <textarea
                             className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-slate-900 dark:text-white text-sm min-h-[120px] resize-none placeholder:text-slate-400"
@@ -98,7 +98,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                         />
                         <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-900/10 border border-amber-100 dark:border-amber-900/30 rounded-[4px]">
                             <AlertCircle size={16} className="text-amber-600 shrink-0 mt-0.5" />
-                            <p className="text-[11px] text-amber-700 dark:text-amber-400/80 font-medium leading-relaxed">
+                            <p className="text-[0.6875rem] text-amber-700 dark:text-amber-400/80 font-medium leading-relaxed">
                                 {t('common:storeOwnerVisibilityNote')}
                             </p>
                         </div>
@@ -115,7 +115,7 @@ const StoreStatusModal: React.FC<StoreStatusModalProps> = ({ store, isOpen, onCl
                         <button
                             type="submit"
                             disabled={loading}
-                            className="flex-[2] py-3 bg-primary text-white text-sm font-black uppercase tracking-widest hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 rounded-[4px]"
+                            className="flex-[2] py-3 bg-primary text-white text-sm font-extrabold uppercase tracking-widest hover:bg-primary-hover shadow-lg shadow-primary/20 transition-all active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2 rounded-[4px]"
                         >
                             {loading ? (
                                 <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-[4px] animate-spin" />

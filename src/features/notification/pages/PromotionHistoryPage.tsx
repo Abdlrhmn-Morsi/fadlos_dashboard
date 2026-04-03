@@ -163,7 +163,7 @@ const PromotionHistoryPage: React.FC = () => {
         if (!criteriaLabel) return '-';
 
         return (
-            <span className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+            <span className="text-[0.625rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                 {criteriaLabel}
             </span>
         );
@@ -283,7 +283,7 @@ const PromotionHistoryPage: React.FC = () => {
                                         <tr key={log.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors group">
                                             <td className="px-6 py-5 whitespace-nowrap">
                                                 <div className="flex flex-col">
-                                                    <span className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tighter">
+                                                    <span className="text-sm font-bold text-slate-900 dark:text-white uppercase tracking-tight">
                                                         {formatDate(log.createdAt).date}
                                                     </span>
                                                     <span className="text-xs text-slate-400">
@@ -295,7 +295,7 @@ const PromotionHistoryPage: React.FC = () => {
                                                 <div className="flex gap-3 items-start">
                                                     {log.coverImageUrl && (
                                                         <div className="w-16 h-12 rounded-lg bg-slate-100 dark:bg-slate-800 shrink-0 overflow-hidden border border-slate-200 dark:border-slate-700">
-                                                            <img src={log.coverImageUrl} alt="" className="w-full h-full object-cover" />
+                                                            <img src={log.coverImageUrl} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
                                                         </div>
                                                     )}
                                                     <div className="flex flex-col gap-1">

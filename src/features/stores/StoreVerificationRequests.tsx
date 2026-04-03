@@ -98,7 +98,7 @@ const StoreVerificationRequests = () => {
     };
 
     const getStatusBadge = (status: string) => {
-        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border";
+        const baseClass = "inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[0.625rem] font-extrabold uppercase tracking-widest border";
         switch (status) {
             case StoreVerificationStatus.PENDING:
                 return <span className={clsx(baseClass, "bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-500/10 dark:text-amber-400 dark:border-amber-800")}><Clock size={12} /> {t('common:pending')}</span>;
@@ -120,7 +120,7 @@ const StoreVerificationRequests = () => {
                         <ShieldCheck size={28} strokeWidth={2} />
                     </div>
                     <div>
-                        <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight leading-none">{t('verificationRequests', 'Verification Requests')}</h2>
+                        <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight leading-none">{t('verificationRequests', 'Verification Requests')}</h2>
                         <p className="text-slate-500 text-xs font-bold uppercase tracking-widest mt-2 opacity-70 italic">{t('reviewMerchantSubmissions', 'Review merchant identity submissions')}</p>
                     </div>
                 </div>
@@ -131,7 +131,7 @@ const StoreVerificationRequests = () => {
                         <input
                             type="text"
                             placeholder={t('searchPlaceholder')}
-                            className="py-3.5 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100 ps-12 pe-4 font-bold placeholder:font-normal"
+                            className="py-3.5 w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- text-slate-900 dark:text-slate-100 ps-12 pe-4 font-bold placeholder:font-normal"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -140,7 +140,7 @@ const StoreVerificationRequests = () => {
                     <div className="relative group">
                         <Filter size={16} className="absolute top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none start-4" />
                         <select
-                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/50 rounded-xl px-10 py-3.5 text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm hover:shadow-md appearance-none cursor-pointer min-w-[160px]"
+                            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/50 rounded-xl px-10 py-3.5 text-sm font-bold text-slate-700 dark:text-slate-300 outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all shadow-sm  appearance-none cursor-pointer min-w-[160px]"
                             value={statusFilter}
                             onChange={(e) => {
                                 setStatusFilter(e.target.value);
@@ -161,18 +161,18 @@ const StoreVerificationRequests = () => {
                 {loading ? (
                     <div className="flex flex-col items-center justify-center py-32 gap-6">
                         <div className="w-12 h-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
-                        <div className="text-slate-400 font-bold uppercase tracking-widest text-[10px] animate-pulse">{t('common:syncing')}</div>
+                        <div className="text-slate-400 font-bold uppercase tracking-widest text-[0.625rem] animate-pulse">{t('common:syncing')}</div>
                     </div>
                 ) : (
                     <div className="overflow-x-auto custom-scrollbar">
                         <table className="w-full border-separate border-spacing-0">
                             <thead>
                                 <tr className="bg-slate-50/50 dark:bg-slate-800/10">
-                                    <th className="px-6 py-5 text-start text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('merchantEntity')}</th>
-                                    <th className="px-6 py-5 text-start text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('crNumber')}</th>
-                                    <th className="px-6 py-5 text-start text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('status')}</th>
-                                    <th className="px-6 py-5 text-start text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('submittedAt', 'Submitted At')}</th>
-                                    <th className="px-6 py-5 text-end text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('common:actions')}</th>
+                                    <th className="px-6 py-5 text-start text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('merchantEntity')}</th>
+                                    <th className="px-6 py-5 text-start text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('crNumber')}</th>
+                                    <th className="px-6 py-5 text-start text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('status')}</th>
+                                    <th className="px-6 py-5 text-start text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('submittedAt', 'Submitted At')}</th>
+                                    <th className="px-6 py-5 text-end text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest border-b border-slate-100 dark:border-slate-800">{t('common:actions')}</th>
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-50 dark:divide-slate-800">
@@ -182,22 +182,22 @@ const StoreVerificationRequests = () => {
                                             <td className="px-6 py-5">
                                                 <div className="flex items-center gap-4">
                                                     {request.store?.logo ? (
-                                                        <img src={request.store.logo} alt="" className="w-12 h-12 rounded-xl object-cover shadow-lg border-2 border-white dark:border-slate-800" />
+                                                        <img src={request.store.logo} alt="Image" aria-hidden="true" className="w-12 h-12 rounded-xl object-cover shadow-lg border-2 border-white dark:border-slate-800" />
                                                     ) : (
-                                                        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-black shadow-inner border border-slate-200 dark:border-slate-700">
+                                                        <div className="w-12 h-12 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 font-extrabold shadow-inner border border-slate-200 dark:border-slate-700">
                                                             {request.store?.name?.charAt(0).toUpperCase()}
                                                         </div>
                                                     )}
                                                     <div>
-                                                        <div className="text-[14px] font-black text-slate-900 dark:text-slate-100 leading-tight group-hover:text-primary transition-colors">
+                                                        <div className="text-[14px] font-extrabold text-slate-900 dark:text-slate-100 leading-tight group-hover:text-primary transition-colors">
                                                             {isRTL ? (request.store?.nameAr || request.store?.name) : (request.store?.name || request.store?.nameAr)}
                                                         </div>
-                                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-tighter mt-1 italic">{request.store?.email}</div>
+                                                        <div className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-tight mt-1 italic">{request.store?.email}</div>
                                                     </div>
                                                 </div>
                                             </td>
                                             <td className="px-6 py-5">
-                                                <div className="text-sm font-black text-slate-700 dark:text-slate-300 font-mono tracking-tight">{request.commercialRegisterNumber}</div>
+                                                <div className="text-sm font-extrabold text-slate-700 dark:text-slate-300 font-mono tracking-tight">{request.commercialRegisterNumber}</div>
                                             </td>
                                             <td className="px-6 py-5">{getStatusBadge(request.status)}</td>
                                             <td className="px-6 py-5">
@@ -211,7 +211,7 @@ const StoreVerificationRequests = () => {
                                                         setRejectionReason(request.rejectionReason || '');
                                                         setShowReviewModal(true);
                                                     }}
-                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-primary dark:hover:bg-primary transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none group"
+                                                    className="inline-flex items-center gap-2 px-4 py-2.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-xl text-[0.625rem] font-extrabold uppercase tracking-widest hover:bg-primary dark:hover:bg-primary transition-all active:scale-95 shadow-lg shadow-slate-200 dark:shadow-none group"
                                                 >
                                                     <Eye size={14} className="group-hover:rotate-12 transition-transform" /> {t('review', 'Review')}
                                                 </button>
@@ -226,7 +226,7 @@ const StoreVerificationRequests = () => {
                                                     <ShieldCheck size={80} strokeWidth={1} />
                                                 </div>
                                                 <div className="text-center">
-                                                    <p className="text-slate-500 font-black italic text-lg tracking-tight">{t('noVerificationsFound', 'No verification requests found')}</p>
+                                                    <p className="text-slate-500 font-extrabold italic text-lg tracking-tight">{t('noVerificationsFound', 'No verification requests found')}</p>
                                                     <p className="text-slate-400 text-xs mt-2 uppercase tracking-widest font-bold opacity-60">{t('allCaughtUp', 'You are all caught up!')}</p>
                                                 </div>
                                             </div>
@@ -260,8 +260,8 @@ const StoreVerificationRequests = () => {
                                         <ShieldCheck size={24} />
                                     </div>
                                     <div>
-                                        <h3 className="text-xl font-black text-slate-900 dark:text-white tracking-tight">{t('reviewVerification')}</h3>
-                                        <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest mt-1 opacity-70 italic">
+                                        <h3 className="text-xl font-extrabold text-slate-900 dark:text-white tracking-tight">{t('reviewVerification')}</h3>
+                                        <p className="text-slate-500 text-[0.625rem] font-bold uppercase tracking-widest mt-1 opacity-70 italic">
                                             {isRTL ? (selectedRequest.store?.nameAr || selectedRequest.store?.name) : (selectedRequest.store?.name || selectedRequest.store?.nameAr)}
                                         </p>
                                     </div>
@@ -279,12 +279,12 @@ const StoreVerificationRequests = () => {
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                     <div className="space-y-6">
                                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/50">
-                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('crNumber')}</label>
-                                            <div className="text-lg font-black text-slate-900 dark:text-white font-mono tracking-wider">{selectedRequest.commercialRegisterNumber}</div>
+                                            <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{t('crNumber')}</label>
+                                            <div className="text-lg font-extrabold text-slate-900 dark:text-white font-mono tracking-wider">{selectedRequest.commercialRegisterNumber}</div>
                                         </div>
 
                                         <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-100 dark:border-slate-800/50">
-                                            <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('submittedAt', 'Submitted At')}</label>
+                                            <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{t('submittedAt', 'Submitted At')}</label>
                                             <div className="text-sm font-bold text-slate-700 dark:text-slate-300">
                                                 {new Date(selectedRequest.createdAt).toLocaleString()}
                                             </div>
@@ -295,14 +295,14 @@ const StoreVerificationRequests = () => {
                                                 "rounded-2xl p-6 border",
                                                 selectedRequest.status === StoreVerificationStatus.APPROVED ? "bg-emerald-50/50 border-emerald-100 dark:bg-emerald-500/5 dark:border-emerald-900/30" : "bg-rose-50/50 border-rose-100 dark:bg-rose-500/5 dark:border-rose-900/30"
                                             )}>
-                                                <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">{t('currentStatus', 'Current Status')}</label>
+                                                <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-2">{t('currentStatus', 'Current Status')}</label>
                                                 {getStatusBadge(selectedRequest.status)}
                                             </div>
                                         )}
                                     </div>
 
                                     <div className="space-y-4">
-                                        <label className="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1">{t('crPhotoLabel', 'Commercial Register Photo')}</label>
+                                        <label className="block text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ps-1">{t('crPhotoLabel', 'Commercial Register Photo')}</label>
                                         <div className="relative group rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 aspect-[4/3] bg-slate-950 flex items-center justify-center">
                                             {selectedRequest.commercialRegisterPhoto ? (
                                                 <>
@@ -321,7 +321,7 @@ const StoreVerificationRequests = () => {
                                             ) : (
                                                 <div className="flex flex-col items-center gap-4 text-slate-700">
                                                     <AlertTriangle size={48} strokeWidth={1} />
-                                                    <span className="text-[10px] font-black uppercase tracking-[0.2em]">{t('noDocumentAttached', 'No document attached')}</span>
+                                                    <span className="text-[0.625rem] font-extrabold uppercase tracking-[0.2em]">{t('noDocumentAttached', 'No document attached')}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -330,7 +330,7 @@ const StoreVerificationRequests = () => {
 
                                 {/* Rejection Reason Textarea */}
                                 <div className="space-y-4 animate-in slide-in-from-top-4">
-                                    <label className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 ps-1">
+                                    <label className="flex items-center gap-2 text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest mb-1 ps-1">
                                         <AlertTriangle size={14} className="text-secondary" /> {t('reasonForRejection')}
                                     </label>
                                     <textarea
@@ -339,7 +339,7 @@ const StoreVerificationRequests = () => {
                                         value={rejectionReason}
                                         onChange={(e) => setRejectionReason(e.target.value)}
                                     />
-                                    <p className="text-[10px] text-slate-400 italic ps-4 font-medium leading-relaxed">{t('rejectionReasonNote', 'Note: This message will be sent to the store owner and should be helpful for them to correct their application.')}</p>
+                                    <p className="text-[0.625rem] text-slate-400 italic ps-4 font-medium leading-relaxed">{t('rejectionReasonNote', 'Note: This message will be sent to the store owner and should be helpful for them to correct their application.')}</p>
                                 </div>
                             </div>
 
@@ -348,14 +348,14 @@ const StoreVerificationRequests = () => {
                                 <button
                                     onClick={() => handleReview(StoreVerificationStatus.REJECTED)}
                                     disabled={isSubmitting || !rejectionReason.trim()}
-                                    className="w-full sm:flex-1 py-4.5 bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white transition-all active:scale-95 disabled:opacity-30 shadow-sm"
+                                    className="w-full sm:flex-1 py-4.5 bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-900/50 rounded-2xl text-[0.6875rem] font-extrabold uppercase tracking-[0.15em] hover:bg-rose-600 hover:text-white dark:hover:bg-rose-600 dark:hover:text-white transition-all active:scale-95 disabled:opacity-30 shadow-sm"
                                 >
                                     {isSubmitting ? <Clock size={18} className="animate-spin mx-auto" /> : t('rejectRequest', 'Reject Request')}
                                 </button>
                                 <button
                                     onClick={() => handleReview(StoreVerificationStatus.APPROVED)}
                                     disabled={isSubmitting}
-                                    className="w-full sm:flex-1 py-4.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl text-[11px] font-black uppercase tracking-[0.15em] hover:bg-primary dark:hover:bg-primary hover:text-white transition-all active:scale-95 disabled:opacity-30 shadow-xl shadow-slate-200 dark:shadow-none"
+                                    className="w-full sm:flex-1 py-4.5 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 rounded-2xl text-[0.6875rem] font-extrabold uppercase tracking-[0.15em] hover:bg-primary dark:hover:bg-primary hover:text-white transition-all active:scale-95 disabled:opacity-30 shadow-xl shadow-slate-200 dark:shadow-none"
                                 >
                                     {isSubmitting ? <Clock size={18} className="animate-spin mx-auto" /> : t('approveRequest', 'Approve Request')}
                                 </button>

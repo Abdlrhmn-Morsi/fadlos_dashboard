@@ -157,7 +157,7 @@ const DriverDashboard = () => {
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm font-bold text-indigo-600">#{order.orderNumber}</span>
                                         <span className={clsx(
-                                            "px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border",
+                                            "px-2 py-0.5 rounded-full text-[0.625rem] font-bold uppercase tracking-wider border",
                                             order.status === OrderStatus.OUT_FOR_DELIVERY
                                                 ? "bg-amber-50 text-amber-600 border-amber-200"
                                                 : "bg-blue-50 text-blue-600 border-blue-200"
@@ -184,7 +184,7 @@ const DriverDashboard = () => {
 
                                     <div className="flex items-center justify-between pt-2 border-t border-slate-50 dark:border-slate-800">
                                         <div className="flex items-center gap-2">
-                                            <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-bold">
+                                            <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[0.625rem] font-bold">
                                                 {order.store?.name?.charAt(0)}
                                             </div>
                                             <span className="text-xs text-slate-600 dark:text-slate-400">{order.store?.name}</span>

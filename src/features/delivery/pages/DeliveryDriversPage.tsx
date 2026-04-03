@@ -251,7 +251,7 @@ const DeliveryDriversPage = () => {
                     <Clock size={18} />
                     {t('dashboard:incomingRequests')}
                     {pendingCounts.incoming > 0 && (
-                        <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[10px] font-bold rounded-full ml-1">
+                        <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-rose-500 text-white text-[0.625rem] font-bold rounded-full ml-1">
                             {pendingCounts.incoming}
                         </span>
                     )}
@@ -268,7 +268,7 @@ const DeliveryDriversPage = () => {
                     <Globe size={18} />
                     {t('dashboard:sentInvitations')}
                     {pendingCounts.sent > 0 && (
-                        <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-amber-500 text-white text-[10px] font-bold rounded-full ml-1">
+                        <span className="flex items-center justify-center min-w-5 h-5 px-1 bg-amber-500 text-white text-[0.625rem] font-bold rounded-full ml-1">
                             {pendingCounts.sent}
                         </span>
                     )}
@@ -457,7 +457,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                 <div className="flex items-center gap-3 text-start">
                                                     <div className="w-10 h-10 rounded-full overflow-hidden border border-slate-200 dark:border-slate-700 bg-slate-100">
                                                         {avatarUrl ? (
-                                                            <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
+                                                            <img src={avatarUrl} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                                 <Truck size={20} />
@@ -466,20 +466,20 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                     </div>
                                                     <div className="text-start">
                                                         <p className="font-bold text-slate-900 dark:text-white uppercase tracking-tight">{driverName}</p>
-                                                        <p className="text-[10px] text-slate-500 lowercase">@{driverUsername}</p>
+                                                        <p className="text-[0.625rem] text-slate-500 lowercase">@{driverUsername}</p>
 
                                                         <div className="mt-2 flex items-center gap-2">
                                                             {type === 'incoming' && (req.status === 'PENDING' || req.status === 'TRANSITION_OFFER') && (
                                                                 <>
                                                                     <button
                                                                         onClick={() => onAction(req, 'ACCEPT')}
-                                                                        className="px-3 py-1 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors rounded shadow-sm"
+                                                                        className="px-3 py-1 bg-emerald-600 text-white text-[0.625rem] font-bold uppercase tracking-wider hover:bg-emerald-700 transition-colors rounded shadow-sm"
                                                                     >
                                                                         {t('dashboard:approve')}
                                                                     </button>
                                                                     <button
                                                                         onClick={() => onAction(req, 'REJECT')}
-                                                                        className="px-3 py-1 bg-rose-600 text-white text-[10px] font-bold uppercase tracking-wider hover:bg-rose-700 transition-colors rounded shadow-sm"
+                                                                        className="px-3 py-1 bg-rose-600 text-white text-[0.625rem] font-bold uppercase tracking-wider hover:bg-rose-700 transition-colors rounded shadow-sm"
                                                                     >
                                                                         {t('common:reject')}
                                                                     </button>
@@ -488,7 +488,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                             {type === 'sent' && (req.status === 'PENDING' || req.status === 'TRANSITION_OFFER') && (
                                                                 <button
                                                                     onClick={() => onAction(req, 'CANCEL')}
-                                                                    className="px-3 py-1 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 text-[10px] font-bold uppercase tracking-wider hover:bg-slate-300 transition-colors rounded"
+                                                                    className="px-3 py-1 bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-200 text-[0.625rem] font-bold uppercase tracking-wider hover:bg-slate-300 transition-colors rounded"
                                                                 >
                                                                     {t('dashboard:cancelInvitation')}
                                                                 </button>
@@ -500,7 +500,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                             <td className="px-6 py-4 text-start">
                                                 <div className="flex flex-col gap-1.5 items-start">
                                                     <span className={clsx(
-                                                        "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
+                                                        "px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-widest rounded",
                                                         req.status === 'REJECTED' 
                                                             ? "bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400"
                                                             : req.status === 'CANCELLED'
@@ -512,7 +512,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                                         {String(t(`delivery:drivers.hiring_status.${req.status?.toLowerCase()}`, req.status))}
                                                     </span>
                                                     {req.status === 'REJECTED' && (req.responseReason || req.rejectionReason) && (
-                                                        <span className="text-[10px] text-rose-500 max-w-[200px] break-words line-clamp-2" title={req.responseReason || req.rejectionReason}>
+                                                        <span className="text-[0.625rem] text-rose-500 max-w-[200px] break-words line-clamp-2" title={req.responseReason || req.rejectionReason}>
                                                             <span className="font-semibold">{t('common:rejection_reason')}:</span> {req.responseReason || req.rejectionReason}
                                                         </span>
                                                     )}
@@ -527,7 +527,7 @@ const HiringRequestsList = ({ requests, type, loading, onAction }: { requests: a
                                             </td>
                                             <td className="px-6 py-4 text-start">
                                                 <span className={clsx(
-                                                    "px-2 py-0.5 text-[10px] font-bold uppercase tracking-widest rounded",
+                                                    "px-2 py-0.5 text-[0.625rem] font-bold uppercase tracking-widest rounded",
                                                     verificationStatus === 'VERIFIED'
                                                         ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                         : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"

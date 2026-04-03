@@ -113,7 +113,7 @@ const ForgotPassword = () => {
                         alt="Logo"
                         className="h-20 object-contain mb-6 self-center"
                     />
-                    <h2 className={clsx("text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tighter", isRTL ? "text-right w-full" : "text-center")}>
+                    <h2 className={clsx("text-2xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight", isRTL ? "text-right w-full" : "text-center")}>
                         {step === 1 ? t('forgotPassword') : step === 2 ? t('verifyCode') : t('resetPassword')}
                     </h2>
                     <p className={clsx("text-slate-500 dark:text-slate-400 text-sm mt-2", isRTL ? "text-right w-full" : "text-center")}>

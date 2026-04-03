@@ -262,7 +262,7 @@ const DeliveryDriverForm = () => {
         <div className="space-y-2">
             <div className="flex flex-col h-10 justify-end mb-2">
                 <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300">{label}</label>
-                {description && <p className="text-[10px] leading-tight text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
+                {description && <p className="text-[0.625rem] leading-tight text-slate-500 dark:text-slate-400 mt-0.5">{description}</p>}
             </div>
             <div className="relative">
                 {previews[field] ? (
@@ -330,7 +330,7 @@ const DeliveryDriverForm = () => {
                             {isEditMode && verificationStatus && (
                                 <div className="flex items-center gap-3 mt-1">
                                     <span className={clsx(
-                                        "px-2.5 py-0.5 rounded-full text-[11px] font-bold uppercase tracking-wider",
+                                        "px-2.5 py-0.5 rounded-full text-[0.6875rem] font-bold uppercase tracking-wider",
                                         verificationStatus === 'VERIFIED' ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/20" :
                                             verificationStatus === 'REJECTED' ? "bg-rose-100 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400 border border-rose-200 dark:border-rose-500/20" :
                                                 "bg-amber-100 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20"
@@ -378,7 +378,7 @@ const DeliveryDriverForm = () => {
                                         ) : (
                                             <User size={48} className="text-slate-300" />
                                         )}
-                                        <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity text-[10px] font-bold uppercase tracking-wider text-center p-2">
+                                        <label className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center text-white opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity text-[0.625rem] font-bold uppercase tracking-wider text-center p-2">
                                             <Camera size={20} className="mb-1" />
                                             {t('common.click_to_upload')}
                                             <input type="file" className="hidden" accept="image/*" onChange={(e) => handleFileChange(e, 'avatar')} />
@@ -753,7 +753,7 @@ const DeliveryDriverForm = () => {
                                 {t('delivery:drivers.identity_verification')}
                             </h3>
                             {isEditMode && verificationStatus !== 'REJECTED' && (
-                                <span className="text-[10px] bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-slate-200 dark:border-slate-700">
+                                <span className="text-[0.625rem] bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1 rounded-full font-bold uppercase tracking-widest border border-slate-200 dark:border-slate-700">
                                     {t('delivery:drivers.locked_verification')}
                                 </span>
                             )}

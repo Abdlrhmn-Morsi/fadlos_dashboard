@@ -674,7 +674,7 @@ const OrderDetail = () => {
                                                     <p className="text-xs text-slate-500 mb-1">
                                                         {t(`orders:statusDesc.${status.toLowerCase()}`)}
                                                     </p>
-                                                    <p className="text-[10px] text-slate-400 uppercase font-medium">
+                                                    <p className="text-[0.625rem] text-slate-400 uppercase font-medium">
                                                         {isCurrent ? t('orders:currentStatus') : isCompleted ? t('orders:completed') : t('orders:pending')}
                                                     </p>
                                                 </div>
@@ -852,7 +852,7 @@ const OrderDetail = () => {
                                         </div>
                                         {order.settlement && (
                                             <div className="p-3 bg-slate-50 dark:bg-slate-800/50 rounded-lg space-y-1">
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('orders:settlementReference')}</p>
+                                                <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('orders:settlementReference')}</p>
                                                 <p className="font-mono text-sm font-bold text-slate-700 dark:text-slate-300">{order.settlement.settlementNumber}</p>
                                             </div>
                                         )}
@@ -910,10 +910,10 @@ const OrderDetail = () => {
                                                 </div>
                                                 <div className="min-w-0 flex-1">
                                                     <div className="flex items-center gap-2 mb-1 flex-wrap">
-                                                        <p className="font-black text-lg text-slate-900 dark:text-white truncate">{order.driver.name}</p>
+                                                        <p className="font-extrabold text-lg text-slate-900 dark:text-white truncate">{order.driver.name}</p>
                                                         {order.driver.verificationStatus && (
                                                             <div className={clsx(
-                                                                "flex items-center gap-0.5 text-[10px] font-black uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm whitespace-nowrap",
+                                                                "flex items-center gap-0.5 text-[0.625rem] font-extrabold uppercase tracking-wider px-2 py-0.5 rounded-lg shadow-sm whitespace-nowrap",
                                                                 order.driver.verificationStatus === 'VERIFIED'
                                                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                                     : "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
@@ -929,7 +929,7 @@ const OrderDetail = () => {
                                                                 "w-2.5 h-2.5 rounded-full ring-4",
                                                                 (order.status === OrderStatus.DRIVER_ASSIGNED || order.status === OrderStatus.OUT_FOR_DELIVERY) ? "bg-amber-500 ring-amber-500/20 animate-pulse" : "bg-emerald-500 ring-emerald-500/20"
                                                             )} />
-                                                            <span className="text-[10px] text-slate-500 uppercase tracking-widest font-black">
+                                                            <span className="text-[0.625rem] text-slate-500 uppercase tracking-widest font-extrabold">
                                                                 {(order.status === OrderStatus.DRIVER_ASSIGNED || order.status === OrderStatus.OUT_FOR_DELIVERY)
                                                                     ? (t('common:driver_status.busy', 'Busy') as string)
                                                                     : (t('common:driver_status.available', 'Available') as string)}
@@ -949,7 +949,7 @@ const OrderDetail = () => {
                                             {order.driverCommissionType && (
                                                 <div className="flex items-center justify-between p-3 mt-1 mb-4 bg-white dark:bg-slate-900 rounded-lg border border-slate-100 dark:border-slate-800">
                                                     <div>
-                                                        <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
+                                                        <div className="text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider mb-0.5">
                                                             {t('orders:storeCommission', 'Store Commission')}
                                                         </div>
                                                         <div className="flex items-baseline gap-1">
@@ -960,7 +960,7 @@ const OrderDetail = () => {
                                                                         ? '0%'
                                                                         : `${order.driverCommissionValue || 0}%`}
                                                             </span>
-                                                            <span className="text-[10px] text-slate-500 font-medium bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
+                                                            <span className="text-[0.625rem] text-slate-500 font-medium bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded">
                                                                 {order.driverCommissionType === 'fixed' 
                                                                     ? t('orders:commissionFixed', 'Fixed')
                                                                     : order.driverCommissionType === 'none'
@@ -970,11 +970,11 @@ const OrderDetail = () => {
                                                         </div>
                                                     </div>
                                                     <div className="text-end">
-                                                        <div className="text-[10px] font-bold text-emerald-600/70 dark:text-emerald-500/70 uppercase tracking-wider mb-0.5">
+                                                        <div className="text-[0.625rem] font-bold text-emerald-600/70 dark:text-emerald-500/70 uppercase tracking-wider mb-0.5">
                                                             {t('orders:driverProfit', 'Driver Profit')}
                                                         </div>
                                                         <div className="flex items-baseline gap-1 justify-end text-emerald-600 dark:text-emerald-400">
-                                                            <span className="font-black">
+                                                            <span className="font-extrabold">
                                                                 {Number(order.driverNetEarnings ?? 0).toFixed(2)}
                                                             </span>
                                                             <span className="text-xs font-bold opacity-80">{t('common:currencySymbol')}</span>
@@ -993,7 +993,7 @@ const OrderDetail = () => {
                                                                 e.stopPropagation();
                                                                 navigate(`/orders/batch-assign?orderId=${id}`);
                                                             }}
-                                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-black uppercase tracking-wider text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 rounded-xl transition-all active:scale-95 border border-indigo-100 dark:border-indigo-800/50"
+                                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-extrabold uppercase tracking-wider text-indigo-600 bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-900/20 dark:hover:bg-indigo-900/40 rounded-xl transition-all active:scale-95 border border-indigo-100 dark:border-indigo-800/50"
                                                         >
                                                             <RefreshCw size={14} />
                                                             {t('orders:reassignDriver', 'Reassign Driver')}
@@ -1003,7 +1003,7 @@ const OrderDetail = () => {
                                                                 e.stopPropagation();
                                                                 setConfirmUnassignModal(true);
                                                             }}
-                                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-black uppercase tracking-wider text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 rounded-xl transition-all active:scale-95 border border-rose-100 dark:border-rose-800/50"
+                                                            className="flex-1 flex items-center justify-center gap-2 py-2.5 text-xs font-extrabold uppercase tracking-wider text-rose-600 bg-rose-50 hover:bg-rose-100 dark:bg-rose-900/20 dark:hover:bg-rose-900/40 rounded-xl transition-all active:scale-95 border border-rose-100 dark:border-rose-800/50"
                                                         >
                                                             <UserMinus size={14} />
                                                             {t('orders:unassignDriver', 'Unassign Driver')}
@@ -1015,7 +1015,7 @@ const OrderDetail = () => {
                                         {order.deliveryPin && (user?.role === UserRole.STORE_OWNER || user?.role === UserRole.EMPLOYEE || user?.role === UserRole.CUSTOMER) && (
                                             <div className="p-3 border border-dashed border-indigo-200 dark:border-indigo-800 rounded-lg flex items-center justify-between">
                                                 <span className="text-sm text-slate-500">{t('orders:deliveryPin', 'Delivery PIN')}</span>
-                                                <span className="text-lg font-black tracking-widest text-indigo-600">{order.deliveryPin}</span>
+                                                <span className="text-lg font-extrabold tracking-widest text-indigo-600">{order.deliveryPin}</span>
                                             </div>
                                         )}
                                     </div>
@@ -1249,7 +1249,7 @@ const OrderDetail = () => {
                 {/* Invoice Header */}
                 <div className="flex justify-between items-start border-b-2 border-slate-200 pb-6 mb-6">
                     <div>
-                        <h1 className="text-4xl font-black text-slate-900 tracking-tight uppercase mb-1">
+                        <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight uppercase mb-1">
                             {t('orders:invoice', 'Invoice')}
                         </h1>
                         <p className="text-sm text-slate-600 font-medium">
@@ -1291,7 +1291,7 @@ const OrderDetail = () => {
                 <div className="grid grid-cols-2 gap-12 mb-8">
                     {/* Customer Info */}
                     <div>
-                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
+                        <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
                             {t('orders:billTo', 'Bill To')}
                         </h2>
                         <div className="text-sm text-slate-800 space-y-1.5">
@@ -1302,7 +1302,7 @@ const OrderDetail = () => {
                             {/* Payment Method nested here if present */}
                             {order?.paymentMethod && (
                                 <div className="mt-4 pt-4 border-t border-slate-100">
-                                    <p className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1">{t('orders:paymentMethod', 'Payment Method')}</p>
+                                    <p className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1">{t('orders:paymentMethod', 'Payment Method')}</p>
                                     <p className="font-medium text-slate-700">{t(`orders:${order.paymentMethod.toLowerCase()}`, { defaultValue: order.paymentMethod.replace(/_/g, ' ') })}</p>
                                 </div>
                             )}
@@ -1311,7 +1311,7 @@ const OrderDetail = () => {
 
                     {/* Delivery Info */}
                     <div>
-                        <h2 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
+                        <h2 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-3 border-b border-slate-100 pb-2">
                             {t('orders:deliveryTo', 'Delivery To')}
                         </h2>
                         {order?.deliveryAddress ? (
@@ -1340,10 +1340,10 @@ const OrderDetail = () => {
                     <table className="w-full text-sm text-center border-collapse">
                         <thead>
                             <tr className="border-b-2 border-slate-200 bg-slate-50/50">
-                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:item', 'Item')}</th>
-                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:qty', 'Qty')}</th>
-                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:price', 'Price')}</th>
-                                <th className="py-3 px-4 text-center font-black text-slate-500 uppercase tracking-widest">{t('orders:total', 'Total')}</th>
+                                <th className="py-3 px-4 text-center font-extrabold text-slate-500 uppercase tracking-widest">{t('orders:item', 'Item')}</th>
+                                <th className="py-3 px-4 text-center font-extrabold text-slate-500 uppercase tracking-widest">{t('orders:qty', 'Qty')}</th>
+                                <th className="py-3 px-4 text-center font-extrabold text-slate-500 uppercase tracking-widest">{t('orders:price', 'Price')}</th>
+                                <th className="py-3 px-4 text-center font-extrabold text-slate-500 uppercase tracking-widest">{t('orders:total', 'Total')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
@@ -1384,7 +1384,7 @@ const OrderDetail = () => {
                                     <td className="py-4 px-4 text-center text-slate-600 font-medium">
                                         {Number(item.price).toFixed(2)}
                                     </td>
-                                    <td className="py-4 px-4 text-center font-black text-slate-900 text-base">
+                                    <td className="py-4 px-4 text-center font-extrabold text-slate-900 text-base">
                                         {(Number(item.price) * item.quantity).toFixed(2)}
                                     </td>
                                 </tr>
@@ -1399,7 +1399,7 @@ const OrderDetail = () => {
                     <div className="w-1/2 pr-8">
                         {order?.driver && (
                             <div className="mb-6 p-4 rounded-lg bg-slate-50 border border-slate-100">
-                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                                <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                     <Truck size={14}/> {t('orders:driver', 'Driver')}
                                 </h3>
                                 <p className="font-bold text-slate-800">{order.driver.name}</p>
@@ -1408,7 +1408,7 @@ const OrderDetail = () => {
                         )}
                         {order?.notes && (
                             <div>
-                                <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+                                <h3 className="text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-2">
                                     {t('orders:notes', 'Notes')}
                                 </h3>
                                 <p className="text-sm text-slate-600 italic leading-relaxed whitespace-pre-wrap p-4 bg-amber-50 rounded-lg text-amber-900 border border-amber-100">"{order.notes}"</p>
@@ -1435,8 +1435,8 @@ const OrderDetail = () => {
                             </div>
                         )}
                         <div className="flex justify-between items-center pt-4 mt-2 border-t-2 border-slate-900">
-                            <span className="font-black text-slate-900 uppercase tracking-widest text-lg">{t('orders:total', 'Total')}</span>
-                            <span className="text-2xl font-black text-slate-900">
+                            <span className="font-extrabold text-slate-900 uppercase tracking-widest text-lg">{t('orders:total', 'Total')}</span>
+                            <span className="text-2xl font-extrabold text-slate-900">
                                 {Number(order?.totalAmount || order?.total || 0).toFixed(2)} {t('common:currencySymbol')}
                             </span>
                         </div>
@@ -1459,7 +1459,7 @@ const OrderDetail = () => {
             >
                 <div className="space-y-4 mt-4">
                     <div>
-                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                        <label className="block text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">
                             {t('orders:deliveryPin', 'Delivery PIN')}
                         </label>
                         <input
@@ -1468,12 +1468,12 @@ const OrderDetail = () => {
                             value={deliveryPin}
                             onChange={(e) => setDeliveryPin(e.target.value.replace(/\D/g, ''))}
                             placeholder="0000"
-                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center text-2xl font-black tracking-[0.5em]"
+                            className="w-full px-4 py-3 bg-slate-50 dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-center text-2xl font-extrabold tracking-[0.5em]"
                         />
                     </div>
 
                     <div>
-                        <label className="block text-xs font-black text-slate-400 uppercase tracking-widest mb-1.5">
+                        <label className="block text-xs font-extrabold text-slate-400 uppercase tracking-widest mb-1.5">
                             {t('orders:proofImage', 'Proof of Delivery (Optional)')}
                         </label>
                         <input

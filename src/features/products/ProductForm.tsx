@@ -955,7 +955,7 @@ const ProductForm = () => {
                                                     </button>
                                                 </div>
                                             )}
-                                            <span className="absolute bottom-1 end-1 px-1.5 py-0.5 bg-indigo-500 text-white text-[10px] uppercase font-bold rounded">New</span>
+                                            <span className="absolute bottom-1 end-1 px-1.5 py-0.5 bg-indigo-500 text-white text-[0.625rem] uppercase font-bold rounded">New</span>
                                         </div>
                                     ))}
 
@@ -983,7 +983,7 @@ const ProductForm = () => {
                                 <Plus className="w-5 h-5 text-indigo-500" />
                                 {t('frequentlyBoughtTogether')}
                                 {!canUseFrequentlyBoughtTogether && (
-                                    <span className="ms-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[10px] font-bold rounded uppercase tracking-wider border border-amber-200 dark:border-amber-800">
+                                    <span className="ms-2 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[0.625rem] font-bold rounded uppercase tracking-wider border border-amber-200 dark:border-amber-800">
                                         {t('common:premiumFeature', { defaultValue: 'Premium' })}
                                     </span>
                                 )}
@@ -1048,7 +1048,7 @@ const ProductForm = () => {
                                                     >
                                                         <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
                                                             {p.coverImage ? (
-                                                                <img src={p.coverImage} className="w-full h-full object-cover" alt="" />
+                                                                <img src={p.coverImage} className="w-full h-full object-cover" alt="Image" aria-hidden="true" />
                                                             ) : (
                                                                 <ImageIcon className="w-6 h-6 absolute inset-0 m-auto text-slate-300" />
                                                             )}
@@ -1155,7 +1155,7 @@ const ProductForm = () => {
                                                 >
                                                     <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-slate-100 dark:bg-slate-800">
                                                         {a.image ? (
-                                                            <img src={a.image} className="w-full h-full object-cover" alt="" />
+                                                            <img src={a.image} className="w-full h-full object-cover" alt="Image" aria-hidden="true" />
                                                         ) : (
                                                             <div className="w-full h-full flex items-center justify-center text-slate-300">
                                                                 <Package size={18} />
@@ -1168,7 +1168,7 @@ const ProductForm = () => {
                                                                 {isRTL ? (a.nameAr || a.name) : a.name}
                                                             </p>
                                                             {isOutOfStock && (
-                                                                <span className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-[10px] font-bold rounded uppercase">
+                                                                <span className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900/30 text-rose-700 dark:text-rose-400 text-[0.625rem] font-bold rounded uppercase">
                                                                     {t('addons:outOfStock', { defaultValue: 'Out of Stock' })}
                                                                 </span>
                                                             )}
@@ -1216,7 +1216,7 @@ const ProductForm = () => {
                                             <Lock size={10} className="text-amber-500" />
                                         )}
                                     </div>
-                                    <p className="text-[10px] text-slate-400">{t('isOfferSubtitle')}</p>
+                                    <p className="text-[0.625rem] text-slate-400">{t('isOfferSubtitle')}</p>
                                 </div>
                                 <label className={clsx(
                                     "relative inline-flex items-center",
@@ -1235,7 +1235,7 @@ const ProductForm = () => {
 
                             {!canUseOffersAndDiscounts && (
                                 <div className="mb-4 p-2 bg-amber-50 dark:bg-amber-900/10 rounded border border-amber-100 dark:border-amber-800/50">
-                                    <p className="text-[10px] text-amber-700 dark:text-amber-400 leading-tight">
+                                    <p className="text-[0.625rem] text-amber-700 dark:text-amber-400 leading-tight">
                                         {t('common:offersLockedUpgradeWarning', { defaultValue: 'Upgrade your plan to enable Offers and Discounts for this product.' })}
                                     </p>
                                 </div>
@@ -1243,7 +1243,7 @@ const ProductForm = () => {
                             <div className="flex items-center justify-between mb-4">
                                 <div className={isRTL ? "text-right" : "text-left"}>
                                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('active')}</label>
-                                    <p className="text-[10px] text-slate-400">{t('activeSubtitle')}</p>
+                                    <p className="text-[0.625rem] text-slate-400">{t('activeSubtitle')}</p>
                                 </div>
                                 <label className={clsx("relative inline-flex items-center", canModifyProduct ? "cursor-pointer" : "cursor-default")}>
                                     <input
@@ -1259,7 +1259,7 @@ const ProductForm = () => {
                             <div className="flex items-center justify-between mb-4">
                                 <div className={isRTL ? "text-right" : "text-left"}>
                                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300">{t('available')}</label>
-                                    <p className="text-[10px] text-slate-400">{t('availableSubtitle')}</p>
+                                    <p className="text-[0.625rem] text-slate-400">{t('availableSubtitle')}</p>
                                 </div>
                                 <label className={clsx("relative inline-flex items-center", canModifyProduct ? "cursor-pointer" : "cursor-default")}>
                                     <input
@@ -1278,7 +1278,7 @@ const ProductForm = () => {
                                     <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                                         {t('isDisplayOnly', { defaultValue: 'Display Only' })}
                                     </label>
-                                    <p className="text-[10px] text-slate-400">
+                                    <p className="text-[0.625rem] text-slate-400">
                                         {t('isDisplayOnlySubtitle', { defaultValue: 'Disable ordering/adding to cart for this product' })}
                                     </p>
                                 </div>
@@ -1310,7 +1310,7 @@ const ProductForm = () => {
                                                 <button
                                                     type="button"
                                                     onClick={() => setIsCategoryModalOpen(true)}
-                                                    className="text-[10px] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 transition-colors uppercase tracking-wider font-bold"
+                                                    className="text-[0.625rem] bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2 py-0.5 rounded border border-indigo-100 dark:border-indigo-800 hover:bg-indigo-100 transition-colors uppercase tracking-wider font-bold"
                                                 >
                                                     {t('newCategory')}
                                                 </button>

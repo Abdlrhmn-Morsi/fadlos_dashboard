@@ -46,11 +46,11 @@ const SOCIAL_PLATFORMS: Record<string, any> = {
 };
 
 const StatCard = ({ title, value, icon: Icon, color, isRTL }: any) => (
-    <div className="bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm transition-all hover:-translate-y-1 rounded-[4px]">
+    <div className="bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm transition-all  rounded-[4px]">
         <div className="flex justify-between items-start">
             <div>
-                <p className="text-slate-500 dark:text-slate-400 text-[10px] font-black uppercase tracking-widest mb-2 opacity-70">{title}</p>
-                <h3 className="text-2xl font-black text-slate-900 dark:text-slate-100 tabular-nums">{value}</h3>
+                <p className="text-slate-500 dark:text-slate-400 text-[0.625rem] font-extrabold uppercase tracking-widest mb-2 opacity-70">{title}</p>
+                <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">{value}</h3>
             </div>
             <div className={clsx(
                 "p-3 rounded-[4px]",
@@ -94,7 +94,7 @@ const StoreDetail: React.FC = () => {
     }, [id, t]);
 
     const getStatusBadge = (status: string) => {
-        const baseClass = "inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-[4px]";
+        const baseClass = "inline-flex items-center gap-1.5 px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-widest rounded-[4px]";
         const s = status?.toUpperCase();
         switch (s) {
             case 'ACTIVE':
@@ -121,7 +121,7 @@ const StoreDetail: React.FC = () => {
                 <div className="mt-6">
                     <button
                         onClick={() => navigate('/stores')}
-                        className="flex items-center gap-2 mx-auto text-primary font-black uppercase tracking-widest text-sm hover:underline"
+                        className="flex items-center gap-2 mx-auto text-primary font-extrabold uppercase tracking-widest text-sm hover:underline"
                     >
                         <ChevronLeft size={18} /> {t('common:back')}
                     </button>
@@ -143,21 +143,21 @@ const StoreDetail: React.FC = () => {
                     </button>
                     <div className="flex items-center gap-4">
                         {store.logo ? (
-                            <img src={store.logo} alt="" className="w-20 h-20 object-cover border-4 border-white dark:border-slate-800 shadow-xl rounded-[4px]" />
+                            <img src={store.logo} alt="Image" aria-hidden="true" className="w-20 h-20 object-cover border-4 border-white dark:border-slate-800 shadow-xl rounded-[4px]" />
                         ) : (
-                            <div className="w-20 h-20 bg-slate-900 flex items-center justify-center text-white text-3xl font-black shadow-xl rounded-[4px]">
+                            <div className="w-20 h-20 bg-slate-900 flex items-center justify-center text-white text-3xl font-extrabold shadow-xl rounded-[4px]">
                                 {store.name.charAt(0).toUpperCase()}
                             </div>
                         )}
                         <div>
-                            <h1 className="text-4xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{store.name}</h1>
+                            <h1 className="text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{store.name}</h1>
                             <div className="mt-3 flex flex-wrap gap-2">
                                 {getStatusBadge(store.status)}
-                                <span className="bg-primary/10 text-primary px-3 py-1.5 text-[10px] font-black uppercase tracking-widest rounded-[4px]">
+                                <span className="bg-primary/10 text-primary px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-widest rounded-[4px]">
                                     {isRTL ? store.businessType?.ar_name : store.businessType?.en_name}
                                 </span>
                                 {store.isVerified && (
-                                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1.5 text-[10px] font-black uppercase tracking-widest flex items-center gap-1 rounded-[4px]">
+                                    <span className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 px-3 py-1.5 text-[0.625rem] font-extrabold uppercase tracking-widest flex items-center gap-1 rounded-[4px]">
                                         <CheckCircle size={12} /> {t('common:verified')}
                                     </span>
                                 )}
@@ -170,7 +170,7 @@ const StoreDetail: React.FC = () => {
             {/* Banner Section */}
             {store.banner && (
                 <div className="relative w-full h-48 md:h-64 overflow-hidden border border-slate-200 dark:border-slate-800 rounded-[4px]">
-                    <img src={store.banner} alt="" className="w-full h-full object-cover" />
+                    <img src={store.banner} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
                 </div>
             )}
@@ -213,7 +213,7 @@ const StoreDetail: React.FC = () => {
                 <div className="lg:col-span-2 space-y-8">
                     {/* description section */}
                     <div className="bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[4px]">
-                        <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6">
+                        <h3 className="text-xl font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6">
                             {t('description')}
                         </h3>
                         <p className="text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
@@ -222,11 +222,11 @@ const StoreDetail: React.FC = () => {
 
                         <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6 pt-8 border-t border-slate-100 dark:border-slate-800">
                             <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('slug')}</span>
+                                <span className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest">{t('slug')}</span>
                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">/{store.slug}</span>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <span className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('plan')}</span>
+                                <span className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest">{t('plan')}</span>
                                 <span className="text-sm font-bold text-primary uppercase">{store.plan}</span>
                             </div>
                         </div>
@@ -234,22 +234,22 @@ const StoreDetail: React.FC = () => {
 
                     {/* Operating Status & Schedule */}
                     <div className="bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[4px]">
-                        <h3 className="text-xl font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 pb-4 border-b border-slate-50 dark:border-slate-800">
+                        <h3 className="text-xl font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 pb-4 border-b border-slate-50 dark:border-slate-800">
                             {t('operationalStatus')}
                         </h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                             <div className="space-y-6">
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                         <Clock size={12} /> {t('common:status')}
                                     </span>
                                     <div className="flex flex-col items-end gap-1">
-                                        <span className={clsx("text-xs font-black uppercase tracking-widest", store.isAcceptingOrders ? "text-emerald-600" : "text-rose-600")}>
+                                        <span className={clsx("text-xs font-extrabold uppercase tracking-widest", store.isAcceptingOrders ? "text-emerald-600" : "text-rose-600")}>
                                             {store.isAcceptingOrders ? t('common:active') : t('common:inactive')}
                                         </span>
                                         {store.is24Hours && (
-                                            <span className="text-[10px] bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-2 py-0.5 font-black uppercase rounded-[4px]">
+                                            <span className="text-[0.625rem] bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400 px-2 py-0.5 font-extrabold uppercase rounded-[4px]">
                                                 {t('open24Hours')}
                                             </span>
                                         )}
@@ -257,7 +257,7 @@ const StoreDetail: React.FC = () => {
                                 </div>
 
                                 <div className="flex justify-between items-center">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                         <Clock size={12} /> {t('openingHours')}
                                     </span>
                                     <span className="text-sm font-bold text-slate-700 dark:text-slate-300 tabular-nums">
@@ -266,7 +266,7 @@ const StoreDetail: React.FC = () => {
                                 </div>
 
                                 <div className="space-y-3 pt-2">
-                                    <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                                    <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest flex items-center gap-2">
                                         <Calendar size={12} /> {t('workingDays')}
                                     </span>
                                     <div className="flex flex-wrap gap-1.5">
@@ -276,7 +276,7 @@ const StoreDetail: React.FC = () => {
                                                 <div
                                                     key={idx}
                                                     className={clsx(
-                                                        "w-7 h-7 flex items-center justify-center text-[10px] font-black rounded-[4px] border transition-colors",
+                                                        "w-7 h-7 flex items-center justify-center text-[0.625rem] font-extrabold rounded-[4px] border transition-colors",
                                                         isActive
                                                             ? "bg-primary text-white border-primary shadow-sm"
                                                             : "bg-slate-50 text-slate-300 border-slate-100 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-600"
@@ -292,25 +292,25 @@ const StoreDetail: React.FC = () => {
 
                             <div className="space-y-6">
                                 <div className="grid grid-cols-1 gap-3">
-                                    <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-800/30 rounded-[4px] text-[10px] font-bold uppercase tracking-tight">
+                                    <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-800/30 rounded-[4px] text-[0.625rem] font-bold uppercase tracking-tight">
                                         <span className="text-slate-500">{t('acceptOrdersIfOffDay')}</span>
                                         <span className={store.acceptOrdersIfOffDay ? "text-emerald-600" : "text-slate-400"}>{store.acceptOrdersIfOffDay ? t('common:yes') : t('common:no')}</span>
                                     </div>
-                                    <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-800/30 rounded-[4px] text-[10px] font-bold uppercase tracking-tight">
+                                    <div className="flex justify-between p-3 bg-slate-50/50 dark:bg-slate-800/30 rounded-[4px] text-[0.625rem] font-bold uppercase tracking-tight">
                                         <span className="text-slate-500">{t('acceptOrdersInClosedHours')}</span>
                                         <span className={store.acceptOrdersInClosedHours ? "text-emerald-600" : "text-slate-400"}>{store.acceptOrdersInClosedHours ? t('common:yes') : t('common:no')}</span>
                                     </div>
                                 </div>
                                 <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800">
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('createdAt')}</span>
+                                        <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('createdAt')}</span>
                                         <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
                                             {new Date(store.createdAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
                                         </span>
                                     </div>
 
                                     <div className="flex justify-between items-center">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('lastOrder')}</span>
+                                        <span className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('lastOrder')}</span>
                                         <span className="text-sm font-bold text-slate-700 dark:text-slate-300">
                                             {store.lastOrderAt ? new Date(store.lastOrderAt).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : t('never')}
                                         </span>
@@ -327,7 +327,7 @@ const StoreDetail: React.FC = () => {
                     <div className="bg-slate-900 text-white p-8 shadow-2xl relative overflow-hidden group rounded-[4px]">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 -rotate-45 translate-x-16 -translate-y-16 group-hover:bg-primary/20 transition-all duration-700" />
 
-                        <h3 className={clsx("text-lg font-black uppercase tracking-widest mb-8 border-b border-white/10 pb-4 relative z-10", isRTL && "text-end")}>
+                        <h3 className={clsx("text-lg font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-4 relative z-10", isRTL && "text-end")}>
                             {t('legalOwner')}
                         </h3>
 
@@ -337,7 +337,7 @@ const StoreDetail: React.FC = () => {
                                     <User size={18} strokeWidth={1.5} />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest line-clamp-1">{t('common:name')}</p>
+                                    <p className="text-[0.625rem] font-extrabold text-white/40 uppercase tracking-widest line-clamp-1">{t('common:name')}</p>
                                     <p className="text-sm font-bold mt-1">{store.owner?.name}</p>
                                 </div>
                             </div>
@@ -347,7 +347,7 @@ const StoreDetail: React.FC = () => {
                                     <Mail size={18} strokeWidth={1.5} />
                                 </div>
                                 <div className={isRTL ? "text-end" : "text-start"}>
-                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest line-clamp-1">{t('common:email')}</p>
+                                    <p className="text-[0.625rem] font-extrabold text-white/40 uppercase tracking-widest line-clamp-1">{t('common:email')}</p>
                                     <p className="text-sm font-bold mt-1 break-all">{store.owner?.email || store.email}</p>
                                 </div>
                             </div>
@@ -357,7 +357,7 @@ const StoreDetail: React.FC = () => {
                                     <Phone size={18} strokeWidth={1.5} />
                                 </div>
                                 <div className={isRTL ? "text-end" : "text-start"}>
-                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-widest line-clamp-1">{t('common:phone')}</p>
+                                    <p className="text-[0.625rem] font-extrabold text-white/40 uppercase tracking-widest line-clamp-1">{t('common:phone')}</p>
                                     <p className="text-sm font-bold mt-1">{store.phone || t('notSet')}</p>
                                 </div>
                             </div>
@@ -366,7 +366,7 @@ const StoreDetail: React.FC = () => {
 
                     {/* Social & Contact Presence */}
                     <div className="bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[4px]">
-                        <h3 className="text-lg font-black uppercase tracking-widest mb-8 border-b border-slate-100 dark:border-slate-800 pb-4">
+                        <h3 className="text-lg font-extrabold uppercase tracking-widest mb-8 border-b border-slate-100 dark:border-slate-800 pb-4">
                             {t('socialMedia')}
                         </h3>
 
@@ -377,7 +377,7 @@ const StoreDetail: React.FC = () => {
                                     <MessageSquare size={18} strokeWidth={1.5} />
                                 </div>
                                 <div>
-                                    <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{t('whatsapp')}</p>
+                                    <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{t('whatsapp')}</p>
                                     <p className="text-sm font-bold mt-1 text-start">{store.whatsapp || t('notSet')}</p>
                                 </div>
                             </div>
@@ -394,7 +394,7 @@ const StoreDetail: React.FC = () => {
                                                 <Icon size={18} strokeWidth={1.5} />
                                             </div>
                                             <div>
-                                                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{social.platform}</p>
+                                                <p className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest">{social.platform}</p>
                                                 <a href={social.url} target="_blank" rel="noopener noreferrer" className="text-xs font-bold mt-1 text-primary hover:underline break-all block">
                                                     {social.url}
                                                 </a>
@@ -410,18 +410,18 @@ const StoreDetail: React.FC = () => {
 
                     {/* Deployment (Moved to Sidebar) */}
                     <div className="bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[4px]">
-                        <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-slate-800 pb-4 text-start">
+                        <h3 className="text-lg font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-slate-800 pb-4 text-start">
                             <MapPin size={22} className="text-primary" />
                             {t('deployment')}
                         </h3>
 
                         <div className="space-y-6">
                             <div className="space-y-3">
-                                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('towns')}</h4>
+                                <h4 className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest">{t('towns')}</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {store.towns && store.towns.length > 0 ? (
                                         store.towns.map((town: any) => (
-                                            <span key={town.id} className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-400 rounded-[4px]">
+                                            <span key={town.id} className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-[0.625rem] font-bold text-slate-600 dark:text-slate-400 rounded-[4px]">
                                                 {isRTL ? town.arName : town.enName}
                                             </span>
                                         ))
@@ -432,11 +432,11 @@ const StoreDetail: React.FC = () => {
                             </div>
 
                             <div className="space-y-3 pt-4 border-t border-slate-50 dark:border-slate-800">
-                                <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-widest">{t('places')}</h4>
+                                <h4 className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest">{t('places')}</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {store.places && store.places.length > 0 ? (
                                         store.places.map((place: any) => (
-                                            <span key={place.id} className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-[10px] font-bold text-slate-600 dark:text-slate-400 rounded-[4px]">
+                                            <span key={place.id} className="px-2 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-[0.625rem] font-bold text-slate-600 dark:text-slate-400 rounded-[4px]">
                                                 {isRTL ? place.arName : place.enName}
                                             </span>
                                         ))
@@ -451,12 +451,12 @@ const StoreDetail: React.FC = () => {
                     {/* Business Categories (Moved to Sidebar) */}
                     {store.businessCategories && store.businessCategories.length > 0 && (
                         <div className="bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[4px]">
-                            <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 border-b border-slate-50 dark:border-slate-800 pb-4">
+                            <h3 className="text-lg font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 border-b border-slate-50 dark:border-slate-800 pb-4">
                                 {t('businessCategories')}
                             </h3>
                             <div className="flex flex-wrap gap-2">
                                 {store.businessCategories.map((cat: any) => (
-                                    <span key={cat.id} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[10px] font-black uppercase tracking-widest rounded-[4px]">
+                                    <span key={cat.id} className="px-3 py-1 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 text-[0.625rem] font-extrabold uppercase tracking-widest rounded-[4px]">
                                         {isRTL ? cat.nameAr || cat.name : cat.name}
                                     </span>
                                 ))}
@@ -466,7 +466,7 @@ const StoreDetail: React.FC = () => {
 
                     {/* System Settings (Moved to Sidebar) */}
                     <div className="bg-white dark:bg-slate-900 p-8 border border-slate-200 dark:border-slate-800 shadow-sm rounded-[4px]">
-                        <h3 className="text-lg font-black uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-slate-800 pb-4 text-start">
+                        <h3 className="text-lg font-extrabold uppercase tracking-tight text-slate-900 dark:text-slate-100 mb-6 flex items-center gap-2 border-b border-slate-50 dark:border-slate-800 pb-4 text-start">
                             <Settings size={22} className="text-slate-400" />
                             {t('common:settings')}
                         </h3>
@@ -477,9 +477,9 @@ const StoreDetail: React.FC = () => {
                                     <div className={clsx("p-2 rounded-[4px]", store.enableStoreReviews ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400")}>
                                         <Star size={16} fill={store.enableStoreReviews ? "currentColor" : "none"} />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">{t('enableStoreReviews')}</span>
+                                    <span className="text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-700 dark:text-slate-300">{t('enableStoreReviews')}</span>
                                 </div>
-                                <span className={clsx("text-[10px] font-black uppercase tracking-widest", store.enableStoreReviews ? "text-emerald-600" : "text-slate-400")}>
+                                <span className={clsx("text-[0.625rem] font-extrabold uppercase tracking-widest", store.enableStoreReviews ? "text-emerald-600" : "text-slate-400")}>
                                     {store.enableStoreReviews ? t('common:active') : t('common:inactive')}
                                 </span>
                             </div>
@@ -489,9 +489,9 @@ const StoreDetail: React.FC = () => {
                                     <div className={clsx("p-2 rounded-[4px]", store.enableProductReviews ? "bg-emerald-100 text-emerald-600" : "bg-slate-100 text-slate-400")}>
                                         <ShoppingBag size={16} fill={store.enableProductReviews ? "currentColor" : "none"} />
                                     </div>
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-700 dark:text-slate-300">{t('enableProductReviews')}</span>
+                                    <span className="text-[0.625rem] font-extrabold uppercase tracking-widest text-slate-700 dark:text-slate-300">{t('enableProductReviews')}</span>
                                 </div>
-                                <span className={clsx("text-[10px] font-black uppercase tracking-widest", store.enableProductReviews ? "text-emerald-600" : "text-slate-400")}>
+                                <span className={clsx("text-[0.625rem] font-extrabold uppercase tracking-widest", store.enableProductReviews ? "text-emerald-600" : "text-slate-400")}>
                                     {store.enableProductReviews ? t('common:active') : t('common:inactive')}
                                 </span>
                             </div>
@@ -503,7 +503,7 @@ const StoreDetail: React.FC = () => {
                         <div className="bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-900/30 p-8">
                             <div className="flex items-center gap-3 mb-4">
                                 <ShieldAlert size={20} className="text-amber-500" />
-                                <h4 className="text-xs font-black uppercase text-amber-700 dark:text-amber-400 tracking-widest text-start">
+                                <h4 className="text-xs font-extrabold uppercase text-amber-700 dark:text-amber-400 tracking-widest text-start">
                                     {t('common:statusReason')}
                                 </h4>
                             </div>

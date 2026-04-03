@@ -141,7 +141,7 @@ const AdminBillingTransactions: React.FC = () => {
             {/* Header */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
                         <CreditCard size={32} className="text-primary" />
                         {t('dashboard:billingTransactions')}
                     </h1>
@@ -212,7 +212,7 @@ const AdminBillingTransactions: React.FC = () => {
 
                 <div className="relative">
                     <label className={clsx(
-                        "absolute -top-2 px-1 bg-white dark:bg-slate-900 text-[10px] font-bold text-slate-400 uppercase tracking-wider z-10",
+                        "absolute -top-2 px-1 bg-white dark:bg-slate-900 text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider z-10",
                         isRTL ? "right-3" : "left-3"
                     )}>
                         {t('common:from')}
@@ -231,7 +231,7 @@ const AdminBillingTransactions: React.FC = () => {
 
                 <div className="relative">
                     <label className={clsx(
-                        "absolute -top-2 px-1 bg-white dark:bg-slate-900 text-[10px] font-bold text-slate-400 uppercase tracking-wider z-10",
+                        "absolute -top-2 px-1 bg-white dark:bg-slate-900 text-[0.625rem] font-bold text-slate-400 uppercase tracking-wider z-10",
                         isRTL ? "right-3" : "left-3"
                     )}>
                         {t('common:to')}
@@ -291,7 +291,7 @@ const AdminBillingTransactions: React.FC = () => {
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden shrink-0">
                                                     {item.store?.logo ? (
-                                                        <img src={item.store.logo} alt="" className="w-full h-full object-cover" />
+                                                        <img src={item.store.logo} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
                                                     ) : (
                                                         <Store size={20} />
                                                     )}
@@ -305,7 +305,7 @@ const AdminBillingTransactions: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <span className={clsx(
-                                                "px-3 py-1 rounded-full text-[11px] font-bold border",
+                                                "px-3 py-1 rounded-full text-[0.6875rem] font-bold border",
                                                 getPlanBadgeColor(item.plan)
                                             )}>
                                                 {t(`dashboard:${item.plan.toLowerCase()}`)}
@@ -314,7 +314,7 @@ const AdminBillingTransactions: React.FC = () => {
                                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-slate-600 dark:text-slate-400 capitalize">
                                             {t(`dashboard:${item.billingCycle.toLowerCase()}`)}
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center font-black text-primary">
+                                        <td className="px-6 py-4 whitespace-nowrap text-center font-extrabold text-primary">
                                             {Number(item.amount).toFixed(2)} {t('common:systemCurrency')}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-slate-500 dark:text-slate-400">
@@ -322,7 +322,7 @@ const AdminBillingTransactions: React.FC = () => {
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <span className={clsx(
-                                                "px-2.5 py-1 rounded-lg text-[10px] font-black uppercase",
+                                                "px-2.5 py-1 rounded-lg text-[0.625rem] font-extrabold uppercase",
                                                 item.status === 'active' 
                                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
                                                     : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"

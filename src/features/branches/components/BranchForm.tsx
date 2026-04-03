@@ -202,7 +202,7 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
             )}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                    <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('town')} <span className="text-rose-500">*</span>
                     </label>
                     <div className="group relative">
@@ -230,11 +230,11 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                             </div>
                         )}
                     </div>
-                    {errors.townId && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.townId.message}</p>}
+                    {errors.townId && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.townId.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                    <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('place')} <span className="text-rose-500">*</span>
                     </label>
                     <div className="group relative">
@@ -264,13 +264,13 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                             </div>
                         )}
                     </div>
-                    {errors.placeId && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.placeId.message}</p>}
+                    {errors.placeId && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.placeId.message}</p>}
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                    <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('addressAr')} <span className="text-rose-500">*</span>
                     </label>
                     <div className="group relative">
@@ -289,11 +289,11 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                             placeholder={t('addressAr')}
                         />
                     </div>
-                    {errors.addressAr && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.addressAr.message}</p>}
+                    {errors.addressAr && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.addressAr.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                    <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('addressEn')} <span className="text-rose-500">*</span>
                     </label>
                     <div className="group relative">
@@ -316,12 +316,12 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                             </div>
                         )}
                     </div>
-                    {errors.addressEn && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.addressEn.message}</p>}
+                    {errors.addressEn && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.addressEn.message}</p>}
                 </div>
             </div>
 
             <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                     {t('phone')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="group relative">
@@ -339,11 +339,11 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                         placeholder="+1 234 567 890"
                     />
                 </div>
-                {errors.phone && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.phone.message}</p>}
+                {errors.phone && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.phone.message}</p>}
             </div>
 
             <div className="space-y-2">
-                <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                     {t('link')} <span className="text-rose-500">*</span>
                 </label>
                 <div className="flex gap-4">
@@ -372,15 +372,15 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                         <span className="hidden md:inline">{t('extract')}</span>
                     </button>
                 </div>
-                <p className="px-1 text-[10px] font-medium text-gray-500 dark:text-gray-400 italic">
+                <p className="px-1 text-[0.625rem] font-medium text-gray-500 dark:text-gray-400 italic">
                     {t('linkDescription')}
                 </p>
-                {errors.link && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.link.message}</p>}
+                {errors.link && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.link.message}</p>}
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                    <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('latitude')} <span className="text-rose-500">*</span>
                     </label>
                     <div className="group relative">
@@ -402,11 +402,11 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                             placeholder="0.0000"
                         />
                     </div>
-                    {errors.latitude && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.latitude.message}</p>}
+                    {errors.latitude && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.latitude.message}</p>}
                 </div>
 
                 <div className="space-y-2">
-                    <label className="text-xs font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
+                    <label className="text-xs font-extrabold text-gray-400 dark:text-gray-500 uppercase tracking-widest ml-1">
                         {t('longitude')} <span className="text-rose-500">*</span>
                     </label>
                     <div className="group relative">
@@ -428,7 +428,7 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                             placeholder="0.0000"
                         />
                     </div>
-                    {errors.longitude && <p className="text-[10px] font-bold text-rose-500 mt-1 ml-1">{errors.longitude.message}</p>}
+                    {errors.longitude && <p className="text-[0.625rem] font-bold text-rose-500 mt-1 ml-1">{errors.longitude.message}</p>}
                 </div>
             </div>
 
@@ -498,7 +498,7 @@ export const BranchForm: React.FC<BranchFormProps> = ({ initialData, onSubmit, i
                 <button
                     type="submit"
                     disabled={isLoading}
-                    className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-10 py-4 text-sm font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700 hover:-translate-y-1 active:scale-95 disabled:opacity-50 overflow-hidden min-w-[160px]"
+                    className="group relative inline-flex items-center justify-center rounded bg-indigo-600 px-10 py-4 text-sm font-bold text-white shadow-xl shadow-indigo-500/20 transition-all duration-300 hover:bg-indigo-700  active:scale-95 disabled:opacity-50 overflow-hidden min-w-[160px]"
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000"></div>
                     {isLoading ? (

@@ -105,7 +105,7 @@ const DriverVerificationPage = () => {
         <div className="p-6 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
                         <ShieldCheck className="text-indigo-600" size={28} />
                         {t('delivery:drivers.verification.title', 'Driver Verification')}
                     </h1>
@@ -148,9 +148,9 @@ const DriverVerificationPage = () => {
                                 }
                             )} />
                             <div className="flex items-center gap-2">
-                                <span className="text-[10px] font-black uppercase tracking-widest">{s.label}</span>
+                                <span className="text-[0.625rem] font-extrabold uppercase tracking-widest">{s.label}</span>
                                 <span className={clsx(
-                                    "px-1.5 py-0.5 rounded text-[10px] font-black transition-colors",
+                                    "px-1.5 py-0.5 rounded text-[0.625rem] font-extrabold transition-colors",
                                     statusFilter === s.value 
                                         ? "bg-white/20 text-white" 
                                         : {
@@ -190,11 +190,11 @@ const DriverVerificationPage = () => {
                     <div 
                         key={profile.id} 
                         onClick={() => navigate(`/drivers/verification/${profile.id}`, { state: { from: location.pathname } })}
-                        className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col group cursor-pointer hover:shadow-md hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 transform hover:-translate-y-1"
+                        className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden flex flex-col group cursor-pointer  hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-300 transform "
                     >
                         {/* Status Header */}
                         <div className={clsx(
-                            "px-4 py-2 text-[10px] font-black uppercase tracking-widest text-center border-b",
+                            "px-4 py-2 text-[0.625rem] font-extrabold uppercase tracking-widest text-center border-b",
                             profile.verificationStatus === 'VERIFIED' ? "bg-emerald-50 text-emerald-600 border-emerald-100 dark:bg-emerald-900/20 dark:border-emerald-800 dark:text-emerald-400" :
                                 profile.verificationStatus === 'REJECTED' ? "bg-rose-50 text-rose-600 border-rose-100 dark:bg-rose-900/20 dark:border-rose-800 dark:text-rose-400" :
                                     profile.verificationStatus === 'UNDER_REVIEW' ? "bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:border-amber-800 dark:text-amber-400" :
@@ -205,7 +205,7 @@ const DriverVerificationPage = () => {
 
                         {/* Driver Info */}
                         <div className="p-5 flex-1 flex flex-col items-center text-center space-y-3">
-                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-black text-2xl text-indigo-600 shadow-inner overflow-hidden border-2 border-slate-200 dark:border-slate-700">
+                            <div className="w-16 h-16 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center font-extrabold text-2xl text-indigo-600 shadow-inner overflow-hidden border-2 border-slate-200 dark:border-slate-700">
                                 {profile.avatarUrl ? (
                                     <img src={profile.avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
                                 ) : (
@@ -214,7 +214,7 @@ const DriverVerificationPage = () => {
                             </div>
                             
                             <div className="space-y-1 w-full min-w-0">
-                                <h3 className="font-black text-slate-900 dark:text-white truncate text-lg group-hover:text-indigo-600 transition-colors">
+                                <h3 className="font-extrabold text-slate-900 dark:text-white truncate text-lg group-hover:text-indigo-600 transition-colors">
                                     {profile.profile?.user?.name || 'Unknown Driver'}
                                 </h3>
                                 
@@ -232,7 +232,7 @@ const DriverVerificationPage = () => {
                             
                             <div className="mt-auto pt-4 w-full border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                                 <span className="font-bold text-slate-400 uppercase">{t('type', 'Type')}</span>
-                                <span className="font-black text-slate-700 dark:text-slate-300">
+                                <span className="font-extrabold text-slate-700 dark:text-slate-300">
                                     {t(`driverTypes.${profile.driverType}`, profile.driverType) as string}
                                 </span>
                             </div>
@@ -246,7 +246,7 @@ const DriverVerificationPage = () => {
                             <ShieldCheck size={40} className="text-slate-300" />
                         </div>
                         <div className="space-y-1">
-                            <p className="text-lg font-black text-slate-900 dark:text-white">
+                            <p className="text-lg font-extrabold text-slate-900 dark:text-white">
                                 {t('delivery:drivers.no_pending', 'No drivers found')}
                             </p>
                             <p className="text-sm text-slate-500">{t('try_different_search', 'Try adjusting your search or filters.')}</p>

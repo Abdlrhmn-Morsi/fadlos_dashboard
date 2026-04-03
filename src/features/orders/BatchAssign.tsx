@@ -303,7 +303,7 @@ const BatchAssign: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-3">
+          <h1 className="text-2xl font-extrabold text-slate-900 dark:text-white uppercase tracking-tight flex items-center gap-3">
             <Truck className="text-primary w-8 h-8" />
             {t('orders:batchAssign')}
           </h1>
@@ -321,7 +321,7 @@ const BatchAssign: React.FC = () => {
           </button>
           <div className="bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-100 dark:border-emerald-900/30 px-6 py-3 rounded-2xl flex items-center gap-3">
             <CheckCircle2 className="text-emerald-500 w-5 h-5 shrink-0" />
-            <span className="text-emerald-700 dark:text-emerald-400 font-black uppercase tracking-tight text-sm">
+            <span className="text-emerald-700 dark:text-emerald-400 font-extrabold uppercase tracking-tight text-sm">
               {t('orders:confirmedForDelivery')}
             </span>
           </div>
@@ -341,7 +341,7 @@ const BatchAssign: React.FC = () => {
                     {orderMeta?.total || 0}
                   </span>
                   <span className="text-slate-300 mx-1">•</span>
-                  <span className="text-[10px] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
+                  <span className="text-[0.625rem] font-bold text-slate-400 flex items-center gap-1.5 uppercase tracking-wider">
                     ({(orderPage - 1) * 10 + orders.length} / {orderMeta?.total || 0})
                     {orderMeta && orderMeta.total > 0 && (
                       <span className="text-primary/70 ml-1">
@@ -468,7 +468,7 @@ const BatchAssign: React.FC = () => {
                             </div>
                             <div className="flex items-center gap-1">
                               <span className="text-xs font-bold text-slate-400">{t('orders:total')}:</span>
-                              <span className="font-black text-primary">{order.total} {t('orders:currency')}</span>
+                              <span className="font-extrabold text-primary">{order.total} {t('orders:currency')}</span>
                             </div>
                           </div>
 
@@ -483,16 +483,16 @@ const BatchAssign: React.FC = () => {
                                   {item.product?.coverImage && (
                                     <img 
                                       src={item.product.coverImage} 
-                                      alt="" 
+                                      alt="Image" aria-hidden="true" 
                                       className="w-10 h-10 rounded-lg object-cover border border-slate-200 dark:border-slate-700" 
                                     />
                                   )}
                                   <div className="flex flex-col">
                                     <div className="flex items-center gap-1 mb-0.5">
-                                      <span className="text-[10px] font-black text-primary leading-none">
+                                      <span className="text-[0.625rem] font-extrabold text-primary leading-none">
                                         {item.quantity}x
                                       </span>
-                                      <span className="text-[10px] font-bold text-slate-700 dark:text-slate-300 truncate max-w-[120px] leading-none">
+                                      <span className="text-[0.625rem] font-bold text-slate-700 dark:text-slate-300 truncate max-w-[120px] leading-none">
                                         {isRTL ? item.product?.nameAr || item.product?.name : item.product?.name}
                                       </span>
                                     </div>
@@ -549,11 +549,11 @@ const BatchAssign: React.FC = () => {
                                         ) : isCompleted ? (
                                           <Check size={12} strokeWidth={3} />
                                         ) : (
-                                          <span className="text-[10px] font-bold">{index + 1}</span>
+                                          <span className="text-[0.625rem] font-bold">{index + 1}</span>
                                         )}
                                       </button>
                                       <span className={clsx(
-                                        "text-[10px] font-bold whitespace-nowrap",
+                                        "text-[0.625rem] font-bold whitespace-nowrap",
                                         isCurrent ? "text-primary" : isCompleted ? "text-slate-600 dark:text-slate-400" : "text-slate-300 dark:text-slate-600"
                                       )}>
                                         {t(`dashboard:status.${status.toLowerCase()}`)}
@@ -590,7 +590,7 @@ const BatchAssign: React.FC = () => {
                     {t('common:previous')}
                   </button>
                 <div className="flex flex-col items-center">
-                  <span className="text-[10px] font-black text-primary/40 uppercase mb-0.5">
+                  <span className="text-[0.625rem] font-extrabold text-primary/40 uppercase mb-0.5">
                     {t('common:page')} {orderPage} / {orderMeta.totalPages}
                   </span>
                   <span className="text-[9px] font-bold text-slate-400">
@@ -613,7 +613,7 @@ const BatchAssign: React.FC = () => {
         {/* Right Panel: Driver Queue */}
         <div className="lg:col-span-5 flex flex-col gap-4">
           <div className="bg-primary/10 dark:bg-primary/20 p-6 rounded-2xl border border-primary/20 backdrop-blur-sm sticky top-6">
-            <h3 className="font-black text-primary uppercase tracking-tight text-lg mb-2 flex items-center gap-2">
+            <h3 className="font-extrabold text-primary uppercase tracking-tight text-lg mb-2 flex items-center gap-2">
               <Truck size={24} />
               {t('orders:dispatchOrders')}
             </h3>
@@ -658,7 +658,7 @@ const BatchAssign: React.FC = () => {
             <div className="bg-white/50 dark:bg-slate-900/50 p-4 rounded-xl border border-white dark:border-slate-800 mb-6">
               <div className="flex justify-between items-center mb-1">
                 <span className="text-sm font-bold text-slate-600 dark:text-slate-400">{t('orders:selectedOrders', { count: selectedOrderIds.length })}</span>
-                <span className="text-lg font-black text-slate-900 dark:text-white">
+                <span className="text-lg font-extrabold text-slate-900 dark:text-white">
                   {selectedOrderIds.length}
                 </span>
               </div>
@@ -709,7 +709,7 @@ const BatchAssign: React.FC = () => {
                       >
                         {/* Queue Badge */}
                         <div className={clsx(
-                          "absolute top-0 px-3 py-1 text-[10px] font-black uppercase tracking-widest",
+                          "absolute top-0 px-3 py-1 text-[0.625rem] font-extrabold uppercase tracking-widest",
                           isRTL ? "left-0 rounded-br-xl" : "right-0 rounded-bl-xl",
                           isNextInTurn ? "bg-primary text-white" : "bg-slate-100 dark:bg-slate-800 text-slate-400"
                         )}>
@@ -718,11 +718,11 @@ const BatchAssign: React.FC = () => {
 
                         <div className="flex items-center gap-4">
                           <div className={clsx(
-                            "w-12 h-12 rounded-full flex items-center justify-center border-2 overflow-hidden font-black text-lg flex-shrink-0",
+                            "w-12 h-12 rounded-full flex items-center justify-center border-2 overflow-hidden font-extrabold text-lg flex-shrink-0",
                             isNextInTurn ? "border-primary/20 bg-primary/5 text-primary" : "border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-800 text-slate-400"
                           )}>
                             {driver.avatarUrl ? (
-                              <img src={driver.avatarUrl} alt="" className="w-full h-full object-cover" />
+                              <img src={driver.avatarUrl} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
                             ) : (driver.name || '?').charAt(0).toUpperCase()}
                           </div>
                           
@@ -733,22 +733,22 @@ const BatchAssign: React.FC = () => {
                             )}>{driver.name}</h4>
                             <div className="flex items-center gap-2 mt-1">
                               <span className={clsx(
-                                "text-[10px] px-2 py-0.5 font-bold rounded uppercase",
+                                "text-[0.625rem] px-2 py-0.5 font-bold rounded uppercase",
                                 (driver.activeOrdersCount || 0) > 0 ? "bg-amber-100 dark:bg-amber-900/30 text-amber-600" : "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600"
                               )}>
                                 {driver.activeOrdersCount || 0} {t('orders:activeTasks')}
                               </span>
                               {(driver.activeOrdersCount || 0) > 0 && (
-                                <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-rose-100 dark:bg-rose-900/30 text-rose-600 animate-pulse">
+                                <span className="text-[0.625rem] px-2 py-0.5 font-bold rounded uppercase bg-rose-100 dark:bg-rose-900/30 text-rose-600 animate-pulse">
                                   {t('orders:onDelivery')}
                                 </span>
                               )}
                               {driver.isBusy && (
-                                <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-amber-100 dark:bg-amber-900/30 text-amber-600 animate-pulse">
+                                <span className="text-[0.625rem] px-2 py-0.5 font-bold rounded uppercase bg-amber-100 dark:bg-amber-900/30 text-amber-600 animate-pulse">
                                   {t('orders:outForDelivery', 'Out for Delivery')}
                                 </span>
                               )}
-                              <span className="text-[10px] px-2 py-0.5 font-bold rounded uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">
+                              <span className="text-[0.625rem] px-2 py-0.5 font-bold rounded uppercase bg-slate-100 dark:bg-slate-800 text-slate-500">
                                 {driver.todayOrdersCount || 0} {t('orders:today', 'Today')}
                               </span>
                             </div>
@@ -790,7 +790,7 @@ const BatchAssign: React.FC = () => {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                <span className="text-xs font-black text-primary/60">
+                <span className="text-xs font-extrabold text-primary/60">
                   {driverPage} / {driverMeta.totalPages}
                 </span>
                 <button

@@ -136,7 +136,7 @@ const CitiesList = () => {
                     <div className="p-3 bg-primary-light rounded-[4px] animate-float">
                         <Map size={24} className="text-primary" />
                     </div>
-                    <h2 className="text-3xl font-black text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
+                    <h2 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">{t('title')}</h2>
                 </div>
                 <div className={clsx("flex flex-wrap gap-3")}>
                     <div className="relative group">
@@ -145,7 +145,7 @@ const CitiesList = () => {
                             type="text"
                             placeholder={t('searchPlaceholder')}
                             className={clsx(
-                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group-hover:shadow-md text-slate-900 dark:text-slate-100",
+                                "py-3 w-full md:w-72 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-[4px] focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all shadow-sm group- text-slate-900 dark:text-slate-100",
                                 isRTL ? "pr-11 pl-4" : "pl-11 pr-4"
                             )}
                             value={search}
@@ -191,7 +191,7 @@ const CitiesList = () => {
                                     filteredCities.map((city: any) => (
                                         <tr key={city.id} className="table-row group">
                                             <td className="table-cell">
-                                                <div className="text-[15px] font-black text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{city.enName}</div>
+                                                <div className="text-[15px] font-extrabold text-slate-900 dark:text-slate-100 group-hover:text-primary transition-colors">{city.enName}</div>
                                             </td>
                                             <td className="table-cell">
                                                 <div className="text-sm text-slate-600 dark:text-slate-400 font-bold">{city.arName}</div>
@@ -200,7 +200,7 @@ const CitiesList = () => {
                                                 <button
                                                     onClick={() => handleToggleStatus(city)}
                                                     className={clsx(
-                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[10px] font-black uppercase tracking-widest transition-all",
+                                                        "inline-flex items-center gap-2 px-3 py-1 rounded-[4px] text-[0.625rem] font-extrabold uppercase tracking-widest transition-all",
                                                         city.isActive
                                                             ? 'bg-emerald-50 text-emerald-600 shadow-sm shadow-emerald-100 ring-1 ring-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:ring-emerald-900'
                                                             : 'bg-slate-50 text-slate-400 ring-1 ring-slate-200 dark:bg-slate-800 dark:text-slate-500 dark:ring-slate-700'
@@ -257,7 +257,7 @@ const CitiesList = () => {
             >
                 <form onSubmit={handleSubmit} className="space-y-8">
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                        <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('universalDesignationEn')}
                         </label>
                         <input
@@ -272,7 +272,7 @@ const CitiesList = () => {
                         />
                     </div>
                     <div className="space-y-3">
-                        <label className={clsx("text-[11px] font-black text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
+                        <label className={clsx("text-[0.6875rem] font-extrabold text-slate-400 uppercase tracking-[0.2em] block mb-1")}>
                             {t('nativeDesignationAr')}
                         </label>
                         <input

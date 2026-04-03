@@ -295,7 +295,7 @@ const EmployeeForm = () => {
                                     ))}
                                 </select>
                             </div>
-                            <p className="text-[11px] text-slate-500 mt-1 pl-1">
+                            <p className="text-[0.6875rem] text-slate-500 mt-1 pl-1">
                                 {t('branchAssignmentDesc', { defaultValue: 'Leave empty to allow employee to manage all branches' })}
                             </p>
                         </div>

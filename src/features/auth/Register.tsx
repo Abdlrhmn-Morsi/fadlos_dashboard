@@ -28,14 +28,14 @@ import clsx from 'clsx';
 const FormSection = ({ title, icon: Icon, children, description }: any) => {
     const { isRTL } = useLanguage();
     return (
-        <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-800 overflow-hidden transition-all hover:shadow-md h-full flex flex-col">
+        <div className="glass overflow-hidden h-full flex flex-col">
             <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/50 flex items-center gap-4 bg-slate-50/40 dark:bg-slate-800/20 backdrop-blur-sm shrink-0">
-                <div className="p-2 bg-primary/10 rounded-xl">
+                <div className="p-2 bg-primary/10 rounded-none">
                     <Icon size={20} className="text-primary" />
                 </div>
                 <div>
                     <h3 className="font-bold text-slate-900 dark:text-white text-sm uppercase tracking-wider">{title}</h3>
-                    {description && <p className="text-[10px] text-slate-400 font-medium">{description}</p>}
+                    {description && <p className="text-[0.625rem] text-slate-400 font-medium">{description}</p>}
                 </div>
             </div>
             <div className="p-6 space-y-6 flex-1">
@@ -52,7 +52,7 @@ const FormInput = ({ label, icon: Icon, ...props }: any) => {
 
     return (
         <div className="space-y-1.5 flex-1">
-            <label className={clsx("text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest", isRTL ? "mr-1 text-right block" : "ml-1")}>
+            <label className={clsx("text-[0.6875rem] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest", isRTL ? "mr-1 text-right block" : "ml-1")}>
                 {label} {props.required && <span className="text-rose-500">*</span>}
             </label>
             <div className="relative group">
@@ -66,7 +66,7 @@ const FormInput = ({ label, icon: Icon, ...props }: any) => {
                     {...props}
                     type={isPassword ? (showPassword ? 'text' : 'password') : props.type}
                     className={clsx(
-                        "w-full py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium",
+                        "w-full py-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-none focus:ring-4 focus:ring-primary/10 focus:border-primary outline-none transition-all text-sm font-medium",
                         isRTL ? "pr-11 pl-12 text-right" : "pl-11 pr-12"
                     )}
                 />
@@ -160,18 +160,18 @@ const Register = () => {
             <div className="w-full max-w-5xl mx-auto relative z-10">
                 <div className="flex flex-col items-center mb-10 text-center animate-in fade-in slide-in-from-top-4 duration-700">
                     <img src={appLogo} alt="Logo" className="h-20 object-contain mb-6" />
-                    <h1 className="text-4xl font-black text-slate-900 dark:text-white tracking-tighter uppercase mb-2">
+                    <h1 className="text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight uppercase mb-2">
                         {t('createStoreAccount')}
                     </h1>
                     <p className="text-slate-500 font-medium max-w-md">
                         {t('wantToBecomeSeller')} {t('setupStore')}
                     </p>
-                    <div className="h-1.5 w-16 bg-primary rounded-full mt-4 shadow-sm shadow-primary/30"></div>
+                    <div className="h-1.5 w-16 bg-primary rounded-none mt-4 shadow-sm shadow-primary/30"></div>
                 </div>
 
                 {error && (
                     <div className={clsx(
-                        "max-w-xl mx-auto bg-rose-100 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 px-6 py-4 rounded-2xl mb-8 flex items-center gap-4 animate-shake",
+                        "max-w-xl mx-auto bg-rose-100 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 px-6 py-4 rounded-none mb-8 flex items-center gap-4 animate-shake",
                         isRTL && "flex-row-reverse"
                     )}>
                         <AlertCircle size={20} className="shrink-0" />
@@ -265,7 +265,7 @@ const Register = () => {
                                         />
                                     </div>
                                     <div className="flex-1 min-h-[40px]"></div>
-                                    <div className="mt-auto p-5 bg-primary/5 dark:bg-primary/10 rounded-2xl border border-primary/10 dark:border-primary/20 shrink-0">
+                                    <div className="mt-auto p-5 bg-primary/5 dark:bg-primary/10 rounded-none border border-primary/10 dark:border-primary/20 shrink-0">
                                         <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
                                             {t('configLaterDesc')}
                                         </p>
@@ -281,7 +281,7 @@ const Register = () => {
                             type="submit"
                             disabled={loading}
                             className={clsx(
-                                "w-full max-w-md py-4 bg-primary text-white font-black rounded-2xl hover:bg-primary-hover shadow-xl shadow-primary/30 transition-all flex items-center justify-center gap-3 group relative overflow-hidden",
+                                "w-full max-w-md py-4 bg-primary text-white font-extrabold rounded-none hover:bg-primary-hover shadow-xl shadow-primary/30 active-push transition-all flex items-center justify-center gap-3 group relative overflow-hidden",
                                 loading && "opacity-70 cursor-not-allowed"
                             )}
                         >
