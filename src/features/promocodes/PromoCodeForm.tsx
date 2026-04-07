@@ -28,6 +28,41 @@ const InputGroup = ({ label, children, icon: Icon, required = false, subtitle = 
     );
 };
 
+const SelectedItemsList = ({ ids = [], metadata = {}, onRemove }: any) => {
+    const { t } = useTranslation(['promocodes']);
+
+    if (ids.length === 0) return null;
+
+    const displayLimit = 10;
+    const itemsToDisplay = ids.slice(0, displayLimit);
+    const remainingCount = ids.length - displayLimit;
+
+    return (
+        <div className="flex flex-wrap gap-2 mt-3">
+            {itemsToDisplay.map((id: string) => (
+                <div
+                    key={id}
+                    className="flex items-center gap-1.5 px-2 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-lg text-xs border border-indigo-100 dark:border-indigo-800 animate-in fade-in zoom-in duration-200"
+                >
+                    <span className="max-w-[150px] truncate">{metadata[id] || id.substring(0, 8)}</span>
+                    <button
+                        type="button"
+                        onClick={() => onRemove(id)}
+                        className="p-0.5 hover:bg-indigo-100 dark:hover:bg-indigo-800 rounded-full transition-colors"
+                    >
+                        <X size={12} />
+                    </button>
+                </div>
+            ))}
+            {remainingCount > 0 && (
+                <div className="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-lg text-xs border border-slate-200 dark:border-slate-700 font-medium">
+                    + {remainingCount} {t('selected')}
+                </div>
+            )}
+        </div>
+    );
+};
+
 const PromoCodeForm = () => {
     const { t } = useTranslation(['promocodes', 'common']);
     const { isRTL } = useLanguage();
@@ -64,11 +99,64 @@ const PromoCodeForm = () => {
         loading: false
     });
 
+    const [selectedItemsMetadata, setSelectedItemsMetadata] = useState<any>({
+        products: {}, // id -> name
+        customers: {}, // id -> name
+        categories: {} // id -> name
+    });
+
     useEffect(() => {
         if (isEditMode) {
             fetchPromoCode();
         }
     }, [id]);
+
+    // Effect to fetch metadata for existing ruleParams on load
+    useEffect(() => {
+        const fetchMetadata = async () => {
+            if (!formData.ruleType || formData.ruleType === 'none') return;
+            
+            const types = [];
+            if (formData.ruleParams.productIds?.length) types.push('products');
+            if (formData.ruleParams.userIds?.length) types.push('customers');
+            if (formData.ruleParams.categoryIds?.length) types.push('categories');
+
+            for (const type of types) {
+                if (Object.keys(selectedItemsMetadata[type]).length > 0) continue;
+                
+                try {
+                    let data: any = [];
+                    if (type === 'products') {
+                        const response = await productsApi.getSellerProducts();
+                        data = response.data || response;
+                    } else if (type === 'customers') {
+                        const response = await clientsApi.getStoreClients();
+                        data = response.data || response;
+                    } else if (type === 'categories') {
+                        const response = await categoriesApi.getSellerCategories();
+                        data = response.data || response;
+                    }
+
+                    const metadata: any = {};
+                    data.forEach((item: any) => {
+                        let name = item.name || item.nameEn || item.user?.name || item.email || item.client?.name || 'Untitled';
+                        if (type === 'categories' && isRTL && item.nameAr) name = item.nameAr;
+                        else if (type === 'products' && isRTL && item.nameAr) name = item.nameAr;
+                        metadata[item.id] = name;
+                    });
+
+                    setSelectedItemsMetadata((prev: any) => ({
+                        ...prev,
+                        [type]: { ...prev[type], ...metadata }
+                    }));
+                } catch (e) {
+                    console.error(`Failed to fetch metadata for ${type}`, e);
+                }
+            }
+        };
+
+        fetchMetadata();
+    }, [formData.ruleType, formData.ruleParams]);
 
     const fetchPromoCode = async () => {
         try {
@@ -139,6 +227,17 @@ const PromoCodeForm = () => {
                     } : null
                 };
             });
+
+            // Refresh metadata
+            const newMetadata: any = {};
+            normalizedItems.forEach((item: any) => {
+                newMetadata[item.id] = item.name;
+            });
+            setSelectedItemsMetadata((prev: any) => ({
+                ...prev,
+                [type]: { ...prev[type], ...newMetadata }
+            }));
+
             setModalData((prev: any) => ({ ...prev, items: normalizedItems, filteredItems: normalizedItems, loading: false }));
         } catch (error) {
             console.error('Failed to fetch items', error);
@@ -349,41 +448,56 @@ const PromoCodeForm = () => {
                                 )}
 
                                 {formData.ruleType === 'specific_customers' && (
-                                    <InputGroup label={t('specificCustomers')} icon={Hash} subtitle={`Selected: ${formData.ruleParams?.userIds?.length || 0}`}>
+                                    <InputGroup label={t('specificCustomers')} icon={Hash} subtitle={t('countSelected', { count: formData.ruleParams?.userIds?.length || 0 })}>
                                         <button
                                             type="button"
                                             onClick={() => openSelectionModal('customers')}
-                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400"
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400 shadow-sm"
                                         >
-                                            <span>{formData.ruleParams?.userIds?.length ? `${formData.ruleParams.userIds.length} Customers Selected` : 'Select Customers...'}</span>
+                                            <span>{formData.ruleParams?.userIds?.length ? t('itemsSelected', { count: formData.ruleParams.userIds.length }) : t('selectCustomersPlaceholder')}</span>
                                             <Search size={16} />
                                         </button>
+                                        <SelectedItemsList 
+                                            ids={formData.ruleParams?.userIds} 
+                                            metadata={selectedItemsMetadata.customers} 
+                                            onRemove={(id: string) => toggleSelection(id, 'userIds')} 
+                                        />
                                     </InputGroup>
                                 )}
 
                                 {formData.ruleType === 'specific_products' && (
-                                    <InputGroup label={t('specificProducts')} icon={Hash} subtitle={`Selected: ${formData.ruleParams?.productIds?.length || 0}`}>
+                                    <InputGroup label={t('specificProducts')} icon={Hash} subtitle={t('countSelected', { count: formData.ruleParams?.productIds?.length || 0 })}>
                                         <button
                                             type="button"
                                             onClick={() => openSelectionModal('products')}
-                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400"
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400 shadow-sm"
                                         >
-                                            <span>{formData.ruleParams?.productIds?.length ? `${formData.ruleParams.productIds.length} Products Selected` : 'Select Products...'}</span>
+                                            <span>{formData.ruleParams?.productIds?.length ? t('itemsSelected', { count: formData.ruleParams.productIds.length }) : t('selectProductsPlaceholder')}</span>
                                             <Search size={16} />
                                         </button>
+                                        <SelectedItemsList 
+                                            ids={formData.ruleParams?.productIds} 
+                                            metadata={selectedItemsMetadata.products} 
+                                            onRemove={(id: string) => toggleSelection(id, 'productIds')} 
+                                        />
                                     </InputGroup>
                                 )}
 
                                 {formData.ruleType === 'category_based' && (
-                                    <InputGroup label={t('categoryBased')} icon={Hash} subtitle={`Selected: ${formData.ruleParams?.categoryIds?.length || 0}`}>
+                                    <InputGroup label={t('categoryBased')} icon={Hash} subtitle={t('countSelected', { count: formData.ruleParams?.categoryIds?.length || 0 })}>
                                         <button
                                             type="button"
                                             onClick={() => openSelectionModal('categories')}
-                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400"
+                                            className="w-full flex items-center justify-between px-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg hover:border-indigo-500 transition-all text-sm text-slate-600 dark:text-slate-400 shadow-sm"
                                         >
-                                            <span>{formData.ruleParams?.categoryIds?.length ? `${formData.ruleParams.categoryIds.length} Categories Selected` : 'Select Categories...'}</span>
+                                            <span>{formData.ruleParams?.categoryIds?.length ? t('itemsSelected', { count: formData.ruleParams.categoryIds.length }) : t('selectCategoriesPlaceholder')}</span>
                                             <Search size={16} />
                                         </button>
+                                        <SelectedItemsList 
+                                            ids={formData.ruleParams?.categoryIds} 
+                                            metadata={selectedItemsMetadata.categories} 
+                                            onRemove={(id: string) => toggleSelection(id, 'categoryIds')} 
+                                        />
                                     </InputGroup>
                                 )}
                             </div>
