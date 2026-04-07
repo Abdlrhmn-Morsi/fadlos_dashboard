@@ -16,7 +16,10 @@ import {
   ArrowLeft,
   User,
   Check,
-  ExternalLink
+  ExternalLink,
+  Store,
+  Phone,
+  Mail
 } from 'lucide-react';
 import { toast } from '../../utils/toast';
 import { ordersApi } from './api/orders.api';
@@ -25,6 +28,7 @@ import clsx from 'clsx';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { ConfirmModal } from '../../components/ConfirmModal';
+import { ImageWithFallback } from '../../components/common/ImageWithFallback';
 import { OrderStatus } from '../../types/order-status';
 import { Permissions } from '../../types/permissions';
 import { UserRole } from '../../types/user-role';
@@ -451,24 +455,81 @@ const BatchAssign: React.FC = () => {
                             </span>
                           </div>
                           
-                          <p className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate mb-1">
-                            {order.client?.name || order.clientInfo?.name || t('orders:guest')}
-                          </p>
+                          <div className="flex items-center gap-3 mb-2">
+                            <div className="w-8 h-8 rounded-full bg-indigo-50 dark:bg-indigo-900/30 flex items-center justify-center overflow-hidden border border-indigo-100 dark:border-indigo-800 shrink-0">
+                                {(order.clientInfo?.profileImage || order.client?.profileImage) ? (
+                                    <ImageWithFallback
+                                        src={order.clientInfo?.profileImage || order.client?.profileImage!}
+                                        alt={order.clientInfo?.name || order.client?.name || ''}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <span className="text-indigo-600 dark:text-indigo-400 font-bold text-xs">
+                                        {(order.client?.name || order.clientInfo?.name || 'G')[0].toUpperCase()}
+                                    </span>
+                                )}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-bold text-slate-700 dark:text-slate-300 truncate leading-tight">
+                                {order.client?.name || order.clientInfo?.name || t('orders:guest')}
+                              </p>
+                              {(address?.phone || address?.email) && (
+                                <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5 text-[10px] font-medium text-slate-500">
+                                  {address.phone && (
+                                    <span className="flex items-center gap-1">
+                                      <Phone size={10} className="text-slate-400" />
+                                      {address.phone}
+                                    </span>
+                                  )}
+                                  {address.email && (
+                                    <span className="flex items-center gap-1">
+                                      <Mail size={10} className="text-slate-400" />
+                                      {address.email}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+                            </div>
+                          </div>
                           
                           <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
-                            <div className="flex items-center gap-1">
+                            {order.branch && (
+                              <div className="flex items-center gap-1 text-primary/70">
+                                <Store size={12} />
+                                <span className="font-bold truncate max-w-[150px]">
+                                  {isRTL 
+                                    ? [order.branch.town?.arName || order.branch.town?.enName, order.branch.place?.arName || order.branch.place?.enName].filter(Boolean).join(' - ')
+                                    : [order.branch.town?.enName || order.branch.town?.arName, order.branch.place?.enName || order.branch.place?.arName].filter(Boolean).join(' - ')}
+                                </span>
+                              </div>
+                            )}
+                            <div className="flex items-center gap-1" title={address?.addressDetails || ''}>
                               <MapPin size={12} />
-                              <span className="truncate max-w-[150px]">
-                                {address?.townEnName}, {address?.placeEnName}
+                              <span className="truncate max-w-[200px]">
+                                {isRTL 
+                                  ? [address?.townArName || address?.townEnName, address?.placeArName || address?.placeEnName].filter(Boolean).join(', ')
+                                  : [address?.townEnName || address?.townArName, address?.placeEnName || address?.placeArName].filter(Boolean).join(', ')}
+                                {address?.addressDetails ? ` - ${address.addressDetails}` : ''}
                               </span>
                             </div>
                             <div className="flex items-center gap-1">
                               <Clock size={12} />
                               <span>{new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                             </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs font-bold text-slate-400">{t('orders:total')}:</span>
-                              <span className="font-extrabold text-primary">{order.total} {t('orders:currency')}</span>
+                          </div>
+
+                          <div className="mt-2 flex items-center justify-between bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg border border-slate-100 dark:border-slate-800">
+                            <div className="flex items-center gap-1.5 flex-1 justify-center border-r border-slate-200 dark:border-slate-700 last:border-0">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('orders:subtotal')}</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{order.subtotal || 0} <span className="text-[9px] text-slate-400">{t('orders:currency')}</span></span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-1 justify-center border-r border-slate-200 dark:border-slate-700 last:border-0">
+                              <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{t('orders:deliveryFee', 'Delivery')}</span>
+                              <span className="text-xs font-bold text-slate-700 dark:text-slate-300">{order.deliveryFee || 0} <span className="text-[9px] text-slate-400">{t('orders:currency')}</span></span>
+                            </div>
+                            <div className="flex items-center gap-1.5 flex-1 justify-center last:border-0">
+                              <span className="text-[9px] font-extrabold text-primary/70 uppercase tracking-widest">{t('orders:total')}</span>
+                              <span className="text-xs font-extrabold text-primary">{order.total} <span className="text-[9px] text-primary/70">{t('orders:currency')}</span></span>
                             </div>
                           </div>
 
