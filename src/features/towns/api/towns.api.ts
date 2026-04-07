@@ -97,3 +97,11 @@ export const resetMyStoreDeliveryAreas = async () => {
         throw error;
     }
 };
+
+export const bulkRemoveDeliveryAreas = async (ids: string[]) => {
+    try {
+        return await apiService.post('/towns/delivery-areas/bulk-delete', { ids });
+    } catch (error) {
+        throw error;
+    }
+};

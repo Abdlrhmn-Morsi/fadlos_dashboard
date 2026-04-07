@@ -1,19 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
     MapPin,
-    Plus,
     Trash2,
-    Save,
     Loader2,
-    CheckCircle,
-    XCircle,
     Truck,
     DollarSign,
     RefreshCw,
-    Filter,
+    Search,
     RotateCcw,
-    Search
+    ChevronDown,
+    Check,
+    CheckSquare,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -24,6 +22,7 @@ import {
     getMyStoreDeliveryAreas,
     updateDeliveryArea,
     removeDeliveryArea,
+    bulkRemoveDeliveryAreas,
     resetMyStoreDeliveryAreas,
     getPlacesByTown
 } from '../../towns/api/towns.api';
@@ -38,39 +37,43 @@ const DeliveryAreas = () => {
     const { isRTL } = useLanguage();
     const { hasPermission } = useAuth();
     const { getCache, setCache, invalidateCache } = useCache();
+
     const [loading, setLoading] = useState(true);
     const [cities, setCities] = useState<any[]>([]);
     const [deliveryAreas, setDeliveryAreas] = useState<any[]>([]);
-    const [selectedCityId, setSelectedCityId] = useState<string>('');
-    const [defaultPrice, setDefaultPrice] = useState<number>(0);
-    const [saving, setSaving] = useState(false);
-    const [places, setPlaces] = useState<any[]>([]);
-    const [selectedPlaceIds, setSelectedPlaceIds] = useState<string[]>([]);
-    const [fetchingPlaces, setFetchingPlaces] = useState(false);
 
-    // Enhancement states
-    const [filterTownId, setFilterTownId] = useState<string>('all');
-    const [showResetConfirm, setShowResetConfirm] = useState(false);
-    const [resetting, setResetting] = useState(false);
+    const [expandedCities, setExpandedCities] = useState<Set<string>>(new Set());
+    const [cityPlacesMap, setCityPlacesMap] = useState<Record<string, any[]>>({});
+    const [loadingPlacesFor, setLoadingPlacesFor] = useState<Set<string>>(new Set());
+    const [cityPrices, setCityPrices] = useState<Record<string, number>>({});
+    const [processingPlaces, setProcessingPlaces] = useState<Set<string>>(new Set());
+    const [processingCities, setProcessingCities] = useState<Set<string>>(new Set());
     const [searchQuery, setSearchQuery] = useState('');
+
+    const [showResetConfirm, setShowResetConfirm] = useState(false);
+    const [showCityRemoveConfirm, setShowCityRemoveConfirm] = useState<string | null>(null);
+    const [resetting, setResetting] = useState(false);
+
+    const currentLng = i18n.language;
+    const canUpdate = hasPermission(Permissions.DELIVERY_AREAS_UPDATE);
+
+    const getName = useCallback((item: any) => {
+        return currentLng.startsWith('ar') ? item?.arName : item?.enName;
+    }, [currentLng]);
 
     const fetchData = async (force = false) => {
         setLoading(true);
         try {
-            // Check cache first
             const cachedCities = getCache<any[]>('cities_all');
             const cachedAreas = force ? null : getCache<any[]>('delivery-areas');
 
             if (cachedCities && cachedAreas) {
-
-                console.log('[Cache] Loading delivery areas and cities from cache');
                 setCities(cachedCities);
                 setDeliveryAreas(cachedAreas);
                 setLoading(false);
                 return;
             }
 
-            console.log('[API] Fetching delivery areas and cities from API');
             const [allCities, areas] = await Promise.all([
                 getCities({ limit: 0 }),
                 getMyStoreDeliveryAreas()
@@ -78,8 +81,6 @@ const DeliveryAreas = () => {
 
             setCities(allCities);
             setDeliveryAreas(areas);
-
-            // Store in cache
             setCache('cities_all', allCities);
             setCache('delivery-areas', areas);
         } catch (error) {
@@ -90,79 +91,129 @@ const DeliveryAreas = () => {
         }
     };
 
-    useEffect(() => {
-        fetchData();
-    }, []);
+    useEffect(() => { fetchData(); }, []);
 
-    useEffect(() => {
-        const fetchPlaces = async () => {
-            if (!selectedCityId) {
-                setPlaces([]);
-                setSelectedPlaceIds([]);
-                return;
-            }
-            setFetchingPlaces(true);
+    const getAreasForCity = (cityId: string) =>
+        deliveryAreas.filter(area => area.place?.town?.id === cityId);
+
+    const getAreaForPlace = (placeId: string) =>
+        deliveryAreas.find(area => area.place?.id === placeId);
+
+    const handleToggleCity = async (cityId: string) => {
+        const next = new Set(expandedCities);
+        if (next.has(cityId)) {
+            next.delete(cityId);
+            setExpandedCities(next);
+            return;
+        }
+
+        next.add(cityId);
+        setExpandedCities(next);
+
+        if (!cityPlacesMap[cityId]) {
+            setLoadingPlacesFor(prev => new Set(prev).add(cityId));
             try {
-                const data = await getPlacesByTown(selectedCityId);
-                setPlaces(data);
-                // Initially select all places
-                setSelectedPlaceIds(data.map((p: any) => p.id));
+                const places = await getPlacesByTown(cityId);
+                setCityPlacesMap(prev => ({ ...prev, [cityId]: places }));
             } catch (error) {
                 console.error('Failed to fetch places:', error);
             } finally {
-                setFetchingPlaces(false);
+                setLoadingPlacesFor(prev => {
+                    const s = new Set(prev);
+                    s.delete(cityId);
+                    return s;
+                });
             }
-        };
-        fetchPlaces();
-    }, [selectedCityId]);
+        }
+    };
 
-    const handleAssignCity = async () => {
-        if (!selectedCityId) return;
-        setSaving(true);
+    const handleTogglePlace = async (cityId: string, placeId: string) => {
+        if (!canUpdate || processingPlaces.has(placeId)) return;
+
+        const area = getAreaForPlace(placeId);
+        setProcessingPlaces(prev => new Set(prev).add(placeId));
+
         try {
-            await assignTownToStore({
-                townId: selectedCityId,
-                defaultPrice: defaultPrice,
-                placeIds: selectedPlaceIds
-            });
-            toast.success(t('common:success'));
-            // Invalidate cache after adding new delivery area
+            if (area) {
+                await removeDeliveryArea(area.id);
+                setDeliveryAreas(prev => prev.filter(a => a.id !== area.id));
+            } else {
+                const price = cityPrices[cityId] || 0;
+                await assignTownToStore({ townId: cityId, defaultPrice: price, placeIds: [placeId] });
+                const areas = await getMyStoreDeliveryAreas();
+                setDeliveryAreas(areas);
+                setCache('delivery-areas', areas);
+            }
             invalidateCache('delivery-areas');
-            fetchData(true);
-            setSelectedCityId('');
-            setDefaultPrice(0);
-            setSelectedPlaceIds([]);
-            setPlaces([]);
+            toast.success(t('common:success'));
         } catch (error) {
-            console.error('Failed to assign city:', error);
             toast.error(t('common:errorUpdatingData'));
         } finally {
-            setSaving(false);
+            setProcessingPlaces(prev => {
+                const s = new Set(prev);
+                s.delete(placeId);
+                return s;
+            });
         }
     };
 
-    const handleUpdatePrice = async (id: string, price: number) => {
+    const handleSelectAllInCity = async (cityId: string) => {
+        if (!canUpdate) return;
+        const places = cityPlacesMap[cityId] || [];
+        const unassignedIds = places.filter(p => !getAreaForPlace(p.id)).map(p => p.id);
+        if (unassignedIds.length === 0) return;
+
+        setProcessingCities(prev => new Set(prev).add(cityId));
         try {
-            await updateDeliveryArea(id, { price });
-            toast.success(t('common:success'));
-            setDeliveryAreas(prev => prev.map(area => area.id === id ? { ...area, price } : area));
-            // Invalidate cache after updating delivery area
+            const price = cityPrices[cityId] || 0;
+            await assignTownToStore({ townId: cityId, defaultPrice: price, placeIds: unassignedIds });
+            const areas = await getMyStoreDeliveryAreas();
+            setDeliveryAreas(areas);
+            setCache('delivery-areas', areas);
             invalidateCache('delivery-areas');
+            toast.success(t('common:success'));
         } catch (error) {
-            console.error('Failed to update price:', error);
             toast.error(t('common:errorUpdatingData'));
+        } finally {
+            setProcessingCities(prev => {
+                const s = new Set(prev);
+                s.delete(cityId);
+                return s;
+            });
         }
     };
 
-    const handleRemoveArea = async (id: string) => {
+    const handleRemoveAllInCity = async (cityId: string) => {
+        if (!canUpdate) return;
+        const areasInCity = getAreasForCity(cityId);
+        if (areasInCity.length === 0) return;
+
+        setProcessingCities(prev => new Set(prev).add(cityId));
+        setShowCityRemoveConfirm(null);
         try {
-            await removeDeliveryArea(id);
-            toast.success(t('common:success'));
-            setDeliveryAreas(prev => prev.filter(area => area.id !== id));
-            // Invalidate cache after removing delivery area
+            const ids = areasInCity.map(area => area.id);
+            await bulkRemoveDeliveryAreas(ids);
+            setDeliveryAreas(prev => prev.filter(a => a.place?.town?.id !== cityId));
             invalidateCache('delivery-areas');
+            toast.success(t('common:success'));
         } catch (error) {
-            console.error('Failed to remove delivery area:', error);
+            toast.error(t('common:errorUpdatingData'));
+        } finally {
+            setProcessingCities(prev => {
+                const s = new Set(prev);
+                s.delete(cityId);
+                return s;
+            });
+        }
+    };
+
+    const handleUpdatePrice = async (areaId: string, price: number) => {
+        try {
+            await updateDeliveryArea(areaId, { price });
+            setDeliveryAreas(prev => prev.map(a => a.id === areaId ? { ...a, price } : a));
+            invalidateCache('delivery-areas');
+            toast.success(t('common:success'));
+        } catch (error) {
             toast.error(t('common:errorUpdatingData'));
         }
     };
@@ -171,330 +222,295 @@ const DeliveryAreas = () => {
         setResetting(true);
         try {
             await resetMyStoreDeliveryAreas();
-            toast.success(t('common:success'));
             setDeliveryAreas([]);
-            setFilterTownId('all');
             setShowResetConfirm(false);
-            // Invalidate cache after resetting all delivery areas
             invalidateCache('delivery-areas');
+            toast.success(t('common:success'));
         } catch (error) {
-            console.error('Failed to reset delivery areas:', error);
             toast.error(t('common:errorUpdatingData'));
         } finally {
             setResetting(false);
         }
     };
 
-    if (loading) {
-        return <LoadingSpinner fullHeight={false} />;
-    }
+    if (loading) return <LoadingSpinner fullHeight={false} />;
 
-    const currentLng = i18n.language;
-    const canUpdate = hasPermission(Permissions.DELIVERY_AREAS_UPDATE);
+    const filteredCities = cities.filter(city => {
+        if (!searchQuery) return true;
+        const q = searchQuery.toLowerCase();
+        return city.enName?.toLowerCase().includes(q) || city.arName?.toLowerCase().includes(q);
+    });
 
-    // Get unique towns for filtering
-    const uniqueTowns = Array.from(new Set(deliveryAreas.map(area => area.place?.town?.id)))
-        .map(townId => {
-            const area = deliveryAreas.find(a => a.place?.town?.id === townId);
-            return {
-                id: townId,
-                enName: area?.place?.town?.enName,
-                arName: area?.place?.town?.arName
-            };
-        })
-        .filter(t => t.id);
+    // Sort: cities with areas first
+    const sortedCities = [...filteredCities].sort((a, b) => {
+        const aCount = getAreasForCity(a.id).length;
+        const bCount = getAreasForCity(b.id).length;
+        if (aCount > 0 && bCount === 0) return -1;
+        if (aCount === 0 && bCount > 0) return 1;
+        return 0;
+    });
 
-    const filteredAreas = deliveryAreas
-        .filter(area => filterTownId === 'all' || area.place?.town?.id === filterTownId)
-        .filter(area => {
-            if (!searchQuery) return true;
-            const search = searchQuery.toLowerCase();
-            const placeNameEn = area.place?.enName?.toLowerCase() || '';
-            const placeNameAr = area.place?.arName?.toLowerCase() || '';
-            return placeNameEn.includes(search) || placeNameAr.includes(search);
-        });
+    const citiesWithAreas = new Set(deliveryAreas.map(a => a.place?.town?.id)).size;
 
     return (
-        <div className="space-y-8">
-            {/* Add New Delivery Area Section */}
-            {canUpdate && (
-                <div className="bg-slate-50 dark:bg-slate-800/30 p-6 border border-slate-200 dark:border-slate-800 rounded-none flex flex-col">
-                    <h4 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs mb-4 flex items-center gap-2">
-                        <Plus size={14} className="text-primary" />
-                        {t('addDeliveryCity')}
-                    </h4>
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="space-y-1">
-                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest block">{t('common:city')}</label>
-                            <select
-                                value={selectedCityId}
-                                onChange={(e) => setSelectedCityId(e.target.value)}
-                                className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors"
-                            >
-                                <option value="">{t('selectCity')}</option>
-                                {cities.map(city => (
-                                    <option key={city.id} value={city.id}>
-                                        {currentLng.startsWith('ar') ? city.arName : city.enName}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-                        <div className="space-y-1">
-                            <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest block">{t('defaultPrice')}</label>
-                            <div className="relative">
-                                <input
-                                    type="number"
-                                    value={defaultPrice}
-                                    onChange={(e) => setDefaultPrice(Number(e.target.value))}
-                                    className={clsx(
-                                        "w-full py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-sm outline-none focus:border-primary transition-colors ps-8 pe-4"
-                                    )}
-                                    min="0"
-                                />
-                                <DollarSign size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 font-bold start-3" />
-                            </div>
-                        </div>
-                        <div className="flex items-end">
-                            <button
-                                type="button"
-                                onClick={handleAssignCity}
-                                disabled={!selectedCityId || saving || selectedPlaceIds.length === 0}
-                                className="w-full flex items-center justify-center gap-2 px-6 py-3 bg-primary text-white font-extrabold uppercase tracking-widest text-xs rounded-none shadow-lg shadow-primary/20 hover:-translate-y-0.5 transition-all disabled:opacity-50 disabled:translate-y-0"
-                            >
-                                {saving ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} />}
-                                {t('addArea')}
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* Places Selection */}
-                    {selectedCityId && (
-                        <div className="mt-6 pt-6 border-t border-slate-200 dark:border-slate-700">
-                            <div className="flex items-center justify-between mb-4">
-                                <h5 className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest block">
-                                    {t('selectPlaces')} ({selectedPlaceIds.length}/{places.length})
-                                </h5>
-                                <div className="flex gap-4">
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectedPlaceIds(places.map(p => p.id))}
-                                        className="text-[0.625rem] font-extrabold text-primary uppercase tracking-widest hover:underline"
-                                    >
-                                        {t('common:selectAll')}
-                                    </button>
-                                    <button
-                                        type="button"
-                                        onClick={() => setSelectedPlaceIds([])}
-                                        className="text-[0.625rem] font-extrabold text-slate-500 uppercase tracking-widest hover:underline"
-                                    >
-                                        {t('common:deselectAll')}
-                                    </button>
-                                </div>
-                            </div>
-
-                            {fetchingPlaces ? (
-                                <div className="flex justify-center py-4">
-                                    <Loader2 size={24} className="animate-spin text-slate-300" />
-                                </div>
-                            ) : places.length === 0 ? (
-                                <p className="text-xs text-slate-500 italic py-2">{t('noPlacesFound')}</p>
-                            ) : (
-                                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-[200px] overflow-y-auto p-1 custom-scrollbar">
-                                    {places.map((place) => {
-                                        const isSelected = selectedPlaceIds.includes(place.id);
-                                        return (
-                                            <button
-                                                key={place.id}
-                                                type="button"
-                                                onClick={() => {
-                                                    if (isSelected) {
-                                                        setSelectedPlaceIds(prev => prev.filter(id => id !== place.id));
-                                                    } else {
-                                                        setSelectedPlaceIds(prev => [...prev, place.id]);
-                                                    }
-                                                }}
-                                                className={clsx(
-                                                    "flex items-center gap-2 p-2 border transition-all text-start",
-                                                    isSelected
-                                                        ? "bg-primary/5 border-primary text-primary"
-                                                        : "bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 hover:border-slate-300"
-                                                )}
-                                            >
-                                                <div className={clsx(
-                                                    "w-3 h-3 border flex items-center justify-center transition-colors",
-                                                    isSelected ? "bg-primary border-primary" : "border-slate-300 dark:border-slate-600"
-                                                )}>
-                                                    {isSelected && <Plus size={10} className="text-white" />}
-                                                </div>
-                                                <span className="text-[0.6875rem] font-bold truncate">
-                                                    {currentLng.startsWith('ar') ? place.arName : place.enName}
-                                                </span>
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-                            )}
-                        </div>
-                    )}
-
-                    <p className="mt-4 text-[0.625rem] text-slate-500 font-medium">
-                        {t('addAreaNote')}
-                    </p>
+        <div className="space-y-6">
+            {/* Header Bar */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="relative flex-1 max-w-sm">
+                    <Search size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-3" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={t('common:search')}
+                        className="w-full py-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors ps-9 pe-4"
+                    />
                 </div>
-            )}
 
-            {/* List of Delivery Areas */}
-            <div className="space-y-4">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                        <div className="flex items-center gap-4">
-                            <h4 className="font-extrabold text-slate-900 dark:text-slate-100 uppercase tracking-widest text-xs flex items-center gap-2">
-                                <Truck size={14} className="text-primary" />
-                                {t('activeDeliveryAreas')}
-                            </h4>
-                            <div className="text-[0.625rem] font-extrabold px-2 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 rounded-none">
-                                {filteredAreas.length}
-                            </div>
-                        </div>
-                    </div>
+                <div className="flex items-center gap-3 flex-wrap">
+                    <span className="text-[0.625rem] font-extrabold px-3 py-1.5 bg-primary/10 text-primary uppercase tracking-widest">
+                        {deliveryAreas.length} {t('totalAreas')}
+                    </span>
+                    <span className="text-[0.625rem] font-extrabold px-3 py-1.5 bg-slate-100 dark:bg-slate-800 text-slate-500 uppercase tracking-widest">
+                        {citiesWithAreas}/{cities.length} {t('citiesCovered')}
+                    </span>
 
-                    <div className="flex items-center gap-3 flex-wrap justify-end">
-                        {/* Town Filter */}
-                        <div className="relative">
-                            <Filter size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-3" />
-                            <select
-                                value={filterTownId}
-                                onChange={(e) => setFilterTownId(e.target.value)}
-                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[0.625rem] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4"
-                            >
-                                <option value="all">{t('allTowns')}</option>
-                                {uniqueTowns.map(town => (
-                                    <option key={town.id} value={town.id}>
-                                        {currentLng.startsWith('ar') ? town.arName : town.enName}
-                                    </option>
-                                ))}
-                            </select>
-                        </div>
-
-                        {/* Search Input */}
-                        <div className="relative">
-                            <Search size={14} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-3" />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => setSearchQuery(e.target.value)}
-                                placeholder={t('common:search')}
-                                className="py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[0.625rem] uppercase tracking-widest outline-none focus:border-primary transition-colors ps-9 pe-4 min-w-[150px]"
-                            />
-                        </div>
-
-                        {/* Reset All Button */}
-                        {canUpdate && (
-                            <button
-                                type="button"
-                                onClick={() => setShowResetConfirm(true)}
-                                disabled={deliveryAreas.length === 0}
-                                className="flex items-center gap-2 px-4 py-2 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-bold text-[0.625rem] uppercase tracking-widest disabled:opacity-30"
-                            >
-                                <RotateCcw size={14} />
-                                {t('resetAll')}
-                            </button>
-                        )}
-
+                    {canUpdate && (
                         <button
                             type="button"
-                            onClick={() => fetchData(true)}
-                            className="p-2 text-slate-400 hover:text-primary transition-colors"
+                            onClick={() => setShowResetConfirm(true)}
+                            disabled={deliveryAreas.length === 0}
+                            className="flex items-center gap-2 px-3 py-1.5 text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors font-extrabold text-[0.625rem] uppercase tracking-widest disabled:opacity-30"
                         >
-                            <RefreshCw size={14} />
+                            <RotateCcw size={12} />
+                            {t('resetAll')}
                         </button>
-                    </div>
-                </div>
+                    )}
 
-                {deliveryAreas.length === 0 ? (
-                    <div className="py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
-                        <Truck size={32} strokeWidth={1} />
-                        <p className="font-bold text-sm uppercase tracking-widest">{t('noDeliveryAreas')}</p>
-                    </div>
-                ) : filteredAreas.length === 0 ? (
-                    <div className="py-12 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
-                        <Filter size={24} strokeWidth={1} />
-                        <p className="font-bold text-xs uppercase tracking-widest">{t('noAreasFoundForTown')}</p>
-                    </div>
-                ) : (
-                    <div className="space-y-8">
-                        {uniqueTowns
-                            .map(town => ({
-                                ...town,
-                                areas: filteredAreas.filter(a => a.place?.town?.id === town.id)
-                            }))
-                            .filter(group => group.areas.length > 0)
-                            .map((group) => (
-                                <div key={group.id} className="space-y-4">
-                                    <div className="flex items-center gap-3 pb-3 border-b-2 border-slate-200 dark:border-slate-800">
-                                        <h5 className="font-extrabold text-slate-900 dark:text-slate-100 text-base uppercase tracking-widest">
-                                            {currentLng.startsWith('ar') ? group.arName : group.enName}
-                                        </h5>
-                                        <span className="text-sm font-extrabold px-3 py-1 bg-primary text-white rounded-none shadow-sm">
-                                            {group.areas.length}
+                    <button
+                        type="button"
+                        onClick={() => fetchData(true)}
+                        className="p-2 text-slate-400 hover:text-primary transition-colors"
+                    >
+                        <RefreshCw size={14} />
+                    </button>
+                </div>
+            </div>
+
+            {/* Cities Accordion */}
+            {sortedCities.length === 0 ? (
+                <div className="py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-2 text-slate-400">
+                    <Truck size={32} strokeWidth={1} />
+                    <p className="font-bold text-sm uppercase tracking-widest">
+                        {searchQuery ? t('noAreasFoundForTown') : t('noDeliveryAreas')}
+                    </p>
+                </div>
+            ) : (
+                <div className="space-y-3">
+                    {sortedCities.map(city => {
+                        const areasInCity = getAreasForCity(city.id);
+                        const places = cityPlacesMap[city.id] || [];
+                        const isExpanded = expandedCities.has(city.id);
+                        const isLoadingPlaces = loadingPlacesFor.has(city.id);
+                        const isCityProcessing = processingCities.has(city.id);
+                        const hasAreas = areasInCity.length > 0;
+                        const allSelected = places.length > 0 && areasInCity.length >= places.length;
+
+                        return (
+                            <div
+                                key={city.id}
+                                className={clsx(
+                                    "border transition-all",
+                                    isExpanded
+                                        ? "border-primary/30 bg-white dark:bg-slate-900 shadow-lg shadow-primary/5"
+                                        : "border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-700",
+                                    hasAreas && !isExpanded && "border-s-4 border-s-primary"
+                                )}
+                            >
+                                {/* City Header */}
+                                <button
+                                    type="button"
+                                    onClick={() => handleToggleCity(city.id)}
+                                    className="w-full flex items-center justify-between p-4 text-start"
+                                >
+                                    <div className="flex items-center gap-3">
+                                        <MapPin
+                                            size={18}
+                                            className={clsx(hasAreas ? "text-primary" : "text-slate-300 dark:text-slate-600")}
+                                        />
+                                        <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm">
+                                            {getName(city)}
                                         </span>
                                     </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        {group.areas.map((area) => (
-                                            <div
-                                                key={area.id}
-                                                className="group bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4 flex items-center justify-between hover:border-primary/50 transition-all shadow-sm"
-                                            >
-                                                <div className="space-y-1">
-                                                    <div className="flex items-center gap-2">
-                                                        <MapPin size={14} className="text-primary" />
-                                                        <span className="font-extrabold text-slate-900 dark:text-slate-100 text-sm italic">
-                                                            {currentLng.startsWith('ar') ? area.place?.arName : area.place?.enName}
-                                                        </span>
-                                                    </div>
+
+                                    <div className="flex items-center gap-3">
+                                        <span className={clsx(
+                                            "text-[0.625rem] font-extrabold px-2.5 py-1 uppercase tracking-widest",
+                                            hasAreas
+                                                ? "bg-primary text-white"
+                                                : "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                                        )}>
+                                            {areasInCity.length}/{city.placesCount || places.length || 0}
+                                        </span>
+
+                                        <ChevronDown
+                                            size={16}
+                                            className={clsx(
+                                                "text-slate-400 transition-transform duration-200",
+                                                isExpanded && "rotate-180"
+                                            )}
+                                        />
+                                    </div>
+                                </button>
+
+                                {/* Expanded Content */}
+                                {isExpanded && (
+                                    <div className="border-t border-slate-200 dark:border-slate-700">
+                                        {/* Actions Bar */}
+                                        {canUpdate && (
+                                            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 bg-slate-50 dark:bg-slate-800/50">
+                                                <div className="flex items-center gap-2">
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => handleSelectAllInCity(city.id)}
+                                                        disabled={isCityProcessing || isLoadingPlaces || allSelected}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[0.625rem] font-extrabold text-primary uppercase tracking-widest hover:bg-primary/5 transition-colors disabled:opacity-30"
+                                                    >
+                                                        <CheckSquare size={12} />
+                                                        {t('common:selectAll')}
+                                                    </button>
+                                                    <span className="text-slate-300 dark:text-slate-600">|</span>
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => setShowCityRemoveConfirm(city.id)}
+                                                        disabled={isCityProcessing || areasInCity.length === 0}
+                                                        className="flex items-center gap-1.5 px-3 py-1.5 text-[0.625rem] font-extrabold text-rose-500 uppercase tracking-widest hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors disabled:opacity-30"
+                                                    >
+                                                        <Trash2 size={12} />
+                                                        {t('removeAllTowns')}
+                                                    </button>
                                                 </div>
 
-                                                <div className="flex items-center gap-3">
-                                                    <div className="relative w-24">
+                                                <div className="flex items-center gap-2">
+                                                    <label className="text-[0.625rem] font-extrabold text-slate-400 uppercase tracking-widest whitespace-nowrap">
+                                                        {t('defaultPrice')}
+                                                    </label>
+                                                    <div className="relative">
                                                         <input
                                                             type="number"
-                                                            readOnly={!canUpdate}
-                                                            defaultValue={area.price}
-                                                            onBlur={(e) => {
-                                                                if (!canUpdate) return;
-                                                                const newPrice = Number(e.target.value);
-                                                                if (newPrice !== area.price) {
-                                                                    handleUpdatePrice(area.id, newPrice);
-                                                                }
-                                                            }}
-                                                            className={clsx(
-                                                                "w-full py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors ps-6 pe-2",
-                                                                !canUpdate && "opacity-60 cursor-not-allowed"
-                                                            )}
+                                                            value={cityPrices[city.id] || 0}
+                                                            onChange={(e) => setCityPrices(prev => ({
+                                                                ...prev,
+                                                                [city.id]: Number(e.target.value)
+                                                            }))}
+                                                            className="w-20 py-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-xs outline-none focus:border-primary transition-colors ps-6 pe-2"
+                                                            min="0"
                                                         />
                                                         <DollarSign size={10} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-2" />
                                                     </div>
-                                                    {canUpdate && (
-                                                        <button
-                                                            type="button"
-                                                            onClick={() => handleRemoveArea(area.id)}
-                                                            className="p-2 text-slate-300 hover:text-red-500 transition-colors"
-                                                            title={t('common:delete')}
-                                                        >
-                                                            <Trash2 size={16} />
-                                                        </button>
-                                                    )}
                                                 </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            ))}
-                    </div>
-                )}
-            </div>
+                                        )}
 
-            {/* Reset Confirmation Modal */}
+                                        {/* Places Grid */}
+                                        <div className="p-4">
+                                            {(isCityProcessing || isLoadingPlaces) ? (
+                                                <div className="flex items-center justify-center gap-2 py-8 text-slate-400">
+                                                    <Loader2 size={20} className="animate-spin" />
+                                                    <span className="text-xs font-bold uppercase tracking-widest">
+                                                        {t('common:loading')}
+                                                    </span>
+                                                </div>
+                                            ) : places.length === 0 ? (
+                                                <p className="text-xs text-slate-400 italic py-4 text-center">
+                                                    {t('noPlacesFound')}
+                                                </p>
+                                            ) : (
+                                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
+                                                    {places.map(place => {
+                                                        const area = getAreaForPlace(place.id);
+                                                        const isAssigned = !!area;
+                                                        const isProcessing = processingPlaces.has(place.id);
+
+                                                        return (
+                                                            <div
+                                                                key={place.id}
+                                                                className={clsx(
+                                                                    "flex items-center gap-3 p-3 border transition-all group",
+                                                                    isAssigned
+                                                                        ? "bg-primary/5 border-primary/30 dark:bg-primary/10"
+                                                                        : "bg-slate-50 dark:bg-slate-800/30 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-600",
+                                                                    isProcessing && "opacity-60 pointer-events-none"
+                                                                )}
+                                                            >
+                                                                {canUpdate && (
+                                                                    <button
+                                                                        type="button"
+                                                                        onClick={() => handleTogglePlace(city.id, place.id)}
+                                                                        disabled={isProcessing}
+                                                                        className="flex-shrink-0"
+                                                                    >
+                                                                        <div className={clsx(
+                                                                            "w-5 h-5 border-2 flex items-center justify-center transition-all",
+                                                                            isAssigned
+                                                                                ? "bg-primary border-primary"
+                                                                                : "border-slate-300 dark:border-slate-600 group-hover:border-primary/50"
+                                                                        )}>
+                                                                            {isProcessing ? (
+                                                                                <Loader2 size={12} className="animate-spin text-white" />
+                                                                            ) : isAssigned ? (
+                                                                                <Check size={12} className="text-white" strokeWidth={3} />
+                                                                            ) : null}
+                                                                        </div>
+                                                                    </button>
+                                                                )}
+
+                                                                <span className={clsx(
+                                                                    "text-xs font-bold flex-1 truncate",
+                                                                    isAssigned
+                                                                        ? "text-slate-900 dark:text-slate-100"
+                                                                        : "text-slate-500 dark:text-slate-400"
+                                                                )}>
+                                                                    {getName(place)}
+                                                                </span>
+
+                                                                {isAssigned && area && (
+                                                                    <div className="relative flex-shrink-0">
+                                                                        <input
+                                                                            type="number"
+                                                                            readOnly={!canUpdate}
+                                                                            defaultValue={area.price}
+                                                                            onBlur={(e) => {
+                                                                                if (!canUpdate) return;
+                                                                                const newPrice = Number(e.target.value);
+                                                                                if (newPrice !== area.price) {
+                                                                                    handleUpdatePrice(area.id, newPrice);
+                                                                                }
+                                                                            }}
+                                                                            className={clsx(
+                                                                                "w-16 py-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-none font-bold text-[0.6875rem] outline-none focus:border-primary transition-colors ps-5 pe-1 text-center",
+                                                                                !canUpdate && "opacity-60 cursor-not-allowed"
+                                                                            )}
+                                                                            min="0"
+                                                                        />
+                                                                        <DollarSign size={8} className="absolute top-1/2 -translate-y-1/2 text-slate-400 start-1.5" />
+                                                                    </div>
+                                                                )}
+                                                            </div>
+                                                        );
+                                                    })}
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Reset All Modal */}
             <StatusModal
                 isOpen={showResetConfirm}
                 onClose={() => setShowResetConfirm(false)}
@@ -503,6 +519,17 @@ const DeliveryAreas = () => {
                 message={t('resetDeliveryAreasMessage')}
                 onConfirm={handleResetAll}
                 confirmText={resetting ? t('common:loading') : t('common:confirm')}
+            />
+
+            {/* Remove City Areas Modal */}
+            <StatusModal
+                isOpen={!!showCityRemoveConfirm}
+                onClose={() => setShowCityRemoveConfirm(null)}
+                type="confirm"
+                title={t('removeAllForCity')}
+                message={t('removeAllForCityMessage')}
+                onConfirm={() => showCityRemoveConfirm && handleRemoveAllInCity(showCityRemoveConfirm)}
+                confirmText={t('common:confirm')}
             />
         </div>
     );
