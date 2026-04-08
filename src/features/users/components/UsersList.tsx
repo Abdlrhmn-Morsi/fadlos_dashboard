@@ -216,9 +216,9 @@ const UsersList: React.FC = () => {
                                             <td className="table-cell">
                                                 <div className="flex items-center gap-4">
                                                     <div className="w-11 h-11 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white font-extrabold shadow-lg shadow-slate-200 dark:shadow-slate-900/50 rotate-2 group-hover:rotate-0 transition-transform overflow-hidden">
-                                                        {(user.profileImage || (user.deliveryProfile && user.deliveryProfile.avatarUrl)) ? (
+                                                        {(user.profileImage || (user.profile?.delivery?.avatarUrl)) ? (
                                                             <img
-                                                                src={user.profileImage || user.deliveryProfile.avatarUrl}
+                                                                src={user.profileImage || user.profile?.delivery?.avatarUrl}
                                                                 alt="Image" aria-hidden="true"
                                                                 className="w-full h-full object-cover"
                                                                 onError={(e) => {
@@ -306,9 +306,9 @@ const UsersList: React.FC = () => {
                 {userToToggle && (
                     <div className="flex justify-center my-4">
                         <div className="w-20 h-20 rounded-none bg-slate-900 dark:bg-slate-800 flex items-center justify-center text-white text-2xl font-extrabold shadow-xl overflow-hidden border-2 border-primary">
-                            {(userToToggle.profileImage || (userToToggle.deliveryProfile && userToToggle.deliveryProfile.avatarUrl)) ? (
+                            {(userToToggle.profileImage || (userToToggle.profile?.delivery?.avatarUrl)) ? (
                                 <img
-                                    src={userToToggle.profileImage || userToToggle.deliveryProfile.avatarUrl}
+                                    src={userToToggle.profileImage || userToToggle.profile?.delivery?.avatarUrl}
                                     alt="Image" aria-hidden="true"
                                     className="w-full h-full object-cover"
                                 />

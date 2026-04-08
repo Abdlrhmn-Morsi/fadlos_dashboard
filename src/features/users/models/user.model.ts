@@ -7,6 +7,11 @@ export interface User {
     role: string;
     isActive: boolean;
     profileImage: string | null;
+    profile?: {
+        delivery?: {
+            avatarUrl: string;
+        };
+    };
     createdAt: string;
 }
 
