@@ -48,7 +48,11 @@ const SubscriptionSettings = () => {
     };
 
     const handleSubscribe = async (planId: string) => {
-        if (planId === usage?.plan) {
+        // If it's the current plan, normally we'd open the cancel modal.
+        // BUT, if it's in a grace period or scheduled to be cancelled, we want to RENEW (re-subscribe).
+        const isEligibleForRenewal = usage?.plan === planId && (usage?.isGracePeriod || usage?.cancelAtPeriodEnd);
+        
+        if (planId === usage?.plan && !isEligibleForRenewal) {
             setCancelModalOpen(true);
             return;
         }
@@ -261,10 +265,10 @@ const SubscriptionSettings = () => {
                                 ) : (
                                     <button
                                         onClick={() => handleSubscribe(plan.id)}
-                                        disabled={processingId === plan.id || processingId === 'cancel' || (isCurrentPlan && usage?.cancelAtPeriodEnd) || (isCurrentPlan && plan.id === 'free')}
+                                        disabled={processingId === plan.id || processingId === 'cancel' || (isCurrentPlan && plan.id === 'free')}
                                         className={clsx(
                                             "w-full h-[60px] rounded-[4px] font-extrabold uppercase tracking-[0.15em] text-xs transition-all duration-300 flex items-center justify-center gap-2 mb-12",
-                                            isCurrentPlan && plan.id !== 'free' && usage?.cancelAtPeriodEnd ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500 border-2 border-slate-200 dark:border-slate-700 cursor-default" :
+                                            isCurrentPlan && plan.id !== 'free' && (usage?.isGracePeriod || usage?.cancelAtPeriodEnd) ? (isMax ? "bg-white text-slate-900 hover:bg-slate-100 shadow-xl shadow-white/5" : isPro ? "bg-orange-500 text-white hover:bg-orange-600 shadow-xl shadow-orange-500/20" : "bg-primary text-white hover:bg-primary/90") :
                                                 isCurrentPlan && plan.id !== 'free' ? "bg-red-500/10 text-red-500 hover:bg-red-500/20 shadow-xl shadow-red-500/5" :
                                                     isCurrentPlan && plan.id === 'free' ? "bg-emerald-500/10 text-emerald-500 border-2 border-emerald-500/20 cursor-default" :
                                                         isMax ? "bg-white text-slate-900 hover:bg-slate-100 shadow-xl shadow-white/5" :
