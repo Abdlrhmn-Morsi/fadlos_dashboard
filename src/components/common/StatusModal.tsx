@@ -13,6 +13,7 @@ interface StatusModalProps {
     confirmText?: string;
     cancelText?: string;
     children?: React.ReactNode;
+    isLoading?: boolean;
 }
 
 import { useTranslation } from 'react-i18next';
@@ -26,7 +27,8 @@ const StatusModal: React.FC<StatusModalProps> = ({
     onConfirm,
     confirmText,
     cancelText,
-    children
+    children,
+    isLoading = false
 }) => {
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
@@ -89,19 +91,31 @@ const StatusModal: React.FC<StatusModalProps> = ({
                     {type === 'confirm' ? (
                         <>
                             <button
-                                className="flex-1 px-6 py-3.5 text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-none hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95"
+                                className="flex-1 px-6 py-3.5 text-sm font-bold text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-800 rounded-none hover:bg-slate-100 dark:hover:bg-slate-700 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed"
                                 onClick={onClose}
+                                disabled={isLoading}
                             >
                                 {finalCancelText}
                             </button>
                             <button
-                                className="flex-1 px-6 py-3.5 text-sm font-bold text-white bg-rose-600 rounded-none hover:bg-rose-700 shadow-lg shadow-rose-200 dark:shadow-rose-900/20 transition-all active:scale-95"
+                                className="flex-1 px-6 py-3.5 text-sm font-bold text-white bg-rose-600 rounded-none hover:bg-rose-700 shadow-lg shadow-rose-200 dark:shadow-rose-900/20 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                                 onClick={() => {
+                                    if (isLoading) return;
                                     onConfirm?.();
-                                    onClose();
+                                    if (!isLoading) {
+                                        onClose();
+                                    }
                                 }}
+                                disabled={isLoading}
                             >
-                                {finalConfirmText}
+                                {isLoading ? (
+                                    <>
+                                        <div className="w-4 h-4 rounded-full border-2 border-white/30 border-t-white animate-spin" />
+                                        {t('common:loading')}...
+                                    </>
+                                ) : (
+                                    finalConfirmText
+                                )}
                             </button>
                         </>
                     ) : (

@@ -33,17 +33,24 @@ export const reviewsApi = {
     },
 
     /**
-     * Deactivate review
+     * Ban customer from store reviews (store-wide)
      */
-    async deactivateReview(reviewId: string) {
-        return apiService.patch(`/reviews/${reviewId}/deactivate`);
+    async banFromStore(reviewId: string) {
+        return apiService.post(`/reviews/${reviewId}/ban`);
     },
 
     /**
-     * Activate review
+     * Unban customer from store reviews
      */
-    async activateReview(reviewId: string) {
-        return apiService.patch(`/reviews/${reviewId}/activate`);
+    async unbanFromStore(reviewId: string) {
+        return apiService.post(`/reviews/${reviewId}/unban`);
+    },
+
+    /**
+     * Get ban status for a review's customer
+     */
+    async getBanStatus(reviewId: string) {
+        return apiService.get(`/reviews/${reviewId}/ban-status`);
     },
 
     /**
@@ -53,11 +60,22 @@ export const reviewsApi = {
         return apiService.delete(`/reviews/${reviewId}`);
     },
 
-    /**
-     * Unreport a review
-     */
     async unreportReview(reviewId: string, moderatorNotes: string = '') {
         return apiService.patch(`/reviews/${reviewId}/unreport`, { moderatorNotes });
+    },
+
+    /**
+     * Get all store-wide review bans
+     */
+    async getAllBans(params: any = {}) {
+        return apiService.get('/reviews/bans', { params });
+    },
+
+    /**
+     * Unban customer by Ban ID
+     */
+    async unbanCustomerById(banId: string) {
+        return apiService.delete(`/reviews/bans/${banId}`);
     }
 };
 

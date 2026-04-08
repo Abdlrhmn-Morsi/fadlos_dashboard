@@ -6,7 +6,7 @@ import { useCache } from '../../contexts/CacheContext';
 import reviewsApi from './api/reviews.api';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types/user-role';
-import { Star, Loader2, MessageSquare, User, Calendar, Package, Flag, Trash2, AlertCircle, ShieldAlert, BadgeCheck, XCircle, Search, Store, ArrowRight, CheckCircle2, Quote, Clock } from 'lucide-react';
+import { Star, Loader2, MessageSquare, User, Calendar, Package, Flag, Trash2, AlertCircle, ShieldAlert, BadgeCheck, XCircle, Search, Store, ArrowRight, CheckCircle2, Quote, Clock, Ban } from 'lucide-react';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
@@ -22,16 +22,22 @@ const ReportedReviewList = () => {
     const { getCache, setCache, updateCacheItem, invalidateCache } = useCache();
     
     // State
+    const [activeTab, setActiveTab] = useState<'reported' | 'banned'>('reported');
     const [reviews, setReviews] = useState<any[]>([]);
+    const [bans, setBans] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
+    const [bansPage, setBansPage] = useState(1);
     const [limit] = useState(10);
     const [totalPages, setTotalPages] = useState(1);
     const [search, setSearch] = useState('');
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [totalItems, setTotalItems] = useState(0);
+    const [totalBans, setTotalBans] = useState(0);
+    const [totalBansPages, setTotalBansPages] = useState(1);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
     const [moderatorNotes, setModeratorNotes] = useState('');
+    const [banStatuses, setBanStatuses] = useState<Record<string, boolean>>({});
 
     // Modals
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -40,10 +46,16 @@ const ReportedReviewList = () => {
     const [reviewToUnreport, setReviewToUnreport] = useState<string | null>(null);
     const [isBanModalOpen, setIsBanModalOpen] = useState(false);
     const [reviewToBan, setReviewToBan] = useState<string | null>(null);
+    const [isUnbanByIdModalOpen, setIsUnbanByIdModalOpen] = useState(false);
+    const [banIdToUnban, setBanIdToUnban] = useState<string | null>(null);
 
     useEffect(() => {
-        fetchReviews();
-    }, [page, debouncedSearch]);
+        if (activeTab === 'reported') {
+            fetchReviews();
+        } else {
+            fetchBans();
+        }
+    }, [page, bansPage, debouncedSearch, activeTab]);
 
     useEffect(() => {
         const timer = setTimeout(() => setDebouncedSearch(search), 500);
@@ -72,6 +84,7 @@ const ReportedReviewList = () => {
                 setTotalPages(cachedData.meta?.totalPages || 1);
                 setTotalItems(cachedData.meta?.total || 0);
                 setLoading(false);
+                fetchBanStatuses(cachedData.data || []);
                 return;
             }
 
@@ -82,6 +95,7 @@ const ReportedReviewList = () => {
                 setTotalPages(response.meta?.totalPages || 1);
                 setTotalItems(response.meta?.total || 0);
                 setCache(cacheKey, response, params);
+                fetchBanStatuses(response.data);
             } else {
                 setReviews([]);
                 setTotalPages(1);
@@ -94,6 +108,52 @@ const ReportedReviewList = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const fetchBans = async () => {
+        try {
+            setLoading(true);
+            const params: any = {
+                page: bansPage,
+                limit,
+            };
+
+            if (debouncedSearch) {
+                params.search = debouncedSearch;
+            }
+            const response: any = await reviewsApi.getAllBans(params);
+
+            if (response && response.data) {
+                setBans(response.data);
+                setTotalBansPages(response.meta?.totalPages || 1);
+                setTotalBans(response.meta?.total || 0);
+            } else {
+                setBans([]);
+                setTotalBansPages(1);
+                setTotalBans(0);
+            }
+        } catch (error) {
+            console.error('Failed to fetch banned customers', error);
+            setBans([]);
+            setTotalBansPages(1);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const fetchBanStatuses = async (reviewList: any[]) => {
+        const statuses: Record<string, boolean> = {};
+        await Promise.all(
+            reviewList.map(async (review) => {
+                try {
+                    const response: any = await reviewsApi.getBanStatus(review.id);
+                    statuses[review.id] = response?.isBanned || false;
+                } catch {
+                    statuses[review.id] = false;
+                }
+            })
+        );
+        setBanStatuses(statuses);
     };
 
     const handleConfirmUnreport = async () => {
@@ -153,21 +213,32 @@ const ReportedReviewList = () => {
         if (!reviewToBan) return;
         try {
             setActionLoading(reviewToBan);
-            const review = reviews.find(r => r.id === reviewToBan);
-            const isCurrentlyActive = review ? review.isActive : true;
+            const isBanned = banStatuses[reviewToBan] || false;
 
-            if (isCurrentlyActive) {
-                // Banning is achieved by deactivating the review
-                await reviewsApi.deactivateReview(reviewToBan);
+            if (!isBanned) {
+                // Ban: store-wide ban
+                await reviewsApi.banFromStore(reviewToBan);
                 toast.success(t('reviews:reviewBannedSuccessfully'));
-                // Just toggle status, do NOT remove from list anymore
-                setReviews(prev => prev.map(r => r.id === reviewToBan ? { ...r, isActive: false } : r));
+                // Mark all reviews from this customer for this store as inactive
+                const bannedReview = reviews.find(r => r.id === reviewToBan);
+                if (bannedReview) {
+                    setReviews(prev => prev.map(r => {
+                        if (r.customerId === bannedReview.customerId) {
+                            // Check if same store
+                            const sameStore = 
+                                (r.storeId && bannedReview.storeId && r.storeId === bannedReview.storeId) ||
+                                (r.store?.id && bannedReview.store?.id && r.store.id === bannedReview.store.id);
+                            if (sameStore) return { ...r, isActive: false };
+                        }
+                        return r;
+                    }));
+                }
+                setBanStatuses(prev => ({ ...prev, [reviewToBan]: true }));
             } else {
-                // Unbanning is achieved by activating the review
-                await reviewsApi.activateReview(reviewToBan);
+                // Unban: remove store-wide ban
+                await reviewsApi.unbanFromStore(reviewToBan);
                 toast.success(t('reviews:reviewUnbannedSuccessfully'));
-                // Just toggle status, do NOT remove from list anymore
-                setReviews(prev => prev.map(r => r.id === reviewToBan ? { ...r, isActive: true } : r));
+                setBanStatuses(prev => ({ ...prev, [reviewToBan]: false }));
             }
             
             invalidateCache('reported_reviews');
@@ -179,6 +250,24 @@ const ReportedReviewList = () => {
             setActionLoading(null);
             setReviewToBan(null);
             setIsBanModalOpen(false);
+        }
+    };
+
+    const handleConfirmUnbanById = async () => {
+        if (!banIdToUnban) return;
+        try {
+            setActionLoading(`unban-${banIdToUnban}`);
+            await reviewsApi.unbanCustomerById(banIdToUnban);
+            toast.success(t('reviews:reviewUnbannedSuccessfully'));
+            
+            setBans(prev => prev.filter(b => b.id !== banIdToUnban));
+            setTotalBans(prev => prev - 1);
+        } catch (error) {
+            toast.error(t('reviews:failedToDeactivateReview'));
+        } finally {
+            setActionLoading(null);
+            setBanIdToUnban(null);
+            setIsUnbanByIdModalOpen(false);
         }
     };
 
@@ -228,28 +317,54 @@ const ReportedReviewList = () => {
             </div>
 
             {/* Metric Blocks - Stagger 1 */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 stagger-1">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 animate-in fade-in slide-in-from-bottom-4 duration-700 stagger-1 my-6">
                 <div className="bg-white dark:bg-slate-900 px-6 py-6 border border-slate-200 dark:border-slate-800 rounded-none shadow-sm flex flex-col justify-between active-push hover:border-rose-200 transition-all duration-300">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-[0.625rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">{t('reviews:totalReported')}</span>
+                        <span className="text-[0.625rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-[0.15em]">{activeTab === 'reported' ? t('reviews:totalReported') : t('reviews:bannedCustomersTab')}</span>
                         <div className="p-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 rounded-none border border-rose-100 dark:border-rose-800/30">
-                            <Flag size={18} />
+                            {activeTab === 'reported' ? <Flag size={18} /> : <Ban size={18} />}
                         </div>
                     </div>
-                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none">{totalItems}</span>
+                    <span className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight leading-none">{activeTab === 'reported' ? totalItems : totalBans}</span>
                 </div>
+            </div>
+
+            {/* Tabs */}
+            <div className="flex items-center gap-2 mb-6 border-b border-slate-200 dark:border-slate-800">
+                <button
+                    onClick={() => setActiveTab('reported')}
+                    className={clsx(
+                        "px-4 py-3 text-sm font-bold uppercase tracking-widest transition-all rounded-none border-b-2",
+                        activeTab === 'reported' 
+                            ? "border-primary text-primary bg-primary/5" 
+                            : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                    )}
+                >
+                    {t('reviews:reportedContentTab')}
+                </button>
+                <button
+                    onClick={() => setActiveTab('banned')}
+                    className={clsx(
+                        "px-4 py-3 text-sm font-bold uppercase tracking-widest transition-all rounded-none border-b-2",
+                        activeTab === 'banned' 
+                            ? "border-primary text-primary bg-primary/5" 
+                            : "border-transparent text-slate-500 hover:text-slate-700 dark:hover:text-slate-300"
+                    )}
+                >
+                    {t('reviews:bannedCustomersTab')}
+                </button>
             </div>
 
             {loading ? (
                 <div className="py-20 flex justify-center">
                     <LoadingSpinner fullHeight={false} />
                 </div>
-            ) : reviews.length === 0 ? (
+            ) : activeTab === 'reported' && reviews.length === 0 ? (
                 <div className="text-center py-20 bg-white dark:bg-slate-900/50 rounded-none border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-sm animate-in fade-in duration-700 stagger-2">
                     <ShieldAlert size={48} className="mx-auto text-slate-300 mb-4" />
                     <p className="font-extrabold text-slate-400 uppercase tracking-widest text-[0.625rem]">{t('reviews:noReportedReviews')}</p>
                 </div>
-            ) : (
+            ) : activeTab === 'reported' ? (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 stagger-2">
                     <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
                         {reviews.map((review, index) => (
@@ -275,7 +390,13 @@ const ReportedReviewList = () => {
                                             <div>
                                                 <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1.5 flex items-center gap-2">
                                                     {review.customer?.name || t('common:anonymous')}
-                                                    {!review.isActive && (
+                                                    {banStatuses[review.id] && (
+                                                        <span className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-[8px] font-extrabold rounded-none uppercase tracking-widest border border-rose-200 dark:border-rose-800 shadow-sm ml-2 flex items-center gap-1">
+                                                            <Ban size={8} />
+                                                            {t('reviews:banned')}
+                                                        </span>
+                                                    )}
+                                                    {!review.isActive && !banStatuses[review.id] && (
                                                         <span className="px-1.5 py-0.5 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[8px] font-extrabold rounded-none uppercase tracking-widest border border-slate-200 dark:border-slate-700 shadow-sm ml-2">
                                                             {t('reviews:inactive')}
                                                         </span>
@@ -363,13 +484,13 @@ const ReportedReviewList = () => {
                                             disabled={!!actionLoading}
                                             className={clsx(
                                                 "flex-1 min-w-[120px] px-3 py-3 border rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50",
-                                                review.isActive 
+                                                !banStatuses[review.id]
                                                     ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 hover:bg-slate-800" 
                                                     : "bg-emerald-600 dark:bg-emerald-700 text-white border-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/20"
                                             )}
-                                            title={review.isActive ? t('reviews:banUser') : t('reviews:unbanUser')}
+                                            title={!banStatuses[review.id] ? t('reviews:banUser') : t('reviews:unbanUser')}
                                         >
-                                            {review.isActive ? (
+                                            {!banStatuses[review.id] ? (
                                                 <>
                                                     <ShieldAlert size={14} className="text-rose-400" />
                                                     {t('reviews:banUser')}
@@ -400,20 +521,111 @@ const ReportedReviewList = () => {
                         ))}
                     </div>
 
-                    {/* Pagination - Rounded none */}
                     {totalPages > 1 && (
-                        <div className="flex justify-center pt-8 border-t border-slate-100 dark:border-slate-800/50">
+                        <div className="mt-8 flex justify-center">
                             <Pagination
                                 currentPage={page}
                                 totalPages={totalPages}
-                                onPageChange={(p) => setPage(p)}
-                             />
+                                onPageChange={setPage}
+                            />
+                        </div>
+                    )}
+                </div>
+            ) : bans.length === 0 ? (
+                <div className="text-center py-20 bg-white dark:bg-slate-900/50 rounded-none border-2 border-dashed border-slate-200 dark:border-slate-800 shadow-sm animate-in fade-in duration-700 stagger-2">
+                    <Ban size={48} className="mx-auto text-slate-300 mb-4" />
+                    <p className="font-extrabold text-slate-400 uppercase tracking-widest text-[0.625rem]">{t('reviews:noBannedCustomers')}</p>
+                </div>
+            ) : (
+                <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-1000 stagger-2">
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        {bans.map((ban, index) => (
+                            <div 
+                                key={ban.id} 
+                                className="group bg-white dark:bg-slate-900 border border-rose-100 dark:border-rose-900/30 rounded-none overflow-hidden transition-all duration-300 relative flex flex-col shadow-sm active-push cursor-default hover:border-rose-200 dark:hover:border-rose-800"
+                                style={{ animationDelay: `${(index % 10) * 50 + 200}ms` }}
+                            >
+                                <div className="absolute top-0 right-0 w-1 h-full bg-rose-500/10" />
+                                <div className="p-6 flex flex-col flex-1 relative z-10">
+                                    <div className="flex items-start justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-12 h-12 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 flex items-center justify-center text-slate-400 overflow-hidden shrink-0 shadow-inner">
+                                                {ban.customer?.profile?.user?.profileImage || ban.customer?.profile?.profileImage || ban.customer?.profileImage ? (
+                                                    <ImageWithFallback src={ban.customer?.profile?.user?.profileImage || ban.customer?.profile?.profileImage || ban.customer?.profileImage} alt={ban.customer?.profile?.user?.name || 'Customer'} className="w-full h-full object-cover" />
+                                                ) : (
+                                                    <User size={20} />
+                                                )}
+                                            </div>
+                                            <div>
+                                                <h3 className="text-sm font-extrabold text-slate-900 dark:text-white uppercase tracking-tight leading-none mb-1.5 flex items-center gap-2">
+                                                    {ban.customer?.profile?.user?.name || ban.customer?.name || t('common:anonymous')}
+                                                    <span className="px-1.5 py-0.5 bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 text-[8px] font-extrabold rounded-none uppercase tracking-widest border border-rose-200 dark:border-rose-800 shadow-sm ml-2 flex items-center gap-1">
+                                                        <Ban size={8} />
+                                                        {t('reviews:banned')}
+                                                    </span>
+                                                </h3>
+                                                <div className="flex items-center gap-3 text-[0.625rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mt-2">
+                                                    <span className="flex items-center gap-1.5"><Calendar size={10} className="text-slate-300" /> {t('reviews:bannedDate')}: {new Date(ban.createdAt).toLocaleDateString()}</span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex flex-col items-end gap-2 text-right">
+                                            {ban.store && (
+                                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-none shadow-sm">
+                                                    <Store size={12} className="text-primary" />
+                                                    <span className="text-[0.625rem] font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
+                                                        {language === 'ar' && ban.store.nameAr ? ban.store.nameAr : ban.store.name}
+                                                    </span>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="mb-6 p-5 bg-rose-50/50 dark:bg-rose-900/10 rounded-none border border-rose-100 dark:border-rose-800/30 italic text-slate-600 dark:text-slate-300 font-medium text-sm leading-relaxed relative">
+                                        <Quote size={20} className="absolute -top-3 -left-3 text-rose-200 dark:text-rose-700/30 rotate-180" />
+                                        "{ban.reason || t('reviews:noReasonProvided')}"
+                                    </div>
+                                    
+                                    {ban.bannedBy && (
+                                        <div className="flex items-center gap-1.5 mb-4 text-[0.625rem] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                                            <ShieldAlert size={10} className="text-rose-400" />
+                                            <span>{t('reviews:bannerAdmin')}: {ban.bannedBy.name}</span>
+                                        </div>
+                                    )}
+
+                                    {/* Global Actions */}
+                                    <div className="mt-auto pt-6 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-end">
+                                        <button 
+                                            onClick={() => {
+                                                setBanIdToUnban(ban.id);
+                                                setIsUnbanByIdModalOpen(true);
+                                            }}
+                                            disabled={!!actionLoading}
+                                            className="min-w-[120px] px-3 py-3 border rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 border-emerald-200 text-emerald-600 hover:bg-emerald-50 dark:border-emerald-800 dark:text-emerald-500 dark:hover:bg-emerald-900/20"
+                                        >
+                                            {actionLoading === `unban-${ban.id}` ? <Loader2 size={14} className="animate-spin" /> : <CheckCircle2 size={14} />}
+                                            {t('reviews:unbanUser')}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {totalBansPages > 1 && (
+                        <div className="mt-8 flex justify-center">
+                            <Pagination
+                                currentPage={bansPage}
+                                totalPages={totalBansPages}
+                                onPageChange={setBansPage}
+                            />
                         </div>
                     )}
                 </div>
             )}
 
-            {/* Modals - Simplified */}
+            {/* Modals */}
             <StatusModal
                 isOpen={isDeleteModalOpen}
                 onClose={() => setIsDeleteModalOpen(false)}
@@ -448,12 +660,34 @@ const ReportedReviewList = () => {
 
             <StatusModal
                 isOpen={isBanModalOpen}
-                onClose={() => setIsBanModalOpen(false)}
+                onClose={() => {
+                    if (!actionLoading) {
+                        setIsBanModalOpen(false);
+                        setReviewToBan(null);
+                    }
+                }}
                 onConfirm={handleConfirmBan}
-                title={reviews.find(r => r.id === reviewToBan)?.isActive ? t('reviews:banUserTitle') : t('reviews:unbanUserTitle')}
-                message={reviews.find(r => r.id === reviewToBan)?.isActive ? t('reviews:banUserMessage') : t('reviews:unbanUserMessage')}
+                title={reviewToBan && banStatuses[reviewToBan] ? t('reviews:unbanUserTitle') : t('reviews:banUserTitle')}
+                message={reviewToBan && banStatuses[reviewToBan] ? t('reviews:unbanUserMessage') : t('reviews:banUserMessage')}
                 type="confirm"
-                confirmText={reviews.find(r => r.id === reviewToBan)?.isActive ? t('reviews:banUser') : t('reviews:unbanUser')}
+                confirmText={reviewToBan && banStatuses[reviewToBan] ? t('reviews:unbanUser') : t('reviews:banUser')}
+                isLoading={!!actionLoading}
+            />
+
+            <StatusModal
+                isOpen={isUnbanByIdModalOpen}
+                onClose={() => {
+                    if (!actionLoading) {
+                        setIsUnbanByIdModalOpen(false);
+                        setBanIdToUnban(null);
+                    }
+                }}
+                onConfirm={handleConfirmUnbanById}
+                title={t('reviews:unbanUserTitle')}
+                message={t('reviews:unbanUserMessage')}
+                type="confirm"
+                confirmText={t('reviews:unbanUser')}
+                isLoading={!!actionLoading}
             />
         </div>
     );
