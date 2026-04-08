@@ -60,8 +60,8 @@ export const authApi = {
     /**
      * Request a password reset code
      */
-    forgotPassword: async (email: string) => {
-        return apiService.post('/auth/forgot-password', { email });
+    forgotPassword: async (identifier: string, role?: string) => {
+        return apiService.post('/auth/forgot-password', { identifier, role });
     },
 
     /**

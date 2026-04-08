@@ -13,6 +13,7 @@ import {
     Camera,
     Phone
 } from 'lucide-react';
+import ResetPasswordModal from './components/ResetPasswordModal';
 import { updateProfile, updatePassword } from '../users/api/users.api';
 import { toast } from '../../utils/toast';
 import { useLanguage } from '../../contexts/LanguageContext';
@@ -35,6 +36,7 @@ const ProfileSettings = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { user, refreshProfile } = useAuth();
+    const [isResetModalOpen, setIsResetModalOpen] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(user?.profileImage || null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
@@ -300,6 +302,15 @@ const ProfileSettings = () => {
                                     {showPasswords.old ? <EyeOff size={18} /> : <Eye size={18} />}
                                 </button>
                             </div>
+                            <div className={clsx("flex pt-1", isRTL ? "justify-start" : "justify-end")}>
+                                <button
+                                    type="button"
+                                    onClick={() => setIsResetModalOpen(true)}
+                                    className="text-xs font-bold text-primary hover:text-primary-dark transition-colors underline decoration-2 decoration-primary/20 underline-offset-4"
+                                >
+                                    {t('common:forgotPasswordBtn')}
+                                </button>
+                            </div>
                         </div>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -363,6 +374,13 @@ const ProfileSettings = () => {
                     </form>
                 </section>
             )}
+
+            <ResetPasswordModal
+                isOpen={isResetModalOpen}
+                onClose={() => setIsResetModalOpen(false)}
+                userEmail={user?.email || ''}
+                userRole={user?.role}
+            />
         </div>
     );
 };
