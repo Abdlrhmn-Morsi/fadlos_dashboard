@@ -155,8 +155,13 @@ const SubscriptionSettings = () => {
                                 <p className="mt-2">
                                     <button
                                         onClick={() => {
-                                            const proPlan = plans.find(p => p.id === 'pro');
-                                            if (proPlan) handleSubscribe('pro');
+                                            if (usage?.plan && usage.plan !== 'free') {
+                                                handleSubscribe(usage.plan);
+                                            } else {
+                                                // Fallback to pro if current plan is unknown or free
+                                                const proPlan = plans.find(p => p.id === 'pro');
+                                                if (proPlan) handleSubscribe('pro');
+                                            }
                                         }}
                                         className="text-amber-700 dark:text-amber-400 text-xs font-bold underline uppercase tracking-widest hover:text-amber-600 transition-colors"
                                     >
