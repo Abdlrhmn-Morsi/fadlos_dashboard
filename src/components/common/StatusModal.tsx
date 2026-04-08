@@ -12,6 +12,7 @@ interface StatusModalProps {
     onConfirm?: () => void;
     confirmText?: string;
     cancelText?: string;
+    children?: React.ReactNode;
 }
 
 import { useTranslation } from 'react-i18next';
@@ -24,7 +25,8 @@ const StatusModal: React.FC<StatusModalProps> = ({
     message,
     onConfirm,
     confirmText,
-    cancelText
+    cancelText,
+    children
 }) => {
     const { t } = useTranslation(['common']);
     const { isRTL } = useLanguage();
@@ -79,7 +81,9 @@ const StatusModal: React.FC<StatusModalProps> = ({
                 {getIcon()}
 
                 <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 mb-3 tracking-tight">{title}</h3>
-                <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-10">{message}</p>
+                <p className="text-slate-500 dark:text-slate-400 font-medium leading-relaxed mb-6">{message}</p>
+
+                {children && <div className="w-full mb-8 text-left">{children}</div>}
 
                 <div className="flex flex-col sm:flex-row gap-3 w-full">
                     {type === 'confirm' ? (

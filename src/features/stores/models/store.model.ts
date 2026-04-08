@@ -19,6 +19,12 @@ export interface Store {
     towns?: Array<{
         id: string;
         enName: string;
+        arName: string;
+    }>;
+    places?: Array<{
+        id: string;
+        enName: string;
+        arName: string;
     }>;
     openingTime?: string;
     closingTime?: string;

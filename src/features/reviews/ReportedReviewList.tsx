@@ -31,12 +31,15 @@ const ReportedReviewList = () => {
     const [debouncedSearch, setDebouncedSearch] = useState('');
     const [totalItems, setTotalItems] = useState(0);
     const [actionLoading, setActionLoading] = useState<string | null>(null);
+    const [moderatorNotes, setModeratorNotes] = useState('');
 
     // Modals
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [reviewToDelete, setReviewToDelete] = useState<string | null>(null);
     const [isUnreportModalOpen, setIsUnreportModalOpen] = useState(false);
     const [reviewToUnreport, setReviewToUnreport] = useState<string | null>(null);
+    const [isBanModalOpen, setIsBanModalOpen] = useState(false);
+    const [reviewToBan, setReviewToBan] = useState<string | null>(null);
 
     useEffect(() => {
         fetchReviews();
@@ -97,37 +100,85 @@ const ReportedReviewList = () => {
         if (!reviewToUnreport) return;
         try {
             setActionLoading(reviewToUnreport);
-            await reviewsApi.unreportReview(reviewToUnreport);
+            await reviewsApi.unreportReview(reviewToUnreport, moderatorNotes);
             toast.success(t('reviews:reviewUnreportedSuccessfully'));
+            
+            // Re-activate since dismiss always unbans
             setReviews(prev => prev.filter(r => r.id !== reviewToUnreport));
             setTotalItems(prev => prev - 1);
+            
             invalidateCache('reported_reviews');
             invalidateCache('reviews');
         } catch (error) {
+            console.error('Dismiss failed:', error);
             toast.error(t('reviews:failedToUnreportReview'));
         } finally {
             setActionLoading(null);
             setReviewToUnreport(null);
             setIsUnreportModalOpen(false);
+            setModeratorNotes('');
         }
     };
 
     const handleConfirmDelete = async () => {
         if (!reviewToDelete) return;
+        console.log('[ReportedReviewList] Attempting to delete review:', reviewToDelete);
         try {
             setActionLoading(reviewToDelete);
-            await reviewsApi.deleteReview(reviewToDelete);
+            const response = await reviewsApi.deleteReview(reviewToDelete);
+            console.log('[ReportedReviewList] Delete response:', response);
             toast.success(t('reviews:reviewDeletedSuccessfully'));
-            setReviews(prev => prev.filter(r => r.id !== reviewToDelete));
+            
+            setReviews(prev => {
+                const updated = prev.filter(r => r.id !== reviewToDelete);
+                console.log(`[ReportedReviewList] Local state update: ${prev.length} -> ${updated.length} items`);
+                return updated;
+            });
             setTotalItems(prev => prev - 1);
             invalidateCache('reported_reviews');
             invalidateCache('reviews');
-        } catch (error) {
-            toast.error(t('reviews:failedToDeleteReview'));
+        } catch (error: any) {
+            console.error('[ReportedReviewList] Delete failed:', error);
+            const errorMessage = error.response?.data?.message || error.message || 'unknown error';
+            toast.error(`${t('reviews:failedToDeleteReview')}: ${errorMessage}`);
         } finally {
+            console.log('[ReportedReviewList] Cleaning up after delete attempt');
             setActionLoading(null);
             setReviewToDelete(null);
             setIsDeleteModalOpen(false);
+        }
+    };
+
+    const handleConfirmBan = async () => {
+        if (!reviewToBan) return;
+        try {
+            setActionLoading(reviewToBan);
+            const review = reviews.find(r => r.id === reviewToBan);
+            const isCurrentlyActive = review ? review.isActive : true;
+
+            if (isCurrentlyActive) {
+                // Banning is achieved by deactivating the review
+                await reviewsApi.deactivateReview(reviewToBan);
+                toast.success(t('reviews:reviewBannedSuccessfully'));
+                // Just toggle status, do NOT remove from list anymore
+                setReviews(prev => prev.map(r => r.id === reviewToBan ? { ...r, isActive: false } : r));
+            } else {
+                // Unbanning is achieved by activating the review
+                await reviewsApi.activateReview(reviewToBan);
+                toast.success(t('reviews:reviewUnbannedSuccessfully'));
+                // Just toggle status, do NOT remove from list anymore
+                setReviews(prev => prev.map(r => r.id === reviewToBan ? { ...r, isActive: true } : r));
+            }
+            
+            invalidateCache('reported_reviews');
+            invalidateCache('reviews');
+        } catch (error) {
+            console.error('Action failed:', error);
+            toast.error(t('reviews:failedToDeactivateReview'));
+        } finally {
+            setActionLoading(null);
+            setReviewToBan(null);
+            setIsBanModalOpen(false);
         }
     };
 
@@ -248,7 +299,7 @@ const ReportedReviewList = () => {
                                                 <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-none shadow-sm">
                                                     <Store size={12} className="text-primary" />
                                                     <span className="text-[0.625rem] font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
-                                                        {review.store.name}
+                                                        {language === 'ar' && review.store.nameAr ? review.store.nameAr : review.store.name}
                                                     </span>
                                                 </div>
                                             )}
@@ -290,25 +341,55 @@ const ReportedReviewList = () => {
                                     </div>
 
                                     {/* Global Actions */}
-                                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between gap-4">
+                                    <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/60 flex flex-wrap items-center justify-between gap-3">
                                         <button 
                                             onClick={() => {
                                                 setReviewToUnreport(review.id);
                                                 setIsUnreportModalOpen(true);
                                             }}
                                             disabled={!!actionLoading}
-                                            className="flex-1 px-4 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.2em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                            className="flex-1 min-w-[120px] px-3 py-3 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-400 rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.1em] hover:bg-slate-50 dark:hover:bg-slate-800 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50"
+                                            title={t('reviews:dismissReport')}
                                         >
                                             <BadgeCheck size={14} className="text-emerald-500" />
                                             {t('reviews:dismissReport')}
                                         </button>
+                                        
+                                        <button 
+                                            onClick={() => {
+                                                setReviewToBan(review.id);
+                                                setIsBanModalOpen(true);
+                                            }}
+                                            disabled={!!actionLoading}
+                                            className={clsx(
+                                                "flex-1 min-w-[120px] px-3 py-3 border rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.1em] transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50",
+                                                review.isActive 
+                                                    ? "bg-slate-900 dark:bg-slate-800 text-white border-slate-900 hover:bg-slate-800" 
+                                                    : "bg-emerald-600 dark:bg-emerald-700 text-white border-emerald-600 hover:bg-emerald-700 shadow-lg shadow-emerald-500/20"
+                                            )}
+                                            title={review.isActive ? t('reviews:banUser') : t('reviews:unbanUser')}
+                                        >
+                                            {review.isActive ? (
+                                                <>
+                                                    <ShieldAlert size={14} className="text-rose-400" />
+                                                    {t('reviews:banUser')}
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <BadgeCheck size={14} className="text-emerald-300" />
+                                                    {t('reviews:unbanUser')}
+                                                </>
+                                            )}
+                                        </button>
+
                                         <button 
                                             onClick={() => {
                                                 setReviewToDelete(review.id);
                                                 setIsDeleteModalOpen(true);
                                             }}
                                             disabled={!!actionLoading}
-                                            className="flex-1 px-4 py-3 bg-rose-600 dark:bg-rose-700 text-white rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.2em] hover:bg-rose-700 hover:shadow-lg hover:shadow-rose-500/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 shadow-sm"
+                                            className="flex-1 min-w-[120px] px-3 py-3 bg-rose-600 dark:bg-rose-700 text-white rounded-none text-[0.625rem] font-extrabold uppercase tracking-[0.1em] hover:bg-rose-700 hover:shadow-lg hover:shadow-rose-500/20 transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 shadow-sm"
+                                            title={t('reviews:deleteReview')}
                                         >
                                             <Trash2 size={14} />
                                             {t('reviews:deleteReview')}
@@ -339,8 +420,7 @@ const ReportedReviewList = () => {
                 onConfirm={handleConfirmDelete}
                 title={t('reviews:deleteReportedTitle')}
                 message={t('reviews:deleteReportedMessage')}
-                type="danger"
-                loading={!!actionLoading}
+                type="confirm"
                 confirmText={t('common:delete')}
             />
 
@@ -350,9 +430,30 @@ const ReportedReviewList = () => {
                 onConfirm={handleConfirmUnreport}
                 title={t('reviews:dismissReportTitle')}
                 message={t('reviews:dismissReportMessage')}
-                type="primary"
-                loading={!!actionLoading}
+                type="confirm"
                 confirmText={t('reviews:dismissReport')}
+            >
+                <div className="space-y-4">
+                    <label className="block text-[0.625rem] font-bold text-slate-500 uppercase tracking-widest">
+                        {t('reviews:moderatorNotes')}
+                    </label>
+                    <textarea
+                        value={moderatorNotes}
+                        onChange={(e) => setModeratorNotes(e.target.value)}
+                        placeholder={t('reviews:moderatorNotesPlaceholder')}
+                        className="w-full min-h-[100px] p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-slate-100 placeholder:text-slate-400 text-sm outline-none focus:border-emerald-500 transition-colors resize-none"
+                    />
+                </div>
+            </StatusModal>
+
+            <StatusModal
+                isOpen={isBanModalOpen}
+                onClose={() => setIsBanModalOpen(false)}
+                onConfirm={handleConfirmBan}
+                title={reviews.find(r => r.id === reviewToBan)?.isActive ? t('reviews:banUserTitle') : t('reviews:unbanUserTitle')}
+                message={reviews.find(r => r.id === reviewToBan)?.isActive ? t('reviews:banUserMessage') : t('reviews:unbanUserMessage')}
+                type="confirm"
+                confirmText={reviews.find(r => r.id === reviewToBan)?.isActive ? t('reviews:banUser') : t('reviews:unbanUser')}
             />
         </div>
     );

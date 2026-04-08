@@ -56,8 +56,8 @@ export const reviewsApi = {
     /**
      * Unreport a review
      */
-    async unreportReview(reviewId: string) {
-        return apiService.patch(`/reviews/${reviewId}/unreport`);
+    async unreportReview(reviewId: string, moderatorNotes: string = '') {
+        return apiService.patch(`/reviews/${reviewId}/unreport`, { moderatorNotes });
     }
 };
 

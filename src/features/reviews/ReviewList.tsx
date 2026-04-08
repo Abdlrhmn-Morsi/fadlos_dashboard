@@ -6,7 +6,7 @@ import { useCache } from '../../contexts/CacheContext';
 import reviewsApi from './api/reviews.api';
 import { useAuth } from '../../contexts/AuthContext';
 import { UserRole } from '../../types/user-role';
-import { Star, Loader2, MessageSquare, User, Calendar, Package, Quote, Flag, Trash2, AlertCircle, ShieldAlert, BadgeCheck, XCircle, Search } from 'lucide-react';
+import { Star, Loader2, MessageSquare, User, Calendar, Package, Quote, Flag, Trash2, AlertCircle, ShieldAlert, BadgeCheck, XCircle, Search, ShieldCheck } from 'lucide-react';
 import clsx from 'clsx';
 import { Pagination } from '../../components/common/Pagination';
 import { ImageWithFallback } from '../../components/common/ImageWithFallback';
@@ -40,6 +40,7 @@ const ReviewList = () => {
     const [actionLoading, setActionLoading] = useState<string | null>(null);
 
     useEffect(() => {
+        invalidateCache('reviews');
         fetchReviews();
     }, [type, page, debouncedSearch]);
 
@@ -370,6 +371,19 @@ const ReviewList = () => {
                                             "{review.comment || t('noComment')}"
                                         </p>
                                     </div>
+
+                                    {/* Moderator Notes Display */}
+                                    {review.moderatorNotes && (
+                                        <div className="mb-4 p-3 bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/30 rounded-xl animate-in fade-in slide-in-from-top-1">
+                                            <div className="flex items-center gap-2 mb-1.5">
+                                                <ShieldCheck size={12} className="text-emerald-500" />
+                                                <span className="text-[9px] font-extrabold text-emerald-500 uppercase tracking-widest">{t('adminNote')}</span>
+                                            </div>
+                                            <p className="text-[0.6875rem] font-bold text-emerald-700 dark:text-emerald-300">
+                                                {review.moderatorNotes}
+                                            </p>
+                                        </div>
+                                    )}
 
                                     {/* Reported Reason Display */}
                                     {review.isReported && review.reportReason && (
