@@ -10,6 +10,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { useAuth } from '../../contexts/AuthContext';
 import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
+import { UserRole } from '../../types/user-role';
 import { Pagination } from '../../components/common/Pagination';
 import clsx from 'clsx';
 import { useNavigate, useSearchParams } from 'react-router-dom';
@@ -19,7 +20,7 @@ import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 const CategoryList = () => {
     const { t } = useTranslation(['categories', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
-    const { hasPermission } = useAuth();
+    const { hasPermission, user } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const storeId = searchParams.get('storeId');
@@ -43,7 +44,7 @@ const CategoryList = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
     const [statusToggleItem, setStatusToggleItem] = useState<any>(null);
-    const isSystemAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+    const isSystemAdmin = user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN;
 
     // Search Debounce
     useEffect(() => {
