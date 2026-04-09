@@ -26,7 +26,8 @@ import {
   MessageSquare,
   Crown,
   ShieldCheck,
-  BadgeCheck
+  BadgeCheck,
+  Ticket
 } from 'lucide-react';
 import clsx from 'clsx';
 import appLogo from '../assets/app_logo_primary.png';
@@ -355,6 +356,9 @@ const DashboardLayout: React.FC = () => {
                     {hasAdminPermission(AdminPermissions.BUSINESS_CATEGORIES_VIEW) && <SidebarItem to="/business-categories" icon={LayoutGrid} label={t('businessCategories')} collapsed={collapsed} />}
                     {user?.role === UserRole.SUPER_ADMIN && (
                       <SidebarItem to="/plans-management" icon={CreditCard} label={t('plansManagement', 'Plans Management')} collapsed={collapsed} />
+                    )}
+                    {user?.role === UserRole.SUPER_ADMIN && (
+                      <SidebarItem to="/subscription-codes" icon={Ticket} label={t('subscriptionCodes', 'Subscription Codes')} collapsed={collapsed} />
                     )}
                     {(user?.role === UserRole.SUPER_ADMIN || hasAdminPermission(AdminPermissions.ANALYTICS_VIEW)) && (
                       <SidebarItem to="/billing-transactions" icon={CreditCard} label={t('billingTransactions')} collapsed={collapsed} />

@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { getPlans, getMySubscriptionUsage, Plan, SubscriptionUsage, createCheckoutSession, cancelSubscription, syncSubscription } from '../api/subscriptions.api';
-import { Shield, Check, X, CreditCard, Clock, Zap, RefreshCw, AlertTriangle } from 'lucide-react';
+import { Shield, Check, X, CreditCard, Clock, Zap, RefreshCw, AlertTriangle, Ticket } from 'lucide-react';
 import clsx from 'clsx';
 import { toast } from '../../../utils/toast';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import Modal from '../../../components/common/Modal';
+import StatusModal from '../../../components/common/StatusModal';
 import CountdownTimer from '../../../components/common/CountdownTimer';
 import { usePaddle } from '../../../hooks/usePaddle';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { PlanFeature } from '../../../types/plan-feature';
+import { redeemSubscriptionCode, confirmRedeemSubscriptionCode } from '../../subscriptions-admin/api/subscription-codes.api';
 
 const SubscriptionSettings = () => {
     const { t } = useTranslation(['common', 'stores', 'subscriptions']);
@@ -22,6 +24,12 @@ const SubscriptionSettings = () => {
     const [syncLoading, setSyncLoading] = useState(false);
     const [cancelModalOpen, setCancelModalOpen] = useState(false);
     const { openCheckout } = usePaddle();
+
+    // Redeem Code State
+    const [redeemModalOpen, setRedeemModalOpen] = useState(false);
+    const [redeemCodeValue, setRedeemCodeValue] = useState('');
+    const [redeemingState, setRedeemingState] = useState(false);
+    const [paddleWarningOpen, setPaddleWarningOpen] = useState(false);
 
     useEffect(() => {
         fetchSubscriptionData();
@@ -108,6 +116,72 @@ const SubscriptionSettings = () => {
         }
     };
 
+    const submitRedeemCode = async (confirm: boolean = false) => {
+        if (!redeemCodeValue.trim()) return;
+        setRedeemingState(true);
+        try {
+            let result;
+            if (confirm) {
+                result = await confirmRedeemSubscriptionCode(redeemCodeValue.trim());
+                setPaddleWarningOpen(false);
+            } else {
+                result = await redeemSubscriptionCode(redeemCodeValue.trim());
+            }
+
+            if (result.requiresConfirmation) {
+                setPaddleWarningOpen(true);
+                return;
+            }
+
+            setRedeemModalOpen(false);
+            setRedeemCodeValue('');
+            
+            // Extract duration from billing cycle (e.g., "1_months" -> 1)
+            const duration = result.subscription?.durationMonths || 
+                            (result.subscription?.billingCycle?.includes('_') ? result.subscription.billingCycle.split('_')[0] : 1);
+
+            const message = t('subscriptions:codes.redeem.success', {
+                plan: result.subscription?.plan === 'pro' ? 'Pro' : 'Premium',
+                duration,
+                defaultValue: 'Code redeemed successfully!'
+            });
+            toast.success(message);
+            await fetchSubscriptionData();
+        } catch (error: any) {
+            console.error('Redeem error:', error);
+            const rawErrorCode = error?.response?.data?.message || 'invalidSubscriptionCode';
+            let translatedError = '';
+            
+            if (rawErrorCode === 'requiresConfirmation') {
+                setPaddleWarningOpen(true);
+                return;
+            }
+
+            if (rawErrorCode === 'paddleCancellationFailed') {
+                translatedError = t('subscriptions:codes.redeem.errors.paddleCancellationFailed');
+                setPaddleWarningOpen(false); // Make sure warning clears
+            } else if (rawErrorCode === 'invalidSubscriptionCode') {
+                translatedError = t('subscriptions:codes.redeem.errors.invalidSubscriptionCode');
+            } else if (rawErrorCode === 'subscriptionCodeExpired') {
+                translatedError = t('subscriptions:codes.redeem.errors.subscriptionCodeExpired');
+            } else if (rawErrorCode === 'subscriptionCodeRevoked') {
+                translatedError = t('subscriptions:codes.redeem.errors.subscriptionCodeRevoked');
+            } else if (rawErrorCode === 'subscriptionCodeFullyUsed') {
+                translatedError = t('subscriptions:codes.redeem.errors.subscriptionCodeFullyUsed');
+            } else if (rawErrorCode === 'storeAlreadyUsedThisCode') {
+                translatedError = t('subscriptions:codes.redeem.errors.storeAlreadyUsedThisCode');
+            } else if (rawErrorCode === 'activeCodeSubscriptionExists') {
+                translatedError = t('subscriptions:codes.redeem.errors.activeCodeSubscriptionExists');
+            } else {
+                translatedError = t('subscriptions:codes.redeem.errors.invalidSubscriptionCode'); // Default
+            }
+
+            toast.error(translatedError);
+        } finally {
+            setRedeemingState(false);
+        }
+    };
+
     if (loading) {
         return <LoadingSpinner />;
     }
@@ -115,12 +189,12 @@ const SubscriptionSettings = () => {
     return (
         <div className="p-6 space-y-8">
             {/* Header Section */}
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-2">
                 <div className={isRTL ? 'text-right' : 'text-left'}>
-                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center gap-3">
+                    <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
                         {t('subscriptions:title')}
                         {usage?.plan !== 'free' && usage?.currentPeriodEnd && (
-                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-full text-sm font-bold mt-1">
+                            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-100 dark:bg-amber-500/10 text-amber-700 dark:text-amber-400 rounded-[4px] text-xs font-extrabold uppercase tracking-widest mt-1">
                                 <Clock size={14} />
                                 {t('subscriptions:renewsOn', { date: new Date(usage.currentPeriodEnd).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) })}
                             </span>
@@ -129,17 +203,26 @@ const SubscriptionSettings = () => {
                             <button
                                 onClick={handleSync}
                                 disabled={syncLoading}
-                                className="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 rounded-full text-sm font-bold mt-1 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors disabled:opacity-50"
+                                className="p-3 text-slate-400 dark:text-slate-500 hover:text-primary dark:hover:text-primary hover:bg-primary-light dark:hover:bg-primary-light/10 rounded-[4px] transition-all active:scale-90"
                                 title={t('subscriptions:syncStatus')}
                             >
-                                <RefreshCw size={14} className={clsx(syncLoading && "animate-spin")} />
-                                {t('subscriptions:syncStatus')}
+                                <RefreshCw size={18} className={clsx(syncLoading && "animate-spin")} />
                             </button>
                         )}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
                         {t('subscriptions:description')}
                     </p>
+                </div>
+
+                <button
+                    onClick={() => setRedeemModalOpen(true)}
+                    className="btn btn-primary min-w-[200px]"
+                >
+                    <Ticket size={20} />
+                    {t('subscriptions:codes.redeem.subscriptionCodeButton', { defaultValue: 'Subscription Code' })}
+                </button>
+            </div>
                     {usage?.isGracePeriod ? (
                         <div className="mt-4 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-none flex items-start gap-3">
                             <div className="mt-0.5 text-amber-600 dark:text-amber-400">
@@ -187,8 +270,6 @@ const SubscriptionSettings = () => {
                             </div>
                         </div>
                     ) : null}
-                </div>
-            </div>
 
             <div className="space-y-12">
 
@@ -413,6 +494,65 @@ const SubscriptionSettings = () => {
                     </div>
                 </div>
             </Modal>
+
+            {/* Redeem Code Modal */}
+            <Modal
+                isOpen={redeemModalOpen}
+                onClose={() => setRedeemModalOpen(false)}
+                title={t('subscriptions:codes.redeem.title')}
+            >
+                <div className="space-y-4">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                        {t('subscriptions:codes.redeem.description')}
+                    </p>
+                    <div>
+                        <input
+                            type="text"
+                            value={redeemCodeValue}
+                            onChange={(e) => setRedeemCodeValue(e.target.value.toUpperCase())}
+                            placeholder={t('subscriptions:codes.redeem.inputPlaceholder')}
+                            className="w-full py-3 px-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-mono uppercase tracking-wider focus:outline-none focus:ring-2 focus:ring-teal-500/30 transition-all font-bold placeholder:font-sans placeholder:tracking-normal placeholder:font-normal"
+                        />
+                    </div>
+                    <div className="flex gap-3 justify-end mt-4">
+                        <button
+                            onClick={() => setRedeemModalOpen(false)}
+                            className="px-5 py-2.5 rounded-[4px] font-bold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+                        >
+                            {t('common:cancel', { defaultValue: 'Cancel' })}
+                        </button>
+                        <button
+                            onClick={() => submitRedeemCode(false)}
+                            disabled={!redeemCodeValue.trim() || redeemingState}
+                            className="btn btn-primary"
+                        >
+                            {redeemingState ? (
+                                <>
+                                    <LoadingSpinner size="sm" fullHeight={false} />
+                                    {t('subscriptions:codes.redeem.redeeming', { defaultValue: 'Redeeming...' })}
+                                </>
+                            ) : (
+                                <>
+                                    <Ticket size={18} />
+                                    {t('subscriptions:codes.redeem.redeemButton')}
+                                </>
+                            )}
+                        </button>
+                    </div>
+                </div>
+            </Modal>
+
+            {/* Paddle Conflict Warning */}
+            <StatusModal
+                isOpen={paddleWarningOpen}
+                onClose={() => setPaddleWarningOpen(false)}
+                type="confirm"
+                title={t('subscriptions:codes.redeem.paddleWarningTitle')}
+                message={t('subscriptions:codes.redeem.paddleWarningMessage')}
+                onConfirm={() => submitRedeemCode(true)}
+                confirmText={t('subscriptions:codes.redeem.paddleWarningConfirm')}
+                isLoading={redeemingState}
+            />
         </div>
     );
 };

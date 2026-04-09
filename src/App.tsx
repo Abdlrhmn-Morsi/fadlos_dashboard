@@ -55,6 +55,7 @@ import SubscriptionPage from './features/subscriptions/pages/SubscriptionPage';
 import UsagePage from './features/subscriptions/pages/UsagePage';
 import BillingHistory from './features/subscriptions/components/BillingHistory';
 import PlansManagement from './features/subscriptions-admin/pages/PlansManagement';
+import SubscriptionCodes from './features/subscriptions-admin/pages/SubscriptionCodes';
 import SendPromotionPage from './features/notification/pages/SendPromotionPage';
 import PromotionHistoryPage from './features/notification/pages/PromotionHistoryPage';
 import AdminRolesList from './features/admin-roles/components/AdminRolesList';
@@ -193,6 +194,9 @@ const AppContent = () => {
             <Route path="stores/verification" element={<AdminPermissionGate permission={AdminPermissions.STORE_VERIFICATION_VIEW}><StoreVerificationRequests /></AdminPermissionGate>} />
             <Route path="plans-management" element={
               user?.role === UserRole.SUPER_ADMIN ? <PlansManagement /> : <Navigate to="/" replace />
+            } />
+            <Route path="subscription-codes" element={
+              user?.role === UserRole.SUPER_ADMIN ? <SubscriptionCodes /> : <Navigate to="/" replace />
             } />
             <Route path="billing-transactions" element={
               (user?.role === UserRole.SUPER_ADMIN || (user?.role === UserRole.ADMIN && hasAdminPermission(AdminPermissions.ANALYTICS_VIEW)))
