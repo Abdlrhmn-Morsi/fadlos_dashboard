@@ -33,6 +33,9 @@ export interface Store {
     acceptOrdersIfOffDay?: boolean;
     acceptOrdersInClosedHours?: boolean;
     isAcceptingOrders?: boolean;
+    categories?: any[];
+    products?: any[];
+    addons?: any[];
 }
 
 

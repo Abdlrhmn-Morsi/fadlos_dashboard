@@ -195,5 +195,6 @@
     "adjustFilters": "حاول تعديل البحث أو الفلاتر",
     "showingItems": "عرض {{from}} إلى {{to}} من أصل {{total}} نتيجة",
     "store": "المتجر",
+    "globalContent": "محتوى المتاجر",
     "revenue": "الإيرادات"
 }

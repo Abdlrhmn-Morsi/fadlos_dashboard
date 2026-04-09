@@ -8,6 +8,11 @@ export interface Addon {
     trackInventory: boolean;
     isActive: boolean;
     storeId: string;
+    store?: {
+        id: string;
+        name: string;
+        nameAr?: string;
+    };
     createdAt: string;
     updatedAt: string;
 }

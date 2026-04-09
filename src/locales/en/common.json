@@ -300,6 +300,7 @@
     "Analytics": "Analytics",
     "Promo Codes": "Promo Codes",
     "Addons": "Add-ons",
+    "All Content Management": "All Content Management",
     "permissions": {
         "store.view": {
             "name": "View Store Info",
@@ -516,7 +517,13 @@
         "admin.employees.manage": { "name": "Manage Admin Employees", "description": "Add, edit, or remove admin staff" },
         "admin.roles.manage": { "name": "Manage Admin Roles", "description": "Create and configure permission sets for admin staff" },
         "admin.app_updates.manage": { "name": "Manage App Updates", "description": "Configure app version requirements" },
-        "admin.analytics.view": { "name": "Analytics & Billing", "description": "• Access system metrics and revenue performance\n• View platform distributions (Plans, Cities, Business Types)\n• Monitor billing transactions and history" }
+        "admin.analytics.view": { "name": "Analytics & Billing", "description": "• Access system metrics and revenue performance\n• View platform distributions (Plans, Cities, Business Types)\n• Monitor billing transactions and history" },
+        "admin.products.view": { "name": "All Products View", "description": "• View and search all products across all stores\n• Access product details and variants" },
+        "admin.stores.products.update": { "name": "Manage All Products", "description": "• Edit product details, categories, and inventory for any store\n• Toggle product availability globally" },
+        "admin.categories.view": { "name": "All Categories View", "description": "• View and search all product categories across all stores" },
+        "admin.stores.categories.update": { "name": "Manage All Categories", "description": "• Create and edit product categories for any store\n• Reorder category display globally" },
+        "admin.addons.view": { "name": "All Add-ons View", "description": "• View and search all product add-ons across all stores" },
+        "admin.stores.addons.update": { "name": "Manage All Add-ons", "description": "• Create and edit product add-ons for any store\n• Update add-on pricing and stock globally" }
     },
     "fields": {
         "status": "Status",
@@ -582,5 +589,6 @@
     "storeDriversLimit": "store drivers",
     "customRolesFeature": "custom roles",
     "upgradeRequired": "Please upgrade your plan to add more {{feature}}.",
-    "upgradeNow": "Upgrade Now"
+    "upgradeNow": "Upgrade Now",
+    "newest": "newest"
 }

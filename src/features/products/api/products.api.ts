@@ -43,6 +43,12 @@ export const productsApi = {
         });
     },
     /**
+     * Toggle product active status
+     */
+    toggleStatus: async (id: string, isActive: boolean) => {
+        return apiService.patch(`/products/${id}/toggle-status`, { isActive });
+    },
+    /**
      * Delete a product
      */
     deleteProduct: async (id: string) => {

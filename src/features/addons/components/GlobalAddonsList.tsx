@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit, Trash2, Package, PackageOpen } from 'lucide-react';
+import { Search, Edit, Trash2, Package, PackageOpen, Store, MoreVertical } from 'lucide-react';
+
 import clsx from 'clsx';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import addonsApi from '../api/addons.api';
 import { ConfirmModal } from '../../../components/ConfirmModal';
 import { toast } from '../../../utils/toast';
@@ -9,17 +10,16 @@ import { useTranslation } from 'react-i18next';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useCache } from '../../../contexts/CacheContext';
+import { AdminPermissions } from '../../../types/admin-permissions';
 import { Permissions } from '../../../types/permissions';
 import { Pagination } from '../../../components/common/Pagination';
 import { Addon } from '../models/addon.model';
 
-const AddonsList = () => {
-    const { user, hasPermission } = useAuth();
+const GlobalAddonsList = () => {
+    const { hasAdminPermission, hasPermission, user } = useAuth();
     const navigate = useNavigate();
     const { t } = useTranslation(['addons', 'common', 'dashboard']);
     const { isRTL } = useLanguage();
-    const [searchParams] = useSearchParams();
-    const storeId = searchParams.get('storeId');
     const { getCache, setCache, invalidateCache } = useCache();
 
     const [addons, setAddons] = useState<Addon[]>([]);
@@ -34,7 +34,6 @@ const AddonsList = () => {
     const [deleteId, setDeleteId] = useState<string | null>(null);
 
     const [statusToggleItem, setStatusToggleItem] = useState<any>(null);
-    const isSystemAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -50,28 +49,30 @@ const AddonsList = () => {
                 page,
                 limit,
                 search: searchTerm || undefined,
-                storeId: storeId || undefined,
             };
 
-            const cacheKey = 'addons';
+            const cacheKey = 'global_addons';
             const cachedData = getCache<any>(cacheKey, params);
             if (cachedData) {
                 setAddons(cachedData.data || []);
+                setTotalPages(cachedData.meta?.totalPages || 1);
                 setLoading(false);
                 return;
             }
 
             const res: any = await addonsApi.getAddons(params);
-            const data = res.data || [];
-            const meta = res.meta;
-
-            setAddons(data);
-            if (meta) {
-                setTotalPages(meta.totalPages || 1);
+            if (res && res.data) {
+                setAddons(res.data);
+                if (res.meta) {
+                    setTotalPages(res.meta.totalPages || 1);
+                }
+                setCache(cacheKey, res, params);
+            } else {
+                setAddons([]);
+                setTotalPages(1);
             }
-            setCache(cacheKey, res, params);
         } catch (error) {
-            console.error('Failed to fetch addons', error);
+            console.error('Failed to fetch global addons', error);
             toast.error(t('loadFailed'));
         } finally {
             setLoading(false);
@@ -89,10 +90,11 @@ const AddonsList = () => {
             await addonsApi.deleteAddon(deleteId);
             toast.success(t('deleteSuccess'));
             setAddons(prev => prev.filter(a => a.id !== deleteId));
-            invalidateCache('addons');
-        } catch (error) {
+            invalidateCache('global_addons');
+        } catch (error: any) {
             console.error('Failed to delete addon', error);
-            toast.error(t('deleteFailed'));
+            const errorMsg = error.response?.data?.message || t('deleteFailed');
+            toast.error(errorMsg);
         } finally {
             setConfirmOpen(false);
             setDeleteId(null);
@@ -105,7 +107,7 @@ const AddonsList = () => {
             await addonsApi.toggleStatus(statusToggleItem.id, !statusToggleItem.isActive);
             toast.success(t('common:success', { defaultValue: 'Status updated via toggle' }));
             setAddons(prev => prev.map(a => a.id === statusToggleItem.id ? { ...a, isActive: !statusToggleItem.isActive } : a));
-            invalidateCache('addons');
+            invalidateCache('global_addons');
         } catch (error: any) {
             console.error('Failed to update status', error);
             toast.error(t('common:error', { defaultValue: 'Failed to update status' }));
@@ -114,27 +116,22 @@ const AddonsList = () => {
         }
     };
 
+    const canManage = hasAdminPermission(AdminPermissions.STORES_ADDONS_UPDATE);
+    const isSystemAdmin = user?.role === 'admin' || user?.role === 'super_admin';
+    const isSuperAdmin = user?.role === 'super_admin';
+
     return (
         <div className="p-6 space-y-6">
             {/* Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div className={isRTL ? 'text-right' : 'text-left'}>
                     <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                        {t('title')}
+                        {t('globalTitle', { defaultValue: 'All Add-on Management' })}
                     </h1>
                     <p className="text-slate-500 dark:text-slate-400 mt-1">
-                        {t('subtitle')}
+                        {t('globalSubtitle', { defaultValue: 'Manage store add-ons across the entire system' })}
                     </p>
                 </div>
-                {hasPermission(Permissions.ADDONS_CREATE) && !storeId && (
-                    <button
-                        onClick={() => navigate('/addons/new')}
-                        className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-lg shadow-md hover:shadow-lg transition-all duration-200 font-medium"
-                    >
-                        <Plus size={20} />
-                        <span>{t('addAddon')}</span>
-                    </button>
-                )}
             </div>
 
             {/* Search Bar */}
@@ -161,26 +158,24 @@ const AddonsList = () => {
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('addonName')}</th>
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('dashboard:store', { defaultValue: 'Store' })}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('dashboard:totalProducts')}</th>
                                 <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('price')}</th>
-                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('inventory')}</th>
-                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('isActive')}</th>
-                                {(hasPermission(Permissions.ADDONS_UPDATE) || hasPermission(Permissions.ADDONS_DELETE) || hasPermission(Permissions.ADDONS_VIEW)) && (
-                                    <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>
-                                        {t('common:actions')}
-                                    </th>
-                                )}
+                                <th className="px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">{t('status')}</th>
+                                <th className={clsx("px-6 py-5 text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider", isRTL ? "text-left" : "text-right")}>
+                                    {t('common:actions')}
+                                </th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
                             {loading ? (
-                                [...Array(3)].map((_, i) => (
+                                [...Array(5)].map((_, i) => (
                                     <tr key={i} className="animate-pulse">
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-32"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-24"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-12"></div></td>
                                         <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-12"></div></td>
-                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-16"></div></td>
+                                        <td className="px-6 py-4"><div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-20"></div></td>
                                         <td className="px-6 py-4"></td>
                                     </tr>
                                 ))
@@ -188,11 +183,8 @@ const AddonsList = () => {
                                 <tr>
                                     <td colSpan={6} className="px-6 py-12 text-center">
                                         <div className="flex flex-col items-center justify-center text-slate-400">
-                                            <div className="p-4 bg-slate-50 dark:bg-slate-800 rounded-full mb-4">
-                                                <PackageOpen size={48} strokeWidth={1} className="text-slate-300 dark:text-slate-600" />
-                                            </div>
-                                            <p className="text-lg font-medium text-slate-600 dark:text-slate-300">{t('noAddonsFound')}</p>
-                                            <p className="text-sm mt-1">{t('getStarted')}</p>
+                                            <PackageOpen size={48} strokeWidth={1} />
+                                            <p className="mt-4 text-lg font-medium">{t('noAddonsFound')}</p>
                                         </div>
                                     </td>
                                 </tr>
@@ -202,78 +194,57 @@ const AddonsList = () => {
                                         <td className="px-6 py-4">
                                             <div className="flex items-center gap-3">
                                                 {addon.image ? (
-                                                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-800 flex-shrink-0">
-                                                        <img src={addon.image} alt="Image" aria-hidden="true" className="w-full h-full object-cover" />
+                                                    <div className="w-10 h-10 rounded-lg overflow-hidden border border-slate-200 flex-shrink-0">
+                                                        <img src={addon.image} alt="Addon" className="w-full h-full object-cover" />
                                                     </div>
                                                 ) : (
                                                     <div className="w-10 h-10 rounded-lg bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-400 flex-shrink-0">
                                                         <Package size={20} />
                                                     </div>
                                                 )}
-                                                <div className="flex flex-col">
-                                                    <p className="font-semibold text-slate-800 dark:text-white">
-                                                        {isRTL ? addon.nameAr || addon.name : addon.name}
-                                                    </p>
-                                                </div>
+                                                <span className="font-semibold text-slate-800 dark:text-white">
+                                                    {isRTL ? addon.nameAr || addon.name : addon.name}
+                                                </span>
                                             </div>
                                         </td>
                                         <td className="px-6 py-4">
-                                            <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">
-                                                {(addon as any).productCount || 0}
-                                            </span>
+                                            <div 
+                                                onClick={() => navigate(`/stores/${addon.store?.id}`)}
+                                                className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 hover:underline cursor-pointer font-medium text-sm"
+                                            >
+                                                <Store size={14} />
+                                                {isRTL ? addon.store?.nameAr || addon.store?.name : addon.store?.name}
+                                            </div>
+                                        </td>
+                                        <td className="px-6 py-4 text-sm font-semibold">
+                                            {(addon as any).productCount || 0}
                                         </td>
                                         <td className="px-6 py-4 font-bold text-slate-900 dark:text-white">
                                             {addon.price.toFixed(2)} {t('common:currencySymbol')}
                                         </td>
                                         <td className="px-6 py-4">
-                                            {addon.trackInventory ? (
-                                                <span className={clsx(
-                                                    "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium",
-                                                    addon.inventory > 0 ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/20" : "bg-rose-50 text-rose-700 dark:bg-rose-900/20"
-                                                )}>
-                                                    {addon.inventory} {t('inStock')}
-                                                </span>
-                                            ) : (
-                                                <span className="text-slate-400 text-xs italic">{t('unlimited')}</span>
-                                            )}
-                                        </td>
-                                        <td className="px-6 py-4">
                                             <span className={clsx(
-                                                "inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border",
+                                                "px-2.5 py-0.5 rounded-full text-xs font-medium border",
                                                 addon.isActive ? "bg-emerald-50 text-emerald-700 border-emerald-200" : "bg-slate-50 text-slate-600 border-slate-200"
                                             )}>
                                                 {addon.isActive ? t('common:active') : t('common:inactive')}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className={clsx("flex items-center gap-2", isRTL ? "justify-start" : "justify-end")}>
-                                                {hasPermission(Permissions.ADDONS_UPDATE) ? (
+                                        <td className="px-6 py-4 text-right">
+                                            <div className="flex items-center gap-2 justify-end">
+                                                {canManage && (
                                                     <button
-                                                        onClick={() => {
-                                                            if (isSystemAdmin) {
-                                                                setStatusToggleItem(addon);
-                                                            } else {
-                                                                navigate(`/addons/edit/${addon.id}`);
-                                                            }
-                                                        }}
-                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
+                                                        onClick={() => isSystemAdmin ? setStatusToggleItem(addon) : navigate(`/addons/edit/${addon.id}`)}
+                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg"
                                                         title={isSystemAdmin ? t('toggleStatus', { defaultValue: 'Toggle Status' }) : t('common:edit')}
                                                     >
                                                         <Edit size={18} />
                                                     </button>
-                                                ) : hasPermission(Permissions.ADDONS_VIEW) && (
-                                                    <button
-                                                        onClick={() => navigate(`/addons/edit/${addon.id}`)}
-                                                        className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                        title={t('common:view')}
-                                                    >
-                                                        <Search size={18} />
-                                                    </button>
                                                 )}
-                                                {hasPermission(Permissions.ADDONS_DELETE) && !isSystemAdmin && (
+                                                {(!isSystemAdmin && hasPermission(Permissions.ADDONS_DELETE)) && (
                                                     <button
                                                         onClick={() => handleDelete(addon.id)}
-                                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
+                                                        className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-lg"
                                                         title={t('common:delete')}
                                                     >
                                                         <Trash2 size={18} />
@@ -287,19 +258,10 @@ const AddonsList = () => {
                         </tbody>
                     </table>
                 </div>
+                <div className="p-4 border-t border-slate-200 dark:border-slate-800">
+                    <Pagination currentPage={page} totalPages={totalPages} onPageChange={setPage} isLoading={loading} />
+                </div>
             </div>
-
-            {
-                totalPages > 1 && (
-                    <div className="flex justify-center mt-8">
-                        <Pagination
-                            currentPage={page}
-                            totalPages={totalPages}
-                            onPageChange={setPage}
-                        />
-                    </div>
-                )
-            }
 
             <ConfirmModal
                 isOpen={confirmOpen}
@@ -316,8 +278,8 @@ const AddonsList = () => {
                 onConfirm={confirmStatusToggle}
                 onCancel={() => setStatusToggleItem(null)}
             />
-        </div >
+        </div>
     );
 };
 
-export default AddonsList;
+export default GlobalAddonsList;

@@ -61,6 +61,9 @@ import AdminRolesList from './features/admin-roles/components/AdminRolesList';
 import AdminRoleForm from './features/admin-roles/components/AdminRoleForm';
 import AdminEmployeesList from './features/admin-employees/components/AdminEmployeesList';
 import AdminEmployeeForm from './features/admin-employees/components/AdminEmployeeForm';
+import GlobalProductList from './features/products/GlobalProductList';
+import GlobalCategoryList from './features/categories/GlobalCategoryList';
+import GlobalAddonsList from './features/addons/components/GlobalAddonsList';
 
 
 import { ThemeProvider, useTheme } from './contexts/ThemeContext';
@@ -87,12 +90,17 @@ const ProtectedRoute = () => {
   return <Outlet />;
 };
 
-const PermissionGate = ({ permission, children }: { permission: string, children: React.ReactNode }) => {
-  const { hasPermission, isLoading } = useAuth();
+const PermissionGate = ({ permission, children, adminPermission }: { permission: string, children: React.ReactNode, adminPermission?: string }) => {
+  const { hasPermission, hasAdminPermission, user, isLoading } = useAuth();
 
   if (isLoading) return null;
 
-  if (!hasPermission(permission)) {
+  const isAccessAllowed = 
+    hasPermission(permission) || 
+    (adminPermission && hasAdminPermission(adminPermission)) ||
+    hasAdminPermission(AdminPermissions.STORES_VIEW); // General access for Admins to view store content
+
+  if (!isAccessAllowed) {
     return <Navigate to="/" replace />;
   }
 
@@ -129,16 +137,16 @@ const AppContent = () => {
             <Route path="analytics" element={<PermissionGate permission={Permissions.ANALYTICS_VIEW}><Analytics /></PermissionGate>} />
 
             {/* Store Owner & Employee Routes */}
-            <Route path="products" element={<ProductList />} />
+            <Route path="products" element={<PermissionGate permission={Permissions.PRODUCTS_VIEW}><ProductList /></PermissionGate>} />
             <Route path="products/new" element={<PermissionGate permission={Permissions.PRODUCTS_CREATE}><ProductForm /></PermissionGate>} />
             <Route path="products/:id" element={<ProductDetail />} />
             <Route path="products/edit/:id" element={<PermissionGate permission={Permissions.PRODUCTS_UPDATE}><ProductForm /></PermissionGate>} />
 
-            <Route path="addons" element={<AddonsList />} />
+            <Route path="addons" element={<PermissionGate permission={Permissions.ADDONS_VIEW}><AddonsList /></PermissionGate>} />
             <Route path="addons/new" element={<PermissionGate permission={Permissions.ADDONS_CREATE}><AddonForm /></PermissionGate>} />
-            <Route path="addons/edit/:id" element={<AddonForm />} />
+            <Route path="addons/edit/:id" element={<PermissionGate permission={Permissions.ADDONS_VIEW}><AddonForm /></PermissionGate>} />
 
-            <Route path="categories" element={<CategoryList />} />
+            <Route path="categories" element={<PermissionGate permission={Permissions.CATEGORIES_VIEW}><CategoryList /></PermissionGate>} />
 
             <Route path="orders" element={<PermissionGate permission={Permissions.ORDERS_VIEW}><OrderList /></PermissionGate>} />
             <Route path="orders/batch-assign" element={<PermissionGate permission={Permissions.ORDERS_UPDATE}><BatchAssign /></PermissionGate>} />
@@ -174,6 +182,12 @@ const AppContent = () => {
             <Route path="business-types" element={<AdminPermissionGate permission={AdminPermissions.BUSINESS_TYPES_VIEW}><BusinessTypes /></AdminPermissionGate>} />
             <Route path="business-categories" element={<AdminPermissionGate permission={AdminPermissions.BUSINESS_CATEGORIES_VIEW}><BusinessCategories /></AdminPermissionGate>} />
             <Route path="reported-reviews" element={<AdminPermissionGate permission={AdminPermissions.REPORTED_REVIEWS_VIEW}><ReportedReviewList /></AdminPermissionGate>} />
+            
+            {/* Global Content Management */}
+            <Route path="global-products" element={<AdminPermissionGate permission={AdminPermissions.GLOBAL_PRODUCTS_VIEW}><GlobalProductList /></AdminPermissionGate>} />
+            <Route path="global-categories" element={<AdminPermissionGate permission={AdminPermissions.GLOBAL_CATEGORIES_VIEW}><GlobalCategoryList /></AdminPermissionGate>} />
+            <Route path="global-addons" element={<AdminPermissionGate permission={AdminPermissions.GLOBAL_ADDONS_VIEW}><GlobalAddonsList /></AdminPermissionGate>} />
+            
             <Route path="drivers/verification" element={<AdminPermissionGate permission={AdminPermissions.DRIVER_VERIFICATION_VIEW}><DriverVerificationPage /></AdminPermissionGate>} />
             <Route path="drivers/verification/:id" element={<AdminPermissionGate permission={AdminPermissions.DRIVER_VERIFICATION_VIEW}><AdminDriverDetail /></AdminPermissionGate>} />
             <Route path="stores/verification" element={<AdminPermissionGate permission={AdminPermissions.STORE_VERIFICATION_VIEW}><StoreVerificationRequests /></AdminPermissionGate>} />

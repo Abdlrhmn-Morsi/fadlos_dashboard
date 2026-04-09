@@ -417,8 +417,11 @@ const ReportedReviewList = () => {
 
                                         <div className="flex flex-col items-end gap-2 text-right">
                                             {review.store && (
-                                                <div className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-none shadow-sm">
-                                                    <Store size={12} className="text-primary" />
+                                                <div 
+                                                    className="flex items-center gap-2 px-3 py-1 bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-none shadow-sm cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-700 transition-all group/store"
+                                                    onClick={() => navigate(`/stores/${review.store.id}`)}
+                                                >
+                                                    <Store size={12} className="text-primary group-hover/store:scale-110 transition-transform" />
                                                     <span className="text-[0.625rem] font-extrabold text-slate-900 dark:text-white uppercase tracking-tight">
                                                         {language === 'ar' && review.store.nameAr ? review.store.nameAr : review.store.name}
                                                     </span>

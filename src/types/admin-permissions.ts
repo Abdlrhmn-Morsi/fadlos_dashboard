@@ -41,6 +41,15 @@ export enum AdminPermissions {
   // App Settings
   APP_UPDATES_MANAGE = 'admin.app_updates.manage',
 
+  // Global Content Management
+  GLOBAL_PRODUCTS_VIEW = 'admin.products.view',
+  GLOBAL_CATEGORIES_VIEW = 'admin.categories.view',
+  GLOBAL_ADDONS_VIEW = 'admin.addons.view',
+
+  STORES_PRODUCTS_UPDATE = 'admin.stores.products.update',
+  STORES_CATEGORIES_UPDATE = 'admin.stores.categories.update',
+  STORES_ADDONS_UPDATE = 'admin.stores.addons.update',
+
   // Admin Team
   ADMIN_EMPLOYEES_VIEW = 'admin.employees.view',
   ADMIN_EMPLOYEES_MANAGE = 'admin.employees.manage',
@@ -121,6 +130,41 @@ export const ADMIN_PERMISSION_GROUPS: AdminPermissionGroup[] = [
     ],
   },
   {
+    category: 'All Content Management',
+    permissions: [
+      {
+        key: AdminPermissions.GLOBAL_PRODUCTS_VIEW,
+        name: 'View All Products',
+        description: '• Search and view all products in the system',
+      },
+      {
+        key: AdminPermissions.STORES_PRODUCTS_UPDATE,
+        name: 'Update Store Products',
+        description: '• Edit product details for any store',
+      },
+      {
+        key: AdminPermissions.GLOBAL_CATEGORIES_VIEW,
+        name: 'View All Categories',
+        description: '• Search and browse all store categories',
+      },
+      {
+        key: AdminPermissions.STORES_CATEGORIES_UPDATE,
+        name: 'Update Store Categories',
+        description: '• Edit categories for any store',
+      },
+      {
+        key: AdminPermissions.GLOBAL_ADDONS_VIEW,
+        name: 'View All Add-ons',
+        description: '• Search and browse all store add-ons',
+      },
+      {
+        key: AdminPermissions.STORES_ADDONS_UPDATE,
+        name: 'Update Store Add-ons',
+        description: '• Edit add-ons for any store',
+      },
+    ],
+  },
+  {
     category: 'Geography',
     permissions: [
       {
@@ -185,7 +229,6 @@ export const ADMIN_PERMISSION_GROUPS: AdminPermissionGroup[] = [
       },
     ],
   },
-
   {
     category: 'Admin Team',
     permissions: [

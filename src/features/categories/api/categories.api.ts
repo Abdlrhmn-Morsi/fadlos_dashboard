@@ -32,6 +32,13 @@ const categoriesApi = {
     updateCategory: async (id: string, data: any) => {
         return apiService.patch(`/categories/${id}`, data);
     },
+    
+    /**
+     * Toggle category active status
+     */
+    toggleStatus: async (id: string, isActive: boolean) => {
+        return apiService.patch(`/categories/${id}/toggle-status`, { isActive });
+    },
 
     /**
      * Delete a category

@@ -17,13 +17,13 @@ export enum Permissions {
     EMPLOYEES_DELETE = 'employees.delete',
 
     // Product Management
-    // PRODUCTS_VIEW = 'products.view', // Now default for all employees
+    PRODUCTS_VIEW = 'products.view',
     PRODUCTS_CREATE = 'products.create',
     PRODUCTS_UPDATE = 'products.update',
     PRODUCTS_DELETE = 'products.delete',
 
     // Category Management
-    // CATEGORIES_VIEW = 'categories.view', // Now default for all employees
+    CATEGORIES_VIEW = 'categories.view',
     CATEGORIES_CREATE = 'categories.create',
     CATEGORIES_UPDATE = 'categories.update',
     CATEGORIES_DELETE = 'categories.delete',

@@ -301,6 +301,24 @@ const DashboardLayout: React.FC = () => {
                 </>
               )}
 
+              {/* Global Content Management */}
+              {(hasAdminPermission(AdminPermissions.GLOBAL_PRODUCTS_VIEW) ||
+                hasAdminPermission(AdminPermissions.GLOBAL_CATEGORIES_VIEW) ||
+                hasAdminPermission(AdminPermissions.GLOBAL_ADDONS_VIEW)) && (
+                  <>
+                    <SidebarHeader label={t('dashboard:globalContent', { defaultValue: 'Store Content' })} collapsed={collapsed} />
+                    {hasAdminPermission(AdminPermissions.GLOBAL_PRODUCTS_VIEW) && (
+                      <SidebarItem to="/global-products" icon={Briefcase} label={t('products')} collapsed={collapsed} />
+                    )}
+                    {hasAdminPermission(AdminPermissions.GLOBAL_CATEGORIES_VIEW) && (
+                      <SidebarItem to="/global-categories" icon={LayoutGrid} label={t('categories')} collapsed={collapsed} />
+                    )}
+                    {hasAdminPermission(AdminPermissions.GLOBAL_ADDONS_VIEW) && (
+                      <SidebarItem to="/global-addons" icon={Layers} label={t('addons')} collapsed={collapsed} />
+                    )}
+                  </>
+                )}
+
               {/* Team Section */}
               {(hasAdminPermission(AdminPermissions.ADMIN_EMPLOYEES_VIEW) ||
                 hasAdminPermission(AdminPermissions.ADMIN_ROLES_MANAGE)) && (

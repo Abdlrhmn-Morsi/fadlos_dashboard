@@ -12,7 +12,7 @@ import { useCache } from '../../contexts/CacheContext';
 import { Permissions } from '../../types/permissions';
 import { Pagination } from '../../components/common/Pagination';
 import clsx from 'clsx';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useSubscription } from '../../hooks/useSubscription';
 import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 
@@ -21,6 +21,8 @@ const CategoryList = () => {
     const { isRTL } = useLanguage();
     const { hasPermission } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const storeId = searchParams.get('storeId');
     const { getCache, setCache, invalidateCache } = useCache();
     const { usage } = useSubscription();
     const [categories, setCategories] = useState<any[]>([]);
@@ -39,6 +41,9 @@ const CategoryList = () => {
     // Delete confirmation state
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+
+    const [statusToggleItem, setStatusToggleItem] = useState<any>(null);
+    const isSystemAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
     // Search Debounce
     useEffect(() => {
@@ -107,7 +112,9 @@ const CategoryList = () => {
             }
 
             // Fetch from API if not cached
-            const response: any = await categoriesApi.getSellerCategories(params);
+            const response: any = storeId
+                ? await categoriesApi.getCategories({ ...params, storeId })
+                : await categoriesApi.getSellerCategories(params);
 
             if (response && response.data) {
                 setCategories(response.data);
@@ -163,6 +170,21 @@ const CategoryList = () => {
         }
     };
 
+    const confirmStatusToggle = async () => {
+        if (!statusToggleItem) return;
+        try {
+            await categoriesApi.toggleStatus(statusToggleItem.id, !statusToggleItem.isActive);
+            toast.success(t('common:success', { defaultValue: 'Status updated via toggle' }));
+            setCategories(prevCategories => prevCategories.map(cat => cat.id === statusToggleItem.id ? { ...cat, isActive: !statusToggleItem.isActive } : cat));
+            invalidateCache('categories');
+        } catch (error) {
+            console.error('Failed to update category status', error);
+            toast.error(t('common:error', { defaultValue: 'Error' }));
+        } finally {
+            setStatusToggleItem(null);
+        }
+    };
+
     const handleEdit = (category: any) => {
         setEditingCategory(category);
         setIsModalOpen(true);
@@ -185,7 +207,7 @@ const CategoryList = () => {
                         {t('subtitle')}
                     </p>
                 </div>
-                {hasPermission(Permissions.CATEGORIES_CREATE) && (
+                {hasPermission(Permissions.CATEGORIES_CREATE) && !storeId && (
                     usage && usage.limits.categories !== -1 && categories.length >= usage.limits.categories ? (
                         <button
                             onClick={() => navigate('/subscription')}
@@ -327,14 +349,20 @@ const CategoryList = () => {
                                             <div className="flex items-center gap-2 transition-opacity duration-200 justify-end">
                                                 {hasPermission(Permissions.CATEGORIES_UPDATE) && (
                                                     <button
-                                                        onClick={() => handleEdit(category)}
+                                                        onClick={() => {
+                                                            if (isSystemAdmin) {
+                                                                setStatusToggleItem(category);
+                                                            } else {
+                                                                handleEdit(category);
+                                                            }
+                                                        }}
                                                         className="p-2 text-slate-500 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-all"
-                                                        title={t('common:edit')}
+                                                        title={isSystemAdmin ? t('toggleStatus', { defaultValue: 'Toggle Status' }) : t('common:edit')}
                                                     >
                                                         <Edit size={18} />
                                                     </button>
                                                 )}
-                                                {hasPermission(Permissions.CATEGORIES_DELETE) && (
+                                                {hasPermission(Permissions.CATEGORIES_DELETE) && !isSystemAdmin && (
                                                     <button
                                                         onClick={() => handleDeleteClick(category.id)}
                                                         className="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-900/30 rounded-lg transition-all"
@@ -394,6 +422,14 @@ const CategoryList = () => {
                 message={t('deleteConfirmation')}
                 onConfirm={confirmDelete}
                 onCancel={() => setConfirmOpen(false)}
+            />
+
+            <ConfirmModal
+                isOpen={!!statusToggleItem}
+                title={t('toggleStatus', { defaultValue: 'Toggle Status' })}
+                message={t('statusToggleConfirmation', { defaultValue: 'Are you sure you want to toggle the active status of this item?' })}
+                onConfirm={confirmStatusToggle}
+                onCancel={() => setStatusToggleItem(null)}
             />
         </div>
     );

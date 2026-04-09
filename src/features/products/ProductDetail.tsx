@@ -14,9 +14,11 @@ const ProductDetail = () => {
     const navigate = useNavigate();
     const { language, isRTL } = useLanguage();
     const { t } = useTranslation(['products', 'common', 'addons']);
-    const { hasPermission } = useAuth();
+    const { hasPermission, user } = useAuth();
     const [product, setProduct] = useState<any>(null);
     const [loading, setLoading] = useState(true);
+
+    const isSystemAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
     useEffect(() => {
         fetchProduct();
@@ -53,14 +55,14 @@ const ProductDetail = () => {
             <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-4">
                     <button
-                        onClick={() => navigate('/products')}
+                        onClick={() => navigate(-1)}
                         className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full transition-colors"
                     >
                         <ArrowLeft size={24} className={clsx("text-slate-600 dark:text-slate-400", isRTL && "rotate-180")} />
                     </button>
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-white">{t('products:productDetails')}</h1>
                 </div>
-                {hasPermission(Permissions.PRODUCTS_UPDATE) && (
+                {hasPermission(Permissions.PRODUCTS_UPDATE) && !isSystemAdmin && (
                     <button
                         onClick={() => navigate(`/products/edit/${product.id}`)}
                         className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded hover:bg-primary-hover transition-colors"

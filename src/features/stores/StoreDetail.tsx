@@ -45,19 +45,26 @@ const SOCIAL_PLATFORMS: Record<string, any> = {
     Website: { icon: Globe, color: 'text-slate-500' }
 };
 
-const StatCard = ({ title, value, icon: Icon, color, isRTL }: any) => (
-    <div className="bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm transition-all  rounded-[4px]">
+const StatCard = ({ title, value, icon: Icon, color, isRTL, onClick }: any) => (
+    <div 
+        className={clsx(
+            "bg-white dark:bg-slate-900 p-6 border border-slate-200 dark:border-slate-800 shadow-sm transition-all rounded-[4px]",
+            onClick && "cursor-pointer hover:shadow-md hover:border-slate-300 dark:hover:border-slate-700 active:scale-[0.98] group"
+        )}
+        onClick={onClick}
+    >
         <div className="flex justify-between items-start">
             <div>
-                <p className="text-slate-500 dark:text-slate-400 text-[0.625rem] font-extrabold uppercase tracking-widest mb-2 opacity-70">{title}</p>
+                <p className="text-slate-500 dark:text-slate-400 text-[0.625rem] font-extrabold uppercase tracking-widest mb-2 opacity-70 group-hover:text-primary transition-colors">{title}</p>
                 <h3 className="text-2xl font-extrabold text-slate-900 dark:text-slate-100 tabular-nums">{value}</h3>
             </div>
             <div className={clsx(
-                "p-3 rounded-[4px]",
+                "p-3 rounded-[4px] transition-transform group-hover:scale-110",
                 color === 'emerald' ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-900/20 dark:text-emerald-400' :
                     color === 'blue' ? 'bg-blue-50 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400' :
                         color === 'orange' ? 'bg-orange-50 text-orange-600 dark:bg-orange-900/20 dark:text-orange-400' :
-                            'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400'
+                            color === 'indigo' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400' :
+                                'bg-slate-50 text-slate-600 dark:bg-slate-900/50 dark:text-slate-400'
             )}>
                 <Icon size={24} strokeWidth={1.5} />
             </div>
@@ -68,7 +75,7 @@ const StatCard = ({ title, value, icon: Icon, color, isRTL }: any) => (
 const StoreDetail: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
-    const { t } = useTranslation(['stores', 'common']);
+    const { t } = useTranslation(['stores', 'common', 'subscriptions']);
     const { isRTL } = useLanguage();
     const [store, setStore] = useState<any>(null);
     const [loading, setLoading] = useState(true);
@@ -176,7 +183,7 @@ const StoreDetail: React.FC = () => {
             )}
 
             {/* Stats Row */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
                 <StatCard
                     title={t('revenue')}
                     value={`${Number(store.totalRevenue || 0).toLocaleString()} ${t('common:currencySymbol')}`}
@@ -197,6 +204,7 @@ const StoreDetail: React.FC = () => {
                     icon={Package}
                     color="blue"
                     isRTL={isRTL}
+                    onClick={() => navigate(`/products?storeId=${store.id}`)}
                 />
                 <StatCard
                     title={t('categories')}
@@ -204,6 +212,15 @@ const StoreDetail: React.FC = () => {
                     icon={Layers}
                     color="indigo"
                     isRTL={isRTL}
+                    onClick={() => navigate(`/categories?storeId=${store.id}`)}
+                />
+                <StatCard
+                    title={t('common:addons', { defaultValue: 'Add-ons' })}
+                    value={store.addons?.length || 0}
+                    icon={Package}
+                    color="rose"
+                    isRTL={isRTL}
+                    onClick={() => navigate(`/addons?storeId=${store.id}`)}
                 />
             </div>
 
@@ -226,8 +243,9 @@ const StoreDetail: React.FC = () => {
                                 <span className="text-sm font-bold text-slate-700 dark:text-slate-300">/{store.slug}</span>
                             </div>
                             <div className="flex flex-col gap-1">
-                                <span className="text-[0.625rem] font-extrabold uppercase text-slate-400 tracking-widest">{t('plan')}</span>
-                                <span className="text-sm font-bold text-primary uppercase">{store.plan}</span>
+                                <span className="text-sm font-bold text-primary uppercase">
+                                    {t(`subscriptions:plans.${store.plan?.toLowerCase()}.name`, { defaultValue: store.plan })}
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -327,7 +345,7 @@ const StoreDetail: React.FC = () => {
                     <div className="bg-slate-900 text-white p-8 shadow-2xl relative overflow-hidden group rounded-[4px]">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 -rotate-45 translate-x-16 -translate-y-16 group-hover:bg-primary/20 transition-all duration-700" />
 
-                        <h3 className={clsx("text-lg font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-4 relative z-10", isRTL && "text-end")}>
+                        <h3 className={clsx("text-lg font-extrabold uppercase tracking-widest mb-8 border-b border-white/10 pb-4 relative z-10")}>
                             {t('legalOwner')}
                         </h3>
 
@@ -346,7 +364,7 @@ const StoreDetail: React.FC = () => {
                                 <div className="p-2 bg-white/10 rounded-[4px] shrink-0">
                                     <Mail size={18} strokeWidth={1.5} />
                                 </div>
-                                <div className={isRTL ? "text-end" : "text-start"}>
+                                <div>
                                     <p className="text-[0.625rem] font-extrabold text-white/40 uppercase tracking-widest line-clamp-1">{t('common:email')}</p>
                                     <p className="text-sm font-bold mt-1 break-all">{store.owner?.email || store.email}</p>
                                 </div>
@@ -356,7 +374,7 @@ const StoreDetail: React.FC = () => {
                                 <div className="p-2 bg-white/10 rounded-[4px] shrink-0">
                                     <Phone size={18} strokeWidth={1.5} />
                                 </div>
-                                <div className={isRTL ? "text-end" : "text-start"}>
+                                <div>
                                     <p className="text-[0.625rem] font-extrabold text-white/40 uppercase tracking-widest line-clamp-1">{t('common:phone')}</p>
                                     <p className="text-sm font-bold mt-1">{store.phone || t('notSet')}</p>
                                 </div>

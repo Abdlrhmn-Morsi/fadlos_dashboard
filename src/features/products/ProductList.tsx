@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, Search, Edit, Trash2, Tag, Package, PackageOpen, Star, Eye, ShieldAlert, MoreVertical, Crown } from 'lucide-react';
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
 import clsx from 'clsx';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import productsApi from './api/products.api';
 import categoriesApi from '../categories/api/categories.api';
 import { ConfirmModal } from '../../components/ConfirmModal';
@@ -19,8 +19,10 @@ import { getMySubscriptionUsage } from '../subscriptions/api/subscriptions.api';
 import { useSubscription } from '../../hooks/useSubscription';
 
 const ProductList = () => {
-    const { hasPermission } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const storeId = searchParams.get('storeId');
+    const { user, hasPermission, hasAdminPermission } = useAuth();
     const { t } = useTranslation(['products', 'common']);
     const { isRTL } = useLanguage();
     const { getCache, setCache, invalidateCache } = useCache();
@@ -44,6 +46,9 @@ const ProductList = () => {
 
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>(null);
+
+    const [statusToggleItem, setStatusToggleItem] = useState<any>(null);
+    const isSystemAdmin = user?.role === 'admin' || user?.role === 'super_admin';
 
     useEffect(() => {
         const timer = setTimeout(() => {
@@ -107,7 +112,9 @@ const ProductList = () => {
             }
 
             // Fetch from API if not cached
-            const data: any = await productsApi.getSellerProducts(params);
+            const data: any = storeId 
+                ? await productsApi.getStoreProducts({ ...params, storeId })
+                : await productsApi.getSellerProducts(params);
 
             if (data && data.data) {
                 setProducts(data.data);
@@ -160,6 +167,21 @@ const ProductList = () => {
         }
     };
 
+    const confirmStatusToggle = async () => {
+        if (!statusToggleItem) return;
+        try {
+            await productsApi.toggleStatus(statusToggleItem.id, !statusToggleItem.isActive);
+            toast.success(t('common:success', { defaultValue: 'Status updated via toggle' }));
+            setProducts(prevProducts => prevProducts.map(p => p.id === statusToggleItem.id ? { ...p, isActive: !statusToggleItem.isActive } : p));
+            invalidateCache('products');
+        } catch (error: any) {
+            console.error('Failed to update status', error);
+            toast.error(t('common:error', { defaultValue: 'Failed to update status' }));
+        } finally {
+            setStatusToggleItem(null);
+        }
+    };
+
     return (
         <div className="p-6 max-w-full mx-auto space-y-6">
             {/* Header Section */}
@@ -172,7 +194,7 @@ const ProductList = () => {
                         {t('subtitle')}
                     </p>
                 </div>
-                {hasPermission(Permissions.PRODUCTS_CREATE) && (
+                {hasPermission(Permissions.PRODUCTS_CREATE) && !storeId && (
                     usage && usage.limits.products !== -1 && products.length >= usage.limits.products ? (
                         <button
                             onClick={() => navigate('/subscription')}
@@ -497,7 +519,13 @@ const ProductList = () => {
                                                             <MenuItem>
                                                                 {({ focus }) => (
                                                                     <button
-                                                                        onClick={() => navigate(`/products/edit/${product.id}`)}
+                                                                        onClick={() => {
+                                                                            if (isSystemAdmin) {
+                                                                                setStatusToggleItem(product);
+                                                                            } else {
+                                                                                navigate(`/products/edit/${product.id}`);
+                                                                            }
+                                                                        }}
                                                                         className={clsx(
                                                                             "w-full px-4 py-2.5 text-sm flex items-center gap-3 transition-colors",
                                                                             focus ? "bg-slate-50 dark:bg-slate-700/50" : "",
@@ -505,13 +533,13 @@ const ProductList = () => {
                                                                         )}
                                                                     >
                                                                         <Edit size={16} className="text-slate-400" />
-                                                                        <span className="text-slate-700 dark:text-slate-300 font-medium">{t('common:edit')}</span>
+                                                                        <span className="text-slate-700 dark:text-slate-300 font-medium">{isSystemAdmin ? t('toggleStatus', { defaultValue: 'Toggle Status' }) : t('common:edit')}</span>
                                                                     </button>
                                                                 )}
                                                             </MenuItem>
                                                         )}
 
-                                                        {hasPermission(Permissions.PRODUCTS_DELETE) && (
+                                                        {hasPermission(Permissions.PRODUCTS_DELETE) && !isSystemAdmin && (
                                                             <>
                                                                 <div className="h-px bg-slate-100 dark:bg-slate-700/50 my-1 mx-3" />
                                                                 <MenuItem>
@@ -556,6 +584,14 @@ const ProductList = () => {
                 message={t('deleteConfirmation')}
                 onConfirm={confirmDelete}
                 onCancel={() => setConfirmOpen(false)}
+            />
+
+            <ConfirmModal
+                isOpen={!!statusToggleItem}
+                title={t('toggleStatus', { defaultValue: 'Toggle Status' })}
+                message={t('statusToggleConfirmation', { defaultValue: 'Are you sure you want to toggle the active status of this item?' })}
+                onConfirm={confirmStatusToggle}
+                onCancel={() => setStatusToggleItem(null)}
             />
         </div>
     );

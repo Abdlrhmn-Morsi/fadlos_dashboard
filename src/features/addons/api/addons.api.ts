@@ -31,6 +31,13 @@ export const addonsApi = {
     },
 
     /**
+     * Toggle addon active status
+     */
+    toggleStatus: async (id: string, isActive: boolean) => {
+        return apiService.patch(`/addons/${id}/toggle-status`, { isActive });
+    },
+
+    /**
      * Delete an addon
      */
     deleteAddon: async (id: string) => {

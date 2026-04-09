@@ -195,5 +195,6 @@
     "adjustFilters": "Try adjusting your search or filters",
     "showingItems": "Showing {{from}} to {{to}} of {{total}} results",
     "store": "Store",
+    "globalContent": "Store Content",
     "revenue": "Revenue"
 }
