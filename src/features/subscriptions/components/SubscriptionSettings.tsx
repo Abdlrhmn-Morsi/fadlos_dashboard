@@ -31,6 +31,11 @@ const SubscriptionSettings = () => {
     const [redeemingState, setRedeemingState] = useState(false);
     const [paddleWarningOpen, setPaddleWarningOpen] = useState(false);
 
+    // Code-to-Paddle Transition State
+    const [transitionModalType, setTransitionModalType] = useState<'none' | 'warning' | 'blocked' | 'downgrade'>('none');
+    const [pendingPlanId, setPendingPlanId] = useState<string | null>(null);
+    const [remainingDays, setRemainingDays] = useState<number>(0);
+
     useEffect(() => {
         fetchSubscriptionData();
     }, []);
@@ -60,13 +65,50 @@ const SubscriptionSettings = () => {
         // BUT, if it's in a grace period or scheduled to be cancelled, we want to RENEW (re-subscribe).
         const isEligibleForRenewal = usage?.plan === planId && (usage?.isGracePeriod || usage?.cancelAtPeriodEnd);
         
+        // Transition Guard for Code-Based Subscriptions
+        if (usage?.paddleSubscriptionId === 'code-based' && usage?.currentPeriodEnd) {
+            const now = new Date();
+            const expiry = new Date(usage.currentPeriodEnd);
+            const diffTime = expiry.getTime() - now.getTime();
+            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+            if (diffDays > 7) {
+                setRemainingDays(diffDays);
+                
+                // Define plan priority to detect downgrades
+                const planPriority: Record<string, number> = { 'free': 0, 'pro': 1, 'premium': 2 };
+                const currentPlanPriority = planPriority[usage.plan] || 0;
+                const targetPlanPriority = planPriority[planId] || 0;
+                
+                if (planId === usage.plan) {
+                    // Change from 'blocked' to 'warning' (or a specific same-tier warning)
+                    // We'll use 'warning' but with logic to show a specific message
+                    setTransitionModalType('warning');
+                    setPendingPlanId(planId);
+                    return;
+                } else if (planId !== 'free') {
+                    // If target is lower than current, it's a downgrade
+                    if (targetPlanPriority < currentPlanPriority) {
+                        setTransitionModalType('downgrade');
+                    } else {
+                        setTransitionModalType('warning');
+                    }
+                    setPendingPlanId(planId);
+                    return;
+                }
+            }
+        }
+
         if (planId === usage?.plan && !isEligibleForRenewal) {
             setCancelModalOpen(true);
             return;
         }
 
-        setProcessingId(planId);
+        await executeCheckout(planId);
+    };
 
+    const executeCheckout = async (planId: string) => {
+        setProcessingId(planId);
         try {
             const session = await createCheckoutSession(planId, billingCycle);
 
@@ -75,12 +117,13 @@ const SubscriptionSettings = () => {
             } else {
                 toast.error(t('subscriptions:checkoutError', { defaultValue: 'Failed to initialize checkout session' }));
             }
-
         } catch (error) {
             console.error('Checkout error:', error);
             toast.error(t('subscriptions:checkoutError', { defaultValue: 'Could not initialize checkout' }));
         } finally {
             setProcessingId(null);
+            setTransitionModalType('none');
+            setPendingPlanId(null);
         }
     };
 
@@ -552,6 +595,49 @@ const SubscriptionSettings = () => {
                 onConfirm={() => submitRedeemCode(true)}
                 confirmText={t('subscriptions:codes.redeem.paddleWarningConfirm')}
                 isLoading={redeemingState}
+            />
+
+            {/* Code-to-Paddle Transition Warning (Upgrade or Same-Tier) */}
+            <StatusModal
+                isOpen={transitionModalType === 'warning'}
+                onClose={() => setTransitionModalType('none')}
+                type="confirm"
+                title={pendingPlanId === usage?.plan 
+                    ? t('subscriptions:codes.transition.switchTitle') 
+                    : t('subscriptions:codes.transition.warningTitle')
+                }
+                message={pendingPlanId === usage?.plan
+                    ? t('subscriptions:codes.transition.switchMessage', {
+                        days: remainingDays,
+                        date: usage?.currentPeriodEnd ? new Date(usage.currentPeriodEnd).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+                    })
+                    : t('subscriptions:codes.transition.warningMessage', {
+                        days: remainingDays,
+                        plan: pendingPlanId === 'pro' ? (isRTL ? 'برو' : 'Pro') : (isRTL ? 'بريميوم' : 'Premium'),
+                        date: usage?.currentPeriodEnd ? new Date(usage.currentPeriodEnd).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+                    })
+                }
+                onConfirm={() => pendingPlanId && executeCheckout(pendingPlanId)}
+                confirmText={pendingPlanId === usage?.plan 
+                    ? t('subscriptions:codes.transition.proceedToSwitch') 
+                    : t('subscriptions:codes.transition.proceedToUpgrade')
+                }
+            />
+
+            {/* Code-to-Paddle Transition Downgrade */}
+            <StatusModal
+                isOpen={transitionModalType === 'downgrade'}
+                onClose={() => setTransitionModalType('none')}
+                type="confirm"
+                title={t('subscriptions:codes.transition.downgradeTitle')}
+                message={t('subscriptions:codes.transition.downgradeMessage', {
+                    days: remainingDays,
+                    currentPlan: usage?.plan === 'premium' ? (isRTL ? 'بريميوم' : 'Premium') : (isRTL ? 'برو' : 'Pro'),
+                    targetPlan: pendingPlanId === 'pro' ? (isRTL ? 'برو' : 'Pro') : (isRTL ? 'بريميوم' : 'Premium'),
+                    date: usage?.currentPeriodEnd ? new Date(usage.currentPeriodEnd).toLocaleDateString(isRTL ? 'ar-EG' : 'en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : ''
+                })}
+                onConfirm={() => pendingPlanId && executeCheckout(pendingPlanId)}
+                confirmText={t('subscriptions:codes.transition.proceedToDowngrade')}
             />
         </div>
     );

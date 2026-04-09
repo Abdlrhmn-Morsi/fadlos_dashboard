@@ -32,6 +32,7 @@ export interface SubscriptionUsage {
     allAvailableFeatures: string[];
     limits: Record<string, number>;
     usage: Record<string, number>;
+    paddleSubscriptionId: string | null;
 }
 
 export const getPlans = async (): Promise<Plan[]> => {

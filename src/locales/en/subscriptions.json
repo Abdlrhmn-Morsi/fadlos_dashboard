@@ -399,14 +399,30 @@
             "paddleWarningConfirm": "Yes, Replace My Subscription",
             "paddleWarningCancel": "Cancel",
             "errors": {
-                "invalidSubscriptionCode": "Invalid subscription code. Please check and try again.",
+                "invalidSubscriptionCode": "Invalid subscription code.",
                 "subscriptionCodeExpired": "This code has expired.",
-                "subscriptionCodeRevoked": "This code has been revoked.",
-                "subscriptionCodeFullyUsed": "This code has reached its maximum number of uses.",
+                "subscriptionCodeRevoked": "This code has been deactivated.",
+                "subscriptionCodeFullyUsed": "This code has reached its usage limit.",
                 "storeAlreadyUsedThisCode": "Your store has already used this code.",
-                "activeCodeSubscriptionExists": "You already have an active code-based subscription. Wait until it expires or cancel it first.",
-                "paddleCancellationFailed": "We could not securely cancel your existing billing provider. Please try again or contact support."
+                "activeCodeSubscriptionExists": "You already have an active subscription from a code.",
+                "paddleCancellationFailed": "Failed to cancel your current Paddle subscription. Please contact support."
             }
+        },
+        "transition": {
+            "warningTitle": "Continue to Upgrade?",
+            "downgradeTitle": "Confirm Downgrade & Switch?",
+            "switchTitle": "Switch to Paid Plan Now?",
+            "switchConfirmTitle": "Confirm Switch to Paid",
+            "warningMessage": "You have {{days}} days left on your free subscription code (expires on {{date}}). Switching to the {{plan}} plan now will start your paid billing immediately and replace your remaining free time.",
+            "downgradeMessage": "You have {{days}} days left on your free Premium subscription (expires on {{date}}). Switching to the Pro plan now will immediately reduce your limits, remove premium features, and start your paid billing. Your free period will be overridden.",
+            "switchMessage": "You still have {{days}} days left on your free period (expires on {{date}}). If you switch to paid now, you will lose these free days and your billing cycle starts immediately. Do you want to proceed?",
+            "switchConfirmMessage": "Are you sure you want to switch to the {{plan}} plan now? You will lose your remaining {{days}} days of free access, and your paid billing cycle will begin immediately.",
+            "blockedTitle": "Subscription Code Active",
+            "blockedMessage": "You currently have a free {{plan}} plan via a code until {{date}}. To avoid losing your free time, you can renew this plan starting 7 days before it expires.",
+            "proceedToUpgrade": "Yes, Upgrade Now",
+            "proceedToDowngrade": "Yes, Downgrade Now",
+            "proceedToSwitch": "Yes, Switch to Paid",
+            "waitForExpiry": "Wait for Expiration"
         }
     }
 }

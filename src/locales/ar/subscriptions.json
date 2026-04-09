@@ -399,14 +399,28 @@
             "paddleWarningConfirm": "نعم، استبدل اشتراكي",
             "paddleWarningCancel": "تراجع",
             "errors": {
-                "invalidSubscriptionCode": "كود اشتراك غير صحيح. يرجى التحقق والمحاولة مرة أخرى.",
-                "subscriptionCodeExpired": "هذا الكود منتهي الصلاحية.",
-                "subscriptionCodeRevoked": "تم إلغاء هذا الكود.",
-                "subscriptionCodeFullyUsed": "وصل هذا الكود إلى الحد الأقصى لعدد الاستخدامات.",
-                "storeAlreadyUsedThisCode": "متجرك استخدم هذا الكود بالفعل.",
-                "activeCodeSubscriptionExists": "لديك اشتراك نشط بالفعل عبر كود. انتظر حتى ينتهي أو قم بإلغائه أولاً.",
-                "paddleCancellationFailed": "لم نتمكن من إلغاء مزود الفوترة الحالي الخاص بك بأمان. يرجى المحاولة مرة أخرى أو الاتصال بالدعم."
+                "invalidSubscriptionCode": "كود الاشتراك غير صالح.",
+                "subscriptionCodeExpired": "انتهت صلاحية هذا الكود.",
+                "subscriptionCodeRevoked": "تم إلغاء تفعيل هذا الكود.",
+                "subscriptionCodeFullyUsed": "وصل هذا الكود إلى حد الاستخدام الأقصى.",
+                "storeAlreadyUsedThisCode": "لقد استخدم متجرك هذا الكود بالفعل.",
+                "activeCodeSubscriptionExists": "لديك اشتراك نشط بالفعل عبر كود.",
+                "paddleCancellationFailed": "فشل إلغاء اشتراك Paddle الحالي. يرجى التواصل مع الدعم."
             }
+        },
+        "transition": {
+            "warningTitle": "الاستمرار في الترقية؟",
+            "downgradeTitle": "تأكيد التنزيل والتبديل؟",
+            "switchTitle": "التبديل إلى اشتراك مدفوع الآن؟",
+            "blockedTitle": "كود الاشتراك نشط",
+            "warningMessage": "يتبقى لك {{days}} أيام في كود الاشتراك المجاني (ينتهي في {{date}}). الانتقال إلى خطة {{plan}} الآن سيبدأ الفوترة المدفوعة فوراً وسيحل محل وقتك المجاني المتبقي.",
+            "downgradeMessage": "يتبقى لك {{days}} أيام في اشتراك {{currentPlan}} المجاني (ينتهي في {{date}}). الانتقال إلى {{targetPlan}} الآن سيؤدي فوراً إلى تقليل حدودك، وإزالة الميزات الممتازة، وبدء الفوترة المدفوعة. سيتم استبدال فترتك المجانية.",
+            "switchMessage": "لا يزال لديك {{days}} أيام متبقية في فترتك المجانية (تنتهي في {{date}}). إذا قمت بالتبديل إلى المدفوع الآن، فستفقد هذه الأيام المجانية وستبدأ دورة الفوترة الخاصة بك على الفور. هل تريد الاستمرار؟",
+            "blockedMessage": "لديك حالياً خطة {{plan}} مجانية عبر كود حتى {{date}}. لتجنب فقدان وقتك المجاني، يمكنك تجديد هذه الخطة قبل 7 أيام من انتهاء صلاحيتها.",
+            "proceedToUpgrade": "نعم، قم بالترقية الآن",
+            "proceedToDowngrade": "نعم، قم بالتنزيل الآن",
+            "proceedToSwitch": "نعم، قم بالتبديل إلى المدفوع",
+            "waitForExpiry": "الانتظار حتى انتهاء الصلاحية"
         }
     }
 }
