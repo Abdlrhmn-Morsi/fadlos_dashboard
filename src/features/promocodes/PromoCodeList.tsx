@@ -181,15 +181,15 @@ const PromoCodeList = () => {
             {/* List Table */}
             <div className="bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
-                    <table className="w-full text-left border-collapse">
+                    <table className="w-full text-start border-collapse">
                         <thead>
                             <tr className="bg-slate-50/50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right rtl:text-right ltr:text-left">{t('campaign')}</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right rtl:text-right ltr:text-left">{t('discount')}</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right rtl:text-right ltr:text-left">{t('validityPeriod')}</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right rtl:text-right ltr:text-left">{t('performance')}</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-right rtl:text-right ltr:text-left">{t('status')}</th>
-                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider flex justify-end">{t('actions')}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-start">{t('campaign')}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-start">{t('discount')}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-start">{t('validityPeriod')}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-start">{t('performance')}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-start">{t('status')}</th>
+                                <th className="px-6 py-4 text-xs font-bold text-slate-500 uppercase tracking-wider text-end">{t('actions')}</th>
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
@@ -262,7 +262,7 @@ const PromoCodeList = () => {
                                                 <div className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 font-medium">
                                                     <Calendar size={12} />
                                                     <span>{promo.startsAt ? new Date(promo.startsAt).toLocaleDateString() : t('immediate')}</span>
-                                                    <span className="text-slate-300">→</span>
+                                                    <span className="text-slate-300 mx-1">{isRTL ? '←' : '→'}</span>
                                                     <span>{promo.expiresAt ? new Date(promo.expiresAt).toLocaleDateString() : t('never')}</span>
                                                 </div>
                                             </div>
