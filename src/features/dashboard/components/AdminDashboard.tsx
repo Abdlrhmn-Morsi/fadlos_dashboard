@@ -109,7 +109,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                 </div>
                 <div className="flex flex-col lg:flex-row flex-wrap gap-4">
                     {hasAdminPermission(AdminPermissions.STORES_VIEW) && (stats.pendingStores || 0) > 0 && (
-                        <div className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-amber-200/60 dark:border-amber-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-amber-300">
+                        <div onClick={() => navigate('/stores')} className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-amber-200/60 dark:border-amber-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-amber-300">
                             <div className="flex items-center gap-3">
                                 <Store size={18} className="text-amber-500/80" />
                                 <span className="text-[0.6875rem] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.05em]">{t('dashboard:pendingStores')}</span>
@@ -118,7 +118,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                         </div>
                     )}
                     {hasAdminPermission(AdminPermissions.STORE_VERIFICATION_VIEW) && (stats.pendingStoreVerifications || 0) > 0 && (
-                        <div className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-blue-200/60 dark:border-blue-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-blue-300">
+                        <div onClick={() => navigate('/stores/verification')} className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-blue-200/60 dark:border-blue-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-blue-300">
                             <div className="flex items-center gap-3">
                                 <ShieldCheck size={18} className="text-blue-500/80" />
                                 <span className="text-[0.6875rem] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.05em]">{t('dashboard:pendingStoreVerifications')}</span>
@@ -127,7 +127,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                         </div>
                     )}
                     {hasAdminPermission(AdminPermissions.DRIVER_VERIFICATION_VIEW) && (stats.underReviewDrivers || 0) > 0 && (
-                        <div className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-orange-200/60 dark:border-orange-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-orange-300">
+                        <div onClick={() => navigate('/drivers/verification')} className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-orange-200/60 dark:border-orange-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-orange-300">
                             <div className="flex items-center gap-3">
                                 <Truck size={18} className="text-orange-500/80" />
                                 <span className="text-[0.6875rem] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.05em]">{t('dashboard:underReviewDrivers')}</span>
@@ -136,7 +136,7 @@ const AdminDashboard: React.FC<AdminDashboardProps> = ({ stats }) => {
                         </div>
                     )}
                     {hasAdminPermission(AdminPermissions.REPORTED_REVIEWS_VIEW) && (stats.reportedReviews || 0) > 0 && (
-                        <div className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-rose-200/60 dark:border-rose-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-rose-300">
+                        <div onClick={() => navigate('/reported-reviews')} className="flex-1 min-w-[250px] flex items-center justify-between bg-white dark:bg-slate-900 px-5 py-4 border border-rose-200/60 dark:border-rose-800/40 rounded-none shadow-sm active-push cursor-pointer hover:border-rose-300">
                             <div className="flex items-center gap-3">
                                 <Flag size={18} className="text-rose-500/80" />
                                 <span className="text-[0.6875rem] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-[0.05em]">{t('dashboard:reportedReviews')}</span>
