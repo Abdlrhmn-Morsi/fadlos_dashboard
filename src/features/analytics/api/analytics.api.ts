@@ -61,7 +61,7 @@ export const fetchAllSubscriptions = async (options: {
     endDate?: string;
 }) => {
     const { page = 1, limit = 10, search, plan, billingCycle, startDate, endDate } = options;
-    let url = `/subscriptions/admin/all?page=${page}&limit=${limit}`;
+    let url = `/subscriptions/admin/billing-history?page=${page}&limit=${limit}`;
     if (search) url += `&search=${search}`;
     if (plan && plan !== 'all') url += `&plan=${plan}`;
     if (billingCycle && billingCycle !== 'all') url += `&billingCycle=${billingCycle}`;

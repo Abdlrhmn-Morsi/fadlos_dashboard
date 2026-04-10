@@ -10,7 +10,10 @@ import {
     Store,
     CreditCard,
     Calendar,
-    ArrowUpDown
+    ArrowUpDown,
+    CheckCircle2,
+    XCircle,
+    RotateCcw
 } from 'lucide-react';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { useLanguage } from '../../../contexts/LanguageContext';
@@ -31,7 +34,7 @@ function useDebounce<T extends (...args: any[]) => any>(callback: T, delay: numb
 }
 
 const AdminBillingTransactions: React.FC = () => {
-    const { t } = useTranslation(['dashboard', 'common']);
+    const { t } = useTranslation(['dashboard', 'common', 'subscriptions']);
     const { isDark } = useTheme();
     const { isRTL } = useLanguage();
     
@@ -207,6 +210,10 @@ const AdminBillingTransactions: React.FC = () => {
                         <option value="all">{t('dashboard:allCycles')}</option>
                         <option value="monthly">{t('dashboard:monthly')}</option>
                         <option value="yearly">{t('dashboard:yearly')}</option>
+                        <option value="1_months">{t('dashboard:1_months')}</option>
+                        <option value="3_months">{t('dashboard:3_months')}</option>
+                        <option value="6_months">{t('dashboard:6_months')}</option>
+                        <option value="12_months">{t('dashboard:12_months')}</option>
                     </select>
                 </div>
 
@@ -259,7 +266,7 @@ const AdminBillingTransactions: React.FC = () => {
                                     {t('dashboard:store')}
                                 </th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
-                                    {t('dashboard:plan')}
+                                    {t('common:plan')}
                                 </th>
                                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
                                     {t('dashboard:cycle')}
@@ -311,23 +318,39 @@ const AdminBillingTransactions: React.FC = () => {
                                                 {t(`dashboard:${item.plan.toLowerCase()}`)}
                                             </span>
                                         </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-slate-600 dark:text-slate-400 capitalize">
+                                        <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium text-slate-600 dark:text-slate-400">
                                             {t(`dashboard:${item.billingCycle.toLowerCase()}`)}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center font-extrabold text-primary">
-                                            {Number(item.amount).toFixed(2)} {t('common:systemCurrency')}
+                                            {Number(item.amount) === 0 && item.paddleTransactionId?.startsWith('code:') ? (
+                                                <span className="px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 text-xs">
+                                                    {t('subscriptions:billingHistory.amountFree')}
+                                                </span>
+                                            ) : (
+                                                <>{Number(item.amount).toFixed(2)} {t('common:systemCurrency')}</>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-slate-500 dark:text-slate-400">
-                                            {new Intl.DateTimeFormat(isRTL ? 'ar' : 'en', { month: 'short', day: '2-digit', year: 'numeric' }).format(new Date(item.createdAt))}
+                                            <div>{new Intl.DateTimeFormat(isRTL ? 'ar' : 'en', { month: 'short', day: '2-digit', year: 'numeric' }).format(new Date(item.createdAt))}</div>
+                                            {item.paddleTransactionId?.startsWith('code:') && (
+                                                <div className="text-[0.625rem] text-emerald-500 font-bold mt-0.5">
+                                                    {t('subscriptions:billingHistory.promoCode')}: {item.paddleTransactionId.split(':')[1]}
+                                                </div>
+                                            )}
                                         </td>
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <span className={clsx(
-                                                "px-2.5 py-1 rounded-lg text-[0.625rem] font-extrabold uppercase",
-                                                item.status === 'active' 
+                                                "inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[0.625rem] font-extrabold uppercase",
+                                                item.status === 'completed' 
                                                     ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400"
+                                                    : item.status === 'refunded'
+                                                    ? "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400"
                                                     : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400"
                                             )}>
-                                                {t(`common:${item.status.toLowerCase()}`)}
+                                                {item.status === 'completed' && <CheckCircle2 size={12} />}
+                                                {item.status === 'failed' && <XCircle size={12} />}
+                                                {item.status === 'refunded' && <RotateCcw size={12} />}
+                                                {t(`subscriptions:billingHistory.status_${item.status}`)}
                                             </span>
                                         </td>
                                     </tr>

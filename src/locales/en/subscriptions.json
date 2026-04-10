@@ -308,7 +308,9 @@
         "noHistory": "No billing history found.",
         "status_completed": "Completed",
         "status_failed": "Failed",
-        "status_refunded": "Refunded"
+        "status_refunded": "Refunded",
+        "promoCode": "Promo Code",
+        "amountFree": "FREE"
     },
     "codes": {
         "title": "Subscription Codes",

@@ -145,6 +145,7 @@
     "planDistribution": "توزيع الخطط",
     "recentBillings": "أحدث معاملات الفوترة",
     "billingCycle": "الدورة",
+    "cycle": "الدورة",
     "amount": "المبلغ",
     "platformGrowthTrend": "اتجاه نمو المنصة",
     "last6Months": "المستخدمون والمتاجر والطلبات الجدد خلال الأشهر الست الماضية",
@@ -156,6 +157,10 @@
     "cycleDistribution": "توزيع الاشتراكات بالمدة",
     "monthly": "شهري",
     "yearly": "سنوي",
+    "1_months": "شهر واحد",
+    "3_months": "3 أشهر",
+    "6_months": "6 أشهر",
+    "12_months": "12 شهرًا",
     "plans": {
         "FREE": "مجانية",
         "STARTER": "ستارتر",

@@ -145,6 +145,7 @@
     "planDistribution": "Plan Distribution",
     "recentBillings": "Recent Billing Transactions",
     "billingCycle": "Cycle",
+    "cycle": "Cycle",
     "amount": "Amount",
     "platformGrowthTrend": "Platform Growth Trend",
     "last6Months": "New users, stores, and orders over the last 6 months",
@@ -156,6 +157,10 @@
     "cycleDistribution": "Cycle Distribution",
     "monthly": "Monthly",
     "yearly": "Yearly",
+    "1_months": "1 Month",
+    "3_months": "3 Months",
+    "6_months": "6 Months",
+    "12_months": "12 Months",
     "plans": {
         "FREE": "Free",
         "STARTER": "Starter",
