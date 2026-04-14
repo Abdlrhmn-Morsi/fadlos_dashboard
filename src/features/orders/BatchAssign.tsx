@@ -827,7 +827,7 @@ const BatchAssign: React.FC = () => {
                             disabled={dispatching || selectedOrderIds.length === 0 || driver.isOverLimit}
                             className={clsx(
                               "p-3 rounded-xl transition-all duration-200",
-                              selectedOrderIds.length > 0
+                              (selectedOrderIds.length > 0 && !driver.isOverLimit)
                                 ? isNextInTurn
                                   ? "bg-primary text-white hover:scale-110 shadow-lg shadow-primary/20"
                                   : "bg-slate-900 dark:bg-slate-200 text-white dark:text-slate-900 hover:scale-110"
