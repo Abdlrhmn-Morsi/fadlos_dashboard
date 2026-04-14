@@ -19,7 +19,8 @@ import {
   ExternalLink,
   Store,
   Phone,
-  Mail
+  Mail,
+  ShieldAlert
 } from 'lucide-react';
 import { toast } from '../../utils/toast';
 import { ordersApi } from './api/orders.api';
@@ -792,6 +793,12 @@ const BatchAssign: React.FC = () => {
                               "font-bold text-slate-900 dark:text-white truncate",
                               isRTL ? "pl-16" : "pr-16"
                             )}>{driver.name}</h4>
+                            {driver.isOverLimit && (
+                              <div className="mt-1 flex items-center gap-1.5 text-amber-600 dark:text-amber-400 text-xs font-medium bg-amber-50 dark:bg-amber-900/20 px-3 py-1.5 rounded-lg w-fit">
+                                <ShieldAlert size={14} />
+                                {t('common:notAvailableInPlan', { defaultValue: 'Not available in your current plan' })}
+                              </div>
+                            )}
                             <div className="flex items-center gap-2 mt-1">
                               <span className={clsx(
                                 "text-[0.625rem] px-2 py-0.5 font-bold rounded uppercase",
@@ -817,7 +824,7 @@ const BatchAssign: React.FC = () => {
 
                           <button
                             onClick={() => handleBatchAssign(driver.id, driver.name)}
-                            disabled={dispatching || selectedOrderIds.length === 0}
+                            disabled={dispatching || selectedOrderIds.length === 0 || driver.isOverLimit}
                             className={clsx(
                               "p-3 rounded-xl transition-all duration-200",
                               selectedOrderIds.length > 0
