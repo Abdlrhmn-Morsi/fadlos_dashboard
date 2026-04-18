@@ -59,14 +59,16 @@ export const fetchAllSubscriptions = async (options: {
     billingCycle?: string;
     startDate?: string;
     endDate?: string;
+    storeId?: string;
 }) => {
-    const { page = 1, limit = 10, search, plan, billingCycle, startDate, endDate } = options;
+    const { page = 1, limit = 10, search, plan, billingCycle, startDate, endDate, storeId } = options;
     let url = `/subscriptions/admin/billing-history?page=${page}&limit=${limit}`;
     if (search) url += `&search=${search}`;
     if (plan && plan !== 'all') url += `&plan=${plan}`;
     if (billingCycle && billingCycle !== 'all') url += `&billingCycle=${billingCycle}`;
     if (startDate) url += `&startDate=${startDate}`;
     if (endDate) url += `&endDate=${endDate}`;
+    if (storeId) url += `&storeId=${storeId}`;
     const response = await apiService.get(url);
     return response;
 };

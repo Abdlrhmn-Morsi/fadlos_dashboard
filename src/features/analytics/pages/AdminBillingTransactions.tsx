@@ -33,7 +33,12 @@ function useDebounce<T extends (...args: any[]) => any>(callback: T, delay: numb
     }, [callback, delay]);
 }
 
-const AdminBillingTransactions: React.FC = () => {
+interface AdminBillingTransactionsProps {
+    storeId?: string;
+    compact?: boolean;
+}
+
+const AdminBillingTransactions: React.FC<AdminBillingTransactionsProps> = ({ storeId, compact }) => {
     const { t } = useTranslation(['dashboard', 'common', 'subscriptions']);
     const { isDark } = useTheme();
     const { isRTL } = useLanguage();
@@ -80,7 +85,8 @@ const AdminBillingTransactions: React.FC = () => {
             plan: planFilter,
             billingCycle: cycleFilter,
             startDate,
-            endDate
+            endDate,
+            storeId
         };
         
         if (search) {
@@ -137,11 +143,12 @@ const AdminBillingTransactions: React.FC = () => {
         <div 
             dir={isRTL ? 'rtl' : 'ltr'}
             className={clsx(
-                "p-6 lg:p-10 space-y-8 animate-in fade-in duration-700",
+                compact ? "p-0 space-y-4" : "p-6 lg:p-10 space-y-8 animate-in fade-in duration-700",
                 isRTL ? "text-right" : "text-left"
             )}
         >
             {/* Header */}
+            {!compact && (
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
                     <h1 className="text-3xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight flex items-center gap-3">
@@ -163,9 +170,14 @@ const AdminBillingTransactions: React.FC = () => {
                     {/* Potential CSV export button */}
                 </div>
             </div>
+            )}
 
             {/* Filters Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 bg-white dark:bg-slate-900 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className={clsx(
+                "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 bg-white dark:bg-slate-900",
+                compact ? "p-4" : "p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm"
+            )}>
+                {!compact && (
                 <div className="xl:col-span-2 relative">
                     <Search className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={18} />
                     <input 
@@ -179,6 +191,7 @@ const AdminBillingTransactions: React.FC = () => {
                         )}
                     />
                 </div>
+                )}
 
                 <div className="relative">
                     <Filter className={clsx("absolute top-1/2 -translate-y-1/2 text-slate-400", isRTL ? "right-3" : "left-3")} size={16} />
@@ -257,14 +270,19 @@ const AdminBillingTransactions: React.FC = () => {
             </div>
 
             {/* Table */}
-            <div className="bg-white dark:bg-slate-900 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+            <div className={clsx(
+                "bg-white dark:bg-slate-900 overflow-hidden",
+                compact ? "" : "rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm"
+            )}>
                 <div className="overflow-x-auto">
                     <table className="w-full border-collapse">
                         <thead>
                             <tr className="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-800">
+                                {!compact && (
                                 <th className={clsx("px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider", isRTL ? "text-right" : "text-left")}>
                                     {t('dashboard:store')}
                                 </th>
+                                )}
                                 <th className="px-6 py-4 text-xs font-bold text-slate-400 uppercase tracking-wider text-center">
                                     {t('common:plan')}
                                 </th>
@@ -294,6 +312,7 @@ const AdminBillingTransactions: React.FC = () => {
                             ) : (data?.length ?? 0) > 0 ? (
                                 data.map((item) => (
                                     <tr key={item.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+                                        {!compact && (
                                         <td className="px-6 py-4 whitespace-nowrap">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold overflow-hidden shrink-0">
@@ -310,6 +329,7 @@ const AdminBillingTransactions: React.FC = () => {
                                                 </div>
                                             </div>
                                         </td>
+                                        )}
                                         <td className="px-6 py-4 whitespace-nowrap text-center">
                                             <span className={clsx(
                                                 "px-3 py-1 rounded-full text-[0.6875rem] font-bold border",
