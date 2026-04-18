@@ -681,5 +681,14 @@
     "customRolesFeature": "الأدوار المخصصة",
     "upgradeRequired": "يرجى ترقية باقتك لإضافة المزيد من {{feature}}.",
     "upgradeNow": "ترقية الآن",
-    "newest": "الأحدث"
+    "newest": "الأحدث",
+    "offersLockedUpgradeWarning": "قم بترقية باقتك لتفعيل العروض والخصومات لهذا المنتج.",
+    "premiumFeature": "مميز",
+    "frequentlyBoughtTogetherLocked": "الميزة مقفلة",
+    "frequentlyBoughtTogetherLockedDesc": "قم بترقية باقتك لفتح ميزة \"يُشترى معاً\" وزيادة متوسط قيمة الطلب.",
+    "deleteEmployee": "حذف الموظف",
+    "deactivateEmployee": "تعطيل الموظف",
+    "activateEmployee": "تنشيط الموظف",
+    "deleteEmployeeConfirmation": "هل أنت متأكد أنك تريد حذف هذا الموظف؟",
+    "toggleEmployeeStatusConfirmation": "هل أنت متأكد أنك تريد تغيير حالة هذا الموظف؟"
 }

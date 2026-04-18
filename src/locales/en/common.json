@@ -591,5 +591,14 @@
     "customRolesFeature": "custom roles",
     "upgradeRequired": "Please upgrade your plan to add more {{feature}}.",
     "upgradeNow": "Upgrade Now",
-    "newest": "newest"
+    "newest": "newest",
+    "offersLockedUpgradeWarning": "Upgrade your plan to enable Offers and Discounts for this product.",
+    "premiumFeature": "Premium",
+    "frequentlyBoughtTogetherLocked": "Feature Locked",
+    "frequentlyBoughtTogetherLockedDesc": "Upgrade your plan to unlock \"Frequently Bought Together\" and increase average order value.",
+    "deleteEmployee": "Delete Employee",
+    "deactivateEmployee": "Deactivate Employee",
+    "activateEmployee": "Activate Employee",
+    "deleteEmployeeConfirmation": "Are you sure you want to delete this employee?",
+    "toggleEmployeeStatusConfirmation": "Are you sure you want to change this employee's status?"
 }
